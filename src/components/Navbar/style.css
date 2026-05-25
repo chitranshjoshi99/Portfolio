@@ -116,6 +116,27 @@
   flex-shrink: 0;
 }
 
+/* ── Resume download link ─────────────────────────────────── */
+
+.navbar__resume {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--nivoda-gold);
+  border: var(--px) solid var(--nivoda-gold);
+  padding: var(--px2) var(--px3);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  text-decoration: none;
+  transition:
+    background var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.navbar__resume:hover {
+  background: color-mix(in srgb, var(--nivoda-gold) 12%, transparent);
+  box-shadow: var(--px) var(--px) 0 var(--nivoda-gold);
+}
+
 /* ── Theme Toggle ─────────────────────────────────────────── */
 
 .theme-toggle {
@@ -264,6 +285,10 @@
 
 @media (max-width: 768px) {
   .navbar__links {
+    display: none;
+  }
+
+  .navbar__resume {
     display: none;
   }
 

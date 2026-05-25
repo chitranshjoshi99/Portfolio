@@ -95,6 +95,24 @@
   font-size: 10px;
 }
 
+.btn--resume {
+  background: transparent;
+  color: var(--nivoda-gold);
+  border-color: var(--nivoda-gold);
+  box-shadow: var(--px2) var(--px2) 0 var(--nivoda-gold);
+}
+
+.btn--resume:hover {
+  background: color-mix(in srgb, var(--nivoda-gold) 12%, transparent);
+  color: var(--nivoda-gold);
+  box-shadow: var(--px2) var(--px2) 0 var(--nivoda-gold);
+}
+
+.btn--pressed {
+  transform: translate(2px, 2px);
+  box-shadow: none !important;
+}
+
 /* ── HERO ──────────────────────────────────────────────────── */
 
 .hero {

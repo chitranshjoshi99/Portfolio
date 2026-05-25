@@ -67,8 +67,16 @@ export function Navbar() {
           ))}
         </ul>
 
-        {/* Right side: theme toggle + mobile burger */}
+        {/* Right side: resume download + theme toggle + mobile burger */}
         <div className="navbar__controls">
+          <a
+            href="/resume.pdf"
+            download="ChitranshJoshi-Resume.pdf"
+            className="navbar__resume pixel-text"
+            aria-label="Download resume"
+          >
+            ↓ CV
+          </a>
           <ThemeToggleButton isDark={isDark} onToggle={toggleTheme} />
 
           {/* Mobile hamburger */}
@@ -100,6 +108,15 @@ export function Navbar() {
                 </NavLink>
               </li>
             ))}
+            <li>
+              <a
+                href="/resume.pdf"
+                download="ChitranshJoshi-Resume.pdf"
+                className="navbar__link navbar__link--resume pixel-text"
+              >
+                ↓ RESUME
+              </a>
+            </li>
           </ul>
         </div>
       </nav>

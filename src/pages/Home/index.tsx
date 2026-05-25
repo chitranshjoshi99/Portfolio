@@ -137,6 +137,14 @@ export default function Home() {
                 HIRE ME
               </Link>
               <a
+                href="/resume.pdf"
+                download="ChitranshJoshi-Resume.pdf"
+                className="btn btn--resume pixel-text"
+                aria-label="Download resume PDF"
+              >
+                ↓ RESUME
+              </a>
+              <a
                 href={PERSON.github}
                 target="_blank"
                 rel="noopener noreferrer"
