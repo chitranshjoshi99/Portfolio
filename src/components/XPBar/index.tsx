@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import './XPBar.css'
+import './style.css'
 
 interface XPBarProps {
   label:   string

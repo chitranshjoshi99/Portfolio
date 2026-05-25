@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import './StatCard.css'
+import './style.css'
 
 interface StatCardProps {
   label:  string

@@ -1,0 +1,158 @@
+/* ============================================================
+   JOURNEY PROGRESS — Right-side carousel dots
+   ============================================================ */
+
+.journey-progress {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  z-index: 10;
+}
+
+/* Continuous vertical track line */
+.journey-progress__track {
+  position: absolute;
+  top: 14px;        /* starts at centre of first dot */
+  bottom: 14px;     /* ends at centre of last dot */
+  width: 2px;
+  background: var(--border-primary);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 0;
+}
+
+/* Filled portion grows as you progress */
+.journey-progress__fill {
+  width: 100%;
+  background: var(--accent-primary);
+  transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: absolute;
+  top: 0;
+}
+
+/* Individual dot button */
+.jp-dot {
+  position: relative;
+  z-index: 1;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin: var(--px4) 0;
+}
+
+/* Outer ring */
+.jp-dot__ring {
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--border-primary);
+  transition:
+    border-color 0.3s ease,
+    transform 0.3s ease;
+}
+
+/* Inner fill square (pixel-art: square, not circle) */
+.jp-dot__fill {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: var(--border-primary);
+  transition:
+    background 0.3s ease,
+    transform 0.3s ease;
+}
+
+/* Past — accent colour at reduced opacity */
+.jp-dot--past .jp-dot__ring {
+  border-color: var(--dot-color);
+}
+
+.jp-dot--past .jp-dot__fill {
+  background: var(--dot-color);
+  opacity: 0.45;
+}
+
+/* Active — fully highlighted + slightly scaled */
+.jp-dot--active .jp-dot__ring {
+  border-color: var(--dot-color);
+  transform: scale(1.15);
+}
+
+.jp-dot--active .jp-dot__fill {
+  background: var(--dot-color);
+  transform: scale(1.2);
+}
+
+/* Hover */
+.jp-dot:hover .jp-dot__ring {
+  border-color: var(--dot-color, var(--accent-primary));
+  transform: scale(1.1);
+}
+
+/* Tooltip — slides out to the left on hover / active */
+.jp-dot__tooltip {
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--bg-card);
+  border: var(--px) solid var(--border-primary);
+  box-shadow: var(--px2) var(--px2) 0 var(--border-primary);
+  padding: var(--px2) var(--px3);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Arrow on the right side of the tooltip */
+.jp-dot__tooltip::after {
+  content: '';
+  position: absolute;
+  right: -5px;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  background: var(--bg-card);
+  border-right: var(--px) solid var(--border-primary);
+  border-top: var(--px) solid var(--border-primary);
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.jp-dot:hover .jp-dot__tooltip,
+.jp-dot--active .jp-dot__tooltip {
+  opacity: 1;
+}
+
+.jp-dot__tooltip-name {
+  font-size: 7px;
+  color: var(--dot-color, var(--accent-primary));
+  letter-spacing: 0.06em;
+}
+
+.jp-dot__tooltip-period {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  font-family: var(--font-body);
+}
+
+/* ── Responsive ────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  .journey-progress {
+    display: none;
+  }
+}

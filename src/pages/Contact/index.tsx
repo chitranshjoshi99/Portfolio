@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
-import { PERSON } from '../data/resume'
-import './Contact.css'
+import { PERSON } from '../../data/resume'
+import './style.css'
 
 // ─────────────────────────────────────────────────────────────
 // EMAIL via Formspree (free, no backend needed)

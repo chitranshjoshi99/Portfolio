@@ -1,10 +1,10 @@
 import { useRef, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useTypewriter } from '../hooks/useTypewriter'
-import { StatCard } from '../components/StatCard/StatCard'
-import { XPBar } from '../components/XPBar/XPBar'
-import { PERSON, STATS, SKILLS } from '../data/resume'
-import './Home.css'
+import { useTypewriter } from '../../hooks/useTypewriter'
+import { StatCard } from '../../components/StatCard'
+import { XPBar } from '../../components/XPBar'
+import { PERSON, STATS, SKILLS } from '../../data/resume'
+import './style.css'
 
 // ── Pixel decorations ────────────────────────────────────────
 const PIXEL_DECO = ['◆', '▲', '●', '■', '◇', '△', '○', '□']

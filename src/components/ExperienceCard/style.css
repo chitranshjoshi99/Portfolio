@@ -1,0 +1,284 @@
+/* ============================================================
+   EXPERIENCE CARD COMPONENT
+   ============================================================ */
+
+.exp-card {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  height: 100%;           /* 100% of journey-scroll = 100vh - 56px */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: var(--px8) 0;
+}
+
+/* Tinted overlay per company */
+.exp-card__bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--exp-bg, transparent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+.exp-card--active .exp-card__bg-overlay {
+  opacity: 0.28;
+}
+
+/* Left accent bar */
+.exp-card::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 12%;
+  bottom: 12%;
+  width: 3px;
+  background: var(--exp-accent);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.exp-card--active::after {
+  opacity: 1;
+}
+
+/* Pixel corner accents */
+.exp-card__corner {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-color: var(--exp-accent);
+  border-style: solid;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.exp-card--active .exp-card__corner {
+  opacity: 0.35;
+}
+
+.exp-card__corner--tl {
+  top: var(--px4);
+  left: var(--px4);
+  border-width: 3px 0 0 3px;
+}
+
+.exp-card__corner--br {
+  bottom: var(--px4);
+  right: var(--px4);
+  border-width: 0 3px 3px 0;
+}
+
+/* ── Inner grid ────────────────────────────────────────────── */
+
+.exp-card__inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--px12);
+  align-items: start;
+  position: relative;
+  z-index: 1;
+}
+
+.exp-card__inner--reverse {
+  direction: rtl;
+}
+
+.exp-card__inner--reverse > * {
+  direction: ltr;
+}
+
+/* ── Left panel ───────────────────────────────────────────── */
+
+.exp-panel--left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--px6);
+}
+
+.exp-company__index {
+  font-size: 8px;
+  color: var(--exp-accent);
+  letter-spacing: 0.1em;
+  margin-bottom: var(--px2);
+}
+
+.exp-company__name {
+  font-size: clamp(1.1rem, 3vw, 1.9rem);
+  color: var(--text-primary);
+  margin-bottom: var(--px);
+  transition: color 0.4s ease;
+}
+
+.exp-card--active .exp-company__name {
+  color: var(--exp-accent);
+}
+
+.exp-company__full {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  margin-bottom: var(--px2);
+}
+
+.exp-company__role {
+  font-size: 9px;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+  margin-bottom: var(--px4);
+}
+
+.exp-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--px2);
+  margin-bottom: var(--px4);
+}
+
+.exp-meta__chip {
+  font-size: 7px;
+  padding: var(--px) var(--px3);
+  border: var(--px) solid var(--exp-accent);
+  color: var(--exp-accent);
+  background: var(--exp-accent-dim, transparent);
+  letter-spacing: 0.05em;
+}
+
+.exp-summary {
+  color: var(--text-secondary);
+  font-size: var(--font-size-base);
+  line-height: 1.7;
+}
+
+.exp-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--px2);
+}
+
+.exp-tag {
+  font-size: 7px;
+  padding: 2px var(--px2);
+  border: var(--px) solid var(--border-primary);
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+  letter-spacing: 0.04em;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.exp-card--active .exp-tag:hover {
+  border-color: var(--exp-accent);
+  color: var(--exp-accent);
+}
+
+/* ── Right panel — achievements ────────────────────────────── */
+
+.exp-panel--right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--px4);
+  max-height: calc(100vh - 56px - var(--px16));
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding-right: var(--px2);
+}
+
+.exp-panel--right::-webkit-scrollbar {
+  display: none;
+}
+
+.exp-achievements__title {
+  font-size: 8px;
+  color: var(--exp-accent);
+  letter-spacing: 0.08em;
+  padding-bottom: var(--px2);
+  border-bottom: var(--px) solid var(--border-secondary);
+  flex-shrink: 0;
+}
+
+.exp-achievements {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--px3);
+}
+
+.exp-achievement {
+  display: flex;
+  gap: var(--px3);
+  align-items: flex-start;
+  opacity: 0;
+  transform: translateX(16px);
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+
+.exp-achievement--visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.exp-achievement__icon {
+  font-size: 7px;
+  color: var(--exp-accent);
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+
+.exp-achievement__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.exp-achievement__top {
+  display: flex;
+  align-items: baseline;
+  gap: var(--px3);
+  flex-wrap: wrap;
+}
+
+.exp-achievement__label {
+  font-size: 7px;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.exp-achievement__metric {
+  font-size: 1.4rem;
+  color: var(--exp-accent);
+  line-height: 1;
+  font-weight: 600;
+}
+
+.exp-achievement__text {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ── Responsive ────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  .exp-card__inner,
+  .exp-card__inner--reverse {
+    grid-template-columns: 1fr;
+    direction: ltr;
+  }
+
+  .exp-card {
+    scroll-snap-align: none;
+    height: auto;
+    min-height: 100vh;
+    padding: var(--px8) 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .exp-company__name {
+    font-size: 1.2rem;
+  }
+}

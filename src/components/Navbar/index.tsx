@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { useTheme } from '../../contexts/ThemeContext'
-import './Navbar.css'
+import './style.css'
 
 const NAV_LINKS = [
   { to: '/',        label: '> HOME',    key: 'home' },
