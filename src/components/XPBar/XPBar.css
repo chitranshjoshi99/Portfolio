@@ -1,0 +1,41 @@
+.xp-bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--px);
+}
+
+.xp-bar__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.xp-bar__label {
+  font-size: 8px;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+}
+
+.xp-bar__value {
+  font-size: 8px;
+  color: var(--text-muted);
+}
+
+.xp-bar__track {
+  display: flex;
+  gap: 2px;
+  height: 10px;
+}
+
+.xp-bar__segment {
+  flex: 1;
+  height: 100%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  transition: background var(--transition-base), border-color var(--transition-base);
+}
+
+.xp-bar__segment--filled {
+  background: var(--seg-color, var(--accent-primary));
+  border-color: var(--seg-color, var(--accent-primary));
+}

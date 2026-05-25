@@ -1,0 +1,165 @@
+/* ============================================================
+   DESIGN TOKENS — Pixel Art Portfolio
+   Muted, soothing palette with dark/light theme support
+
+   Company accent inspirations (muted):
+   - Nivoda  → champagne gold  (#C9A96E → muted: #9E8562)
+   - Delhivery → coral red    (#E8472F → muted: #B87A72)
+   - Classplus → soft purple  (#7B5EA7 → muted: #8B7BA8)
+   ============================================================ */
+
+:root {
+  /* ---------- PIXEL GRID ---------- */
+  --px: 4px;           /* 1 pixel unit — scale all pixel-art sizing */
+  --px2: 8px;
+  --px3: 12px;
+  --px4: 16px;
+  --px6: 24px;
+  --px8: 32px;
+  --px12: 48px;
+  --px16: 64px;
+  --px24: 96px;
+
+  /* ---------- FONTS ---------- */
+  --font-pixel:  'Press Start 2P', monospace;   /* headings, labels */
+  --font-vt:     'VT323', monospace;            /* large display numbers / accents */
+  --font-body:   'Inter', sans-serif;           /* readable body copy */
+
+  --font-size-xs:   0.6rem;
+  --font-size-sm:   0.75rem;
+  --font-size-base: 0.875rem;
+  --font-size-md:   1rem;
+  --font-size-lg:   1.25rem;
+  --font-size-xl:   1.5rem;
+  --font-size-2xl:  2rem;
+  --font-size-3xl:  3rem;
+
+  /* ---------- COMPANY ACCENT PALETTE ---------- */
+  --nivoda-gold:      #9E8562;   /* muted champagne — diamond luxury */
+  --nivoda-gold-dim:  #7A6448;
+  --nivoda-bg:        #1C1812;   /* very dark warm brown */
+
+  --delhivery-red:    #B87A72;   /* muted coral — logistics energy */
+  --delhivery-red-dim:#8F5C55;
+  --delhivery-bg:     #1C1212;
+
+  --classplus-purple: #8B7BA8;   /* muted violet — edtech creativity */
+  --classplus-purple-dim: #6B5D88;
+  --classplus-bg:     #14121C;
+
+  /* ---------- NEUTRAL BASE PALETTE ---------- */
+  --slate-50:  #F8F7F5;
+  --slate-100: #EDEAE5;
+  --slate-200: #D8D3CB;
+  --slate-300: #BEB7AC;
+  --slate-400: #9E9690;
+  --slate-500: #7A756E;
+  --slate-600: #5C5852;
+  --slate-700: #3D3A35;
+  --slate-800: #28251F;
+  --slate-850: #1E1B16;
+  --slate-900: #141210;
+  --slate-950: #0C0A08;
+
+  /* ---------- RADIUS (pixel-art = no radius by default) ---------- */
+  --radius-none: 0px;
+  --radius-sm:   2px;  /* subtle for inputs only */
+
+  /* ---------- TRANSITIONS ---------- */
+  --transition-fast:   150ms ease;
+  --transition-base:   250ms ease;
+  --transition-slow:   400ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ---------- SHADOWS (pixel-drop-shadow style) ---------- */
+  --shadow-pixel-sm:  4px 4px 0px var(--shadow-color);
+  --shadow-pixel-md:  6px 6px 0px var(--shadow-color);
+  --shadow-pixel-lg:  8px 8px 0px var(--shadow-color);
+
+  /* ---------- Z-INDEX ---------- */
+  --z-nav:     100;
+  --z-overlay: 200;
+  --z-modal:   300;
+}
+
+/* ============================================================
+   LIGHT THEME
+   ============================================================ */
+[data-theme="light"] {
+  /* Backgrounds */
+  --bg-primary:       #F5F3EF;   /* warm cream */
+  --bg-secondary:     #EDE9E2;   /* slightly darker cream */
+  --bg-card:          #FAF8F4;   /* near-white card */
+  --bg-card-hover:    #F0EDE7;
+  --bg-nav:           rgba(245, 243, 239, 0.92);
+  --bg-code:          #E8E4DC;
+
+  /* Text */
+  --text-primary:     #2A2520;   /* warm near-black */
+  --text-secondary:   #5C5852;   /* muted mid */
+  --text-muted:       #9E9690;
+  --text-inverse:     #F5F3EF;
+
+  /* Borders */
+  --border-primary:   #C8C3BA;
+  --border-secondary: #E0DBD3;
+  --border-accent:    var(--accent-primary);
+
+  /* Accent */
+  --accent-primary:   #7A6E8E;   /* muted purple-slate */
+  --accent-secondary: #9E8562;   /* nivoda gold */
+  --accent-tertiary:  #B87A72;   /* delhivery coral */
+  --accent-glow:      rgba(122, 110, 142, 0.15);
+
+  /* Pixel shadow */
+  --shadow-color:     #C8C3BA;
+  --shadow-dark:      rgba(42, 37, 32, 0.12);
+
+  /* Scrollbar */
+  --scrollbar-track:  #EDE9E2;
+  --scrollbar-thumb:  #C8C3BA;
+
+  /* Cursor / scanline overlay */
+  --scanline-opacity: 0.03;
+}
+
+/* ============================================================
+   DARK THEME
+   ============================================================ */
+[data-theme="dark"] {
+  /* Backgrounds */
+  --bg-primary:       #16141A;   /* deep slate-purple */
+  --bg-secondary:     #1E1B24;
+  --bg-card:          #1A1820;
+  --bg-card-hover:    #22202A;
+  --bg-nav:           rgba(22, 20, 26, 0.92);
+  --bg-code:          #120F18;
+
+  /* Text */
+  --text-primary:     #E8E4DC;   /* warm off-white */
+  --text-secondary:   #A8A2B0;   /* muted lavender-grey */
+  --text-muted:       #6A6570;
+  --text-inverse:     #16141A;
+
+  /* Borders */
+  --border-primary:   #2E2B38;
+  --border-secondary: #231F2E;
+  --border-accent:    var(--accent-primary);
+
+  /* Accent */
+  --accent-primary:   #9B8EA0;   /* muted lilac */
+  --accent-secondary: #C9A96E;   /* nivoda gold — brighter on dark */
+  --accent-tertiary:  #C47A72;   /* delhivery coral */
+  --accent-glow:      rgba(155, 142, 160, 0.12);
+
+  /* Pixel shadow */
+  --shadow-color:     #0A080E;
+  --shadow-dark:      rgba(0, 0, 0, 0.4);
+
+  /* Scrollbar */
+  --scrollbar-track:  #1E1B24;
+  --scrollbar-thumb:  #3A3545;
+
+  /* Cursor / scanline overlay */
+  --scanline-opacity: 0.04;
+}

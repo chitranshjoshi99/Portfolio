@@ -1,0 +1,277 @@
+/* ============================================================
+   NAVBAR — Pixel Art Portfolio
+   ============================================================ */
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-nav);
+  background: var(--bg-nav);
+  border-bottom: var(--px) solid var(--border-primary);
+  transition:
+    background var(--transition-slow),
+    border-color var(--transition-slow),
+    box-shadow var(--transition-slow);
+}
+
+.navbar--scrolled {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 var(--px) 0 var(--border-primary);
+}
+
+.navbar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  gap: var(--px6);
+}
+
+/* ── Logo ─────────────────────────────────────────────────── */
+
+.navbar__logo {
+  font-family: var(--font-pixel);
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  transition: color var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.navbar__logo:hover {
+  color: var(--accent-primary);
+}
+
+.navbar__logo-bracket {
+  color: var(--accent-primary);
+  font-size: var(--font-size-md);
+}
+
+.navbar__logo-name {
+  color: var(--text-primary);
+  transition: color var(--transition-fast);
+}
+
+.navbar__logo:hover .navbar__logo-name {
+  color: var(--accent-secondary);
+}
+
+/* Blinking cursor after logo */
+.navbar__logo-cursor::after {
+  content: '▮';
+  font-size: var(--font-size-xs);
+  color: var(--accent-primary);
+  animation: blink 1s step-end infinite;
+  margin-left: 2px;
+}
+
+/* ── Nav Links ────────────────────────────────────────────── */
+
+.navbar__links {
+  display: flex;
+  align-items: center;
+  gap: var(--px6);
+  list-style: none;
+}
+
+.navbar__link {
+  font-family: var(--font-pixel);
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  padding: var(--px2) var(--px3);
+  border: var(--px) solid transparent;
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+  white-space: nowrap;
+}
+
+.navbar__link:hover {
+  color: var(--accent-primary);
+  border-color: var(--border-primary);
+  background: var(--bg-secondary);
+}
+
+.navbar__link--active {
+  color: var(--accent-primary);
+  border-color: var(--accent-primary);
+  background: var(--accent-glow);
+  box-shadow: var(--px2) var(--px2) 0 var(--accent-primary);
+}
+
+/* ── Controls ─────────────────────────────────────────────── */
+
+.navbar__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--px3);
+  flex-shrink: 0;
+}
+
+/* ── Theme Toggle ─────────────────────────────────────────── */
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--px2);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--text-primary);
+  font-family: var(--font-pixel);
+  font-size: 9px;
+}
+
+.theme-toggle__track {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 44px;
+  height: 20px;
+  background: var(--bg-secondary);
+  border: var(--px) solid var(--border-primary);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.theme-toggle:hover .theme-toggle__track {
+  border-color: var(--accent-primary);
+}
+
+.theme-toggle__icon {
+  position: absolute;
+  font-size: 10px;
+  line-height: 1;
+  transition: opacity var(--transition-base);
+  pointer-events: none;
+}
+
+.theme-toggle__icon--sun {
+  left: 4px;
+  color: var(--accent-secondary);
+  opacity: 1;
+}
+
+.theme-toggle__icon--moon {
+  right: 4px;
+  color: var(--accent-primary);
+  opacity: 1;
+}
+
+.theme-toggle__thumb {
+  position: absolute;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  background: var(--accent-secondary);
+  border-right: var(--px) solid var(--border-primary);
+  transition: transform var(--transition-spring);
+}
+
+.theme-toggle__thumb--dark {
+  transform: translateX(24px);
+  background: var(--accent-primary);
+  border-right: none;
+  border-left: var(--px) solid var(--border-primary);
+}
+
+.theme-toggle__label {
+  color: var(--text-muted);
+  font-size: 8px;
+  min-width: 26px;
+  letter-spacing: 0.05em;
+}
+
+/* ── Burger (mobile) ──────────────────────────────────────── */
+
+.navbar__burger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  width: 32px;
+  height: 32px;
+  padding: 4px;
+  background: none;
+  border: var(--px) solid var(--border-primary);
+  cursor: pointer;
+}
+
+.navbar__burger span {
+  display: block;
+  height: 2px;
+  background: var(--text-primary);
+  transition: transform var(--transition-base), opacity var(--transition-base);
+  transform-origin: center;
+}
+
+.navbar__burger--open span:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+.navbar__burger--open span:nth-child(2) {
+  opacity: 0;
+}
+.navbar__burger--open span:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+/* ── Mobile Menu ──────────────────────────────────────────── */
+
+.navbar__mobile-menu {
+  display: none;
+  position: absolute;
+  top: 56px;
+  left: 0;
+  right: 0;
+  background: var(--bg-nav);
+  border-bottom: var(--px) solid var(--border-primary);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height var(--transition-slow);
+}
+
+.navbar__mobile-menu--open {
+  max-height: 300px;
+}
+
+.navbar__mobile-menu ul {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  padding: var(--px3) var(--px4);
+  gap: var(--px2);
+}
+
+.navbar__mobile-menu .navbar__link {
+  display: block;
+  width: 100%;
+  padding: var(--px3) var(--px4);
+  font-size: 10px;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .navbar__links {
+    display: none;
+  }
+
+  .navbar__burger {
+    display: flex;
+  }
+
+  .navbar__mobile-menu {
+    display: block;
+  }
+}

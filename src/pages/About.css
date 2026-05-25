@@ -1,0 +1,700 @@
+/* ============================================================
+   ABOUT / EXPERIENCE PAGE
+   ============================================================ */
+
+.about-page {
+  padding-top: 56px;
+}
+
+/* ── Intro section ─────────────────────────────────────────── */
+
+.about-intro {
+  padding: var(--px16) 0;
+  border-bottom: var(--px) solid var(--border-primary);
+}
+
+.about-intro__inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--px16);
+  align-items: start;
+}
+
+.about-intro__label {
+  font-size: 8px;
+  color: var(--accent-primary);
+  letter-spacing: 0.08em;
+  margin-bottom: var(--px3);
+}
+
+.about-intro__name {
+  font-size: clamp(0.9rem, 2.5vw, 1.4rem);
+  margin-bottom: var(--px2);
+  line-height: 1.5;
+}
+
+.about-intro__role {
+  font-size: 1.5rem;
+  color: var(--accent-secondary);
+  margin-bottom: var(--px4);
+  letter-spacing: 0.04em;
+}
+
+.about-intro__bio {
+  color: var(--text-secondary);
+  line-height: 1.75;
+  margin-bottom: var(--px6);
+  max-width: 500px;
+}
+
+.edu-card {
+  display: flex;
+  gap: var(--px4);
+  align-items: flex-start;
+  padding: var(--px4);
+  border: var(--px) solid var(--border-primary);
+  background: var(--bg-card);
+  box-shadow: var(--px2) var(--px2) 0 var(--border-primary);
+}
+
+.edu-card__icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.edu-card__degree {
+  font-size: 8px;
+  color: var(--text-primary);
+  letter-spacing: 0.04em;
+  margin-bottom: var(--px);
+  line-height: 1.5;
+}
+
+.edu-card__school {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+.about-intro__stats-title {
+  font-size: 9px;
+  color: var(--accent-primary);
+  letter-spacing: 0.08em;
+  margin-bottom: var(--px4);
+}
+
+.about-stats-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--px4);
+}
+
+/* ── Journey header ────────────────────────────────────────── */
+/* Consistent padding: same side gutters as container, fixed vertical */
+
+.journey-header {
+  border-bottom: var(--px) solid var(--border-primary);
+  background: var(--bg-secondary);
+}
+
+.journey-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--px8);
+  padding-top: var(--px6);
+  padding-bottom: var(--px6);
+  flex-wrap: wrap;
+}
+
+.journey-header__prefix {
+  color: var(--accent-primary);
+}
+
+.journey-header__title {
+  font-size: var(--font-size-sm);
+  letter-spacing: 0.05em;
+  margin-bottom: var(--px);
+}
+
+.journey-header__sub {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ── Company tab navigation ────────────────────────────────── */
+
+.journey-tabs {
+  display: flex;
+  gap: 0;
+  flex-shrink: 0;
+}
+
+.journey-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: var(--px3) var(--px5, 20px);
+  background: var(--bg-card);
+  border: var(--px) solid var(--border-primary);
+  border-right-width: 0;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast);
+  position: relative;
+}
+
+.journey-tab:last-child {
+  border-right-width: var(--px);
+}
+
+.journey-tab::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 0;
+  background: var(--tab-color);
+  transition: height var(--transition-base);
+}
+
+.journey-tab--active {
+  background: var(--bg-secondary);
+}
+
+.journey-tab--active::after {
+  height: 3px;
+}
+
+.journey-tab__num {
+  font-size: 7px;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+
+.journey-tab--active .journey-tab__num {
+  color: var(--tab-color);
+}
+
+.journey-tab__name {
+  font-size: 8px;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+  transition: color var(--transition-fast);
+}
+
+.journey-tab--active .journey-tab__name {
+  color: var(--tab-color);
+}
+
+.journey-tab__period {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  font-family: var(--font-body);
+}
+
+.journey-tab:hover .journey-tab__name {
+  color: var(--tab-color, var(--text-primary));
+}
+
+/* ── Scroll-snap wrapper ───────────────────────────────────── */
+
+.journey-scroll-wrap {
+  position: relative;   /* anchor for the progress dots */
+}
+
+/* ── Scroll container ──────────────────────────────────────── */
+/* Fixed height so each card fills exactly one "screen" */
+
+.journey-scroll {
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
+  /* Full viewport minus the fixed navbar */
+  height: calc(100vh - 56px);
+  scrollbar-width: none;          /* hide native scrollbar — we have our own */
+  -ms-overflow-style: none;
+  scroll-behavior: smooth;
+}
+
+.journey-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Experience Card ───────────────────────────────────────── */
+
+.exp-card {
+  /* Each card fills the container exactly so snap works */
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  height: 100%;                   /* 100% of journey-scroll height = 100vh - 56px */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  /* Consistent vertical padding — same on all cards */
+  padding: var(--px8) 0;
+}
+
+/* Tinted overlay per company */
+.exp-card__bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--exp-bg, transparent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+.exp-card--active .exp-card__bg-overlay {
+  opacity: 0.28;
+}
+
+/* Left accent bar */
+.exp-card::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 12%;
+  bottom: 12%;
+  width: 3px;
+  background: var(--exp-accent);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.exp-card--active::after {
+  opacity: 1;
+}
+
+/* Pixel corner accents */
+.exp-card__corner {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-color: var(--exp-accent);
+  border-style: solid;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.exp-card--active .exp-card__corner {
+  opacity: 0.35;
+}
+
+.exp-card__corner--tl {
+  top: var(--px4);
+  left: var(--px4);
+  border-width: 3px 0 0 3px;
+}
+
+.exp-card__corner--br {
+  bottom: var(--px4);
+  right: var(--px4);
+  border-width: 0 3px 3px 0;
+}
+
+/* ── Inner grid — consistent horizontal padding ──────────── */
+
+.exp-card__inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--px12);
+  align-items: start;
+  position: relative;
+  z-index: 1;
+}
+
+.exp-card__inner--reverse {
+  direction: rtl;
+}
+
+.exp-card__inner--reverse > * {
+  direction: ltr;
+}
+
+/* ── Left panel ───────────────────────────────────────────── */
+
+.exp-panel--left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--px6);
+}
+
+.exp-company__index {
+  font-size: 8px;
+  color: var(--exp-accent);
+  letter-spacing: 0.1em;
+  margin-bottom: var(--px2);
+}
+
+.exp-company__name {
+  font-size: clamp(1.1rem, 3vw, 1.9rem);
+  color: var(--text-primary);
+  margin-bottom: var(--px);
+  transition: color 0.4s ease;
+}
+
+.exp-card--active .exp-company__name {
+  color: var(--exp-accent);
+}
+
+.exp-company__full {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  margin-bottom: var(--px2);
+}
+
+.exp-company__role {
+  font-size: 9px;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+  margin-bottom: var(--px4);
+}
+
+.exp-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--px2);
+  margin-bottom: var(--px4);
+}
+
+.exp-meta__chip {
+  font-size: 7px;
+  padding: var(--px) var(--px3);
+  border: var(--px) solid var(--exp-accent);
+  color: var(--exp-accent);
+  background: var(--exp-accent-dim, transparent);
+  letter-spacing: 0.05em;
+}
+
+.exp-summary {
+  color: var(--text-secondary);
+  font-size: var(--font-size-base);
+  line-height: 1.7;
+}
+
+.exp-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--px2);
+}
+
+.exp-tag {
+  font-size: 7px;
+  padding: 2px var(--px2);
+  border: var(--px) solid var(--border-primary);
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+  letter-spacing: 0.04em;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.exp-card--active .exp-tag:hover {
+  border-color: var(--exp-accent);
+  color: var(--exp-accent);
+}
+
+/* ── Right panel — achievements ────────────────────────────── */
+
+.exp-panel--right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--px4);
+  max-height: calc(100vh - 56px - var(--px16));
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding-right: var(--px2);
+}
+
+.exp-panel--right::-webkit-scrollbar {
+  display: none;
+}
+
+.exp-achievements__title {
+  font-size: 8px;
+  color: var(--exp-accent);
+  letter-spacing: 0.08em;
+  padding-bottom: var(--px2);
+  border-bottom: var(--px) solid var(--border-secondary);
+  flex-shrink: 0;
+}
+
+.exp-achievements {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--px3);
+}
+
+.exp-achievement {
+  display: flex;
+  gap: var(--px3);
+  align-items: flex-start;
+  /* Hidden until card is active */
+  opacity: 0;
+  transform: translateX(16px);
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+
+.exp-achievement--visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.exp-achievement__icon {
+  font-size: 7px;
+  color: var(--exp-accent);
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+
+.exp-achievement__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.exp-achievement__top {
+  display: flex;
+  align-items: baseline;
+  gap: var(--px3);
+  flex-wrap: wrap;
+}
+
+.exp-achievement__label {
+  font-size: 7px;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.exp-achievement__metric {
+  font-size: 1.4rem;
+  color: var(--exp-accent);
+  line-height: 1;
+  font-weight: 600;
+}
+
+.exp-achievement__text {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ============================================================
+   RIGHT-SIDE PROGRESS DOTS
+   ============================================================ */
+
+.journey-progress {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  z-index: 10;
+  /* vertical rhythm = track behind the dots */
+}
+
+/* The continuous vertical line track */
+.journey-progress__track {
+  position: absolute;
+  top: 14px;            /* starts at centre of first dot */
+  bottom: 14px;         /* ends at centre of last dot */
+  width: 2px;
+  background: var(--border-primary);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 0;
+}
+
+/* Filled portion of track (grows as you progress) */
+.journey-progress__fill {
+  width: 100%;
+  background: var(--accent-primary);
+  transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: absolute;
+  top: 0;
+}
+
+/* Individual dot button */
+.jp-dot {
+  position: relative;
+  z-index: 1;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  /* Space between dots */
+  margin: var(--px4) 0;
+}
+
+/* Outer ring (always visible) */
+.jp-dot__ring {
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--border-primary);
+  transition:
+    border-color 0.3s ease,
+    transform 0.3s ease;
+}
+
+/* Inner fill square (pixel-art: square not circle) */
+.jp-dot__fill {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: var(--border-primary);
+  transition:
+    background 0.3s ease,
+    transform 0.3s ease;
+}
+
+/* Past: ring + fill get accent colour */
+.jp-dot--past .jp-dot__ring {
+  border-color: var(--dot-color);
+}
+
+.jp-dot--past .jp-dot__fill {
+  background: var(--dot-color);
+  opacity: 0.45;
+}
+
+/* Active: fully highlighted + slightly scaled */
+.jp-dot--active .jp-dot__ring {
+  border-color: var(--dot-color);
+  transform: scale(1.15);
+}
+
+.jp-dot--active .jp-dot__fill {
+  background: var(--dot-color);
+  transform: scale(1.2);
+}
+
+/* Hover */
+.jp-dot:hover .jp-dot__ring {
+  border-color: var(--dot-color, var(--accent-primary));
+  transform: scale(1.1);
+}
+
+/* Tooltip (shows on hover) */
+.jp-dot__tooltip {
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--bg-card);
+  border: var(--px) solid var(--border-primary);
+  box-shadow: var(--px2) var(--px2) 0 var(--border-primary);
+  padding: var(--px2) var(--px3);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.jp-dot__tooltip::after {
+  content: '';
+  position: absolute;
+  right: -5px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  background: var(--bg-card);
+  border-right: var(--px) solid var(--border-primary);
+  border-top: var(--px) solid var(--border-primary);
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.jp-dot:hover .jp-dot__tooltip,
+.jp-dot--active .jp-dot__tooltip {
+  opacity: 1;
+}
+
+.jp-dot__tooltip-name {
+  font-size: 7px;
+  color: var(--dot-color, var(--accent-primary));
+  letter-spacing: 0.06em;
+}
+
+.jp-dot__tooltip-period {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  font-family: var(--font-body);
+}
+
+/* ── RESPONSIVE ────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  .journey-tabs {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 900px) {
+  .about-intro__inner {
+    grid-template-columns: 1fr;
+  }
+
+  .journey-header__inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--px4);
+  }
+
+  .exp-card__inner,
+  .exp-card__inner--reverse {
+    grid-template-columns: 1fr;
+    direction: ltr;
+  }
+
+  /* On mobile, disable the snap and let it scroll naturally */
+  .journey-scroll {
+    height: auto;
+    overflow-y: visible;
+    scroll-snap-type: none;
+  }
+
+  .exp-card {
+    scroll-snap-align: none;
+    height: auto;
+    min-height: 100vh;
+    padding: var(--px8) 0;
+  }
+
+  .journey-progress {
+    display: none; /* hide progress dots on mobile — they overlap */
+  }
+}
+
+@media (max-width: 600px) {
+  .exp-company__name {
+    font-size: 1.2rem;
+  }
+
+  .journey-tabs {
+    gap: 0;
+    width: 100%;
+  }
+
+  .journey-tab {
+    flex: 1;
+  }
+}
