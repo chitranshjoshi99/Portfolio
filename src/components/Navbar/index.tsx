@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useTheme } from "../../contexts/ThemeContext";
 import "./style.css";
+import { asset } from "@/assets";
 
 const NAV_LINKS = [
   { to: "/", label: "> HOME", key: "home" },
@@ -73,7 +74,7 @@ export function Navbar() {
         {/* Right side: resume download + theme toggle + mobile burger */}
         <div className="navbar__controls">
           <a
-            href="/resume.pdf"
+            href={asset("/resume.pdf")}
             download="ChitranshJoshi-Resume.pdf"
             className="navbar__resume pixel-text"
             aria-label="Download resume"
@@ -115,7 +116,7 @@ export function Navbar() {
             ))}
             <li>
               <a
-                href="/resume.pdf"
+                href={asset("/resume.pdf")}
                 download="ChitranshJoshi-Resume.pdf"
                 className="navbar__link navbar__link--resume pixel-text"
               >

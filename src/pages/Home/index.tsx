@@ -5,6 +5,7 @@ import { StatCard } from "../../components/StatCard";
 import { XPBar } from "../../components/XPBar";
 import { PERSON, STATS, SKILLS } from "../../data/resume";
 import "./style.css";
+import { asset } from "@/assets";
 
 // ── Pixel decorations ────────────────────────────────────────
 const PIXEL_DECO = ["◆", "▲", "●", "■", "◇", "△", "○", "□"];
@@ -155,7 +156,7 @@ export default function Home() {
                 HIRE ME
               </Link>
               <a
-                href="/resume.pdf"
+                href={asset("/resume.pdf")}
                 download="ChitranshJoshi-Resume.pdf"
                 className="btn btn--resume pixel-text"
                 aria-label="Download resume PDF"
@@ -178,7 +179,7 @@ export default function Home() {
             <div className="hero__avatar-frame">
               <div className="hero__avatar-inner">
                 <img
-                  src="/profile.jpeg"
+                  src={asset("/profile.jpeg")}
                   alt={`${PERSON.name} — pixel art avatar`}
                   className="hero__avatar-img"
                   width="240"
