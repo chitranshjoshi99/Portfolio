@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Redirecting...</title>
+    <script>
+      // GitHub Pages SPA redirect — preserves the path for React Router
+      sessionStorage.redirect = location.href;
+      const l = window.location;
+      const repo = "/" + l.pathname.split("/")[1]; // '/Portfolio'
+      l.replace(
+        l.protocol + "//" + l.hostname + (l.port ? ":" + l.port : "") + repo,
+      );
+    </script>
+  </head>
+  <body></body>
+</html>
