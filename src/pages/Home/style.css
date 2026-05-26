@@ -355,7 +355,7 @@
 .hero__scroll-prompt {
   position: absolute;
   bottom: var(--px6);
-  left: 50%;
+
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
@@ -516,6 +516,10 @@
 /* ── RESPONSIVE ────────────────────────────────────────────── */
 
 @media (max-width: 768px) {
+  .hero {
+    padding-bottom: 96px; /* extra room so scroll prompt clears the stacked CTAs */
+  }
+
   .hero__inner {
     grid-template-columns: 1fr;
     gap: var(--px8);
@@ -523,6 +527,7 @@
 
   .hero__avatar-wrap {
     order: -1; /* Avatar first on mobile */
+    align-self: center; /* centre the avatar in single-column layout */
   }
 
   .hero__avatar-frame {
@@ -545,6 +550,11 @@
   .skills-grid {
     grid-template-columns: 1fr;
   }
+
+  /* Scroll prompt: keep it absolute-centred; the extra padding-bottom above gives clearance */
+  .hero__scroll-prompt {
+    bottom: var(--px8);
+  }
 }
 
 @media (max-width: 480px) {
@@ -554,6 +564,7 @@
 
   .hero__ctas {
     flex-direction: column;
+    align-items: stretch; /* full-width buttons on narrow screens */
   }
 
   .btn {

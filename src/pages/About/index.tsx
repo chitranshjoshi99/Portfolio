@@ -5,18 +5,35 @@ import JourneyProgress from "../../components/JourneyProgress";
 import { PERSON, EXPERIENCE, EDUCATION, SKILLS } from "../../data/resume";
 import "./style.css";
 
+// Breakpoint that matches the CSS rule that disables scroll-snap
+const MOBILE_BP = 900;
+
 export default function About() {
   const [activeIdx, setActiveIdx] = useState(0);
   const cardRefs = useRef<(HTMLElement | null)[]>([null, null, null]);
   const journeyRef = useRef<HTMLDivElement>(null);
 
-  // IntersectionObserver — root is the scroll container, not the viewport.
-  // Without root: journeyRef.current the observer never fires inside the
-  // nested scroll box, so activeIdx stays 0 and achievements don't show.
+  // Track whether we're on mobile so we pick the correct IntersectionObserver root.
+  // On desktop the cards live inside a nested scroll container (journeyRef) so we
+  // must pass root: container — otherwise the viewport-root observer never fires.
+  // On mobile scroll-snap is disabled and the document scrolls, so root must be
+  // null (viewport). We listen to matchMedia so it stays correct on resize.
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= MOBILE_BP);
+
+  useEffect(() => {
+    const mq = window.matchMedia(`(max-width: ${MOBILE_BP}px)`);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
   useEffect(() => {
     const container = journeyRef.current;
     if (!container) return;
 
+    // root: null → viewport (mobile, document scroll)
+    // root: container → nested scroll box (desktop)
+    const root = isMobile ? null : container;
     const observers: IntersectionObserver[] = [];
 
     cardRefs.current.forEach((el, i) => {
@@ -25,14 +42,14 @@ export default function About() {
         ([entry]) => {
           if (entry.isIntersecting) setActiveIdx(i);
         },
-        { root: container, threshold: 0.5 },
+        { root, threshold: 0.5 },
       );
       obs.observe(el);
       observers.push(obs);
     });
 
     return () => observers.forEach((o) => o.disconnect());
-  }, []);
+  }, [isMobile]); // rebuild observers whenever mobile/desktop flips
 
   // Scroll within journey-scroll (scrollIntoView scrolls the document, not the container)
   const scrollToCard = (i: number) => {

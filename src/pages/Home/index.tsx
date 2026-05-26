@@ -174,8 +174,8 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Right — profile picture */}
-          <div className="hero__avatar-wrap">
+          {/* Right — profile picture (id="hero-avatar" watched by Navbar) */}
+          <div className="hero__avatar-wrap" id="hero-avatar">
             <div className="hero__avatar-frame">
               <div className="hero__avatar-inner">
                 <img

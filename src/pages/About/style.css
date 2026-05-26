@@ -97,6 +97,10 @@
 .journey-header {
   border-bottom: var(--px) solid var(--border-primary);
   background: var(--bg-secondary);
+  /* Sticky: stays just below the fixed navbar while user scrolls */
+  position: sticky;
+  top: 56px;
+  z-index: 30;
 }
 
 .journey-header__inner {
@@ -104,7 +108,9 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--px8);
-  padding-top: var(--px6);
+  padding-top: var(
+    --px8
+  ); /* ↑ generous top gap so heading clears the rule above */
   padding-bottom: var(--px6);
   flex-wrap: wrap;
 }
@@ -117,6 +123,7 @@
   font-size: var(--font-size-sm);
   letter-spacing: 0.05em;
   margin-bottom: var(--px);
+  margin-top: var(--px2);
 }
 
 .journey-header__sub {

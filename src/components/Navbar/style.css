@@ -53,6 +53,41 @@
   font-size: var(--font-size-md);
 }
 
+/* ── Mini avatar (slides in when hero avatar leaves viewport) ─ */
+
+.navbar__mini-avatar {
+  /* starts hidden, shrunken, to the left of the text */
+  width: 0;
+  height: 28px;
+  overflow: hidden;
+  opacity: 0;
+  transform: scale(0.6) translateX(-6px);
+  transition:
+    width      var(--transition-spring),
+    opacity    var(--transition-base),
+    transform  var(--transition-spring);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.navbar__mini-avatar--visible {
+  width: 32px;      /* expands to show the avatar */
+  opacity: 1;
+  transform: scale(1) translateX(0);
+  margin-right: var(--px2);
+}
+
+.navbar__mini-avatar-img {
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+  border: var(--px) solid var(--accent-primary);
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  flex-shrink: 0;
+}
+
 .navbar__logo-name {
   color: var(--text-primary);
   transition: color var(--transition-fast);

@@ -3,7 +3,7 @@
    ============================================================ */
 
 .contact-page {
-  padding-top: 56px;
+  padding-top: 66px;
   min-height: 100vh;
   display: flex;
   align-items: stretch;
@@ -371,6 +371,7 @@
 @media (max-width: 768px) {
   .contact-inner {
     grid-template-columns: 1fr;
+    padding-top: var(--px16); /* extra breathing room below navbar on mobile */
   }
 
   .contact-info {

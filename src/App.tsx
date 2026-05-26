@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { Navbar } from "./components/Navbar";
+import { ScrollToTop } from "./components/ScrollToTop";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -10,6 +11,7 @@ function App() {
   return (
     <ThemeProvider>
       <BrowserRouter basename="/Portfolio">
+        <ScrollToTop />
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
