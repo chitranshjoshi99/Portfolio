@@ -13,7 +13,7 @@ import './style.css'
 //
 // Until configured, the Email button falls back to mailto:.
 // ─────────────────────────────────────────────────────────────
-const FORMSPREE_ID = ''   // ← paste your Formspree form ID here
+const FORMSPREE_ID = 'xgoqnnlg'   // ← paste your Formspree form ID here
 
 // WhatsApp number (digits only, with country code)
 const WA_NUMBER = '918126196827'
