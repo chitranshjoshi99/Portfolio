@@ -66,7 +66,7 @@ export default function About() {
   };
 
   return (
-    <main className="about-page">
+    <main className="about-page" id="main-content">
       {/* ── Profile intro ──────────────────────────────────── */}
       <section className="about-intro" aria-label="About Chitransh">
         <div className="container about-intro__inner">

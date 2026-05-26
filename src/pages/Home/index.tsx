@@ -75,7 +75,7 @@ export default function Home() {
   };
 
   return (
-    <main className="home-page">
+    <main className="home-page" id="main-content">
       {/* ── HERO ──────────────────────────────────────────── */}
       <section className="hero" aria-label="Introduction">
         {/* Floating pixel decorations */}

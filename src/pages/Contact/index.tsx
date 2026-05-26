@@ -139,7 +139,7 @@ export default function Contact() {
   const isSending = status === "sending";
 
   return (
-    <main className="contact-page">
+    <main className="contact-page" id="main-content">
       <div className="container contact-inner">
         {/* ── Left — info panel ──────────────────────────── */}
         <aside className="contact-info">

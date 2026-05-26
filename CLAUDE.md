@@ -158,6 +158,26 @@ const WA_NUMBER = "918126196827";
 
 ---
 
+## SEO / Social preview
+
+All meta lives in `index.html`. The deployed base URL is hard-coded as
+`https://chitranshjoshi99.github.io/Portfolio` in:
+- `<link rel="canonical">`
+- All `og:url` / `og:image` / `twitter:image` tags
+- The JSON-LD `@id` and `url` fields
+- `public/robots.txt` Sitemap pointer
+- `public/sitemap.xml` `<loc>` entries
+
+**If the domain changes**, do a global find-replace on
+`chitranshjoshi99.github.io/Portfolio` across `index.html`,
+`public/robots.txt`, and `public/sitemap.xml`.
+
+The OG share image is `public/profile.jpeg` (served at `/profile.jpeg`).
+WhatsApp, iMessage, LinkedIn, Twitter/X and Slack all read the OG tags and
+will show the profile photo + name + description as the link preview.
+
+---
+
 ## Commands
 
 ```bash
