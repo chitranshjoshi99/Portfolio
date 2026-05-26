@@ -1,73 +1,77 @@
-import { useRef, useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useTypewriter } from '../../hooks/useTypewriter'
-import { StatCard } from '../../components/StatCard'
-import { XPBar } from '../../components/XPBar'
-import { PERSON, STATS, SKILLS } from '../../data/resume'
-import './style.css'
+import { useRef, useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useTypewriter } from "../../hooks/useTypewriter";
+import { StatCard } from "../../components/StatCard";
+import { XPBar } from "../../components/XPBar";
+import { PERSON, STATS, SKILLS } from "../../data/resume";
+import "./style.css";
 
 // ── Pixel decorations ────────────────────────────────────────
-const PIXEL_DECO = ['◆', '▲', '●', '■', '◇', '△', '○', '□']
+const PIXEL_DECO = ["◆", "▲", "●", "■", "◇", "△", "○", "□"];
 
 function randomDeco(seed: number) {
-  return PIXEL_DECO[seed % PIXEL_DECO.length]
+  return PIXEL_DECO[seed % PIXEL_DECO.length];
 }
 
 // ── Skill category colours ───────────────────────────────────
 const CAT_COLOR: Record<string, string> = {
-  frontend: 'var(--accent-primary)',
-  backend:  'var(--delhivery-red)',
-  data:     'var(--nivoda-gold)',
-  tooling:  'var(--accent-secondary)',
-  testing:  'var(--delhivery-red-dim)',
-  ai:       'var(--classplus-purple)',
-  infra:    'var(--classplus-purple-dim)',
-}
+  frontend: "var(--accent-primary)",
+  backend: "var(--delhivery-red)",
+  data: "var(--nivoda-gold)",
+  tooling: "var(--accent-secondary)",
+  testing: "var(--delhivery-red-dim)",
+  ai: "var(--classplus-purple)",
+  infra: "var(--classplus-purple-dim)",
+};
 
 export default function Home() {
-  const scrollRef  = useRef<HTMLDivElement>(null)
-  const ctaRef     = useRef<HTMLDivElement>(null)
-  const ctaBtnRef  = useRef<HTMLAnchorElement>(null)
-  const [ctaInView, setCtaInView]   = useState(false)
-  const [ctaPressed, setCtaPressed] = useState(false)
-  const navigate = useNavigate()
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
+  const ctaBtnRef = useRef<HTMLAnchorElement>(null);
+  const [ctaInView, setCtaInView] = useState(false);
+  const [ctaPressed, setCtaPressed] = useState(false);
+  const navigate = useNavigate();
 
   // Track when the "PRESS START" screen enters the viewport
   useEffect(() => {
-    const el = ctaRef.current
-    if (!el) return
+    const el = ctaRef.current;
+    if (!el) return;
     const obs = new IntersectionObserver(
       ([entry]) => setCtaInView(entry.isIntersecting),
-      { threshold: 0.6 }
-    )
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [])
+      { threshold: 0.6 },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   // ENTER key fires the button when CTA is in view
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key !== 'Enter' || !ctaInView || ctaPressed) return
-      e.preventDefault()
-      setCtaPressed(true)
+      if (e.key !== "Enter" || !ctaInView || ctaPressed) return;
+      e.preventDefault();
+      setCtaPressed(true);
       // Brief visual "press" before navigating
-      setTimeout(() => navigate('/about'), 320)
-    }
-    window.addEventListener('keydown', handleKey)
-    return () => window.removeEventListener('keydown', handleKey)
-  }, [ctaInView, ctaPressed, navigate])
+      setTimeout(() => navigate("/about"), 320);
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [ctaInView, ctaPressed, navigate]);
 
   // Typewriter for the hero role line
-  const { displayed: typedRole, done: roleDone } =
-    useTypewriter(PERSON.tagline, { delay: 800, speed: 50 })
+  const { displayed: typedRole, done: roleDone } = useTypewriter(
+    PERSON.tagline,
+    { delay: 800, speed: 50 },
+  );
 
   // Secondary typewriter for location
-  const { displayed: typedLoc } =
-    useTypewriter(`// ${PERSON.location}`, { delay: 2200, speed: 40 })
+  const { displayed: typedLoc } = useTypewriter(`// ${PERSON.location}`, {
+    delay: 2200,
+    speed: 40,
+  });
 
   const scrollDown = () => {
-    scrollRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
     <main className="home-page">
@@ -79,12 +83,14 @@ export default function Home() {
             <span
               key={i}
               className="hero__deco-dot"
-              style={{
-                '--deco-x':     `${8 + (i * 7.7) % 88}%`,
-                '--deco-y':     `${5 + (i * 11.3) % 85}%`,
-                '--deco-delay': `${(i * 0.4) % 3}s`,
-                '--deco-dur':   `${2.5 + (i * 0.3) % 2}s`,
-              } as React.CSSProperties}
+              style={
+                {
+                  "--deco-x": `${8 + ((i * 7.7) % 88)}%`,
+                  "--deco-y": `${5 + ((i * 11.3) % 85)}%`,
+                  "--deco-delay": `${(i * 0.4) % 3}s`,
+                  "--deco-dur": `${2.5 + ((i * 0.3) % 2)}s`,
+                } as React.CSSProperties
+              }
             >
               {randomDeco(i)}
             </span>
@@ -101,8 +107,12 @@ export default function Home() {
 
             {/* Name */}
             <h1 className="hero__name pixel-text">
-              {PERSON.name.split(' ').map((word, i) => (
-                <span key={i} className="hero__name-word" style={{ animationDelay: `${0.1 + i * 0.15}s` }}>
+              {PERSON.name.split(" ").map((word, i) => (
+                <span
+                  key={i}
+                  className="hero__name-word"
+                  style={{ animationDelay: `${0.1 + i * 0.15}s` }}
+                >
                   {word}
                 </span>
               ))}
@@ -110,9 +120,13 @@ export default function Home() {
 
             {/* Role — typewriter */}
             <p className="hero__role pixel-text">
-              <span className="hero__role-prefix">{'>'}</span>{' '}
+              <span className="hero__role-prefix">{">"}</span>{" "}
               <span className="hero__role-text">{typedRole}</span>
-              {!roleDone && <span className="hero__cursor" aria-hidden="true">▮</span>}
+              {!roleDone && (
+                <span className="hero__cursor" aria-hidden="true">
+                  ▮
+                </span>
+              )}
             </p>
 
             {/* Location — secondary typewriter */}
@@ -124,8 +138,12 @@ export default function Home() {
             {/* Years badge */}
             <div className="hero__badges">
               <span className="hero__badge pixel-text">LVL 5+ EXP</span>
-              <span className="hero__badge hero__badge--gold pixel-text">REACT MASTER</span>
-              <span className="hero__badge hero__badge--purple pixel-text">AI ADOPTER</span>
+              <span className="hero__badge hero__badge--gold pixel-text">
+                REACT MASTER
+              </span>
+              <span className="hero__badge hero__badge--purple pixel-text">
+                AI ADOPTER
+              </span>
             </div>
 
             {/* CTA buttons */}
@@ -168,10 +186,30 @@ export default function Home() {
                 />
               </div>
               {/* Corner decorations */}
-              <span className="hero__corner hero__corner--tl pixel-text" aria-hidden="true">┌</span>
-              <span className="hero__corner hero__corner--tr pixel-text" aria-hidden="true">┐</span>
-              <span className="hero__corner hero__corner--bl pixel-text" aria-hidden="true">└</span>
-              <span className="hero__corner hero__corner--br pixel-text" aria-hidden="true">┘</span>
+              <span
+                className="hero__corner hero__corner--tl pixel-text"
+                aria-hidden="true"
+              >
+                ┌
+              </span>
+              <span
+                className="hero__corner hero__corner--tr pixel-text"
+                aria-hidden="true"
+              >
+                ┐
+              </span>
+              <span
+                className="hero__corner hero__corner--bl pixel-text"
+                aria-hidden="true"
+              >
+                └
+              </span>
+              <span
+                className="hero__corner hero__corner--br pixel-text"
+                aria-hidden="true"
+              >
+                ┘
+              </span>
             </div>
 
             {/* Status card below avatar */}
@@ -183,20 +221,32 @@ export default function Home() {
         </div>
 
         {/* Scroll prompt */}
-        <button className="hero__scroll-prompt" onClick={scrollDown} aria-label="Scroll to stats">
+        <button
+          className="hero__scroll-prompt"
+          onClick={scrollDown}
+          aria-label="Scroll to stats"
+        >
           <span className="pixel-text">SCROLL</span>
-          <span className="hero__scroll-arrow" aria-hidden="true">▼</span>
+          <span className="hero__scroll-arrow" aria-hidden="true">
+            ▼
+          </span>
         </button>
       </section>
 
       {/* ── STATS ─────────────────────────────────────────── */}
-      <section className="stats-section" ref={scrollRef} aria-label="Performance metrics">
+      <section
+        className="stats-section"
+        ref={scrollRef}
+        aria-label="Performance metrics"
+      >
         <div className="container">
           <h2 className="section-title pixel-text">
             <span className="section-title__prefix">// </span>
             IMPACT.log
           </h2>
-          <p className="section-subtitle">Real metrics from real production systems.</p>
+          <p className="section-subtitle">
+            Real metrics from real production systems.
+          </p>
 
           <div className="stats-grid">
             {STATS.map((s, i) => (
@@ -208,10 +258,13 @@ export default function Home() {
                 pct={s.pct}
                 unit={s.unit}
                 color={
-                  i === 0 ? 'var(--nivoda-gold)' :
-                  i === 1 ? 'var(--delhivery-red)' :
-                  i === 2 ? 'var(--classplus-purple)' :
-                            'var(--accent-primary)'
+                  i === 0
+                    ? "var(--nivoda-gold)"
+                    : i === 1
+                      ? "var(--delhivery-red)"
+                      : i === 2
+                        ? "var(--classplus-purple)"
+                        : "var(--accent-primary)"
                 }
                 delay={i * 100}
               />
@@ -227,7 +280,9 @@ export default function Home() {
             <span className="section-title__prefix">// </span>
             SKILL_TREE
           </h2>
-          <p className="section-subtitle">5+ years of grinding XP across the stack.</p>
+          <p className="section-subtitle">
+            5+ years of grinding XP across the stack.
+          </p>
 
           <div className="skills-grid">
             {SKILLS.map((skill, i) => (
@@ -235,7 +290,7 @@ export default function Home() {
                 key={skill.label}
                 label={skill.label}
                 value={skill.xp}
-                color={CAT_COLOR[skill.category] ?? 'var(--accent-primary)'}
+                color={CAT_COLOR[skill.category] ?? "var(--accent-primary)"}
                 delay={i * 60}
               />
             ))}
@@ -249,19 +304,21 @@ export default function Home() {
           {/* Pixel screen — ENTER key activates when this is visible */}
           <div
             ref={ctaRef}
-            className={`pixel-screen ${ctaPressed ? 'pixel-screen--pressed' : ''}`}
+            className={`pixel-screen ${ctaPressed ? "pixel-screen--pressed" : ""}`}
             role="group"
             aria-label="Press ENTER to view experience"
           >
             <span className="pixel-text pixel-screen__text">PRESS START</span>
-            <span className="pixel-screen__sub vt-text">to view my experience →</span>
+            <span className="pixel-screen__sub vt-text">
+              to view my experience →
+            </span>
             <span className="pixel-screen__hint pixel-text">[ ENTER ]</span>
           </div>
 
           <Link
             to="/about"
             ref={ctaBtnRef}
-            className={`btn btn--primary btn--lg pixel-text ${ctaPressed ? 'btn--pressed' : ''}`}
+            className={`btn btn--primary btn--lg pixel-text ${ctaPressed ? "btn--pressed" : ""}`}
             onClick={() => setCtaPressed(true)}
           >
             ▶ VIEW EXPERIENCE
@@ -269,5 +326,5 @@ export default function Home() {
         </div>
       </section>
     </main>
-  )
+  );
 }

@@ -1,13 +1,17 @@
-import { EXPERIENCE } from '../../data/resume'
-import './style.css'
+import { EXPERIENCE } from "../../data/resume";
+import "./style.css";
 
 interface JourneyProgressProps {
-  experiences: typeof EXPERIENCE
-  activeIdx:   number
-  onDotClick:  (i: number) => void
+  experiences: typeof EXPERIENCE;
+  activeIdx: number;
+  onDotClick: (i: number) => void;
 }
 
-export default function JourneyProgress({ experiences, activeIdx, onDotClick }: JourneyProgressProps) {
+export default function JourneyProgress({
+  experiences,
+  activeIdx,
+  onDotClick,
+}: JourneyProgressProps) {
   return (
     <div className="journey-progress" aria-label="Experience progress">
       {/* Vertical track line */}
@@ -21,8 +25,8 @@ export default function JourneyProgress({ experiences, activeIdx, onDotClick }: 
       {experiences.map((exp, i) => (
         <button
           key={exp.id}
-          className={`jp-dot ${activeIdx === i ? 'jp-dot--active' : ''} ${activeIdx > i ? 'jp-dot--past' : ''}`}
-          style={{ '--dot-color': exp.accentHex } as React.CSSProperties}
+          className={`jp-dot ${activeIdx === i ? "jp-dot--active" : ""} ${activeIdx > i ? "jp-dot--past" : ""}`}
+          style={{ "--dot-color": exp.accentHex } as React.CSSProperties}
           onClick={() => onDotClick(i)}
           aria-label={exp.company}
           title={exp.company}
@@ -36,5 +40,5 @@ export default function JourneyProgress({ experiences, activeIdx, onDotClick }: 
         </button>
       ))}
     </div>
-  )
+  );
 }

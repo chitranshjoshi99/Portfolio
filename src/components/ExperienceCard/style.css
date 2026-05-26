@@ -5,7 +5,7 @@
 .exp-card {
   scroll-snap-align: start;
   scroll-snap-stop: always;
-  height: 100%;           /* 100% of journey-scroll = 100vh - 56px */
+  height: 100%; /* 100% of journey-scroll = 100vh - 56px */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -30,7 +30,7 @@
 
 /* Left accent bar */
 .exp-card::after {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   top: 12%;
@@ -165,7 +165,9 @@
   color: var(--text-muted);
   background: var(--bg-secondary);
   letter-spacing: 0.04em;
-  transition: border-color var(--transition-fast), color var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    color var(--transition-fast);
 }
 
 .exp-card--active .exp-tag:hover {

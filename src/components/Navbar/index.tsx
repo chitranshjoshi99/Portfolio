@@ -1,46 +1,49 @@
-import { useState, useEffect, useRef } from 'react'
-import { NavLink, useLocation } from 'react-router-dom'
-import { useTheme } from '../../contexts/ThemeContext'
-import './style.css'
+import { useState, useEffect, useRef } from "react";
+import { NavLink, useLocation } from "react-router-dom";
+import { useTheme } from "../../contexts/ThemeContext";
+import "./style.css";
 
 const NAV_LINKS = [
-  { to: '/',        label: '> HOME',    key: 'home' },
-  { to: '/about',   label: '> ABOUT',   key: 'about' },
-  { to: '/contact', label: '> CONTACT', key: 'contact' },
-]
+  { to: "/", label: "> HOME", key: "home" },
+  { to: "/about", label: "> ABOUT", key: "about" },
+  { to: "/contact", label: "> CONTACT", key: "contact" },
+];
 
 export function Navbar() {
-  const { isDark, toggleTheme } = useTheme()
-  const [scrolled, setScrolled] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
-  const location = useLocation()
-  const menuRef = useRef<HTMLDivElement>(null)
+  const { isDark, toggleTheme } = useTheme();
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
+  const menuRef = useRef<HTMLDivElement>(null);
 
   // Detect scroll to add backdrop blur
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20)
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   // Close menu on route change
   useEffect(() => {
-    setMenuOpen(false)
-  }, [location])
+    setMenuOpen(false);
+  }, [location]);
 
   // Close menu on outside click
   useEffect(() => {
     const onClickOutside = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false)
+        setMenuOpen(false);
       }
-    }
-    if (menuOpen) document.addEventListener('mousedown', onClickOutside)
-    return () => document.removeEventListener('mousedown', onClickOutside)
-  }, [menuOpen])
+    };
+    if (menuOpen) document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, [menuOpen]);
 
   return (
-    <header className={`navbar ${scrolled ? 'navbar--scrolled' : ''}`} role="banner">
+    <header
+      className={`navbar ${scrolled ? "navbar--scrolled" : ""}`}
+      role="banner"
+    >
       <nav className="navbar__inner container" ref={menuRef}>
         {/* Logo / brand */}
         <NavLink to="/" className="navbar__logo" aria-label="Go to home">
@@ -56,9 +59,9 @@ export function Navbar() {
             <li key={key}>
               <NavLink
                 to={to}
-                end={to === '/'}
+                end={to === "/"}
                 className={({ isActive }) =>
-                  `navbar__link ${isActive ? 'navbar__link--active' : ''}`
+                  `navbar__link ${isActive ? "navbar__link--active" : ""}`
                 }
               >
                 {label}
@@ -81,9 +84,9 @@ export function Navbar() {
 
           {/* Mobile hamburger */}
           <button
-            className={`navbar__burger ${menuOpen ? 'navbar__burger--open' : ''}`}
-            onClick={() => setMenuOpen(v => !v)}
-            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            className={`navbar__burger ${menuOpen ? "navbar__burger--open" : ""}`}
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
           >
             <span />
@@ -93,15 +96,17 @@ export function Navbar() {
         </div>
 
         {/* Mobile dropdown */}
-        <div className={`navbar__mobile-menu ${menuOpen ? 'navbar__mobile-menu--open' : ''}`}>
+        <div
+          className={`navbar__mobile-menu ${menuOpen ? "navbar__mobile-menu--open" : ""}`}
+        >
           <ul role="list">
             {NAV_LINKS.map(({ to, label, key }) => (
               <li key={key}>
                 <NavLink
                   to={to}
-                  end={to === '/'}
+                  end={to === "/"}
                   className={({ isActive }) =>
-                    `navbar__link ${isActive ? 'navbar__link--active' : ''}`
+                    `navbar__link ${isActive ? "navbar__link--active" : ""}`
                   }
                 >
                   {label}
@@ -121,27 +126,33 @@ export function Navbar() {
         </div>
       </nav>
     </header>
-  )
+  );
 }
 
 /* ── Theme Toggle Button ─────────────────────────────────── */
-function ThemeToggleButton({ isDark, onToggle }: { isDark: boolean; onToggle: () => void }) {
+function ThemeToggleButton({
+  isDark,
+  onToggle,
+}: {
+  isDark: boolean;
+  onToggle: () => void;
+}) {
   return (
     <button
       className="theme-toggle"
       onClick={onToggle}
-      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-      title={isDark ? 'Light mode' : 'Dark mode'}
+      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      title={isDark ? "Light mode" : "Dark mode"}
     >
       <span className="theme-toggle__track" aria-hidden="true">
         {/* Pixel sun / moon icons rendered with CSS + spans */}
         <span className="theme-toggle__icon theme-toggle__icon--sun">☀</span>
         <span className="theme-toggle__icon theme-toggle__icon--moon">☽</span>
-        <span className={`theme-toggle__thumb ${isDark ? 'theme-toggle__thumb--dark' : ''}`} />
+        <span
+          className={`theme-toggle__thumb ${isDark ? "theme-toggle__thumb--dark" : ""}`}
+        />
       </span>
-      <span className="theme-toggle__label">
-        {isDark ? 'DARK' : 'LITE'}
-      </span>
+      <span className="theme-toggle__label">{isDark ? "DARK" : "LITE"}</span>
     </button>
-  )
+  );
 }

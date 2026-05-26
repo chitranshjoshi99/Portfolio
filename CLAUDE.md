@@ -17,6 +17,7 @@ single-page app with three routes: Home (`/`), About (`/about`), Contact
 ## File & folder conventions
 
 Every component and page lives in its own folder with exactly two files:
+
 - `index.tsx` — the component/page
 - `style.css` — styles scoped to that component/page only
 
@@ -45,35 +46,40 @@ src/
 
 ## Critical files
 
-| File | Purpose |
-|---|---|
-| `src/data/resume.ts` | **Only place resume content lives.** Edit here; pages pick it up automatically. |
-| `src/styles/tokens.css` | All CSS custom properties — palette, spacing, fonts, shadows. Edit colours here, not inline. |
-| `src/styles/global.css` | Reset, utility classes (`.pixel-text`, `.vt-text`, `.btn`, animations). |
+| File                            | Purpose                                                                                                                                                                    |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/data/resume.ts`            | **Only place resume content lives.** Edit here; pages pick it up automatically.                                                                                            |
+| `src/styles/tokens.css`         | All CSS custom properties — palette, spacing, fonts, shadows. Edit colours here, not inline.                                                                               |
+| `src/styles/global.css`         | Reset, utility classes (`.pixel-text`, `.vt-text`, `.btn`, animations).                                                                                                    |
 | `src/contexts/ThemeContext.tsx` | Dark/light theme. Reads `prefers-color-scheme` as default; persists override in `localStorage` under key `cj-portfolio-theme`. Applies `data-theme` attribute to `<html>`. |
-| `src/pages/Contact/index.tsx` | Has `FORMSPREE_ID` constant at the top — set it to enable direct email. |
+| `src/pages/Contact/index.tsx`   | Has `FORMSPREE_ID` constant at the top — set it to enable direct email.                                                                                                    |
 
 ---
 
 ## Architecture decisions
 
 ### CSS custom properties, not Tailwind
+
 All theming is done through CSS variables in `tokens.css`. There is no
 Tailwind, no CSS-in-JS. When adding styles, extend tokens first before
 hardcoding hex values inline.
 
 ### One CSS file per component/page
+
 Each `.tsx` file has a sibling `.css` file. Global utilities live in
 `global.css`. Do not add page-specific rules to `global.css`.
 
 ### Pixel-art conventions
+
 - Spacing always uses `--px` multiples (`--px2` = 8px, `--px4` = 16px, etc.)
 - Borders are `var(--px)` (4px) solid — never `border-radius` except `--radius-sm` (2px) on inputs
 - Box shadows use the pixel drop-shadow pattern: `Xpx Xpx 0 <color>` (hard offset, no blur)
 - Image rendering: `image-rendering: pixelated` on the avatar
 
 ### Company accent colours
+
 Three muted accent colours used throughout the experience cards:
+
 - `--nivoda-gold` (#9E8562) — Nivoda LLP
 - `--delhivery-red` (#B87A72) — Delhivery
 - `--classplus-purple` (#8B7BA8) — Classplus
@@ -110,6 +116,7 @@ not the document scroll. This has two important consequences:
 
 The "PRESS START" pixel screen block triggers navigation to `/about` on ENTER
 when the block is ≥60% visible in the viewport. Implementation in `Home.tsx`:
+
 - `ctaRef` → the pixel-screen div
 - `ctaInView` state via IntersectionObserver
 - `keydown` listener on `window` that checks `ctaInView && !ctaPressed`
@@ -122,8 +129,8 @@ when the block is ≥60% visible in the viewport. Implementation in `Home.tsx`:
 Two send paths, both declared at the top of `Contact.tsx`:
 
 ```ts
-const FORMSPREE_ID = ''          // empty = mailto fallback
-const WA_NUMBER    = '918126196827'
+const FORMSPREE_ID = ""; // empty = mailto fallback
+const WA_NUMBER = "918126196827";
 ```
 
 - **WhatsApp**: always works, opens `https://wa.me/${WA_NUMBER}?text=...`

@@ -154,7 +154,7 @@
 }
 
 .journey-tab::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 0;
@@ -206,7 +206,7 @@
 /* ── Scroll-snap wrapper & container ───────────────────────── */
 
 .journey-scroll-wrap {
-  position: relative;   /* anchor for the absolutely-positioned progress dots */
+  position: relative; /* anchor for the absolutely-positioned progress dots */
 }
 
 .journey-scroll {

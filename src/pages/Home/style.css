@@ -137,11 +137,12 @@
 .hero__deco-dot {
   position: absolute;
   left: var(--deco-x);
-  top:  var(--deco-y);
+  top: var(--deco-y);
   font-size: 10px;
   color: var(--border-primary);
   opacity: 0.5;
-  animation: float var(--deco-dur, 3s) ease-in-out var(--deco-delay, 0s) infinite;
+  animation: float var(--deco-dur, 3s) ease-in-out var(--deco-delay, 0s)
+    infinite;
   transition: color var(--transition-slow);
 }
 
@@ -312,10 +313,22 @@
   line-height: 1;
 }
 
-.hero__corner--tl { top: -10px;  left: -10px;  }
-.hero__corner--tr { top: -10px;  right: -10px; }
-.hero__corner--bl { bottom: -10px; left: -10px;  }
-.hero__corner--br { bottom: -10px; right: -10px; }
+.hero__corner--tl {
+  top: -10px;
+  left: -10px;
+}
+.hero__corner--tr {
+  top: -10px;
+  right: -10px;
+}
+.hero__corner--bl {
+  bottom: -10px;
+  left: -10px;
+}
+.hero__corner--br {
+  bottom: -10px;
+  right: -10px;
+}
 
 /* Status indicator */
 .hero__status {
@@ -323,8 +336,8 @@
   align-items: center;
   gap: var(--px2);
   font-size: 7px;
-  color: #7A9E7A;
-  border: var(--px) solid #4A6E4A;
+  color: #7a9e7a;
+  border: var(--px) solid #4a6e4a;
   padding: var(--px) var(--px3);
   background: rgba(74, 110, 74, 0.1);
   letter-spacing: 0.06em;
@@ -333,8 +346,8 @@
 .hero__status-dot {
   width: 6px;
   height: 6px;
-  background: #7A9E7A;
-  border-radius: 0;   /* pixel art: square dot */
+  background: #7a9e7a;
+  border-radius: 0; /* pixel art: square dot */
   animation: blink 2s step-end infinite;
 }
 
@@ -436,8 +449,8 @@
 .pixel-screen--pressed {
   border-color: var(--accent-secondary);
   box-shadow:
-    0 0 0 var(--border-secondary),          /* drop shadow collapses */
-    inset 0 0 0 var(--px) var(--bg-secondary);
+    0 0 0 var(--border-secondary),
+    /* drop shadow collapses */ inset 0 0 0 var(--px) var(--bg-secondary);
   transform: translate(var(--px2), var(--px2));
   background: var(--accent-glow);
 }
@@ -470,7 +483,9 @@
   border: var(--px) solid var(--border-primary);
   padding: 2px var(--px2);
   opacity: 0.6;
-  transition: opacity var(--transition-base), color var(--transition-base);
+  transition:
+    opacity var(--transition-base),
+    color var(--transition-base);
 }
 
 .pixel-screen:hover .pixel-screen__hint,
@@ -482,9 +497,16 @@
 
 /* Pressed state on the View Experience button */
 @keyframes btn-press {
-  0%   { transform: translate(0, 0); }
-  40%  { transform: translate(var(--px2), var(--px2)); box-shadow: 0 0 0 var(--accent-secondary); }
-  100% { transform: translate(0, 0); }
+  0% {
+    transform: translate(0, 0);
+  }
+  40% {
+    transform: translate(var(--px2), var(--px2));
+    box-shadow: 0 0 0 var(--accent-secondary);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
 }
 
 .btn--pressed {

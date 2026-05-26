@@ -78,7 +78,7 @@ To send email directly to your inbox without the user needing a mail app:
 4. Open `src/pages/Contact.tsx` and set:
 
 ```ts
-const FORMSPREE_ID = 'xpzgkwqr'   // ← your ID here
+const FORMSPREE_ID = "xpzgkwqr"; // ← your ID here
 ```
 
 The form will now `fetch()` directly to Formspree and deliver to your inbox.  
@@ -100,11 +100,11 @@ Company accent colours (`--nivoda-gold`, `--delhivery-red`, `--classplus-purple`
 
 Loaded from Google Fonts in `index.html`:
 
-| Font | Use |
-|---|---|
+| Font           | Use                                 |
+| -------------- | ----------------------------------- |
 | Press Start 2P | Headings, labels, pixel UI elements |
-| VT323 | Large display numbers / metrics |
-| Inter | Body copy, descriptions |
+| VT323          | Large display numbers / metrics     |
+| Inter          | Body copy, descriptions             |
 
 ---
 
@@ -127,13 +127,13 @@ netlify deploy --dir=dist --prod
 
 ## Tech stack
 
-| | |
-|---|---|
-| Framework | React 18 |
-| Build tool | Vite 5 + SWC |
-| Language | TypeScript 5 |
-| Routing | React Router v6 |
-| Styling | Plain CSS with custom properties (no CSS-in-JS) |
-| Fonts | Google Fonts (Press Start 2P, VT323, Inter) |
-| Email | Formspree (optional) |
-| Messaging | WhatsApp wa.me API |
+|            |                                                 |
+| ---------- | ----------------------------------------------- |
+| Framework  | React 18                                        |
+| Build tool | Vite 5 + SWC                                    |
+| Language   | TypeScript 5                                    |
+| Routing    | React Router v6                                 |
+| Styling    | Plain CSS with custom properties (no CSS-in-JS) |
+| Fonts      | Google Fonts (Press Start 2P, VT323, Inter)     |
+| Email      | Formspree (optional)                            |
+| Messaging  | WhatsApp wa.me API                              |

@@ -64,7 +64,7 @@
 
 /* Blinking cursor after logo */
 .navbar__logo-cursor::after {
-  content: '▮';
+  content: "▮";
   font-size: var(--font-size-xs);
   color: var(--accent-primary);
   animation: blink 1s step-end infinite;
@@ -231,7 +231,9 @@
   display: block;
   height: 2px;
   background: var(--text-primary);
-  transition: transform var(--transition-base), opacity var(--transition-base);
+  transition:
+    transform var(--transition-base),
+    opacity var(--transition-base);
   transform-origin: center;
 }
 

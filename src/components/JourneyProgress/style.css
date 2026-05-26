@@ -17,8 +17,8 @@
 /* Continuous vertical track line */
 .journey-progress__track {
   position: absolute;
-  top: 14px;        /* starts at centre of first dot */
-  bottom: 14px;     /* ends at centre of last dot */
+  top: 14px; /* starts at centre of first dot */
+  bottom: 14px; /* ends at centre of last dot */
   width: 2px;
   background: var(--border-primary);
   left: 50%;
@@ -120,7 +120,7 @@
 
 /* Arrow on the right side of the tooltip */
 .jp-dot__tooltip::after {
-  content: '';
+  content: "";
   position: absolute;
   right: -5px;
   top: 50%;
