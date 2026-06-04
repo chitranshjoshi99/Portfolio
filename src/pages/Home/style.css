@@ -97,15 +97,15 @@
 
 .btn--resume {
   background: transparent;
-  color: var(--nivoda-gold);
-  border-color: var(--nivoda-gold);
-  box-shadow: var(--px2) var(--px2) 0 var(--nivoda-gold);
+  color: var(--delhivery-red);
+  border-color: var(--delhivery-red);
+  box-shadow: var(--px2) var(--px2) 0 var(--delhivery-red);
 }
 
 .btn--resume:hover {
-  background: color-mix(in srgb, var(--nivoda-gold) 12%, transparent);
-  color: var(--nivoda-gold);
-  box-shadow: var(--px2) var(--px2) 0 var(--nivoda-gold);
+  background: color-mix(in srgb, var(--delhivery-red) 12%, transparent);
+  color: var(--delhivery-red);
+  box-shadow: var(--px2) var(--px2) 0 var(--delhivery-red);
 }
 
 .btn--pressed {
@@ -255,6 +255,12 @@
   color: var(--classplus-purple);
   border-color: var(--classplus-purple);
   background: rgba(139, 123, 168, 0.08);
+}
+
+.hero__badge--red {
+  color: var(--delhivery-red);
+  border-color: var(--delhivery-red);
+  background: rgba(122, 158, 122, 0.08);
 }
 
 /* CTAs */

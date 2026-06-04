@@ -133,12 +133,11 @@ export default function Home() {
             {/* Location — secondary typewriter */}
             <p className="hero__location vt-text">{typedLoc}</p>
 
-            {/* Bio */}
-            <p className="hero__bio">{PERSON.bio}</p>
-
             {/* Years badge */}
             <div className="hero__badges">
-              <span className="hero__badge pixel-text">LVL 5+ EXP</span>
+              <span className="hero__badge hero__badge--red pixel-text">
+                LVL 5+ EXP
+              </span>
               <span className="hero__badge hero__badge--gold pixel-text">
                 REACT MASTER
               </span>
@@ -146,15 +145,11 @@ export default function Home() {
                 AI ADOPTER
               </span>
             </div>
+            {/* Bio */}
+            <p className="hero__bio">{PERSON.bio}</p>
 
             {/* CTA buttons */}
             <div className="hero__ctas">
-              <Link to="/about" className="btn btn--primary pixel-text">
-                VIEW JOURNEY
-              </Link>
-              <Link to="/contact" className="btn btn--outline pixel-text">
-                HIRE ME
-              </Link>
               <a
                 href={asset("/resume.pdf")}
                 download="ChitranshJoshi-Resume.pdf"
@@ -163,14 +158,20 @@ export default function Home() {
               >
                 ↓ RESUME
               </a>
-              <a
+              <Link to="/about" className="btn btn--primary pixel-text">
+                VIEW JOURNEY
+              </Link>
+              <Link to="/contact" className="btn btn--outline pixel-text">
+                HIRE ME
+              </Link>
+              {/* <a
                 href={PERSON.github}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn--ghost pixel-text"
               >
                 GITHUB
-              </a>
+              </a> */}
             </div>
           </div>
 
