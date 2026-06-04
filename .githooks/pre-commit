@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# ─────────────────────────────────────────────────────────────
+#  pre-commit hook — CLAUDE.md freshness check
+#
+#  If any file under src/ is staged, CLAUDE.md must also be staged.
+#  Bypass:  git commit --no-verify
+# ─────────────────────────────────────────────────────────────
+
+STAGED=$(git diff --cached --name-only)
+
+# No src/ files staged → nothing to enforce
+if ! echo "$STAGED" | grep -q '^src/'; then
+  exit 0
+fi
+
+# src/ files staged → require CLAUDE.md to be staged too
+if echo "$STAGED" | grep -q '^CLAUDE\.md$'; then
+  exit 0
+fi
+
+echo ""
+echo "┌─────────────────────────────────────────────────────────┐"
+echo "│  ✗  CLAUDE.md is stale                                  │"
+echo "│                                                          │"
+echo "│  You staged changes in src/ but CLAUDE.md was not       │"
+echo "│  updated. Document what changed, then:                   │"
+echo "│                                                          │"
+echo "│    git add CLAUDE.md                                     │"
+echo "│                                                          │"
+echo "│  To skip this check:                                     │"
+echo "│    git commit --no-verify                                │"
+echo "└─────────────────────────────────────────────────────────┘"
+echo ""
+
+exit 1

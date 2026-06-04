@@ -1,0 +1,498 @@
+/* ============================================================
+   LABS PAGE
+   ============================================================ */
+
+.labs-page {
+  padding-top: 56px; /* navbar */
+  position: relative;
+}
+
+/* ── Scroll container ──────────────────────────────────────── */
+
+.labs-scroll {
+  height: calc(100vh - 56px);
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  /* Hide native scrollbar — dots nav replaces it */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.labs-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Each section ──────────────────────────────────────────── */
+
+.labs-section {
+  height: 100%;
+  scroll-snap-align: start;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--px8) var(--px4);
+}
+
+.labs-section--intro  { background: var(--bg-primary); }
+.labs-section--oracle { background: var(--bg-secondary); border-top: var(--px) solid var(--border-primary); }
+.labs-section--arcade { background: var(--bg-primary);   border-top: var(--px) solid var(--border-primary); }
+.labs-section--blog   { background: var(--bg-secondary); border-top: var(--px) solid var(--border-primary); }
+
+/* ── Side progress dots ────────────────────────────────────── */
+
+.labs-progress {
+  position: fixed;
+  right: var(--px6);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--px3);
+  z-index: 50;
+  /* sit above the page but below the navbar */
+}
+
+.labs-progress__dot {
+  width: 8px;
+  height: 8px;
+  background: var(--border-primary);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition:
+    background var(--transition-base),
+    transform var(--transition-base),
+    box-shadow var(--transition-base);
+}
+
+.labs-progress__dot--active {
+  background: var(--accent-primary);
+  transform: scale(1.5);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.labs-progress__dot:hover:not(.labs-progress__dot--active) {
+  background: var(--text-muted);
+  transform: scale(1.2);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   INTRO SECTION
+   ══════════════════════════════════════════════════════════════ */
+
+.labs-intro {
+  max-width: 560px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--px8);
+}
+
+.labs-intro__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--px3);
+}
+
+.labs-intro__boot {
+  font-size: 8px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+}
+
+.labs-intro__title {
+  font-size: clamp(1.1rem, 3vw, 1.8rem);
+  color: var(--text-primary);
+  letter-spacing: 0.06em;
+  line-height: 1.4;
+}
+
+.labs-intro__sub {
+  font-size: 1.4rem;
+  color: var(--text-muted);
+  letter-spacing: 0.03em;
+  line-height: 1.5;
+}
+
+.labs-intro__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--px3);
+  border: var(--px) solid var(--border-primary);
+  padding: var(--px4) var(--px6);
+  background: var(--bg-card);
+  box-shadow: var(--px2) var(--px2) 0 var(--border-secondary);
+}
+
+.labs-intro__item {
+  display: flex;
+  align-items: center;
+  gap: var(--px2);
+  font-size: 7px;
+  letter-spacing: 0.06em;
+  color: var(--text-primary);
+}
+
+.labs-intro__item-name {
+  flex-shrink: 0;
+}
+
+.labs-intro__item-dots {
+  flex: 1;
+  border-bottom: 1px dotted var(--border-primary);
+  margin: 0 var(--px2);
+  align-self: center;
+}
+
+.labs-intro__hint {
+  font-size: 6px;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-align: center;
+  animation: blink 2s step-end infinite;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   LABS CARD — shared chrome for all three experiments
+   ══════════════════════════════════════════════════════════════ */
+
+.labs-card {
+  width: min(520px, 100%);
+  border: var(--px) solid var(--border-primary);
+  background: var(--bg-card);
+  box-shadow: var(--px2) var(--px2) 0 var(--border-secondary);
+  overflow: hidden;
+}
+
+.labs-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--px2) var(--px4);
+  background: var(--bg-secondary);
+  border-bottom: var(--px) solid var(--border-primary);
+  gap: var(--px4);
+}
+
+.labs-card__title {
+  font-size: 7px;
+  color: var(--text-primary);
+  letter-spacing: 0.06em;
+}
+
+.labs-card__badge {
+  font-size: 6px;
+  letter-spacing: 0.06em;
+  padding: 2px var(--px2);
+  border: var(--px) solid currentColor;
+  flex-shrink: 0;
+}
+
+.labs-card__badge--running { color: var(--classplus-purple); }
+.labs-card__badge--offline { color: var(--delhivery-red); }
+.labs-card__badge--writing { color: var(--nivoda-gold); animation: blink 1.6s step-end infinite; }
+
+.labs-card__body {
+  padding: var(--px6) var(--px6) var(--px8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--px6);
+}
+
+.labs-card__desc {
+  font-size: 1.3rem;
+  color: var(--text-muted);
+  text-align: center;
+  letter-spacing: 0.03em;
+  line-height: 1.6;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RETRO TV
+   ══════════════════════════════════════════════════════════════ */
+
+.retro-tv {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Antennas */
+.retro-tv__antennas {
+  display: flex;
+  gap: 56px;
+  margin-bottom: -2px; /* overlap with body border */
+  position: relative;
+  z-index: 1;
+}
+
+.retro-tv__antenna {
+  width: 4px;
+  height: 44px;
+  background: var(--border-primary);
+}
+
+.retro-tv__antenna--left  { transform-origin: bottom center; transform: rotate(-22deg); }
+.retro-tv__antenna--right { transform-origin: bottom center; transform: rotate(22deg);  }
+
+/* TV body */
+.retro-tv__body {
+  border: var(--px) solid var(--border-primary);
+  background: var(--bg-secondary);
+  padding: var(--px4);
+  box-shadow: var(--px2) var(--px2) 0 var(--border-secondary);
+  display: flex;
+  gap: var(--px4);
+  align-items: center;
+}
+
+/* Screen */
+.retro-tv__screen-wrap {
+  position: relative;
+  width: 200px;
+  height: 150px;
+  border: var(--px) solid var(--text-muted);
+  overflow: hidden;
+  background: #000;
+  flex-shrink: 0;
+}
+
+.retro-tv__canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* "NO SIGNAL" text overlay */
+.retro-tv__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: rgba(0, 0, 0, 0.30);
+  pointer-events: none;
+}
+
+.retro-tv__overlay .pixel-text {
+  font-size: 7px;
+  color: rgba(255, 255, 255, 0.65);
+  letter-spacing: 0.12em;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+}
+
+/* CRT scanlines */
+.retro-tv__scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0, 0, 0, 0.14) 3px,
+    rgba(0, 0, 0, 0.14) 4px
+  );
+  pointer-events: none;
+}
+
+/* Control panel */
+.retro-tv__controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--px4);
+  padding: var(--px2) 0;
+}
+
+.retro-tv__knob {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.retro-tv__knob-face {
+  width: 20px;
+  height: 20px;
+  border: var(--px) solid var(--border-primary);
+  background: var(--bg-card);
+  border-radius: 50%;
+  position: relative;
+}
+
+/* Indicator tick on knob */
+.retro-tv__knob-face::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 6px;
+  background: var(--text-muted);
+}
+
+.retro-tv__knob-label {
+  font-size: 5px;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+
+/* Speaker dots — 2-column grid */
+.retro-tv__speaker {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+}
+
+.retro-tv__speaker-dot {
+  width: 5px;
+  height: 5px;
+  background: var(--border-primary);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BLOG TERMINAL
+   ══════════════════════════════════════════════════════════════ */
+
+.blog-terminal {
+  width: 100%;
+  max-width: 420px;
+  border: var(--px) solid var(--border-primary);
+  background: var(--bg-code);
+  box-shadow: var(--px2) var(--px2) 0 var(--border-secondary);
+  overflow: hidden;
+}
+
+.blog-terminal__titlebar {
+  display: flex;
+  align-items: center;
+  gap: var(--px2);
+  padding: var(--px2) var(--px3);
+  background: var(--bg-secondary);
+  border-bottom: var(--px) solid var(--border-primary);
+}
+
+.blog-terminal__dots {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.blog-terminal__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.blog-terminal__dot--red    { background: var(--delhivery-red); }
+.blog-terminal__dot--yellow { background: var(--nivoda-gold); }
+.blog-terminal__dot--green  { background: #7a9e7a; }
+
+.blog-terminal__title {
+  flex: 1;
+  text-align: center;
+  font-size: 6px;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+
+.blog-terminal__status {
+  font-size: 5px;
+  color: var(--nivoda-gold);
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+  animation: blink 1.6s step-end infinite;
+}
+
+.blog-terminal__body {
+  padding: var(--px3) var(--px4) var(--px4);
+  min-height: 148px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.blog-terminal__line {
+  font-size: 1.15rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  white-space: pre;
+  animation: terminal-line-in 0.12s ease both;
+  margin: 0;
+  font-family: var(--font-vt);
+}
+
+@keyframes terminal-line-in {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0);    }
+}
+
+.blog-terminal__prompt {
+  color: var(--accent-primary);
+}
+
+.blog-terminal__cursor {
+  font-size: 8px;
+  color: var(--accent-primary);
+  animation: blink 0.9s step-end infinite;
+  display: inline-block;
+  margin-top: 2px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ══════════════════════════════════════════════════════════════ */
+
+/* Hide side dots on tablets */
+@media (max-width: 900px) {
+  .labs-progress { display: none; }
+}
+
+/* Mobile: stack sections, disable scroll-snap */
+@media (max-width: 768px) {
+  .labs-scroll {
+    height: auto;
+    overflow-y: visible;
+    scroll-snap-type: none;
+  }
+
+  .labs-section {
+    height: auto;
+    min-height: calc(100vh - 56px);
+    scroll-snap-align: none;
+    padding: var(--px12) var(--px4);
+  }
+
+  /* TV: stack controls below screen */
+  .retro-tv__body {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .retro-tv__controls {
+    flex-direction: row;
+    gap: var(--px8);
+  }
+}
+
+@media (max-width: 480px) {
+  .labs-card {
+    width: 100%;
+  }
+
+  .retro-tv__antennas { gap: 40px; }
+  .retro-tv__antenna  { height: 36px; }
+
+  .retro-tv__screen-wrap {
+    width: 160px;
+    height: 120px;
+  }
+
+  .blog-terminal { max-width: 100%; }
+}

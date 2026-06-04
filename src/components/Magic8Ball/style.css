@@ -1,0 +1,273 @@
+/* ============================================================
+   MAGIC 8-BALL — pixel-art oracle game
+
+   Canvas: 28 × 28 logical pixels → 168 × 168 CSS (6× integer scale)
+   image-rendering: pixelated keeps every pixel a perfect hard square.
+
+   Ball centre:      (14, 14)  ball-radius: 13
+   White window:     centre (14, 14)  radius: 6
+   Window CSS size:  radius 6 × scale 6 × 2 = 72 × 72 px
+
+   Content (8 / countdown / answer) is an HTML overlay — NOT drawn
+   on canvas — so we can use any font and animate freely.
+
+   Layout: .m8b__stage is always the same size (168 × 168).
+   The ball and the button-overlay are both position:absolute inside it.
+   When the ball fades out, the overlay appears in exactly the same spot —
+   zero layout shift.
+   ============================================================ */
+
+/* ── Outer wrapper ────────────────────────────────────────── */
+
+.m8b {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--px3);
+}
+
+/* ── Stage (fixed 168×168 — never changes size) ─────────── */
+
+.m8b__stage {
+  position: relative;
+  width: 168px;
+  height: 168px;
+  flex-shrink: 0;
+}
+
+/* ── Ball button ─────────────────────────────────────────── */
+
+.m8b__ball {
+  position: absolute;
+  inset: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  opacity: 1;
+  /* Pixel drop-shadow on the ball shape */
+  filter: drop-shadow(var(--px2) var(--px2) 0 var(--shadow-color));
+  transition:
+    opacity       0.55s ease,
+    filter        var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+.m8b__ball:hover:not(:disabled) {
+  filter: drop-shadow(var(--px2) var(--px2) 0 var(--accent-primary));
+}
+
+.m8b__ball:disabled { cursor: default; }
+
+/* Fade-out when buttons take over */
+.m8b__ball--hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── The canvas (ball body shape) ───────────────────────── */
+
+.m8b__canvas {
+  display: block;
+  width: 168px;   /* 28 logical × 6 = perfect integer scale */
+  height: 168px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges; /* Safari fallback */
+}
+
+/* ── HTML window overlay — sits on the white circle ─────── */
+/*
+   White circle CSS coords:
+     centre  14 × 6 = 84px from canvas edge
+     radius   6 × 6 = 36px → diameter 72px
+   ⇒ left: 50%; top: 50%; translate(-50%,-50%) lands exactly on centre.
+*/
+
+.m8b__window {
+  position: absolute;
+  width: 72px;
+  height: 72px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* ── Window contents ─────────────────────────────────────── */
+
+/* Idle / tapping — "8" */
+.m8b__w-eight {
+  font-size: 20px;
+  color: #080612;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+/* Countdown number — blasts in from large */
+.m8b__w-count {
+  font-size: 46px;
+  line-height: 1;
+  color: #080612;
+  animation: m8b-count-blast 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes m8b-count-blast {
+  from { transform: scale(3); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+/* Answer text — 3 lines, fades in */
+.m8b__w-answer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 14px;
+  line-height: 1;
+  color: var(--delhivery-red);
+  letter-spacing: 0.04em;
+  text-align: center;
+  animation: m8b-answer-fade 0.35s ease both;
+}
+
+@keyframes m8b-answer-fade {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1);    }
+}
+
+/* ── Shake animations (1–5, escalating intensity) ────────── */
+
+@keyframes m8b-shake-1 {
+  0%,100% { transform: translate(0,0); }
+  30%     { transform: translate(-5px, 2px); }
+  70%     { transform: translate(5px, -2px); }
+}
+@keyframes m8b-shake-2 {
+  0%,100% { transform: translate(0,0) rotate(0); }
+  25%     { transform: translate(-7px, 3px) rotate(-2deg); }
+  50%     { transform: translate(7px,-3px)  rotate(2deg);  }
+  75%     { transform: translate(-5px, 2px) rotate(-1deg); }
+}
+@keyframes m8b-shake-3 {
+  0%,100% { transform: translate(0,0) rotate(0); }
+  15%     { transform: translate(-9px, 4px)  rotate(-4deg); }
+  35%     { transform: translate(10px,-4px)  rotate(4deg);  }
+  55%     { transform: translate(-9px, 4px)  rotate(-3deg); }
+  75%     { transform: translate(7px,-3px)   rotate(2deg);  }
+  90%     { transform: translate(-3px,1px)   rotate(-1deg); }
+}
+@keyframes m8b-shake-4 {
+  0%,100% { transform: translate(0,0) rotate(0); }
+  10%     { transform: translate(-11px, 5px)  rotate(-5deg); }
+  25%     { transform: translate(13px,-5px)   rotate(6deg);  }
+  40%     { transform: translate(-12px, 5px)  rotate(-5deg); }
+  55%     { transform: translate(11px,-5px)   rotate(5deg);  }
+  70%     { transform: translate(-8px, 3px)   rotate(-3deg); }
+  85%     { transform: translate(6px,-2px)    rotate(2deg);  }
+  93%     { transform: translate(-3px,1px)    rotate(-1deg); }
+}
+@keyframes m8b-shake-5 {
+  0%,100% { transform: translate(0,0) rotate(0); }
+  8%      { transform: translate(-13px, 6px)  rotate(-7deg); }
+  18%     { transform: translate(15px,-6px)   rotate(8deg);  }
+  28%     { transform: translate(-15px, 7px)  rotate(-8deg); }
+  38%     { transform: translate(14px,-6px)   rotate(7deg);  }
+  48%     { transform: translate(-12px, 5px)  rotate(-5deg); }
+  58%     { transform: translate(11px,-4px)   rotate(5deg);  }
+  68%     { transform: translate(-8px, 3px)   rotate(-3deg); }
+  78%     { transform: translate(6px,-2px)    rotate(2deg);  }
+  88%     { transform: translate(-3px,1px)    rotate(-1deg); }
+  95%     { transform: translate(1px,0)       rotate(0deg);  }
+}
+
+.m8b__ball--shake[data-intensity="1"] { animation: m8b-shake-1 0.28s ease both; }
+.m8b__ball--shake[data-intensity="2"] { animation: m8b-shake-2 0.34s ease both; }
+.m8b__ball--shake[data-intensity="3"] { animation: m8b-shake-3 0.40s ease both; }
+.m8b__ball--shake[data-intensity="4"] { animation: m8b-shake-4 0.46s ease both; }
+.m8b__ball--shake[data-intensity="5"] { animation: m8b-shake-5 0.52s ease both; }
+
+/* Continuous rattle during counting */
+@keyframes m8b-rattle {
+  0%,100% { transform: translate(0,0) rotate(0);       }
+  20%     { transform: translate(-3px,2px) rotate(-2deg); }
+  40%     { transform: translate(4px,-2px) rotate(2deg);  }
+  60%     { transform: translate(-3px,2px) rotate(-1deg); }
+  80%     { transform: translate(3px,-2px) rotate(1deg);  }
+}
+
+.m8b__ball--counting {
+  animation: m8b-rattle 0.38s ease-in-out infinite;
+}
+
+/* ── Button overlay (appears in same space as ball) ───────── */
+
+.m8b__btns-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--px3);
+  animation: m8b-btns-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+}
+
+@keyframes m8b-btns-in {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1);   }
+}
+
+/* ── Status row ──────────────────────────────────────────── */
+
+.m8b__status {
+  min-height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.m8b__hint {
+  font-size: 6px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  animation: m8b-blink 1.7s step-end infinite;
+}
+
+.m8b__progress {
+  font-size: 6px;
+  color: var(--accent-secondary);
+  letter-spacing: 0.07em;
+}
+
+.m8b__consulting {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  animation: m8b-blink 0.7s step-end infinite;
+}
+
+@keyframes m8b-blink {
+  0%,100% { opacity: 1;   }
+  50%      { opacity: 0.2; }
+}
+
+/* ── Mobile ──────────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+  /* 28 × 4 = 112px (4× integer scale) */
+  .m8b__stage  { width: 112px; height: 112px; }
+  .m8b__canvas { width: 112px; height: 112px; }
+
+  /* Window: radius 6 × scale 4 × 2 = 48px */
+  .m8b__window { width: 48px; height: 48px; }
+
+  .m8b__w-eight { font-size: 14px; }
+  .m8b__w-count { font-size: 30px; }
+  .m8b__w-answer { font-size: 10px; gap: 1px; }
+}

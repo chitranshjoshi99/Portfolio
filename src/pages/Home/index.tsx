@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useTypewriter } from "../../hooks/useTypewriter";
 import { StatCard } from "../../components/StatCard";
 import { XPBar } from "../../components/XPBar";
+import { haptics } from "../../utils/haptics";
 import { PERSON, STATS, SKILLS } from "../../data/resume";
 import "./style.css";
 import { asset } from "@/assets";
@@ -51,6 +52,7 @@ export default function Home() {
       if (e.key !== "Enter" || !ctaInView || ctaPressed) return;
       e.preventDefault();
       setCtaPressed(true);
+      haptics.press();
       // Brief visual "press" before navigating
       setTimeout(() => navigate("/about"), 320);
     };
@@ -71,6 +73,7 @@ export default function Home() {
   });
 
   const scrollDown = () => {
+    haptics.tap();
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
@@ -155,13 +158,22 @@ export default function Home() {
                 download="ChitranshJoshi-Resume.pdf"
                 className="btn btn--resume pixel-text"
                 aria-label="Download resume PDF"
+                onClick={() => haptics.press()}
               >
                 ↓ RESUME
               </a>
-              <Link to="/about" className="btn btn--primary pixel-text">
+              <Link
+                to="/about"
+                className="btn btn--primary pixel-text"
+                onClick={() => haptics.press()}
+              >
                 VIEW JOURNEY
               </Link>
-              <Link to="/contact" className="btn btn--outline pixel-text">
+              <Link
+                to="/contact"
+                className="btn btn--outline pixel-text"
+                onClick={() => haptics.press()}
+              >
                 HIRE ME
               </Link>
               {/* <a
@@ -300,10 +312,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── CALL TO ACTION ────────────────────────────────── */}
+      {/* ── CALL TO ACTION ───────────────────────────────── */}
       <section className="home-cta-section" aria-label="Call to action">
         <div className="container home-cta-inner">
-          {/* Pixel screen — ENTER key activates when this is visible */}
           <div
             ref={ctaRef}
             className={`pixel-screen ${ctaPressed ? "pixel-screen--pressed" : ""}`}
@@ -321,7 +332,7 @@ export default function Home() {
             to="/about"
             ref={ctaBtnRef}
             className={`btn btn--primary btn--lg pixel-text ${ctaPressed ? "btn--pressed" : ""}`}
-            onClick={() => setCtaPressed(true)}
+            onClick={() => { setCtaPressed(true); haptics.press(); }}
           >
             ▶ VIEW EXPERIENCE
           </Link>

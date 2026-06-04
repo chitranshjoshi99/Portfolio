@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useTheme } from "../../contexts/ThemeContext";
+import { haptics } from "../../utils/haptics";
 import "./style.css";
 import { asset } from "@/assets";
 
 const NAV_LINKS = [
-  { to: "/", label: "> HOME", key: "home" },
-  { to: "/about", label: "> ABOUT", key: "about" },
+  { to: "/",        label: "> HOME",    key: "home"    },
+  { to: "/about",   label: "> ABOUT",   key: "about"   },
+  { to: "/labs",    label: "> LABS",    key: "labs"    },
   { to: "/contact", label: "> CONTACT", key: "contact" },
 ];
 
@@ -109,6 +111,7 @@ export function Navbar() {
                 className={({ isActive }) =>
                   `navbar__link ${isActive ? "navbar__link--active" : ""}`
                 }
+                onClick={() => haptics.tap()}
               >
                 {label}
               </NavLink>
@@ -123,15 +126,16 @@ export function Navbar() {
             download="ChitranshJoshi-Resume.pdf"
             className="navbar__resume pixel-text"
             aria-label="Download resume"
+            onClick={() => haptics.press()}
           >
             ↓ CV
           </a>
-          <ThemeToggleButton isDark={isDark} onToggle={toggleTheme} />
+          <ThemeToggleButton isDark={isDark} onToggle={() => { haptics.toggle(); toggleTheme(); }} />
 
           {/* Mobile hamburger */}
           <button
             className={`navbar__burger ${menuOpen ? "navbar__burger--open" : ""}`}
-            onClick={() => setMenuOpen((v) => !v)}
+            onClick={() => { haptics.tap(); setMenuOpen((v) => !v); }}
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
           >
@@ -154,6 +158,7 @@ export function Navbar() {
                   className={({ isActive }) =>
                     `navbar__link ${isActive ? "navbar__link--active" : ""}`
                   }
+                  onClick={() => haptics.tap()}
                 >
                   {label}
                 </NavLink>
@@ -164,6 +169,7 @@ export function Navbar() {
                 href={asset("/resume.pdf")}
                 download="ChitranshJoshi-Resume.pdf"
                 className="navbar__link navbar__link--resume pixel-text"
+                onClick={() => haptics.press()}
               >
                 ↓ RESUME
               </a>
