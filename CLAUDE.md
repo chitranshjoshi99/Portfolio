@@ -24,27 +24,42 @@ Every component and page lives in its own folder with exactly two files:
 ```
 src/
 ├── components/
+│   ├── ChannelStatic/    index.tsx + style.css   ← TV static noise canvas (on-demand only)
+│   ├── CodePanel/        index.tsx + style.css   ← expandable code window (titlebar + pre)
 │   ├── ExperienceCard/   index.tsx + style.css
 │   ├── JourneyProgress/  index.tsx + style.css
-│   ├── Magic8Ball/       index.tsx + style.css   ← pixel-art oracle game
+│   ├── LabsRail/         index.tsx + style.css   ← Labs nav rail (fixed desktop / sticky mobile)
+│   ├── Magic8Ball/       index.tsx + style.css   ← pixel-art oracle game (unchanged)
 │   ├── Navbar/           index.tsx + style.css
 │   ├── PixelBorder/      index.tsx + style.css
+│   ├── SceneText/        index.tsx + style.css   ← title + teaser + SHOW LOGIC toggle
 │   ├── ScrollIndicator/  index.tsx + style.css
 │   ├── ScrollToTop/      index.tsx
 │   ├── StatCard/         index.tsx + style.css
 │   ├── ThemeToggle/      index.tsx
-│   └── XPBar/            index.tsx + style.css
+│   ├── TVScreen/         index.tsx + style.css   ← channel host + static-burst FSM
+│   ├── TVSet/            index.tsx + style.css   ← CRT chrome (antennas, knobs, scanlines)
+│   ├── XPBar/            index.tsx + style.css
+│   └── games/
+│       ├── types.ts       GameProps { active: boolean }
+│       ├── DinoRun/      index.tsx + style.css
+│       ├── Gacha/        index.tsx + style.css
+│       ├── Pong/         index.tsx + style.css
+│       └── Snake/        index.tsx + style.css
 ├── contexts/
-│   └── ThemeContext.tsx   (standalone, no folder needed)
+│   ├── ScrollProgressContext.tsx  ← shared rAF loop writing --p to scene elements
+│   └── ThemeContext.tsx
 ├── data/
+│   ├── labs.ts            ← Labs content (experiments, TV channels, toys)
 │   └── resume.ts          ← single source of truth for all content
 ├── hooks/
+│   ├── useScrollProgress.ts  ← registers element with ScrollProgressContext
 │   └── useTypewriter.ts
 ├── pages/
 │   ├── About/            index.tsx + style.css
 │   ├── Contact/          index.tsx + style.css
 │   ├── Home/             index.tsx + style.css
-│   └── Labs/             index.tsx + style.css   ← experimental playground
+│   └── Labs/             index.tsx + style.css   ← experimental playground (restructured)
 ├── styles/
 │   ├── global.css         reset, utilities, animations
 │   └── tokens.css         all CSS custom properties
@@ -57,12 +72,15 @@ src/
 | File                            | Purpose                                                                                                                                                                    |
 | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `src/data/resume.ts`                  | **Only place resume content lives.** Edit here; pages pick it up automatically.                                                                                            |
+| `src/data/labs.ts`                    | **Only place Labs content lives.** All experiments, channels, teasers, code snippets. See §Labs internals.                                                                  |
 | `src/styles/tokens.css`               | All CSS custom properties — palette, spacing, fonts, shadows. Edit colours here, not inline.                                                                               |
 | `src/styles/global.css`               | Reset, utility classes (`.pixel-text`, `.vt-text`, animations). **Also owns all `.btn` / `.btn--*` variants** — moved here from Home so Magic8Ball buttons work on Labs too. |
 | `src/contexts/ThemeContext.tsx`       | Dark/light theme. Reads `prefers-color-scheme` as default; persists override in `localStorage` under key `cj-portfolio-theme`. Applies `data-theme` attribute to `<html>`. |
+| `src/contexts/ScrollProgressContext.tsx` | One shared rAF loop writing `--p` (0→1) onto registered scene elements. Used by Labs SceneText for entry animations. |
 | `src/pages/Contact/index.tsx`         | Has `FORMSPREE_ID` constant at the top — set it to enable direct email.                                                                                                    |
 | `src/utils/haptics.ts`                | Thin wrapper around `navigator.vibrate` + stub for future haptic patterns. Import `haptics` and call `.tap()`, `.press()`, `.toggle()`, `.reveal()`.                       |
-| `src/components/Magic8Ball/index.tsx` | Self-contained pixel-art oracle game. Lives in **Labs → ORACLE_v1.exe** section. See §Magic8Ball below.                                                                    |
+| `src/components/Magic8Ball/index.tsx` | Self-contained pixel-art oracle game. Lives in **Labs → magic8ball toy scene**. See §Magic8Ball below.                                                                      |
+| `src/components/TVScreen/index.tsx`   | Channel host FSM (`live` / `static`). `GAME_MAP` here maps `GameKey → Component`. Add new TV games here.                                                                   |
 
 ---
 
@@ -138,39 +156,106 @@ All methods are no-ops where `navigator.vibrate` is unsupported (desktop). Every
 
 ---
 
-## Labs page — scroll-snap internals
+## Labs page — scroll-snap internals (restructured)
 
-`src/pages/Labs/` — an experimental playground with four full-height scroll-snap sections.
+`src/pages/Labs/` — a content-driven scroll journey with a **shared sticky CRT TV** for game channels and standalone toy scenes.
 
-**Sections (in order):**
-1. **INIT** — terminal-style boot screen listing experiments with status badges.
-2. **ORACLE_v1.exe** — `Magic8Ball` component; badge color `--classplus-purple`.
-3. **ARCADE.exe** — 90s retro TV placeholder with canvas static noise; badge color `--delhivery-red`.
-4. **BLOG.exe** — Terminal window with animated line-by-line output; badge color `--nivoda-gold`.
+### Content model
 
-**Scroll-snap implementation** (same pattern as About journey, different concerns):
+`src/data/labs.ts` is the single source of truth (mirrors `resume.ts`). Each `LabExperiment` has:
+- `render: 'tv' | 'standalone'` — determines scene type
+- `game: GameKey` — maps to a game component in `src/components/games/`
+- `code: string` — the core-logic snippet shown in the expandable `CodePanel`
+- **Invariant**: all `render: 'tv'` entries must be contiguous before `standalone` entries. A dev-mode assertion in `labs.ts` throws if violated.
 
-1. **Container** is `div.labs-scroll` — `height: calc(100vh - 56px)`, `overflow-y: scroll`, `scroll-snap-type: y mandatory`. Native scrollbar hidden (side dots replace it).
+### Component tree
 
-2. **Each section** is `height: 100%` (exactly 100% of the container). `min-height: 100%` breaks snapping — keep it `height`.
+```
+Labs (page)
+├── LabsRail           floating pill (position: fixed, left: 20px, centered vertically)
+│                      hidden on hero (activeIdx === 0), slides in on scroll
+└── labs-stage         scroll container (root for IntersectionObserver)
+     ├── HeroScene     boot intro (section idx 0)
+     ├── .tv-zone      two-column flex; height = TV_COUNT × (100vh − 56px)
+     │    ├── .tv-zone__left   scrollable TEXT column (TVBlogScene × TV_COUNT)
+     │    └── .tv-zone__right  sticky CRT column (TVSet → TVScreen → active game)
+     └── ToyScene × N  standalone toys — text left, toy right (section idx TV_COUNT+1 …)
+```
 
-3. **IntersectionObserver uses `root: scrollRef.current`** with `threshold: 0.5`. The same rule as About applies: use the nested container as root, not the viewport.
+**Column order (TV zone):** TEXT is LEFT, TV is RIGHT. This is the opposite of the original spec — text fills the wide left column, the CRT TV sticks on the right.
 
-4. **`scrollToSection`** uses the same manual `container.scrollTo` pattern as About's `scrollToCard` — `scrollIntoView` won't work on the nested container.
+New components: `LabsRail`, `TVSet`, `TVScreen`, `ChannelStatic`, `CodePanel`, `SceneText`, `games/Snake`, `games/Pong`, `games/DinoRun`, `games/Gacha`.
 
-5. **`BlogTerminal` replays** whenever its section becomes active (`isActive={activeIdx === 3}`). The `useEffect` keys on `isActive` — when it flips to `true`, it clears timers, resets count to 0, and restarts the line-by-line animation.
+### Sticky TV pattern
 
-6. **`RetroTVScreen`** runs `requestAnimationFrame` continuously to animate canvas static noise. It's a lightweight 60×45 canvas so this is fine; no need to pause on visibility.
+`.tv-zone__right` has `flex: 0 0 46%` and `align-self: stretch` (default), so it grows to match the left column's total height (`TV_COUNT × (100vh−56px)`). Inside it, `.tv-set-wrapper` is `position: sticky; top: 0; height: calc(100vh−56px)` — this keeps the CRT pinned while the text scrolls.
 
-7. **Mobile** (`≤768px`): scroll-snap disabled, sections stack vertically with `min-height: calc(100vh - 56px)`. TV controls switch from column to row layout.
+**`scrollIntoView` will NOT work** on the nested scroll container — use the manual `stageRef.current.scrollTo` pattern.
 
-8. **Side progress dots** (`labs-progress`) are `position: fixed`, hidden at `≤900px`.
+### Scroll-snap
 
-**Adding a new lab experiment:**
-1. Add a `{ id, label }` entry to `LABS_SECTIONS` array.
-2. Add a new `<section className="labs-section labs-section--yourname">` with a `ref={(el) => { sectionRefs.current[N] = el; }}`.
-3. Add the section's background/border rule in `style.css`.
-4. Extend the intro list in Section 0 with name, status, and color.
+- `scroll-snap-type: y mandatory` on `.labs-stage`.
+- Snap targets are `height: calc(100vh−56px)` with `scroll-snap-align: start`. **Never `min-height`** — that breaks snap.
+- Snap targets: HeroScene, each TVBlogScene (inside `.tv-zone__left`), each ToyScene.
+- CSS scroll-snap-align works on descendants of the scroll container — TVBlogScenes don't need to be direct children.
+
+### LabsRail — floating pill
+
+- `position: fixed; left: 20px; top: 50%; transform: translateY(-50%)`
+- Compact dot navigation (10px circles per section + thin separator after hero dot)
+- Hidden (`opacity: 0; transform: translateX(-56px) translateY(-50%)`) when `activeIdx === 0` (hero)
+- Slides in with CSS transition when user scrolls to any experiment
+- `display: none` on ≤899px (no mobile rail)
+- `.labs-page` has `padding-left: 76px` on ≥900px to stop content hiding behind the pill
+
+### IntersectionObserver
+
+Uses `root: stageRef.current` on desktop, `root: null` (viewport) on mobile (where `.labs-stage` becomes `overflow-y: visible`). The observer fires on the same `sectionRefs` array covering all 6 scenes.
+
+- `activeIdx` (0–5) drives the rail dot highlight and toy `active` prop.
+- `activeChannel` (1–3) is only updated when `activeIdx` is in the TV range (1–TV_COUNT).
+
+### TVScreen channel-change FSM
+
+```
+states: 'live' | 'static'
+on activeChannel change:
+  set status = 'static'  → mount ChannelStatic + flash "CH 0X"
+  after 280ms:
+    set displayChannel = activeChannel
+    set status = 'live'  → mount new game (key=channel, fresh state)
+```
+
+Inactive TV games are **unmounted** (via `key={displayChannel}` conditional). No off-screen rAF loops.
+
+### Game component contract
+
+All games in `src/components/games/` implement `GameProps { active: boolean }`:
+- rAF loops must **not run** when `active` is false.
+- DinoRun shows a "SPACE / TAP TO START" overlay until first input (avoids auto-death on channel switch).
+- Keep game state in `useRef`, not `useState`, inside the loop — zero re-renders per frame.
+
+### SceneText + CodePanel
+
+`SceneText` has **no `max-width`** — it fills its parent column. `CodePanel` has no `max-height` / `overflow-y` — the code expands fully without internal scroll. On mobile, `CodePanel` sets `max-width: 100%; min-width: 0` to prevent horizontal layout shift.
+
+### ScrollProgressContext
+
+`src/contexts/ScrollProgressContext.tsx` runs **one shared rAF loop** that writes `--p` (0→1) as a CSS custom property onto each registered scene element, based on distance from stage center. `SceneText` maps `--p` to `translateY` + `opacity` for entry animations. Disabled when `prefers-reduced-motion: reduce`.
+
+### Mobile (≤768px)
+
+- `.labs-stage` → `height: auto; overflow-y: visible; scroll-snap-type: none`
+- `.tv-zone` → `flex-direction: column`; TV column (`tv-zone__right`) renders first (order: 0), text column second (order: 1); `.tv-set-wrapper` → `position: static`
+- `LabsRail` → `display: none` (no mobile rail at all)
+- Toy scene: stacks to column; game centered
+
+### Adding a new lab experiment
+
+1. Add an entry to `LAB_EXPERIMENTS` in `src/data/labs.ts` (keep all `tv` entries before `standalone`).
+2. If it's a TV game, create `src/components/games/YourGame/index.tsx + style.css` implementing `GameProps`, then add it to `GAME_MAP` in `TVScreen/index.tsx`.
+3. If it's a toy, add a `game === 'yourkey'` branch in the `ToyScene` component inside `Labs/index.tsx`.
+4. No section ref wiring needed — the Labs page maps `LAB_EXPERIMENTS` dynamically.
 
 ---
 

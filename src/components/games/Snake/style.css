@@ -1,0 +1,21 @@
+.snake-game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--px2);
+}
+
+.snake-game__canvas {
+  border: var(--px) solid var(--border-primary);
+  box-shadow: var(--px2) var(--px2) 0 var(--border-secondary);
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  cursor: pointer;
+  display: block;
+}
+
+.snake-game__hint {
+  font-size: 5px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+}

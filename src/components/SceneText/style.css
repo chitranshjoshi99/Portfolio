@@ -1,0 +1,99 @@
+.scene-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--px3);
+  width: 100%;
+}
+
+.scene-text__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--px4);
+}
+
+.scene-text__channel {
+  font-size: 6px;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+}
+
+.scene-text__badge {
+  font-size: 5px;
+  letter-spacing: 0.08em;
+  padding: 2px var(--px2);
+  border: var(--px) solid currentColor;
+  flex-shrink: 0;
+  animation: none;
+}
+
+/* Blink the WRITING badge */
+.scene-text__badge[style*='nivoda-gold'] {
+  animation: blink 1.6s step-end infinite;
+}
+
+.scene-text__title {
+  font-size: clamp(0.45rem, 1.2vw, 0.65rem);
+  color: var(--text-primary);
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+  transform: translateY(calc((1 - var(--p, 1)) * 20px));
+  opacity: calc(0.2 + var(--p, 1) * 0.8);
+  transition: none; /* let rAF drive this */
+}
+
+.scene-text__teaser {
+  font-size: 1.35rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  letter-spacing: 0.02em;
+  opacity: calc(0.1 + var(--p, 1) * 0.9);
+  transform: translateY(calc((1 - var(--p, 1)) * 12px));
+}
+
+.scene-text__toggle {
+  align-self: flex-start;
+  font-size: 6px;
+  letter-spacing: 0.08em;
+  padding: var(--px2) var(--px3);
+  border: var(--px) solid var(--border-primary);
+  background: transparent;
+  color: var(--accent-primary);
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.scene-text__toggle:hover {
+  background: var(--bg-card-hover);
+  box-shadow: var(--px) var(--px) 0 var(--border-primary);
+}
+
+.scene-text__code-wrap {
+  animation: code-panel-in 0.2s ease both;
+}
+
+@keyframes code-panel-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Native scroll-timeline (progressive enhancement) */
+@supports (animation-timeline: view()) {
+  .scene-text__title,
+  .scene-text__teaser {
+    transform: none;
+    opacity: 1;
+    /* Use rAF path on older browsers; native timeline on modern Chrome/Safari */
+  }
+}
+
+/* Reduced motion: kill transforms */
+@media (prefers-reduced-motion: reduce) {
+  .scene-text__title,
+  .scene-text__teaser {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}

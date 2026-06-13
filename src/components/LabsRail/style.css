@@ -1,0 +1,70 @@
+/* ── Floating pill — desktop ─────────────────────────────────── */
+
+.labs-rail {
+  position: fixed;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 90;
+
+  background: var(--bg-card);
+  border: var(--px) solid var(--border-primary);
+  border-radius: 20px;
+  box-shadow: var(--px2) var(--px2) 0 var(--border-secondary);
+  padding: var(--px4) 10px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--px3);
+
+  /* Slide-in transition */
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Hidden state: slide off to the left */
+.labs-rail--hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-56px) translateY(-50%);
+}
+
+/* Nav dots */
+.labs-rail__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: var(--px) solid var(--border-primary);
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: background var(--transition-fast), border-color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.labs-rail__dot:hover {
+  border-color: var(--text-muted);
+  transform: scale(1.25);
+}
+
+.labs-rail__dot--active {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  transform: scale(1.35);
+}
+
+/* Thin line separating the hero dot from experiment dots */
+.labs-rail__sep {
+  width: 1px;
+  height: 10px;
+  background: var(--border-primary);
+}
+
+/* ── Mobile: completely hidden ──────────────────────────────── */
+
+@media (max-width: 899px) {
+  .labs-rail {
+    display: none;
+  }
+}
