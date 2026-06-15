@@ -1,20 +1,20 @@
 import { ImageResponse } from "@vercel/og";
-import { BLOGS } from "../blogs.config";
 
 export const config = { runtime: "edge" };
 
-// Press Start 2P TTF (Satori needs a real font file in the edge runtime)
+// Self-contained: reads title/tag/accent from query params (built by
+// api/page.js + the app via ogImageUrl in blogs.config.ts). No cross-module
+// imports, so the edge bundle stays clean.
+
+// Press Start 2P TTF — Satori needs a real font file in the edge runtime.
 const FONT_URL =
   "https://raw.githubusercontent.com/google/fonts/main/ofl/pressstart2p/PressStart2P-Regular.ttf";
 
 export default async function handler(req: Request) {
   const { searchParams } = new URL(req.url);
-  const slug = searchParams.get("slug") ?? "";
-  const blog = BLOGS.find((b) => b.slug === slug) ?? {
-    title: "Engineering notes & live POCs",
-    tag: "LABS",
-    accent: "#9b8ea0",
-  };
+  const title = searchParams.get("title") ?? "Engineering notes & live POCs";
+  const tag = searchParams.get("tag") ?? "LABS";
+  const accent = searchParams.get("accent") ?? "#9b8ea0";
 
   const font = await fetch(FONT_URL).then((r) => r.arrayBuffer());
 
@@ -35,9 +35,7 @@ export default async function handler(req: Request) {
           backgroundSize: "28px 28px",
         }}
       >
-        <div style={{ display: "flex", fontSize: 22, color: blog.accent }}>
-          {blog.tag}
-        </div>
+        <div style={{ display: "flex", fontSize: 22, color: accent }}>{tag}</div>
         <div
           style={{
             display: "flex",
@@ -46,7 +44,7 @@ export default async function handler(req: Request) {
             maxWidth: "960px",
           }}
         >
-          {blog.title}
+          {title}
         </div>
         <div
           style={{

@@ -380,7 +380,11 @@ update the host in `public/sitemap.xml` + `public/robots.txt`. That's it.
   `<!--SEO-->…<!--/SEO-->` block for blog-specific tags (incl.
   `og:image = /api/og?slug=…`). Humans still get the SPA.
 - `api/og.tsx` (`@vercel/og`, edge runtime) renders a 1200×630 pixel-art card per
-  post. Refresh LinkedIn's cache via the Post Inspector after each deploy.
+  post. It's **self-contained** — reads `title`/`tag`/`accent` from query params
+  (built by `ogImageUrl()` in `blogs.config.ts`), so the edge bundle has no
+  cross-module imports to choke on. `api/tsconfig.json` enables JSX
+  (`jsx: react-jsx`) for the function build. Refresh LinkedIn's cache via the
+  Post Inspector after each deploy.
 - **Add a post:** create the `.mdx`, add an entry to `blogs.config.ts` (set
   `gameKey` to match a Lab experiment's `game` to get the "READ FULL POST →"
   button in Labs), and add a `<loc>` to `public/sitemap.xml`.

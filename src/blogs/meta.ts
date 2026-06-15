@@ -1,6 +1,6 @@
-import { BLOGS, type BlogMeta } from "../../blogs.config";
+import { BLOGS, ogImageUrl, type BlogMeta } from "../../blogs.config";
 
-export { BLOGS };
+export { BLOGS, ogImageUrl };
 export type { BlogMeta };
 
 export const getBlog = (slug: string): BlogMeta | undefined =>

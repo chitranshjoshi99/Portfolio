@@ -25,3 +25,17 @@ export const BLOGS: BlogMeta[] = [
     gameKey: "snake",
   },
 ];
+
+// Build the @vercel/og image URL for a post. Passed as query params so the
+// edge function (api/og.tsx) stays self-contained — no shared imports to bundle.
+export function ogImageUrl(
+  origin: string,
+  blog: Pick<BlogMeta, "title" | "tag" | "accent">,
+): string {
+  const p = new URLSearchParams({
+    title: blog.title,
+    tag: blog.tag,
+    accent: blog.accent,
+  });
+  return `${origin}/api/og?${p.toString()}`;
+}

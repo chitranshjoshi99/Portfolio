@@ -1,4 +1,4 @@
-import { BLOGS } from "../blogs.config";
+import { BLOGS, ogImageUrl } from "../blogs.config";
 
 const esc = (s = "") =>
   s
@@ -21,7 +21,7 @@ export default async function handler(req, res) {
 
   if (blog) {
     const url = `${origin}/blogs/${blog.slug}`;
-    const image = `${origin}/api/og?slug=${encodeURIComponent(blog.slug)}`;
+    const image = ogImageUrl(origin, blog);
     const block = `
     <title>${esc(blog.title)} — Chitransh Joshi</title>
     <meta name="description" content="${esc(blog.description)}" />

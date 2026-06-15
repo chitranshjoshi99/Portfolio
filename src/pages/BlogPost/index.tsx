@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ComponentType } from "react";
 import { Link, useParams } from "react-router-dom";
-import { getBlog } from "../../blogs/meta";
+import { getBlog, ogImageUrl } from "../../blogs/meta";
 import { loadBlogBody } from "../../blogs/content";
 import { useDocumentMeta } from "../../hooks/useDocumentMeta";
 import { SITE_URL } from "../../config/site";
@@ -29,7 +29,7 @@ export default function BlogPost() {
             title: blog.title,
             description: blog.description,
             url: `${SITE_URL}/blogs/${blog.slug}`,
-            image: `${SITE_URL}/api/og?slug=${blog.slug}`,
+            image: ogImageUrl(SITE_URL, blog),
           }
         : null,
     [blog],
