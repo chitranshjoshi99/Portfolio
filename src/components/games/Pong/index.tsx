@@ -1,13 +1,13 @@
-import { useEffect, useRef } from 'react';
-import type { GameProps } from '../types';
-import './style.css';
+import { useEffect, useRef } from "react";
+import type { GameProps } from "../types";
+import "./style.css";
 
 const CW = 280;
 const CH = 180;
 const PAD_W = 8;
 const PAD_H = 40;
 const BALL = 8;
-const STEP = 1 / 60;
+const STEP = 1 / 240;
 const PAD_SPEED = 180; // px/s
 const INIT_SPEED = 140;
 const MAX_SPEED = 320;
@@ -29,10 +29,12 @@ interface PongState {
 }
 
 function intersects(a: Rect, b: Rect) {
-  return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+  return (
+    a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y
+  );
 }
 
-function initBall(): PongState['ball'] {
+function initBall(): PongState["ball"] {
   const ang = ((Math.random() * 60 - 30) * Math.PI) / 180;
   const dir = Math.random() < 0.5 ? 1 : -1;
   return {
@@ -67,7 +69,9 @@ function physics(s: PongState, dt: number) {
   const ballCenterY = s.ball.y + BALL / 2;
   const aiCenterY = s.padR + PAD_H / 2;
   const aiDelta = (ballCenterY - aiCenterY) * 3 * dt;
-  s.padR = clampPad(s.padR + Math.min(Math.abs(aiDelta), PAD_SPEED * dt) * Math.sign(aiDelta));
+  s.padR = clampPad(
+    s.padR + Math.min(Math.abs(aiDelta), PAD_SPEED * dt) * Math.sign(aiDelta),
+  );
 
   // Ball movement
   s.ball.x += s.ball.vx * dt;
@@ -123,12 +127,12 @@ function physics(s: PongState, dt: number) {
 }
 
 function draw(ctx: CanvasRenderingContext2D, s: PongState) {
-  ctx.fillStyle = '#0c0a0e';
+  ctx.fillStyle = "#0c0a0e";
   ctx.fillRect(0, 0, CW, CH);
 
   // Center dashed line
   ctx.setLineDash([6, 4]);
-  ctx.strokeStyle = '#2a2535';
+  ctx.strokeStyle = "#2a2535";
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(CW / 2, 0);
@@ -137,21 +141,21 @@ function draw(ctx: CanvasRenderingContext2D, s: PongState) {
   ctx.setLineDash([]);
 
   // Score
-  ctx.fillStyle = '#3a3545';
+  ctx.fillStyle = "#3a3545";
   ctx.font = '14px "Press Start 2P"';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'top';
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
   ctx.fillText(String(s.scoreL), CW / 2 - 28, 6);
   ctx.fillText(String(s.scoreR), CW / 2 + 28, 6);
 
   // Paddles
-  ctx.fillStyle = '#e8e4dc';
+  ctx.fillStyle = "#e8e4dc";
   ctx.fillRect(8, s.padL, PAD_W, PAD_H);
-  ctx.fillStyle = '#8b7ba8';
+  ctx.fillStyle = "#8b7ba8";
   ctx.fillRect(CW - 8 - PAD_W, s.padR, PAD_W, PAD_H);
 
   // Ball
-  ctx.fillStyle = '#9b8ea0';
+  ctx.fillStyle = "#9b8ea0";
   ctx.fillRect(s.ball.x, s.ball.y, BALL, BALL);
 }
 
@@ -163,18 +167,24 @@ export function Pong({ active }: GameProps) {
     if (!active) return;
     const onKey = (e: KeyboardEvent, down: boolean) => {
       const k = stateRef.current.keys;
-      if (e.key === 'w') k.w = down;
-      if (e.key === 's') k.s = down;
-      if (e.key === 'ArrowUp') { k.up = down; e.preventDefault(); }
-      if (e.key === 'ArrowDown') { k.down = down; e.preventDefault(); }
+      if (e.key === "w") k.w = down;
+      if (e.key === "s") k.s = down;
+      if (e.key === "ArrowUp") {
+        k.up = down;
+        e.preventDefault();
+      }
+      if (e.key === "ArrowDown") {
+        k.down = down;
+        e.preventDefault();
+      }
     };
     const onDown = (e: KeyboardEvent) => onKey(e, true);
     const onUp = (e: KeyboardEvent) => onKey(e, false);
-    window.addEventListener('keydown', onDown);
-    window.addEventListener('keyup', onUp);
+    window.addEventListener("keydown", onDown);
+    window.addEventListener("keyup", onUp);
     return () => {
-      window.removeEventListener('keydown', onDown);
-      window.removeEventListener('keyup', onUp);
+      window.removeEventListener("keydown", onDown);
+      window.removeEventListener("keyup", onUp);
     };
   }, [active]);
 
@@ -182,7 +192,7 @@ export function Pong({ active }: GameProps) {
     if (!active) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     let raf: number;

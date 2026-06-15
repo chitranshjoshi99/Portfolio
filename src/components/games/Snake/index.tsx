@@ -67,7 +67,7 @@ function step(s: SnakeState) {
   }
 }
 
-function draw(ctx: CanvasRenderingContext2D, s: SnakeState) {
+function draw(ctx: CanvasRenderingContext2D, s: SnakeState, started: boolean) {
   ctx.fillStyle = '#0c0a0e';
   ctx.fillRect(0, 0, W, H);
 
@@ -97,6 +97,17 @@ function draw(ctx: CanvasRenderingContext2D, s: SnakeState) {
   ctx.textBaseline = 'top';
   ctx.fillText(`${s.score}`, 4, 3);
 
+  if (!started && !s.dead) {
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#e8e4dc';
+    ctx.font = '7px "Press Start 2P"';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('TAP / ↑ TO START', W / 2, H / 2);
+    ctx.textAlign = 'left';
+  }
+
   if (s.dead) {
     ctx.fillStyle = 'rgba(0,0,0,0.65)';
     ctx.fillRect(0, 0, W, H);
@@ -115,6 +126,7 @@ function draw(ctx: CanvasRenderingContext2D, s: SnakeState) {
 export function Snake({ active }: GameProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef<SnakeState>(init());
+  const startedRef = useRef(false);
 
   // Keyboard input — only when active
   useEffect(() => {
@@ -123,6 +135,7 @@ export function Snake({ active }: GameProps) {
       const s = stateRef.current;
       if (s.dead) {
         stateRef.current = init();
+        startedRef.current = false;
         return;
       }
       switch (e.key) {
@@ -147,6 +160,13 @@ export function Snake({ active }: GameProps) {
           e.preventDefault();
           break;
       }
+      if (
+        ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd'].includes(
+          e.key,
+        )
+      ) {
+        startedRef.current = true;
+      }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -165,11 +185,11 @@ export function Snake({ active }: GameProps) {
 
     function loop(now: number) {
       raf = requestAnimationFrame(loop);
-      if (now - last >= TICK) {
+      if (startedRef.current && now - last >= TICK) {
         step(stateRef.current);
         last = now;
       }
-      draw(ctx!, stateRef.current);
+      draw(ctx!, stateRef.current, startedRef.current);
     }
 
     raf = requestAnimationFrame(loop);
@@ -177,7 +197,13 @@ export function Snake({ active }: GameProps) {
   }, [active]);
 
   const handleClick = () => {
-    if (stateRef.current.dead) stateRef.current = init();
+    const s = stateRef.current;
+    if (s.dead) {
+      stateRef.current = init();
+      startedRef.current = false;
+      return;
+    }
+    startedRef.current = true;
   };
 
   return (

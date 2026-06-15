@@ -74,19 +74,30 @@
   animation: code-panel-in 0.2s ease both;
 }
 
+.scene-text__readmore {
+  align-self: flex-start;
+  margin-top: var(--px2);
+  font-size: 6px;
+  letter-spacing: 0.08em;
+  color: var(--accent-primary);
+  text-decoration: none;
+  padding: var(--px2) var(--px3);
+  border: var(--px) solid var(--accent-primary);
+  transition:
+    background var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.scene-text__readmore:hover {
+  background: var(--bg-card-hover);
+  box-shadow: var(--px) var(--px) 0 var(--accent-primary);
+  transform: translate(-1px, -1px);
+}
+
 @keyframes code-panel-in {
   from { opacity: 0; transform: translateY(-6px); }
   to   { opacity: 1; transform: translateY(0); }
-}
-
-/* Native scroll-timeline (progressive enhancement) */
-@supports (animation-timeline: view()) {
-  .scene-text__title,
-  .scene-text__teaser {
-    transform: none;
-    opacity: 1;
-    /* Use rAF path on older browsers; native timeline on modern Chrome/Safari */
-  }
 }
 
 /* Reduced motion: kill transforms */

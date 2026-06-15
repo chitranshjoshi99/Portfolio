@@ -1,4 +1,8 @@
-/* ── Floating pill — desktop ─────────────────────────────────── */
+/* ============================================================
+   LABS RAIL — floating side menu
+   Collapsed = dots only.  Hover/focus = dots expand to names.
+   Desktop: detached pill, left-of-center.  Mobile: bottom dock.
+   ============================================================ */
 
 .labs-rail {
   position: fixed;
@@ -11,60 +15,173 @@
   border: var(--px) solid var(--border-primary);
   border-radius: 20px;
   box-shadow: var(--px2) var(--px2) 0 var(--border-secondary);
-  padding: var(--px4) 10px;
+  padding: var(--px3) 10px;
+}
 
+.labs-rail__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
+  gap: var(--px3);
+}
+
+/* ── Item: collapsed shows the dot, label slides out on hover ── */
+.labs-rail__item {
+  display: flex;
   align-items: center;
   gap: var(--px3);
-
-  /* Slide-in transition */
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-secondary);
 }
 
-/* Hidden state: slide off to the left */
-.labs-rail--hidden {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateX(-56px) translateY(-50%);
-}
-
-/* Nav dots */
 .labs-rail__dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
   border: var(--px) solid var(--border-primary);
   background: transparent;
-  cursor: pointer;
-  padding: 0;
   flex-shrink: 0;
-  transition: background var(--transition-fast), border-color var(--transition-fast),
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
     transform var(--transition-fast);
 }
 
-.labs-rail__dot:hover {
-  border-color: var(--text-muted);
-  transform: scale(1.25);
+.labs-rail__item:hover .labs-rail__dot {
+  border-color: var(--row-accent, var(--text-muted));
+  transform: scale(1.2);
 }
 
-.labs-rail__dot--active {
-  background: var(--accent-primary);
-  border-color: var(--accent-primary);
-  transform: scale(1.35);
+.labs-rail__item.is-active .labs-rail__dot {
+  background: var(--row-accent, var(--accent-primary));
+  border-color: var(--row-accent, var(--accent-primary));
+  transform: scale(1.3);
 }
 
-/* Thin line separating the hero dot from experiment dots */
+/* Label — hidden until the pill is hovered or focused */
+.labs-rail__label {
+  display: flex;
+  align-items: center;
+  gap: var(--px2);
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition:
+    max-width var(--transition-base),
+    opacity var(--transition-base);
+}
+
+.labs-rail:hover .labs-rail__label,
+.labs-rail:focus-within .labs-rail__label {
+  max-width: 170px;
+  opacity: 1;
+}
+
+.labs-rail__tag {
+  font-size: 6px;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.labs-rail__name {
+  font-size: 1.05rem;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.labs-rail__item.is-active .labs-rail__name {
+  color: var(--row-accent, var(--accent-primary));
+}
+
+.labs-rail__status {
+  font-size: 7px;
+  color: var(--row-accent, var(--text-muted));
+}
+
+/* ── Group separator (thin line; label reveals on hover) ─────── */
 .labs-rail__sep {
-  width: 1px;
-  height: 10px;
-  background: var(--border-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--px2);
 }
 
-/* ── Mobile: completely hidden ──────────────────────────────── */
+.labs-rail__sep::before {
+  content: '';
+  width: 10px; /* aligns under the dots */
+  height: 1px;
+  background: var(--border-primary);
+  flex-shrink: 0;
+}
 
+.labs-rail__sep-label {
+  font-size: 5px;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition:
+    max-width var(--transition-base),
+    opacity var(--transition-base);
+}
+
+.labs-rail:hover .labs-rail__sep-label,
+.labs-rail:focus-within .labs-rail__sep-label {
+  max-width: 80px;
+  opacity: 1;
+}
+
+/* ── Mobile: floating bottom dock (dots; active shows its name) ── */
 @media (max-width: 899px) {
   .labs-rail {
+    left: 50%;
+    top: auto;
+    bottom: 16px;
+    transform: translateX(-50%);
+    padding: var(--px2) var(--px3);
+    border-radius: 18px;
+  }
+
+  .labs-rail__list {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--px3);
+  }
+
+  /* No hover on touch — keep dots, but reveal the active item's name */
+  .labs-rail__label {
+    display: none;
+  }
+
+  .labs-rail__item.is-active .labs-rail__label {
+    display: flex;
+    max-width: none;
+    opacity: 1;
+  }
+
+  .labs-rail__item.is-active .labs-rail__tag,
+  .labs-rail__item.is-active .labs-rail__status {
+    display: none;
+  }
+
+  /* Separator becomes a short vertical divider */
+  .labs-rail__sep::before {
+    width: 1px;
+    height: 14px;
+  }
+
+  .labs-rail__sep-label {
     display: none;
   }
 }

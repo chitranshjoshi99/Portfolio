@@ -172,7 +172,7 @@ All methods are no-ops where `navigator.vibrate` is unsupported (desktop). Every
 
 ```
 Labs (page)
-├── LabsRail           floating pill (position: fixed, left: 20px, centered vertically)
+├── LabsRail           floating pill menu (left-center desktop / bottom dock mobile; names on hover)
 │                      hidden on hero (activeIdx === 0), slides in on scroll
 └── labs-stage         scroll container (root for IntersectionObserver)
      ├── HeroScene     boot intro (section idx 0)
@@ -199,14 +199,14 @@ New components: `LabsRail`, `TVSet`, `TVScreen`, `ChannelStatic`, `CodePanel`, `
 - Snap targets: HeroScene, each TVBlogScene (inside `.tv-zone__left`), each ToyScene.
 - CSS scroll-snap-align works on descendants of the scroll container — TVBlogScenes don't need to be direct children.
 
-### LabsRail — floating pill
+### LabsRail — floating pill (names expand on hover)
 
-- `position: fixed; left: 20px; top: 50%; transform: translateY(-50%)`
-- Compact dot navigation (10px circles per section + thin separator after hero dot)
-- Hidden (`opacity: 0; transform: translateX(-56px) translateY(-50%)`) when `activeIdx === 0` (hero)
-- Slides in with CSS transition when user scrolls to any experiment
-- `display: none` on ≤899px (no mobile rail)
-- `.labs-page` has `padding-left: 76px` on ≥900px to stop content hiding behind the pill
+- **Always visible** (including on the hero) — no hide-on-scroll. The old hero experiment-list was removed so the rail is the single index.
+- **Collapsed = dots only.** Each item is a 10px dot; the label (`CH0X`/`TOY`/`INIT` tag + experiment name + status glyph) is `max-width: 0; opacity: 0` and slides open on `.labs-rail:hover` / `:focus-within`. This is the icon-rail-expands-on-hover pattern.
+- Active item tracked by `activeIdx`; dot fills with the item's accent (`--row-accent` set inline), active name tints to the accent. Groups separated by a thin `.labs-rail__sep` line whose `TV` / `TOYS` micro-label also reveals on hover.
+- **Desktop:** detached pill `position: fixed; left: 20px; top: 50%`, rounded (`border-radius: 20px`), pixel drop-shadow. `.labs-page` has `padding-left: 76px` so content clears the *collapsed* pill (expanded labels overlay transiently on hover).
+- **Mobile (≤899px):** becomes a floating bottom dock (`left: 50%; bottom: 16px; flex-direction: row`). No hover on touch, so it stays dots-only except the **active** item, which shows its name inline.
+- Props: `{ activeIdx, experiments, onJump }`. (No `progress` fill / `isVisible` / `totalSections` — removed.)
 
 ### IntersectionObserver
 
@@ -241,7 +241,9 @@ All games in `src/components/games/` implement `GameProps { active: boolean }`:
 
 ### ScrollProgressContext
 
-`src/contexts/ScrollProgressContext.tsx` runs **one shared rAF loop** that writes `--p` (0→1) as a CSS custom property onto each registered scene element, based on distance from stage center. `SceneText` maps `--p` to `translateY` + `opacity` for entry animations. Disabled when `prefers-reduced-motion: reduce`.
+`src/contexts/ScrollProgressContext.tsx` runs **one shared rAF loop** that writes `--p` (0→1) as a CSS custom property onto each registered scene element, based on distance from stage center. Disabled when `prefers-reduced-motion: reduce` (the loop returns early, so `--p` is never written and CSS falls back to `var(--p, 1)` = fully-visible/static).
+
+**Registration is required for any of this to animate.** Each scene (`HeroScene`, `TVBlogScene`, `ToyScene`) creates an internal ref and calls `useScrollProgress(ref)` to register itself; for the forwardRef scenes the internal ref is merged with the parent's section ref via `assignRef`. `--p` is set on the section and inherits to descendants. Consumers: `SceneText` (`.scene-text__title` / `.scene-text__teaser` → `translateY` + `opacity`) and `.toy-scene__game` (parallax `translateX` + `scale`). Do **not** add an `@supports (animation-timeline: view())` block that zeroes these transforms unless you also define a real native scroll-timeline animation — an earlier version did and silently disabled the effect on modern Chrome/Safari.
 
 ### Mobile (≤768px)
 
@@ -352,21 +354,40 @@ git commit --no-verify -m "chore: ..."
 
 ## SEO / Social preview
 
-All meta lives in `index.html`. The deployed base URL is hard-coded as
-`https://chitranshjoshi99.github.io/Portfolio` in:
-- `<link rel="canonical">`
-- All `og:url` / `og:image` / `twitter:image` tags
-- The JSON-LD `@id` and `url` fields
-- `public/robots.txt` Sitemap pointer
-- `public/sitemap.xml` `<loc>` entries
+Deploys to **Vercel** (framework preset: Vite, `base: "/"`, router `basename="/"`).
+The base URL is centralized in `VITE_SITE_URL`:
 
-**If the domain changes**, do a global find-replace on
-`chitranshjoshi99.github.io/Portfolio` across `index.html`,
-`public/robots.txt`, and `public/sitemap.xml`.
+- `index.html` uses the `%VITE_SITE_URL%` build-time token in canonical, all
+  `og:*` / `twitter:*`, and the JSON-LD `@id`/`url`/image fields — Vite
+  substitutes it at build from `VITE_SITE_URL` (`.env` locally, Vercel env in
+  prod). `src/config/site.ts` exposes the same value to app code.
+- `public/sitemap.xml` and `public/robots.txt` are **static** (Vite does NOT
+  substitute tokens there) — they carry a placeholder host.
 
-The OG share image is `public/profile.jpeg` (served at `/profile.jpeg`).
-WhatsApp, iMessage, LinkedIn, Twitter/X and Slack all read the OG tags and
-will show the profile photo + name + description as the link preview.
+**When the real domain is chosen:** set `VITE_SITE_URL` (locally + Vercel) and
+update the host in `public/sitemap.xml` + `public/robots.txt`. That's it.
+
+### Blogs + LinkedIn link previews
+
+- Posts are **MDX** in `src/blogs/posts/<slug>.mdx` (can import & embed the live
+  Labs game). Metadata is shared in root `blogs.config.ts` — imported by BOTH the
+  app and the Vercel functions, which is why it's a typed `.ts`, not JSON.
+- Routes: `/blogs` (`BlogIndex`) and `/blogs/:slug` (`BlogPost`, lazy-loads the
+  MDX body via `src/blogs/content.ts`). `useDocumentMeta` mirrors per-route meta
+  into the head for users + Google.
+- **Social crawlers don't run JS.** `vercel.json` rewrites `/blogs/:slug` →
+  `api/page.js`, which fetches the static `index.html` and swaps the
+  `<!--SEO-->…<!--/SEO-->` block for blog-specific tags (incl.
+  `og:image = /api/og?slug=…`). Humans still get the SPA.
+- `api/og.tsx` (`@vercel/og`, edge runtime) renders a 1200×630 pixel-art card per
+  post. Refresh LinkedIn's cache via the Post Inspector after each deploy.
+- **Add a post:** create the `.mdx`, add an entry to `blogs.config.ts` (set
+  `gameKey` to match a Lab experiment's `game` to get the "READ FULL POST →"
+  button in Labs), and add a `<loc>` to `public/sitemap.xml`.
+
+The MDX toolchain is `@mdx-js/rollup` (vite plugin, `enforce: 'pre'`, before the
+SWC react plugin) + `@mdx-js/react` + `remark-gfm`. `*.mdx` is typed in
+`src/vite-env.d.ts`.
 
 ---
 

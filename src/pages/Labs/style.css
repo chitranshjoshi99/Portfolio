@@ -6,7 +6,7 @@
   padding-top: 56px;
 }
 
-/* On desktop, offset content right of the floating rail pill */
+/* On desktop, reserve space for the collapsed floating pill (left: 20px) */
 @media (min-width: 900px) {
   .labs-page {
     padding-left: 76px;
@@ -185,6 +185,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Scroll-driven parallax — reads --p (0..1) from the registered .toy-scene */
+  opacity: calc(0.35 + var(--p, 1) * 0.65);
+  transform: translateX(calc((1 - var(--p, 1)) * 36px))
+    scale(calc(0.94 + var(--p, 1) * 0.06));
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toy-scene__game {
+    transform: none;
+    opacity: 1;
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════

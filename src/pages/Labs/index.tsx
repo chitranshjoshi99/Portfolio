@@ -1,5 +1,6 @@
 import { forwardRef, useEffect, useRef, useState } from 'react';
 import { ScrollProgressProvider } from '../../contexts/ScrollProgressContext';
+import { useScrollProgress } from '../../hooks/useScrollProgress';
 import { LabsRail } from '../../components/LabsRail';
 import { TVSet } from '../../components/TVSet';
 import { SceneText } from '../../components/SceneText';
@@ -13,33 +14,37 @@ import {
 } from '../../data/labs';
 import './style.css';
 
+// Merge an internal ref (for scroll-progress registration) with the ref the
+// parent forwards (for IntersectionObserver section tracking).
+function assignRef<T>(forwarded: React.ForwardedRef<T>, value: T) {
+  if (typeof forwarded === 'function') forwarded(value);
+  else if (forwarded) forwarded.current = value;
+}
+
 // ── Hero / boot scene ─────────────────────────────────────────
 function HeroScene({ sectionRef }: { sectionRef: (el: HTMLElement | null) => void }) {
+  const ref = useRef<HTMLElement | null>(null);
+  useScrollProgress(ref);
   return (
     <section
       className="labs-section labs-hero"
-      ref={sectionRef}
+      ref={(el) => {
+        ref.current = el;
+        sectionRef(el);
+      }}
       aria-label="Labs introduction"
     >
       <div className="labs-hero__inner">
         <p className="pixel-text labs-hero__boot">$ ls ~/labs/experiments/</p>
         <h1 className="pixel-text labs-hero__title">LABS.exe</h1>
         <p className="vt-text labs-hero__sub">
-          experimental playground — digital toys &amp; works in progress
+          experimental playground — digital toys &amp; works in progress.
+          <br />
+          each entry pairs a short write-up with a live mini-game.
         </p>
-
-        <div className="labs-hero__list pixel-text">
-          {LAB_EXPERIMENTS.map((exp) => (
-            <div key={exp.id} className="labs-hero__entry">
-              <span style={{ color: exp.accent }} aria-hidden="true">◆</span>
-              <span className="labs-hero__entry-name">{exp.id.toUpperCase()}.exe</span>
-              <span className="labs-hero__entry-dots" aria-hidden="true" />
-              <span style={{ color: exp.accent }}>[{exp.status}]</span>
-            </div>
-          ))}
-        </div>
-
-        <p className="pixel-text labs-hero__hint">▼ SCROLL TO EXPLORE</p>
+        <p className="pixel-text labs-hero__hint">
+          ◀ PICK A CHANNEL · ▼ SCROLL TO EXPLORE
+        </p>
       </div>
     </section>
   );
@@ -52,18 +57,25 @@ interface TVBlogSceneProps {
 }
 
 const TVBlogScene = forwardRef<HTMLElement, TVBlogSceneProps>(
-  ({ experiment, isActive }, ref) => (
-    <article
-      ref={ref as React.Ref<HTMLElement>}
-      className={`labs-section tv-blog-scene${isActive ? ' tv-blog-scene--active' : ''}`}
-      aria-label={experiment.title}
-      aria-current={isActive ? 'true' : undefined}
-    >
-      <div className="tv-blog-scene__inner">
-        <SceneText experiment={experiment} />
-      </div>
-    </article>
-  ),
+  ({ experiment, isActive }, forwardedRef) => {
+    const ref = useRef<HTMLElement | null>(null);
+    useScrollProgress(ref);
+    return (
+      <article
+        ref={(el) => {
+          ref.current = el;
+          assignRef(forwardedRef, el);
+        }}
+        className={`labs-section tv-blog-scene${isActive ? ' tv-blog-scene--active' : ''}`}
+        aria-label={experiment.title}
+        aria-current={isActive ? 'true' : undefined}
+      >
+        <div className="tv-blog-scene__inner">
+          <SceneText experiment={experiment} />
+        </div>
+      </article>
+    );
+  },
 );
 TVBlogScene.displayName = 'TVBlogScene';
 
@@ -73,28 +85,37 @@ interface ToySceneProps {
   active: boolean;
 }
 
-const ToyScene = forwardRef<HTMLElement, ToySceneProps>(({ experiment, active }, ref) => (
-  <section
-    ref={ref as React.Ref<HTMLElement>}
-    className="labs-section toy-scene"
-    aria-label={experiment.title}
-  >
-    <div className="toy-scene__inner">
-      {/* Text left — SceneText handles toggle + code panel */}
-      <div className="toy-scene__text">
-        <SceneText experiment={experiment} />
-      </div>
-      {/* Toy right */}
-      <div className="toy-scene__game">
-        {experiment.game === 'magic8ball' ? (
-          <Magic8Ball />
-        ) : (
-          <Gacha active={active} />
-        )}
-      </div>
-    </div>
-  </section>
-));
+const ToyScene = forwardRef<HTMLElement, ToySceneProps>(
+  ({ experiment, active }, forwardedRef) => {
+    const ref = useRef<HTMLElement | null>(null);
+    useScrollProgress(ref);
+    return (
+      <section
+        ref={(el) => {
+          ref.current = el;
+          assignRef(forwardedRef, el);
+        }}
+        className="labs-section toy-scene"
+        aria-label={experiment.title}
+      >
+        <div className="toy-scene__inner">
+          {/* Text left — SceneText handles toggle + code panel */}
+          <div className="toy-scene__text">
+            <SceneText experiment={experiment} />
+          </div>
+          {/* Toy right */}
+          <div className="toy-scene__game">
+            {experiment.game === 'magic8ball' ? (
+              <Magic8Ball />
+            ) : (
+              <Gacha active={active} />
+            )}
+          </div>
+        </div>
+      </section>
+    );
+  },
+);
 ToyScene.displayName = 'ToyScene';
 
 // ── Labs page ─────────────────────────────────────────────────
@@ -105,8 +126,6 @@ export default function Labs() {
   const [activeChannel, setActiveChannel] = useState(1);
 
   const TV_COUNT = TV_EXPERIMENTS.length;
-  const TOY_COUNT = TOY_EXPERIMENTS.length;
-  const TOTAL = 1 + TV_COUNT + TOY_COUNT;
 
   // IntersectionObserver — stage root on desktop, viewport on mobile
   useEffect(() => {
@@ -135,7 +154,7 @@ export default function Labs() {
 
     sectionRefs.current.forEach((el) => el && obs.observe(el));
     return () => obs.disconnect();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [TV_COUNT]);
 
   const scrollToSection = (idx: number) => {
     const container = stageRef.current;
@@ -152,13 +171,11 @@ export default function Labs() {
   return (
     <main className="labs-page" id="main-content">
       <ScrollProgressProvider stageRef={stageRef}>
-        {/* Floating pill rail — fixed position, not in flow */}
+        {/* Persistent named index — left rail (desktop) / top strip (mobile) */}
         <LabsRail
           activeIdx={activeIdx}
-          totalSections={TOTAL}
           experiments={LAB_EXPERIMENTS}
           onJump={scrollToSection}
-          isVisible={activeIdx > 0}
         />
 
         <div className="labs-stage" ref={stageRef}>
