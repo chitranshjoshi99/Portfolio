@@ -10,14 +10,15 @@ const decode = (s: string) =>
     .replace(/&#x27;/gi, "'");
 
 // Grab an og:/twitter:/name meta value regardless of attribute order.
+// Lazy quantifiers + head-only input keep this cheap inside the Edge CPU budget.
 const meta = (html: string, prop: string): string => {
   const res = [
     new RegExp(
-      `<meta[^>]+(?:property|name)=["']${prop}["'][^>]+content=["']([^"']*)["']`,
+      `<meta[^>]*?(?:property|name)=["']${prop}["'][^>]*?content=["']([^"']*)`,
       "i",
     ),
     new RegExp(
-      `<meta[^>]+content=["']([^"']*)["'][^>]+(?:property|name)=["']${prop}["']`,
+      `<meta[^>]*?content=["']([^"']*)["'][^>]*?(?:property|name)=["']${prop}["']`,
       "i",
     ),
   ];
@@ -34,67 +35,47 @@ export default async function handler(req: Request) {
     "content-type": "application/json",
   };
 
-  const target = new URL(req.url).searchParams.get("url") || "";
+  try {
+    const target = new URL(req.url).searchParams.get("url") || "";
 
-  // Validate earlier and more explicitly
-  if (!target) {
-    return new Response(
-      JSON.stringify({ error: "Enter a valid http(s) URL" }),
-      {
+    let parsed: URL;
+    try {
+      parsed = new URL(target);
+      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+        throw new Error("bad protocol");
+      }
+    } catch {
+      return new Response(JSON.stringify({ error: "Enter a valid http(s) URL" }), {
         status: 400,
         headers: cors,
-      },
-    );
-  }
-
-  let parsed: URL;
-  try {
-    parsed = new URL(target);
-    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-      throw new Error("bad protocol");
+      });
     }
-  } catch (err) {
-    return new Response(
-      JSON.stringify({ error: "Enter a valid http(s) URL" }),
-      {
-        status: 400,
-        headers: cors,
-      },
-    );
-  }
 
-  try {
     const r = await fetch(parsed.toString(), {
       headers: {
-        "user-agent": "LinkedInBot/1.0 (preview)",
-        accept: "text/html",
+        "user-agent":
+          "Mozilla/5.0 (compatible; LinkPreviewBot/1.0; +https://chitransh.dev)",
+        accept: "text/html,application/xhtml+xml",
       },
       redirect: "follow",
-      // Add timeout to prevent hanging
-      ...(Deno?.timeout ? { timeout: Deno.timeout(10000) } : {}),
     });
 
-    // Check response status BEFORE trying to read text
     if (!r.ok) {
       return new Response(
         JSON.stringify({ error: `Couldn't fetch that page (${r.status})` }),
-        {
-          status: r.status,
-          headers: cors,
-        },
+        { status: 502, headers: cors },
       );
     }
 
-    const html = (await r.text()).slice(0, 250_000);
+    // OG/Twitter/title tags all live in <head>; scanning only the head keeps the
+    // regex work tiny and well inside the Edge runtime's CPU limit.
+    const full = await r.text();
+    const headEnd = full.search(/<\/head>/i);
+    const html = (headEnd > -1 ? full.slice(0, headEnd) : full).slice(0, 120_000);
 
     const titleTag = html.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1] ?? "";
     let image = meta(html, "og:image") || meta(html, "twitter:image");
-
-    // FIX: Handle undefined image (this is likely causing the crash)
-    if (image && image.startsWith("/")) {
-      image = parsed.origin + image;
-    }
-    image = image || "";
+    if (image.startsWith("/")) image = parsed.origin + image;
 
     return new Response(
       JSON.stringify({
@@ -108,12 +89,12 @@ export default async function handler(req: Request) {
       { headers: { ...cors, "cache-control": "public, s-maxage=600" } },
     );
   } catch (err) {
-    // Log the actual error to see what's happening
-    console.error("Preview fetch error:", err);
-
-    return new Response(JSON.stringify({ error: "Couldn't fetch that page" }), {
-      status: 502,
-      headers: cors,
-    });
+    return new Response(
+      JSON.stringify({
+        error: "Couldn't fetch that page",
+        detail: String((err as Error)?.message || err),
+      }),
+      { status: 502, headers: cors },
+    );
   }
 }
