@@ -1,47 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Static file — Vite does NOT substitute %VITE_SITE_URL% here.
-     Update the host below when the final domain is chosen. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
   <url>
-    <loc>https://your-app.vercel.app/</loc>
-    <lastmod>2026-06-14</lastmod>
+    <loc>https://chitransh.dev/</loc>
+    <lastmod>2026-06-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
 
   <url>
-    <loc>https://your-app.vercel.app/about</loc>
-    <lastmod>2026-06-14</lastmod>
+    <loc>https://chitransh.dev/about</loc>
+    <lastmod>2026-06-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://your-app.vercel.app/labs</loc>
-    <lastmod>2026-06-14</lastmod>
+    <loc>https://chitransh.dev/labs</loc>
+    <lastmod>2026-06-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://your-app.vercel.app/blogs</loc>
-    <lastmod>2026-06-14</lastmod>
+    <loc>https://chitransh.dev/blogs</loc>
+    <lastmod>2026-06-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://your-app.vercel.app/blogs/game-loop-without-rerender</loc>
-    <lastmod>2026-06-14</lastmod>
+    <loc>https://chitransh.dev/blogs/game-loop-without-rerender</loc>
+    <lastmod>2026-06-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://your-app.vercel.app/contact</loc>
-    <lastmod>2026-06-14</lastmod>
+    <loc>https://chitransh.dev/contact</loc>
+    <lastmod>2026-06-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>

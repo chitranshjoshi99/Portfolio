@@ -283,6 +283,15 @@ not the document scroll. This has two important consequences:
    (which is `height: calc(100vh - 56px)`). `min-height: 100%` breaks snap
    because the container can't identify fixed snap targets.
 
+5. **Dock-before-scroll (desktop):** a `scroll`/`resize` effect in `About`
+   toggles `journey-scroll`'s inline `overflow-y` — `hidden` until the container
+   is docked under the sticky `.journey-header` (so the wheel bubbles to the page
+   and finishes scrolling the section into view), then `scroll` so the cards take
+   over. Without this the nested container "captures" the wheel while the intro
+   is still visible. The effect clears the inline style on mobile so the
+   `overflow-y: visible` media query wins. `scrollToCard` also docks the section
+   (via `window.scrollTo`) before placing a card when a tab is clicked undocked.
+
 ---
 
 ## Home page — ENTER key on CTA

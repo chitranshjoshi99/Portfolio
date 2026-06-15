@@ -51,6 +51,39 @@ export default function About() {
     return () => observers.forEach((o) => o.disconnect());
   }, [isMobile]); // rebuild observers whenever mobile/desktop flips
 
+  // ── Dock-before-scroll ────────────────────────────────────────
+  // Desktop: keep the nested card-scroll LOCKED until the journey section is
+  // docked — i.e. the sticky `.journey-header` is pinned under the navbar, which
+  // means the intro has scrolled away. Until then the inner container would
+  // "capture" the wheel and advance cards while the intro is still on screen.
+  // The header has `top: 56px`, so once pinned its rect.top === 56; while the
+  // intro is visible it's > 56. Undocked → overflow:hidden (wheel bubbles to the
+  // page so it docks first); docked → overflow:scroll (cards scroll). Scrolling
+  // up past the first card chains back to the page and un-docks.
+  useEffect(() => {
+    const container = journeyRef.current;
+    if (!container) return;
+    if (isMobile) {
+      container.style.overflowY = ""; // let the mobile CSS (visible) win
+      return;
+    }
+    const header = document.querySelector<HTMLElement>(".journey-header");
+
+    const sync = () => {
+      const docked = !header || header.getBoundingClientRect().top <= 57;
+      const want = docked ? "scroll" : "hidden";
+      if (container.style.overflowY !== want) container.style.overflowY = want;
+    };
+
+    sync();
+    window.addEventListener("scroll", sync, { passive: true });
+    window.addEventListener("resize", sync);
+    return () => {
+      window.removeEventListener("scroll", sync);
+      window.removeEventListener("resize", sync);
+    };
+  }, [isMobile]);
+
   // Scroll within journey-scroll (scrollIntoView scrolls the document, not the container)
   const scrollToCard = (i: number) => {
     const container = journeyRef.current;
@@ -61,6 +94,20 @@ export default function About() {
       card.getBoundingClientRect().top -
       container.getBoundingClientRect().top +
       container.scrollTop;
+
+    // Desktop: if not docked, pin the header under the navbar first (so the inner
+    // scroll is visible), then place the card.
+    if (!isMobile) {
+      const header = document.querySelector<HTMLElement>(".journey-header");
+      if (header && header.getBoundingClientRect().top > 57) {
+        const targetWinY =
+          header.getBoundingClientRect().top + window.scrollY - 56;
+        container.style.overflowY = "scroll";
+        container.scrollTop = cardTop;
+        window.scrollTo({ top: targetWinY, behavior: "smooth" });
+        return;
+      }
+    }
 
     container.scrollTo({ top: cardTop, behavior: "smooth" });
   };

@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
 
-# Point crawlers to the sitemap (update host when the domain is chosen)
-Sitemap: https://your-app.vercel.app/sitemap.xml
+# Point crawlers to the sitemap
+Sitemap: https://chitransh.dev/sitemap.xml

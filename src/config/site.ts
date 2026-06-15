@@ -2,5 +2,5 @@
 // No trailing slash. Set VITE_SITE_URL in .env and in Vercel project settings.
 // Changing the domain later = update that one env var and redeploy.
 export const SITE_URL = (
-  import.meta.env.VITE_SITE_URL ?? "https://your-app.vercel.app"
+  import.meta.env.VITE_SITE_URL ?? "https://chitransh.dev"
 ).replace(/\/+$/, "");
