@@ -1,0 +1,35 @@
+import { Magic8Ball } from "../../components/Magic8Ball";
+
+Most UI bugs are impossible states that we accidentally made possible. A loading flag that is true while an error is also showing. A modal that is open and closed at once. These slip in because we model UI with a pile of independent booleans, and booleans multiply: four of them describe sixteen combinations, and most of those should never exist.
+
+## One variable, a few named states
+
+A state machine replaces the boolean pile with a single value that can only be one of a fixed set, plus rules for moving between them. The oracle below has exactly four states:
+
+```ts
+type Phase = "idle" | "tapping" | "counting" | "revealed";
+
+function next(phase: Phase, event: "tap" | "reset"): Phase {
+  if (event === "reset") return "idle";
+  switch (phase) {
+    case "idle":
+      return "tapping";
+    case "tapping":
+      return taps >= MAX ? "counting" : "tapping";
+    case "counting":
+      return done ? "revealed" : "counting";
+    default:
+      return phase; // revealed waits for reset
+  }
+}
+```
+
+Because the view reads one `phase`, it cannot render the countdown and the idle hint at the same time. The illegal combination is not handled, it is unrepresentable. TypeScript enforces that at compile time.
+
+## Where it pays off
+
+Any flow with steps wants this shape: checkout, onboarding, a multi-tap toy, a media player. When a new requirement arrives you add a state and its transitions, not another boolean and another round of guessing which combinations are now legal. Give the oracle five taps and watch it walk its four states.
+
+<div className="blog-demo">
+  <Magic8Ball />
+</div>

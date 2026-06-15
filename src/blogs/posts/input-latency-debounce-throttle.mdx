@@ -1,0 +1,48 @@
+import { DinoRun } from "../../components/games/DinoRun";
+
+The dino jumps the instant you press space because the handler is raw: keydown fires, jump runs, done. That immediacy is the whole point of a game control. The same immediacy would be a disaster on a search box that hits an API on every keystroke. Same event, opposite needs. The tools that bridge them are debounce and throttle.
+
+## Three ways to handle a stream of events
+
+Raw runs on every event. Use it when latency is the enemy: game input, key handling, anything that has to feel instant.
+
+```ts
+window.addEventListener("keydown", (e) => {
+  if (e.code === "Space") jump(); // no delay, ever
+});
+```
+
+Debounce waits for the noise to stop, then fires once. Use it when only the final value matters: search as you type, validating a field, reacting to a resize that has settled.
+
+```ts
+function debounce(fn, ms) {
+  let t;
+  return (...a) => {
+    clearTimeout(t);
+    t = setTimeout(() => fn(...a), ms);
+  };
+}
+```
+
+Throttle lets one call through per interval and drops the rest. Use it for steady high-frequency streams you want to sample: scroll position, pointer move, a rate-limited endpoint.
+
+```ts
+function throttle(fn, ms) {
+  let last = 0;
+  return (...a) => {
+    const now = Date.now();
+    if (now - last >= ms) {
+      last = now;
+      fn(...a);
+    }
+  };
+}
+```
+
+## Picking wrong is a felt bug
+
+Debounce a game jump and the dino feels drunk. Throttle a search and results lag behind the cursor. Raw-bind a scroll handler and you ship jank. The choice is not about correctness, since all three run. It is about which delay the user can feel. Hold space below and the raw handler keeps the dino alive.
+
+<div className="blog-demo">
+  <DinoRun active />
+</div>

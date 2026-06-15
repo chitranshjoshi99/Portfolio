@@ -1,0 +1,41 @@
+import { Gacha } from "../../components/games/Gacha";
+
+Stale-while-revalidate is a caching idea with a good bedside manner: show what you already have right now, quietly fetch a fresh copy, swap it in when it arrives. The user never stares at a spinner for data you loaded a moment ago, and the screen still ends up current. You do not need a library to get the core of it.
+
+## About forty lines
+
+Two module-level maps do the work. One caches results by key, the other tracks in-flight requests so two components asking for the same key share a single fetch.
+
+```ts
+const cache = new Map();
+const pending = new Map();
+
+function useSWR(key, fetcher, staleMs = 5000) {
+  const [data, setData] = useState(cache.get(key)?.data ?? null); // serve stale now
+
+  useEffect(() => {
+    const entry = cache.get(key);
+    if (entry && Date.now() - entry.ts < staleMs) return; // still fresh
+
+    const req = pending.get(key) ?? fetcher(); // dedupe in-flight
+    pending.set(key, req);
+    req.then((result) => {
+      cache.set(key, { data: result, ts: Date.now() });
+      pending.delete(key);
+      setData(result);
+    });
+  }, [key]);
+
+  return data;
+}
+```
+
+## The two ideas that matter
+
+Serve stale immediately: the first line seeds state from the cache, so a revisit paints with zero wait. Deduplicate in flight: the `pending` map means ten components pulling the same key trigger one network call, not ten. Add freshness windows and revalidation on focus and you have rebuilt the heart of SWR and React Query.
+
+The gacha machine below pulls from a cache. Spin it, and a repeat pull of the same prize comes back instantly because the result was already sitting in the map.
+
+<div className="blog-demo">
+  <Gacha active />
+</div>

@@ -1,0 +1,37 @@
+import { LinkPreview } from "../../components/games/LinkPreview";
+
+Single-page apps ship one nearly empty `index.html` and paint everything with JavaScript after load. That is great for users and awkward for the machines that read your pages. Social crawlers like LinkedIn, Slack, and X do not run JavaScript at all. They fetch the raw HTML, read the `<head>`, and leave. So every route of a vanilla SPA hands them the same default tags, and every link you share looks identical.
+
+The reflex is to reach for server-side rendering, but you do not always need that hammer. For a link preview the crawler only ever reads the `<head>`. The body can stay client-rendered. That reframes the whole problem: you do not need to render the page on a server, you only need to inject the right meta tags per route.
+
+## The trick: rewrite to a tiny function
+
+On Vercel a single rule sends page routes to a serverless function instead of the static file:
+
+```json
+{ "rewrites": [{ "source": "/blogs/:slug", "destination": "/api/page?slug=:slug" }] }
+```
+
+The function fetches the already-built `index.html`, swaps a marked block in the head for route-specific tags, and returns it. Humans still get the full app. Crawlers get a correct card. No SSR framework, no hydration step, no rewrite of your stack.
+
+```ts
+let html = await fetch(origin + "/index.html").then((r) => r.text());
+html = html.replace(
+  /<!--SEO-->[\s\S]*?<!--\/SEO-->/,
+  `<!--SEO-->${tagsFor(route)}<!--/SEO-->`,
+);
+```
+
+## Generate the image too
+
+A preview is mostly its picture, and one static image for the whole site is a missed chance. An edge function renders a unique card per page with `@vercel/og`, reading the title and accent from query params and drawing a 1200 by 630 image on the fly. Every post gets its own art without anyone opening a design tool.
+
+## See it in reverse
+
+The TV channel below does the opposite of that function. Paste any URL and it fetches the page, scrapes the live `og:` tags, and renders the card a crawler would build. Try it with this very post once it is deployed.
+
+<div style={{ width: 340, height: 264, margin: "16px auto" }}>
+  <LinkPreview active />
+</div>
+
+The takeaway: an SPA is not doomed for SEO. Google renders JavaScript, so normal indexing already works. For the crawlers that do not, a thin meta-injection layer at the edge buys you correct per-page previews while you keep the client-rendered architecture you liked in the first place.

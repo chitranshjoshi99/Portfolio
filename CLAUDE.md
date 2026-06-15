@@ -44,6 +44,7 @@ src/
 │       ├── types.ts       GameProps { active: boolean }
 │       ├── DinoRun/      index.tsx + style.css
 │       ├── Gacha/        index.tsx + style.css
+│       ├── LinkPreview/  index.tsx + style.css   ← TV channel: paste a URL → live OG card (calls api/preview)
 │       ├── Pong/         index.tsx + style.css
 │       └── Snake/        index.tsx + style.css
 ├── contexts/
@@ -400,7 +401,14 @@ update the host in `public/sitemap.xml` + `public/robots.txt`. That's it.
   Post Inspector after each deploy.
 - **Add a post:** create the `.mdx`, add an entry to `blogs.config.ts` (set
   `gameKey` to match a Lab experiment's `game` to get the "READ FULL POST →"
-  button in Labs), and add a `<loc>` to `public/sitemap.xml`.
+  button in Labs) **and the same entry to the inlined `BLOGS` in `api/page.ts`**
+  (the function can't import the shared config), then add a `<loc>` to
+  `public/sitemap.xml`.
+- There is one post per Lab feature. The `spa-seo-without-ssr` post (top of the
+  list) is tied to the `linkpreview` channel. That channel (`games/LinkPreview`)
+  takes a pasted URL, calls the `api/preview.ts` edge function which fetches the
+  page and scrapes its `og:`/`twitter:` tags, and renders the card live in the
+  CRT — a working demo of the meta the SEO post is about.
 
 The MDX toolchain is `@mdx-js/rollup` (vite plugin, `enforce: 'pre'`, before the
 SWC react plugin) + `@mdx-js/react` + `remark-gfm`. `*.mdx` is typed in

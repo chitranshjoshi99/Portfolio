@@ -20,8 +20,14 @@
   background: var(--border-primary);
 }
 
-.tv-set__antenna--left  { transform-origin: bottom center; transform: rotate(-22deg); }
-.tv-set__antenna--right { transform-origin: bottom center; transform: rotate(22deg); }
+.tv-set__antenna--left {
+  transform-origin: bottom center;
+  transform: rotate(-22deg);
+}
+.tv-set__antenna--right {
+  transform-origin: bottom center;
+  transform: rotate(22deg);
+}
 
 /* Body */
 .tv-set__body {
@@ -38,7 +44,7 @@
 .tv-set__screen-wrap {
   position: relative;
   width: 280px;
-  height: 200px;
+  height: 240px;
   border: var(--px) solid var(--text-muted);
   overflow: hidden;
   background: #000;
@@ -86,7 +92,7 @@
 }
 
 .tv-set__knob-face::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 3px;
   left: 50%;
@@ -121,8 +127,12 @@
     height: 156px;
   }
 
-  .tv-set__antennas { gap: 48px; }
-  .tv-set__antenna  { height: 36px; }
+  .tv-set__antennas {
+    gap: 48px;
+  }
+  .tv-set__antenna {
+    height: 36px;
+  }
 }
 
 @media (max-width: 480px) {

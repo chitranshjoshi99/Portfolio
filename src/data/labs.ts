@@ -1,5 +1,11 @@
 export type RenderType = 'tv' | 'standalone';
-export type GameKey = 'snake' | 'pong' | 'dino' | 'magic8ball' | 'gacha';
+export type GameKey =
+  | 'snake'
+  | 'pong'
+  | 'dino'
+  | 'linkpreview'
+  | 'magic8ball'
+  | 'gacha';
 
 export interface LabExperiment {
   id: string;
@@ -21,12 +27,12 @@ export const LAB_EXPERIMENTS: LabExperiment[] = [
     channel: 1,
     title: 'A game loop in React without re-rendering',
     teaser:
-      'React re-renders on every state change — but game loops fire 60 times a second. Keep all mutable state in refs, run one rAF loop, and let React own only the canvas element.',
+      'React re-renders on every state change, but game loops fire 60 times a second. Keep all mutable state in refs, run one rAF loop, and let React own only the canvas element.',
     status: 'RUNNING',
     accent: 'var(--classplus-purple)',
     render: 'tv',
     game: 'snake',
-    code: `// All game state lives in refs — zero re-renders per frame
+    code: `// All game state lives in refs, zero re-renders per frame
 const stateRef = useRef({ snake: [[10,10]], dir: [1,0], food: [5,5] });
 
 useEffect(() => {
@@ -70,7 +76,7 @@ function loop(now: number) {
   draw(ctx, state);       // render at display frame rate
 }
 
-// AABB collision — axis-aligned bounding boxes
+// AABB collision, axis-aligned bounding boxes
 function intersects(a: Rect, b: Rect): boolean {
   return a.x < b.x + b.w && a.x + a.w > b.x
       && a.y < b.y + b.h && a.y + a.h > b.y;
@@ -81,17 +87,17 @@ function intersects(a: Rect, b: Rect): boolean {
     channel: 3,
     title: 'Input latency: debounce vs throttle vs raw',
     teaser:
-      "The dino's jump feels instant because it uses raw keydown — no delay. Debounce waits for silence; throttle limits frequency. Picking the wrong one is the difference between snappy and laggy.",
+      "The dino's jump feels instant because it uses raw keydown, with no delay. Debounce waits for silence; throttle limits frequency. Picking the wrong one is the difference between snappy and laggy.",
     status: 'RUNNING',
     accent: 'var(--nivoda-gold)',
     render: 'tv',
     game: 'dino',
-    code: `// Raw — fires immediately on keydown (used in the game)
+    code: `// Raw: fires immediately on keydown (used in the game)
 window.addEventListener('keydown', e => {
   if (e.code === 'Space') jump();
 });
 
-// Debounce — fires only after N ms of silence
+// Debounce: fires only after N ms of silence
 //   Best for: search inputs, resize handlers
 function debounce<T extends unknown[]>(fn: (...a: T) => void, ms: number) {
   let t: ReturnType<typeof setTimeout>;
@@ -101,7 +107,7 @@ function debounce<T extends unknown[]>(fn: (...a: T) => void, ms: number) {
   };
 }
 
-// Throttle — fires at most once per N ms
+// Throttle: fires at most once per N ms
 //   Best for: scroll handlers, rate-limited APIs
 function throttle<T extends unknown[]>(fn: (...a: T) => void, ms: number) {
   let last = 0;
@@ -111,14 +117,43 @@ function throttle<T extends unknown[]>(fn: (...a: T) => void, ms: number) {
   };
 }`,
   },
+  {
+    id: 'linkpreview',
+    channel: 4,
+    title: 'Live OG previews from a pasted URL',
+    teaser:
+      'Paste any page URL and the TV tunes into its social card. An edge function fetches the page, scrapes its og: tags, and beams back the title, image, and description that LinkedIn would show.',
+    status: 'RUNNING',
+    accent: 'var(--delhivery-red)',
+    render: 'tv',
+    game: 'linkpreview',
+    code: `// Edge function: fetch the page, scrape its OG tags, return JSON
+export const config = { runtime: 'edge' };
+
+export default async function handler(req) {
+  const url = new URL(req.url).searchParams.get('url');
+  const html = await fetch(url, {
+    headers: { 'user-agent': 'LinkedInBot/1.0 (preview)' },
+  }).then(r => r.text());
+
+  // grab <meta property="og:title" content="..."> regardless of order
+  const og = (prop) => scrapeMetaContent(html, prop);
+
+  return Response.json({
+    title: og('og:title'),
+    image: og('og:image'),
+    description: og('og:description'),
+  });
+}`,
+  },
 
   // ── Standalone toys ──────────────────────────────────────────
   {
     id: 'magic8ball',
-    channel: 4,
+    channel: 5,
     title: 'Modeling UI as a finite state machine',
     teaser:
-      'Five taps, a countdown, a reveal — all driven by an explicit FSM with four states. No boolean spaghetti, no impossible UI states. The machine makes illegal states unrepresentable.',
+      'Five taps, a countdown, a reveal, all driven by an explicit FSM with four states. No boolean spaghetti, no impossible UI states. The machine makes illegal states unrepresentable.',
     status: 'RUNNING',
     accent: 'var(--classplus-purple)',
     render: 'standalone',
@@ -136,16 +171,16 @@ function transition(phase: Phase, event: 'tap' | 'reset'): Phase {
   }
 }
 
-// Each render reads phase — impossible states can't render:
+// Each render reads phase, so impossible states can't render:
 // can't show the countdown AND the idle hint simultaneously.
 // TypeScript enforces it at the type level.`,
   },
   {
     id: 'gacha',
-    channel: 5,
+    channel: 6,
     title: 'Build a tiny SWR cache',
     teaser:
-      'Stale-while-revalidate: return cached data immediately, fetch fresh data in background, update when done. This ~40-line hook is the entire idea — no library needed for simple use cases.',
+      'Stale-while-revalidate: return cached data immediately, fetch fresh data in background, update when done. This ~40-line hook is the entire idea, no library needed for simple use cases.',
     status: 'WRITING',
     accent: 'var(--nivoda-gold)',
     render: 'standalone',
@@ -162,7 +197,7 @@ function useSWR<T>(key: string, fetcher: () => Promise<T>, staleMs = 5000) {
   useEffect(() => {
     const entry = cache.get(key);
     const fresh = entry && Date.now() - entry.ts < staleMs;
-    if (fresh) return;           // still fresh — skip fetch
+    if (fresh) return;           // still fresh, skip fetch
 
     // Deduplicate: attach to in-flight request if one exists
     const inflight = pending.get(key) as Promise<T> | undefined;

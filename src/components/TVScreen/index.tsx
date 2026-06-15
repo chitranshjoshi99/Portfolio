@@ -3,6 +3,7 @@ import { ChannelStatic } from '../ChannelStatic';
 import { Snake } from '../games/Snake';
 import { Pong } from '../games/Pong';
 import { DinoRun } from '../games/DinoRun';
+import { LinkPreview } from '../games/LinkPreview';
 import type { LabExperiment } from '../../data/labs';
 import type { GameProps } from '../games/types';
 import './style.css';
@@ -13,6 +14,7 @@ const GAME_MAP: Record<string, React.ComponentType<GameProps>> = {
   snake: Snake,
   pong: Pong,
   dino: DinoRun,
+  linkpreview: LinkPreview,
 };
 
 interface Props {

@@ -1,0 +1,129 @@
+.lp {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #0c0a0e;
+  color: #e8e4dc;
+}
+
+.lp__screen {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  overflow: hidden;
+  text-align: center;
+}
+
+.lp__msg {
+  font-size: 6px;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.9;
+  max-width: 92%;
+}
+
+.lp__msg--err {
+  color: var(--delhivery-red);
+}
+
+.lp__card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  gap: 4px;
+}
+
+.lp__img {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.lp__img--none {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 6px;
+  color: rgba(255, 255, 255, 0.4);
+  background: #16141a;
+}
+
+.lp__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+
+.lp__site {
+  font-size: 5px;
+  color: var(--accent-secondary, #c9a96e);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.lp__title {
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #e8e4dc;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.lp__desc {
+  font-family: var(--font-body);
+  font-size: 0.5rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.lp__bar {
+  display: flex;
+  gap: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
+}
+
+.lp__input {
+  flex: 1;
+  min-width: 0;
+  background: #16141a;
+  border: none;
+  color: #e8e4dc;
+  font-size: 0.95rem;
+  padding: 4px 6px;
+  outline: none;
+}
+
+.lp__input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.lp__btn {
+  background: var(--accent-primary, #9b8ea0);
+  color: #0c0a0e;
+  border: none;
+  font-size: 6px;
+  letter-spacing: 0.06em;
+  padding: 0 8px;
+  cursor: pointer;
+}
+
+.lp__btn:hover {
+  filter: brightness(1.12);
+}

@@ -1,0 +1,40 @@
+import { Pong } from "../../components/games/Pong";
+
+If you move the ball by a fixed number of pixels every animation frame, your game runs at different speeds on different monitors. A 144Hz screen advances the ball nearly two and a half times faster than a 60Hz one. The fix is to stop trusting the frame and start trusting the clock.
+
+## Accumulate time, step in fixed chunks
+
+A fixed timestep keeps a running accumulator of real elapsed time and spends it in equal slices. Physics always advances by the same `STEP`, no matter how often the browser paints.
+
+```ts
+const STEP = 1 / 60; // seconds per physics tick
+let acc = 0,
+  prev = performance.now();
+
+function loop(now) {
+  acc += (now - prev) / 1000;
+  prev = now;
+  while (acc >= STEP) {
+    physics(state, STEP); // deterministic, identical on any display
+    acc -= STEP;
+  }
+  draw(ctx, state); // render as often as the screen allows
+}
+```
+
+Simulation and rendering are now decoupled. The screen can paint 30 or 240 times a second and the ball still crosses the table in the same wall-clock time.
+
+## Why it also fixes tunnelling
+
+A big variable step can teleport the ball clean through a thin paddle between two frames, because collision is only checked at frame edges. Small fixed steps keep movement per tick tiny, so the overlap test actually catches the hit. Collision here is a plain axis-aligned box test:
+
+```ts
+const hit =
+  a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+```
+
+Play a rally below. The paddles are simple, but the ball obeys the clock, not the frame.
+
+<div className="blog-demo">
+  <Pong active />
+</div>

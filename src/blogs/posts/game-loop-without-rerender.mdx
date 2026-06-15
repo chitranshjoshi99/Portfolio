@@ -1,7 +1,7 @@
 import { Snake } from "../../components/games/Snake";
 
 React re-renders a component every time its state changes. That's exactly what
-you want for a form — and exactly what you *don't* want for a game loop that
+you want for a form, and exactly what you *don't* want for a game loop that
 fires sixty times a second. If the snake's position lived in `useState`, every
 frame would queue a re-render, React would reconcile the whole tree, and your
 buttery 60fps would turn to soup.
@@ -11,7 +11,7 @@ The fix is to keep the loop's mutable state out of React entirely.
 ## Refs hold the state, React holds the canvas
 
 A `useRef` gives you a stable, mutable box that survives re-renders without
-triggering them. The whole game — snake body, direction, food, score — lives in
+triggering them. The whole game (snake body, direction, food, score) lives in
 one ref object. React renders the `<canvas>` exactly once; the loop mutates the
 ref and paints pixels directly. Try it (arrow keys / WASD, or tap):
 
@@ -42,7 +42,7 @@ useEffect(() => {
 
 ## Why this matters
 
-Zero re-renders per frame means React never becomes the bottleneck — the only
+Zero re-renders per frame means React never becomes the bottleneck. The only
 work per frame is your own `step` + `draw`. The same pattern powers Pong, the
 dino runner, and every other canvas toy in the Labs. Reach for it any time you
 have an animation loop that React shouldn't be sitting in the middle of.
