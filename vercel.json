@@ -1,6 +1,10 @@
 {
   "rewrites": [
+    { "source": "/about", "destination": "/api/page?route=about" },
+    { "source": "/labs", "destination": "/api/page?route=labs" },
+    { "source": "/blogs", "destination": "/api/page?route=blogs" },
     { "source": "/blogs/:slug", "destination": "/api/page?slug=:slug" },
+    { "source": "/contact", "destination": "/api/page?route=contact" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

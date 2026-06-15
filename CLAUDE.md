@@ -384,10 +384,14 @@ update the host in `public/sitemap.xml` + `public/robots.txt`. That's it.
 - Routes: `/blogs` (`BlogIndex`) and `/blogs/:slug` (`BlogPost`, lazy-loads the
   MDX body via `src/blogs/content.ts`). `useDocumentMeta` mirrors per-route meta
   into the head for users + Google.
-- **Social crawlers don't run JS.** `vercel.json` rewrites `/blogs/:slug` →
-  `api/page.js`, which fetches the static `index.html` and swaps the
-  `<!--SEO-->…<!--/SEO-->` block for blog-specific tags (incl.
-  `og:image = /api/og?slug=…`). Humans still get the SPA.
+- **Social crawlers don't run JS.** `vercel.json` rewrites the page routes
+  (`/about`, `/labs`, `/blogs`, `/blogs/:slug`, `/contact`) to `api/page.ts`,
+  which fetches the static `index.html` and swaps the `<!--SEO-->…<!--/SEO-->`
+  block for route-specific tags (incl. a generated `og:image`). `page.ts`
+  resolves a post by `?slug=` (from inline `BLOGS`) or a section page by
+  `?route=` (from the inline `PAGES` map) — both inlined because the function
+  can't import shared TS. `/` stays static (its default meta is the
+  home/profile card). Humans + Google still get the SPA.
 - `api/og.tsx` (`@vercel/og`, edge runtime) renders a 1200×630 pixel-art card per
   post. It's **self-contained** — reads `title`/`tag`/`accent` from query params
   (built by `ogImageUrl()` in `blogs.config.ts`), so the edge bundle has no
