@@ -1,4 +1,35 @@
-import { BLOGS, ogImageUrl } from "../blogs.config";
+// Rewritten from /blogs/:slug (see vercel.json). Returns the static SPA shell
+// with the <!--SEO--> block swapped for blog-specific tags, so non-JS crawlers
+// (LinkedIn, Slack, X) read the right preview. Humans still get the SPA.
+//
+// SELF-CONTAINED ON PURPOSE: Vercel's function bundler doesn't reliably compile
+// a shared relative .ts import (it crashes at module load), so the per-post meta
+// the crawler needs is inlined here. KEEP IN SYNC with blogs.config.ts when you
+// add or edit a post.
+
+type Meta = {
+  slug: string;
+  title: string;
+  description: string;
+  tag: string;
+  accent: string;
+};
+
+const BLOGS: Meta[] = [
+  {
+    slug: "game-loop-without-rerender",
+    title: "A game loop in React without re-rendering",
+    description:
+      "React re-renders on every state change, but a game loop fires 60 times a second. Keep mutable state in refs, run one requestAnimationFrame loop, and let React own only the canvas element.",
+    tag: "CH01 · SNAKE",
+    accent: "#8b7ba8",
+  },
+];
+
+const ogImageUrl = (origin: string, b: Meta) => {
+  const p = new URLSearchParams({ title: b.title, tag: b.tag, accent: b.accent });
+  return `${origin}/api/og?${p.toString()}`;
+};
 
 const esc = (s = "") =>
   s
@@ -7,10 +38,6 @@ const esc = (s = "") =>
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
 
-// Rewritten from /blogs/:slug (see vercel.json). Returns the static SPA shell
-// with the <!--SEO--> block swapped for blog-specific tags, so non-JS crawlers
-// (LinkedIn, Slack, X) read the right preview. Humans still get the SPA.
-// .ts (not .js) so the `../blogs.config` import bundles reliably on Vercel.
 export default async function handler(req: any, res: any) {
   try {
     const slug = (req.query && req.query.slug) || "";
