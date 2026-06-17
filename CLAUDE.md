@@ -70,18 +70,18 @@ src/
 
 ## Critical files
 
-| File                            | Purpose                                                                                                                                                                    |
-| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/data/resume.ts`                  | **Only place resume content lives.** Edit here; pages pick it up automatically.                                                                                            |
-| `src/data/labs.ts`                    | **Only place Labs content lives.** All experiments, channels, teasers, code snippets. See §Labs internals.                                                                  |
-| `src/styles/tokens.css`               | All CSS custom properties — palette, spacing, fonts, shadows. Edit colours here, not inline.                                                                               |
-| `src/styles/global.css`               | Reset, utility classes (`.pixel-text`, `.vt-text`, animations), **all `.btn` / `.btn--*` variants**, and two blink keyframes: `blink` (step-end, for cursors/CTAs) and `blink-soft` (ease-in-out fade, for persistent chrome like the navbar cursor). |
-| `src/contexts/ThemeContext.tsx`       | Dark/light theme. Reads `prefers-color-scheme` as default; persists override in `localStorage` under key `cj-portfolio-theme`. Applies `data-theme` attribute to `<html>`. |
-| `src/contexts/ScrollProgressContext.tsx` | One shared rAF loop writing `--p` (0→1) onto registered scene elements. Used by Labs SceneText for entry animations. |
-| `src/pages/Contact/index.tsx`         | Has `FORMSPREE_ID` constant at the top — set it to enable direct email.                                                                                                    |
-| `src/utils/haptics.ts`                | Thin wrapper around `navigator.vibrate` + stub for future haptic patterns. Import `haptics` and call `.tap()`, `.press()`, `.toggle()`, `.reveal()`.                       |
-| `src/components/Magic8Ball/index.tsx` | Self-contained pixel-art oracle game. Lives in **Labs → magic8ball toy scene**. See §Magic8Ball below.                                                                      |
-| `src/components/TVScreen/index.tsx`   | Channel host FSM (`live` / `static`). `GAME_MAP` here maps `GameKey → Component`. Add new TV games here.                                                                   |
+| File                                     | Purpose                                                                                                                                                                                                                                               |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/data/resume.ts`                     | **Only place resume content lives.** Edit here; pages pick it up automatically.                                                                                                                                                                       |
+| `src/data/labs.ts`                       | **Only place Labs content lives.** All experiments, channels, teasers, code snippets. See §Labs internals.                                                                                                                                            |
+| `src/styles/tokens.css`                  | All CSS custom properties — palette, spacing, fonts, shadows. Edit colours here, not inline.                                                                                                                                                          |
+| `src/styles/global.css`                  | Reset, utility classes (`.pixel-text`, `.vt-text`, animations), **all `.btn` / `.btn--*` variants**, and two blink keyframes: `blink` (step-end, for cursors/CTAs) and `blink-soft` (ease-in-out fade, for persistent chrome like the navbar cursor). |
+| `src/contexts/ThemeContext.tsx`          | Dark/light theme. Reads `prefers-color-scheme` as default; persists override in `localStorage` under key `cj-portfolio-theme`. Applies `data-theme` attribute to `<html>`.                                                                            |
+| `src/contexts/ScrollProgressContext.tsx` | One shared rAF loop writing `--p` (0→1) onto registered scene elements. Used by Labs SceneText for entry animations.                                                                                                                                  |
+| `src/pages/Contact/index.tsx`            | Has `FORMSPREE_ID` constant at the top — set it to enable direct email.                                                                                                                                                                               |
+| `src/utils/haptics.ts`                   | Thin wrapper around `navigator.vibrate` + stub for future haptic patterns. Import `haptics` and call `.tap()`, `.press()`, `.toggle()`, `.reveal()`.                                                                                                  |
+| `src/components/Magic8Ball/index.tsx`    | Self-contained pixel-art oracle game. Lives in **Labs → magic8ball toy scene**. See §Magic8Ball below.                                                                                                                                                |
+| `src/components/TVScreen/index.tsx`      | Channel host FSM (`live` / `static`). `GAME_MAP` here maps `GameKey → Component`. Add new TV games here.                                                                                                                                              |
 
 ---
 
@@ -122,16 +122,19 @@ These are defined in both light and dark themes in `tokens.css`.
 `src/components/Magic8Ball/` — a fully self-contained pixel-art oracle mini-game. Previously rendered in the Home CTA; now lives in the **Labs page** under the `ORACLE_v1.exe` card.
 
 **Canvas approach:**
+
 - Ball is drawn on a `28×28` logical canvas scaled to `168×168` CSS (6× integer scale, `image-rendering: pixelated`).
-- Ball body + white inner window circle are on canvas. All *text content* (the 8, countdown, answer) is an HTML overlay (`div.m8b__window`) positioned via CSS to sit exactly over the white circle — so fonts and animations work freely.
+- Ball body + white inner window circle are on canvas. All _text content_ (the 8, countdown, answer) is an HTML overlay (`div.m8b__window`) positioned via CSS to sit exactly over the white circle — so fonts and animations work freely.
 
 **5-tap game loop:**
+
 1. **idle** — shows `8` in the window, blinking `[ TAP TO SHAKE ]` hint below.
 2. **tapping** (taps 1-4) — each tap triggers a CSS shake animation (`m8b-shake-1` through `m8b-shake-5`) with escalating intensity set via `data-intensity` attribute. Progress label updates: `TAP MORE` → `KEEP GOING` → `ALMOST THERE` → `SO CLOSE...`.
 3. **counting** — 5th tap starts a `3→2→1` countdown inside the window with a blast-in animation per digit and continuous rattle CSS animation on the ball. `navigator.vibrate` pulses escalate each second.
 4. **revealed** — answer text appears in the window (currently hardcoded `DON'T / COUNT / ON IT`). After 1.5 s the ball fades out and two buttons appear in its place (`PROVE IT WRONG →` → Contact page; `↺ ASK AGAIN` → reset).
 
 **Layout trick (no layout shift):**
+
 - `.m8b__stage` is fixed `168×168`. The ball button and the button overlay are both `position: absolute; inset: 0` inside it. When the ball fades to `opacity: 0`, the overlay appears — zero reflow.
 
 **Mobile:** media query at `max-width: 480px` drops to 4× scale (`112×112`) with proportionally adjusted window (`48×48`) and font sizes.
@@ -147,10 +150,10 @@ These are defined in both light and dark themes in `tokens.css`.
 `src/utils/haptics.ts` — thin wrapper:
 
 ```ts
-haptics.tap()     // short 40ms buzz — links, nav, minor taps
-haptics.press()   // medium 80ms — primary button presses
-haptics.toggle()  // double pulse — theme switch
-haptics.reveal()  // triple escalating pulse — Magic8Ball reveal
+haptics.tap(); // short 40ms buzz — links, nav, minor taps
+haptics.press(); // medium 80ms — primary button presses
+haptics.toggle(); // double pulse — theme switch
+haptics.reveal(); // triple escalating pulse — Magic8Ball reveal
 ```
 
 All methods are no-ops where `navigator.vibrate` is unsupported (desktop). Every interactive element in Navbar and Home CTAs is wired to haptics.
@@ -164,6 +167,7 @@ All methods are no-ops where `navigator.vibrate` is unsupported (desktop). Every
 ### Content model
 
 `src/data/labs.ts` is the single source of truth (mirrors `resume.ts`). Each `LabExperiment` has:
+
 - `render: 'tv' | 'standalone'` — determines scene type
 - `game: GameKey` — maps to a game component in `src/components/games/`
 - `code: string` — the core-logic snippet shown in the expandable `CodePanel`
@@ -205,7 +209,7 @@ New components: `LabsRail`, `TVSet`, `TVScreen`, `ChannelStatic`, `CodePanel`, `
 - **Always visible** (including on the hero) — no hide-on-scroll. The old hero experiment-list was removed so the rail is the single index.
 - **Collapsed = dots only.** Each item is a 10px dot; the label (`CH0X`/`TOY`/`INIT` tag + experiment name + status glyph) is `max-width: 0; opacity: 0` and slides open on `.labs-rail:hover` / `:focus-within`. This is the icon-rail-expands-on-hover pattern.
 - Active item tracked by `activeIdx`; dot fills with the item's accent (`--row-accent` set inline), active name tints to the accent. Groups separated by a thin `.labs-rail__sep` line whose `TV` / `TOYS` micro-label also reveals on hover.
-- **Desktop:** detached pill `position: fixed; left: 20px; top: 50%`, rounded (`border-radius: 20px`), pixel drop-shadow. `.labs-page` has `padding-left: 76px` so content clears the *collapsed* pill (expanded labels overlay transiently on hover).
+- **Desktop:** detached pill `position: fixed; left: 20px; top: 50%`, rounded (`border-radius: 20px`), pixel drop-shadow. `.labs-page` has `padding-left: 76px` so content clears the _collapsed_ pill (expanded labels overlay transiently on hover).
 - **Mobile (≤899px):** becomes a floating bottom dock (`left: 50%; bottom: 16px; flex-direction: row`). No hover on touch, so it stays dots-only except the **active** item, which shows its name inline.
 - Props: `{ activeIdx, experiments, onJump }`. (No `progress` fill / `isVisible` / `totalSections` — removed.)
 
@@ -232,6 +236,7 @@ Inactive TV games are **unmounted** (via `key={displayChannel}` conditional). No
 ### Game component contract
 
 All games in `src/components/games/` implement `GameProps { active: boolean }`:
+
 - rAF loops must **not run** when `active` is false.
 - DinoRun shows a "SPACE / TAP TO START" overlay until first input (avoids auto-death on channel switch).
 - Keep game state in `useRef`, not `useState`, inside the loop — zero re-renders per frame.
@@ -350,6 +355,7 @@ const WA_NUMBER = "918126196827";
 A git hook at `.githooks/pre-commit` (tracked) blocks commits that stage `src/` changes without also staging `CLAUDE.md`. This enforces the doc-with-feature contract.
 
 **One-time setup** (already added to `package.json` `prepare` script, runs after `npm install`):
+
 ```bash
 npm install   # triggers prepare → git config core.hooksPath .githooks
 # or manually:
@@ -357,6 +363,7 @@ git config core.hooksPath .githooks
 ```
 
 **To bypass** (intentionally skip the doc check):
+
 ```bash
 git commit --no-verify -m "chore: ..."
 ```

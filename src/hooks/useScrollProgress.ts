@@ -1,5 +1,5 @@
-import { useEffect, type RefObject } from 'react';
-import { useScrollProgressRegister } from '../contexts/ScrollProgressContext';
+import { useEffect, type RefObject } from "react";
+import { useScrollProgressRegister } from "../contexts/ScrollProgressContext";
 
 export function useScrollProgress(ref: RefObject<HTMLElement | null>) {
   const register = useScrollProgressRegister();

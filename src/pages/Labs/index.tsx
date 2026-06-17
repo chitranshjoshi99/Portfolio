@@ -1,28 +1,32 @@
-import { forwardRef, useEffect, useRef, useState } from 'react';
-import { ScrollProgressProvider } from '../../contexts/ScrollProgressContext';
-import { useScrollProgress } from '../../hooks/useScrollProgress';
-import { LabsRail } from '../../components/LabsRail';
-import { TVSet } from '../../components/TVSet';
-import { SceneText } from '../../components/SceneText';
-import { Magic8Ball } from '../../components/Magic8Ball';
-import { Gacha } from '../../components/games/Gacha';
+import { forwardRef, useEffect, useRef, useState } from "react";
+import { ScrollProgressProvider } from "../../contexts/ScrollProgressContext";
+import { useScrollProgress } from "../../hooks/useScrollProgress";
+import { LabsRail } from "../../components/LabsRail";
+import { TVSet } from "../../components/TVSet";
+import { SceneText } from "../../components/SceneText";
+import { Magic8Ball } from "../../components/Magic8Ball";
+import { Gacha } from "../../components/games/Gacha";
 import {
   LAB_EXPERIMENTS,
   TV_EXPERIMENTS,
   TOY_EXPERIMENTS,
   type LabExperiment,
-} from '../../data/labs';
-import './style.css';
+} from "../../data/labs";
+import "./style.css";
 
 // Merge an internal ref (for scroll-progress registration) with the ref the
 // parent forwards (for IntersectionObserver section tracking).
 function assignRef<T>(forwarded: React.ForwardedRef<T>, value: T) {
-  if (typeof forwarded === 'function') forwarded(value);
+  if (typeof forwarded === "function") forwarded(value);
   else if (forwarded) forwarded.current = value;
 }
 
 // ── Hero / boot scene ─────────────────────────────────────────
-function HeroScene({ sectionRef }: { sectionRef: (el: HTMLElement | null) => void }) {
+function HeroScene({
+  sectionRef,
+}: {
+  sectionRef: (el: HTMLElement | null) => void;
+}) {
   const ref = useRef<HTMLElement | null>(null);
   useScrollProgress(ref);
   return (
@@ -66,9 +70,9 @@ const TVBlogScene = forwardRef<HTMLElement, TVBlogSceneProps>(
           ref.current = el;
           assignRef(forwardedRef, el);
         }}
-        className={`labs-section tv-blog-scene${isActive ? ' tv-blog-scene--active' : ''}`}
+        className={`labs-section tv-blog-scene${isActive ? " tv-blog-scene--active" : ""}`}
         aria-label={experiment.title}
-        aria-current={isActive ? 'true' : undefined}
+        aria-current={isActive ? "true" : undefined}
       >
         <div className="tv-blog-scene__inner">
           <SceneText experiment={experiment} />
@@ -77,7 +81,7 @@ const TVBlogScene = forwardRef<HTMLElement, TVBlogSceneProps>(
     );
   },
 );
-TVBlogScene.displayName = 'TVBlogScene';
+TVBlogScene.displayName = "TVBlogScene";
 
 // ── Toy scene ─────────────────────────────────────────────────
 interface ToySceneProps {
@@ -105,7 +109,7 @@ const ToyScene = forwardRef<HTMLElement, ToySceneProps>(
           </div>
           {/* Toy right */}
           <div className="toy-scene__game">
-            {experiment.game === 'magic8ball' ? (
+            {experiment.game === "magic8ball" ? (
               <Magic8Ball />
             ) : (
               <Gacha active={active} />
@@ -116,7 +120,7 @@ const ToyScene = forwardRef<HTMLElement, ToySceneProps>(
     );
   },
 );
-ToyScene.displayName = 'ToyScene';
+ToyScene.displayName = "ToyScene";
 
 // ── Labs page ─────────────────────────────────────────────────
 export default function Labs() {
@@ -139,7 +143,9 @@ export default function Labs() {
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
-            const idx = sectionRefs.current.indexOf(entry.target as HTMLElement);
+            const idx = sectionRefs.current.indexOf(
+              entry.target as HTMLElement,
+            );
             if (idx !== -1) {
               setActiveIdx(idx);
               if (idx >= 1 && idx <= TV_COUNT) {
@@ -164,7 +170,7 @@ export default function Labs() {
     const tRect = target.getBoundingClientRect();
     container.scrollTo({
       top: container.scrollTop + (tRect.top - cRect.top),
-      behavior: 'smooth',
+      behavior: "smooth",
     });
   };
 
@@ -205,7 +211,10 @@ export default function Labs() {
             {/* Right: sticky CRT TV (channel-switching) */}
             <div className="tv-zone__right">
               <div className="tv-set-wrapper">
-                <TVSet activeChannel={activeChannel} tvExperiments={TV_EXPERIMENTS} />
+                <TVSet
+                  activeChannel={activeChannel}
+                  tvExperiments={TV_EXPERIMENTS}
+                />
               </div>
             </div>
           </div>

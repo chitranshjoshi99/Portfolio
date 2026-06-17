@@ -332,7 +332,10 @@ export default function Home() {
             to="/about"
             ref={ctaBtnRef}
             className={`btn btn--primary btn--lg pixel-text ${ctaPressed ? "btn--pressed" : ""}`}
-            onClick={() => { setCtaPressed(true); haptics.press(); }}
+            onClick={() => {
+              setCtaPressed(true);
+              haptics.press();
+            }}
           >
             ▶ VIEW EXPERIENCE
           </Link>

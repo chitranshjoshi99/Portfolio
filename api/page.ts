@@ -216,6 +216,8 @@ export default async function handler(req: any, res: any) {
     res.setHeader("Content-Type", "text/html; charset=utf-8");
     res
       .status(500)
-      .send(`<!doctype html><meta charset="utf-8"><pre>page fn error: ${String(err)}</pre>`);
+      .send(
+        `<!doctype html><meta charset="utf-8"><pre>page fn error: ${String(err)}</pre>`,
+      );
   }
 }

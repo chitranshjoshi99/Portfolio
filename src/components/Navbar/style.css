@@ -168,8 +168,9 @@
 }
 
 .navbar__resume:hover {
-  background: color-mix(in srgb, var(--nivoda-gold) 12%, transparent);
-  box-shadow: var(--px) var(--px) 0 var(--nivoda-gold);
+  background: color-mix(in srgb, var(--classplus-purple) 12%, transparent);
+  box-shadow: var(--px) var(--px) 0 var(--classplus-purple);
+  color: var(--accent-primary);
 }
 
 /* ── Theme Toggle ─────────────────────────────────────────── */

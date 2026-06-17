@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react';
-import type { GameProps } from '../types';
-import './style.css';
+import { useEffect, useRef } from "react";
+import type { GameProps } from "../types";
+import "./style.css";
 
 const GRID = 20;
 const CELL = 10;
@@ -68,11 +68,11 @@ function step(s: SnakeState) {
 }
 
 function draw(ctx: CanvasRenderingContext2D, s: SnakeState, started: boolean) {
-  ctx.fillStyle = '#0c0a0e';
+  ctx.fillStyle = "#0c0a0e";
   ctx.fillRect(0, 0, W, H);
 
   // Subtle grid dots
-  ctx.fillStyle = 'rgba(255,255,255,0.04)';
+  ctx.fillStyle = "rgba(255,255,255,0.04)";
   for (let gx = 0; gx < GRID; gx++) {
     for (let gy = 0; gy < GRID; gy++) {
       ctx.fillRect(gx * CELL + CELL / 2 - 1, gy * CELL + CELL / 2 - 1, 2, 2);
@@ -80,46 +80,46 @@ function draw(ctx: CanvasRenderingContext2D, s: SnakeState, started: boolean) {
   }
 
   // Food
-  ctx.fillStyle = '#9b8ea0';
+  ctx.fillStyle = "#9b8ea0";
   ctx.fillRect(s.food[0] * CELL + 1, s.food[1] * CELL + 1, CELL - 2, CELL - 2);
 
   // Snake
   s.snake.forEach(([x, y], i) => {
-    ctx.fillStyle = i === 0 ? '#e8e4dc' : i % 2 === 0 ? '#4a4555' : '#3a3545';
+    ctx.fillStyle = i === 0 ? "#e8e4dc" : i % 2 === 0 ? "#4a4555" : "#3a3545";
     ctx.fillRect(x * CELL + 1, y * CELL + 1, CELL - 2, CELL - 2);
   });
 
   // Score strip
-  ctx.fillStyle = 'rgba(0,0,0,0.75)';
+  ctx.fillStyle = "rgba(0,0,0,0.75)";
   ctx.fillRect(0, 0, W, 14);
-  ctx.fillStyle = '#9b8ea0';
+  ctx.fillStyle = "#9b8ea0";
   ctx.font = '8px "Press Start 2P"';
-  ctx.textBaseline = 'top';
+  ctx.textBaseline = "top";
   ctx.fillText(`${s.score}`, 4, 3);
 
   if (!started && !s.dead) {
-    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillStyle = "rgba(0,0,0,0.6)";
     ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = '#e8e4dc';
+    ctx.fillStyle = "#e8e4dc";
     ctx.font = '7px "Press Start 2P"';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('TAP / ↑ TO START', W / 2, H / 2);
-    ctx.textAlign = 'left';
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("TAP / ↑ TO START", W / 2, H / 2);
+    ctx.textAlign = "left";
   }
 
   if (s.dead) {
-    ctx.fillStyle = 'rgba(0,0,0,0.65)';
+    ctx.fillStyle = "rgba(0,0,0,0.65)";
     ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = '#b87a72';
+    ctx.fillStyle = "#b87a72";
     ctx.font = '8px "Press Start 2P"';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('GAME OVER', W / 2, H / 2 - 8);
-    ctx.fillStyle = '#6a6570';
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("GAME OVER", W / 2, H / 2 - 8);
+    ctx.fillStyle = "#6a6570";
     ctx.font = '6px "Press Start 2P"';
-    ctx.fillText('CLICK TO RETRY', W / 2, H / 2 + 10);
-    ctx.textAlign = 'left';
+    ctx.fillText("CLICK TO RETRY", W / 2, H / 2 + 10);
+    ctx.textAlign = "left";
   }
 }
 
@@ -139,37 +139,44 @@ export function Snake({ active }: GameProps) {
         return;
       }
       switch (e.key) {
-        case 'ArrowUp':
-        case 'w':
+        case "ArrowUp":
+        case "w":
           s.nextDir = [0, -1];
           e.preventDefault();
           break;
-        case 'ArrowDown':
-        case 's':
+        case "ArrowDown":
+        case "s":
           s.nextDir = [0, 1];
           e.preventDefault();
           break;
-        case 'ArrowLeft':
-        case 'a':
+        case "ArrowLeft":
+        case "a":
           s.nextDir = [-1, 0];
           e.preventDefault();
           break;
-        case 'ArrowRight':
-        case 'd':
+        case "ArrowRight":
+        case "d":
           s.nextDir = [1, 0];
           e.preventDefault();
           break;
       }
       if (
-        ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd'].includes(
-          e.key,
-        )
+        [
+          "ArrowUp",
+          "ArrowDown",
+          "ArrowLeft",
+          "ArrowRight",
+          "w",
+          "a",
+          "s",
+          "d",
+        ].includes(e.key)
       ) {
         startedRef.current = true;
       }
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, [active]);
 
   // rAF game loop — pauses when inactive
@@ -177,7 +184,7 @@ export function Snake({ active }: GameProps) {
     if (!active) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     let raf: number;

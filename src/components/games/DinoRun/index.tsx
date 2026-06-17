@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react';
-import type { GameProps } from '../types';
-import './style.css';
+import { useEffect, useRef } from "react";
+import type { GameProps } from "../types";
+import "./style.css";
 
 const CW = 320;
 const CH = 110;
@@ -23,11 +23,11 @@ interface Obstacle {
 }
 
 interface DinoState {
-  dinoY: number;    // y of dino top (ground = GROUND_Y - DINO_H)
+  dinoY: number; // y of dino top (ground = GROUND_Y - DINO_H)
   dinoVY: number;
   onGround: boolean;
   obstacles: Obstacle[];
-  nextObs: number;  // x at which to spawn next obstacle
+  nextObs: number; // x at which to spawn next obstacle
   speed: number;
   score: number;
   dead: boolean;
@@ -94,7 +94,12 @@ function step(s: DinoState, dt: number) {
   const dh = DINO_H - 3;
   for (const obs of s.obstacles) {
     const oy = GROUND_Y - obs.h;
-    if (dx < obs.x + OBS_W && dx + dw > obs.x && dy < GROUND_Y && dy + dh > oy) {
+    if (
+      dx < obs.x + OBS_W &&
+      dx + dw > obs.x &&
+      dy < GROUND_Y &&
+      dy + dh > oy
+    ) {
       s.dead = true;
       return;
     }
@@ -102,22 +107,22 @@ function step(s: DinoState, dt: number) {
 }
 
 function draw(ctx: CanvasRenderingContext2D, s: DinoState) {
-  ctx.fillStyle = '#0c0a0e';
+  ctx.fillStyle = "#0c0a0e";
   ctx.fillRect(0, 0, CW, CH);
 
   // Ground
-  ctx.fillStyle = '#2e2b38';
+  ctx.fillStyle = "#2e2b38";
   ctx.fillRect(0, GROUND_Y, CW, 2);
 
   // Score
-  ctx.fillStyle = '#3a3545';
+  ctx.fillStyle = "#3a3545";
   ctx.font = '7px "Press Start 2P"';
-  ctx.textAlign = 'right';
-  ctx.textBaseline = 'top';
-  ctx.fillText(`${Math.floor(s.score).toString().padStart(5, '0')}`, CW - 8, 6);
+  ctx.textAlign = "right";
+  ctx.textBaseline = "top";
+  ctx.fillText(`${Math.floor(s.score).toString().padStart(5, "0")}`, CW - 8, 6);
 
   // Obstacles (cactus-like)
-  ctx.fillStyle = '#9e8562';
+  ctx.fillStyle = "#9e8562";
   for (const obs of s.obstacles) {
     const oy = GROUND_Y - obs.h;
     ctx.fillRect(obs.x, oy, OBS_W, obs.h);
@@ -129,17 +134,17 @@ function draw(ctx: CanvasRenderingContext2D, s: DinoState) {
   // Dino body
   const dx = DINO_X;
   const dy = s.dinoY;
-  ctx.fillStyle = s.dead ? '#b87a72' : '#e8e4dc';
+  ctx.fillStyle = s.dead ? "#b87a72" : "#e8e4dc";
 
   // Body
   ctx.fillRect(dx + 2, dy, DINO_W - 4, DINO_H - 6);
   // Head
   ctx.fillRect(dx + 6, dy - 8, 12, 10);
   // Eye
-  ctx.fillStyle = '#0c0a0e';
+  ctx.fillStyle = "#0c0a0e";
   ctx.fillRect(dx + 14, dy - 6, 2, 2);
   // Jaw
-  ctx.fillStyle = s.dead ? '#b87a72' : '#e8e4dc';
+  ctx.fillStyle = s.dead ? "#b87a72" : "#e8e4dc";
   ctx.fillRect(dx + 12, dy - 2, 6, 2);
 
   // Legs
@@ -161,28 +166,28 @@ function draw(ctx: CanvasRenderingContext2D, s: DinoState) {
 
   // Waiting overlay
   if (s.waiting) {
-    ctx.fillStyle = '#6a6570';
+    ctx.fillStyle = "#6a6570";
     ctx.font = '6px "Press Start 2P"';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('SPACE / TAP TO START', CW / 2, CH / 2 + 20);
-    ctx.textAlign = 'left';
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("SPACE / TAP TO START", CW / 2, CH / 2 + 20);
+    ctx.textAlign = "left";
   }
 
   // Death overlay
   if (s.dead) {
-    ctx.fillStyle = 'rgba(0,0,0,0.65)';
+    ctx.fillStyle = "rgba(0,0,0,0.65)";
     ctx.fillRect(0, 0, CW, CH);
-    ctx.fillStyle = '#b87a72';
+    ctx.fillStyle = "#b87a72";
     ctx.font = '7px "Press Start 2P"';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('GAME OVER', CW / 2, CH / 2 - 10);
-    ctx.fillStyle = '#6a6570';
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("GAME OVER", CW / 2, CH / 2 - 10);
+    ctx.fillStyle = "#6a6570";
     ctx.font = '6px "Press Start 2P"';
     ctx.fillText(`SCORE ${Math.floor(s.score)}`, CW / 2, CH / 2 + 6);
-    ctx.fillText('SPACE / TAP TO RETRY', CW / 2, CH / 2 + 20);
-    ctx.textAlign = 'left';
+    ctx.fillText("SPACE / TAP TO RETRY", CW / 2, CH / 2 + 20);
+    ctx.textAlign = "left";
   }
 }
 
@@ -210,20 +215,20 @@ export function DinoRun({ active }: GameProps) {
   useEffect(() => {
     if (!active) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.code === 'Space' || e.key === 'ArrowUp' || e.key === ' ') {
+      if (e.code === "Space" || e.key === "ArrowUp" || e.key === " ") {
         e.preventDefault();
         doJump();
       }
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, [active]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!active) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     let raf: number;

@@ -116,7 +116,7 @@
 }
 
 .labs-rail__sep::before {
-  content: '';
+  content: "";
   width: 10px; /* aligns under the dots */
   height: 1px;
   background: var(--border-primary);

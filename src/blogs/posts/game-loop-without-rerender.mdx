@@ -1,7 +1,7 @@
 import { Snake } from "../../components/games/Snake";
 
 React re-renders a component every time its state changes. That's exactly what
-you want for a form, and exactly what you *don't* want for a game loop that
+you want for a form, and exactly what you _don't_ want for a game loop that
 fires sixty times a second. If the snake's position lived in `useState`, every
 frame would queue a re-render, React would reconcile the whole tree, and your
 buttery 60fps would turn to soup.
@@ -27,12 +27,16 @@ so an off-screen channel burns zero CPU.
 
 ```ts
 useEffect(() => {
-  if (!active) return;            // paused when inactive
-  let raf = 0, last = 0;
-  const TICK = 150;               // ms per simulation step
+  if (!active) return; // paused when inactive
+  let raf = 0,
+    last = 0;
+  const TICK = 150; // ms per simulation step
   function loop(now: number) {
     raf = requestAnimationFrame(loop);
-    if (now - last >= TICK) { step(stateRef.current); last = now; }
+    if (now - last >= TICK) {
+      step(stateRef.current);
+      last = now;
+    }
     draw(ctx, stateRef.current);
   }
   raf = requestAnimationFrame(loop);

@@ -18,21 +18,21 @@ the core logic). A shared CRT TV hosts all "screen" games as switchable
 
 ## 2. Locked decisions
 
-| Decision | Choice |
-| --- | --- |
-| Scroll mechanic | **Hybrid** — scroll-snap rest points (desktop) **+** the TV zone is pinned (`position: sticky`) so channels change while the set stays put. |
-| Index rail | **Left rail** on desktop (≥900px). On mobile, collapses to a **slim sticky horizontal channel-strip** under the navbar — always visible, never a hidden drawer. |
+| Decision        | Choice                                                                                                                                                                                                          |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Scroll mechanic | **Hybrid** — scroll-snap rest points (desktop) **+** the TV zone is pinned (`position: sticky`) so channels change while the set stays put.                                                                     |
+| Index rail      | **Left rail** on desktop (≥900px). On mobile, collapses to a **slim sticky horizontal channel-strip** under the navbar — always visible, never a hidden drawer.                                                 |
 | Blog depth (v1) | Game is **always rendered and interactive**. Brief teaser text per scene + an **expand toggle** that reveals the core logic as a styled code panel **beside/below the game without unmounting or covering it**. |
-| Ordering | Scroll **grouped by render type** (all TV channels contiguous, then toys). Nav order = scroll order, with a thin `TV CHANNELS` / `TOYS` divider label in the rail. |
+| Ordering        | Scroll **grouped by render type** (all TV channels contiguous, then toys). Nav order = scroll order, with a thin `TV CHANNELS` / `TOYS` divider label in the rail.                                              |
 
 ## 3. Content taxonomy (the rule that decides everything)
 
 Every mini-game is exactly one of two kinds:
 
-- **`tv` (channel)** — the game *is a screen*: pixel/canvas content (Snake,
+- **`tv` (channel)** — the game _is a screen_: pixel/canvas content (Snake,
   Pong, Dino-run, static noise). These render inside the shared CRT and are
   grouped contiguously. Switching between them is a **channel change**.
-- **`standalone` (toy)** — the game *is a physical object with its own chrome*
+- **`standalone` (toy)** — the game _is a physical object with its own chrome_
   (Magic8Ball's ball body, a slot machine). The TV is absent; the object
   scrolls in from one side, scrolls out on exit.
 
@@ -47,23 +47,25 @@ Single source of truth, mirroring `src/data/resume.ts`.
 `src/data/labs.ts`:
 
 ```ts
-export type RenderType = 'tv' | 'standalone';
-export type GameKey = 'snake' | 'pong' | 'dino' | 'magic8ball' | 'gacha';
+export type RenderType = "tv" | "standalone";
+export type GameKey = "snake" | "pong" | "dino" | "magic8ball" | "gacha";
 
 export interface LabExperiment {
-  id: string;            // 'snake'
-  channel: number;       // 1-based; CH number in rail + TV overlay
-  title: string;         // blog title
-  teaser: string;        // 1–3 sentence brief
-  status: 'RUNNING' | 'WRITING' | 'OFFLINE';
-  accent: string;        // one of --nivoda-gold | --delhivery-red | --classplus-purple
+  id: string; // 'snake'
+  channel: number; // 1-based; CH number in rail + TV overlay
+  title: string; // blog title
+  teaser: string; // 1–3 sentence brief
+  status: "RUNNING" | "WRITING" | "OFFLINE";
+  accent: string; // one of --nivoda-gold | --delhivery-red | --classplus-purple
   render: RenderType;
-  game: GameKey;         // key → component in the game registry
-  code: string;          // the core-logic snippet shown in the expand panel
-  postSlug?: string;     // reserved for a future full article route
+  game: GameKey; // key → component in the game registry
+  code: string; // the core-logic snippet shown in the expand panel
+  postSlug?: string; // reserved for a future full article route
 }
 
-export const LAB_EXPERIMENTS: LabExperiment[] = [ /* see §11 launch set */ ];
+export const LAB_EXPERIMENTS: LabExperiment[] = [
+  /* see §11 launch set */
+];
 
 // Assert TV entries are contiguous (throw in dev if violated).
 ```
@@ -106,7 +108,7 @@ off-screen:
 
 ```ts
 export interface GameProps {
-  active: boolean;   // true only when its channel/scene is the active one
+  active: boolean; // true only when its channel/scene is the active one
 }
 ```
 
@@ -133,7 +135,7 @@ IntersectionObserver, and the manual `container.scrollTo({ top: … })` for jump
   - each `TVBlogScene` slice inside `TVZone` (N) — the TV stays sticky across all of them
   - each `ToyScene` (1 each)
 - `TVZone` height = `N × 100vh`; `TVSet` is `position: sticky; top: 0;
-  height: calc(100vh - 56px)`. As each `TVBlogScene` slice crosses center
+height: calc(100vh - 56px)`. As each `TVBlogScene` slice crosses center
   (IntersectionObserver, threshold 0.5, root = stage), set `activeChannel`. The
   set never moves — only the channel content does.
 
@@ -201,18 +203,18 @@ and interactive**; expanding never covers or unmounts it.
 
 **TV channels (contiguous):**
 
-| CH | game | blog title | code panel shows |
-| --- | --- | --- | --- |
-| 01 | `snake` | A game loop in React without re-rendering | `useRef` state + single rAF loop, pause on inactive |
-| 02 | `pong`  | Fixed-timestep loops & collision | accumulator timestep, AABB collision |
-| 03 | `dino`  | Input latency: debounce vs throttle vs raw | hand-rolled `debounce`/`throttle`, jump handler |
+| CH  | game    | blog title                                 | code panel shows                                    |
+| --- | ------- | ------------------------------------------ | --------------------------------------------------- |
+| 01  | `snake` | A game loop in React without re-rendering  | `useRef` state + single rAF loop, pause on inactive |
+| 02  | `pong`  | Fixed-timestep loops & collision           | accumulator timestep, AABB collision                |
+| 03  | `dino`  | Input latency: debounce vs throttle vs raw | hand-rolled `debounce`/`throttle`, jump handler     |
 
 **Toys (standalone, after channels):**
 
-| game | blog title | code panel shows |
-| --- | --- | --- |
-| `magic8ball` | Modeling UI as a finite state machine | the existing `idle→tapping→counting→revealed` FSM |
-| `gacha` | Build a tiny SWR cache (dedupe + stale-while-revalidate) | ~40-line in-memory cache hook |
+| game         | blog title                                               | code panel shows                                  |
+| ------------ | -------------------------------------------------------- | ------------------------------------------------- |
+| `magic8ball` | Modeling UI as a finite state machine                    | the existing `idle→tapping→counting→revealed` FSM |
+| `gacha`      | Build a tiny SWR cache (dedupe + stale-while-revalidate) | ~40-line in-memory cache hook                     |
 
 Three contiguous channels then two toys exercises **both** transition types.
 

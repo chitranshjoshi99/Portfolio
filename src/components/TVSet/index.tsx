@@ -1,6 +1,6 @@
-import { TVScreen } from '../TVScreen';
-import type { LabExperiment } from '../../data/labs';
-import './style.css';
+import { TVScreen } from "../TVScreen";
+import type { LabExperiment } from "../../data/labs";
+import "./style.css";
 
 interface Props {
   activeChannel: number;
@@ -20,7 +20,10 @@ export function TVSet({ activeChannel, tvExperiments }: Props) {
       <div className="tv-set__body">
         {/* Screen area */}
         <div className="tv-set__screen-wrap">
-          <TVScreen activeChannel={activeChannel} tvExperiments={tvExperiments} />
+          <TVScreen
+            activeChannel={activeChannel}
+            tvExperiments={tvExperiments}
+          />
           <div className="tv-set__scanlines" aria-hidden="true" />
         </div>
 

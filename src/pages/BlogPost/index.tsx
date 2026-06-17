@@ -55,7 +55,9 @@ export default function BlogPost() {
       <article className="blog-post__inner">
         <button
           className="blog-post__back pixel-text"
-          onClick={() => window.history.length > 1 ? navigate(-1) : navigate("/blogs")}
+          onClick={() =>
+            window.history.length > 1 ? navigate(-1) : navigate("/blogs")
+          }
         >
           ← BACK
         </button>

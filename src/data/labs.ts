@@ -1,37 +1,37 @@
-export type RenderType = 'tv' | 'standalone';
+export type RenderType = "tv" | "standalone";
 export type GameKey =
-  | 'snake'
-  | 'pong'
-  | 'dino'
-  | 'linkpreview'
-  | 'magic8ball'
-  | 'gacha';
+  | "snake"
+  | "pong"
+  | "dino"
+  | "linkpreview"
+  | "magic8ball"
+  | "gacha";
 
 export interface LabExperiment {
   id: string;
-  channel: number;   // 1-based; CH number in rail + TV overlay
+  channel: number; // 1-based; CH number in rail + TV overlay
   title: string;
   teaser: string;
-  status: 'RUNNING' | 'WRITING' | 'OFFLINE';
-  accent: string;    // CSS custom property reference
+  status: "RUNNING" | "WRITING" | "OFFLINE";
+  accent: string; // CSS custom property reference
   render: RenderType;
   game: GameKey;
-  code: string;      // core-logic snippet shown in expand panel
+  code: string; // core-logic snippet shown in expand panel
   postSlug?: string; // reserved for future full article route
 }
 
 export const LAB_EXPERIMENTS: LabExperiment[] = [
   // ── TV channels (contiguous) ─────────────────────────────────
   {
-    id: 'snake',
+    id: "snake",
     channel: 1,
-    title: 'A game loop in React without re-rendering',
+    title: "A game loop in React without re-rendering",
     teaser:
-      'React re-renders on every state change, but game loops fire 60 times a second. Keep all mutable state in refs, run one rAF loop, and let React own only the canvas element.',
-    status: 'RUNNING',
-    accent: 'var(--classplus-purple)',
-    render: 'tv',
-    game: 'snake',
+      "React re-renders on every state change, but game loops fire 60 times a second. Keep all mutable state in refs, run one rAF loop, and let React own only the canvas element.",
+    status: "RUNNING",
+    accent: "var(--classplus-purple)",
+    render: "tv",
+    game: "snake",
     code: `// All game state lives in refs, zero re-renders per frame
 const stateRef = useRef({ snake: [[10,10]], dir: [1,0], food: [5,5] });
 
@@ -53,15 +53,15 @@ useEffect(() => {
 }, [active]);             // restart only when active flips`,
   },
   {
-    id: 'pong',
+    id: "pong",
     channel: 2,
-    title: 'Fixed-timestep loops & collision',
+    title: "Fixed-timestep loops & collision",
     teaser:
-      'A fixed timestep accumulates elapsed time and steps physics in discrete chunks. This decouples rendering from physics, preventing the ball from tunnelling through a paddle at high frame rates.',
-    status: 'RUNNING',
-    accent: 'var(--delhivery-red)',
-    render: 'tv',
-    game: 'pong',
+      "A fixed timestep accumulates elapsed time and steps physics in discrete chunks. This decouples rendering from physics, preventing the ball from tunnelling through a paddle at high frame rates.",
+    status: "RUNNING",
+    accent: "var(--delhivery-red)",
+    render: "tv",
+    game: "pong",
     code: `const STEP = 1 / 60;   // 60 Hz physics tick
 let acc = 0, prev = performance.now();
 
@@ -83,15 +83,15 @@ function intersects(a: Rect, b: Rect): boolean {
 }`,
   },
   {
-    id: 'dino',
+    id: "dino",
     channel: 3,
-    title: 'Input latency: debounce vs throttle vs raw',
+    title: "Input latency: debounce vs throttle vs raw",
     teaser:
       "The dino's jump feels instant because it uses raw keydown, with no delay. Debounce waits for silence; throttle limits frequency. Picking the wrong one is the difference between snappy and laggy.",
-    status: 'RUNNING',
-    accent: 'var(--nivoda-gold)',
-    render: 'tv',
-    game: 'dino',
+    status: "RUNNING",
+    accent: "var(--nivoda-gold)",
+    render: "tv",
+    game: "dino",
     code: `// Raw: fires immediately on keydown (used in the game)
 window.addEventListener('keydown', e => {
   if (e.code === 'Space') jump();
@@ -118,15 +118,15 @@ function throttle<T extends unknown[]>(fn: (...a: T) => void, ms: number) {
 }`,
   },
   {
-    id: 'linkpreview',
+    id: "linkpreview",
     channel: 4,
-    title: 'Live OG previews from a pasted URL',
+    title: "Live OG previews from a pasted URL",
     teaser:
-      'Paste any page URL and the TV tunes into its social card. An edge function fetches the page, scrapes its og: tags, and beams back the title, image, and description that LinkedIn would show.',
-    status: 'RUNNING',
-    accent: 'var(--delhivery-red)',
-    render: 'tv',
-    game: 'linkpreview',
+      "Paste any page URL and the TV tunes into its social card. An edge function fetches the page, scrapes its og: tags, and beams back the title, image, and description that LinkedIn would show.",
+    status: "RUNNING",
+    accent: "var(--delhivery-red)",
+    render: "tv",
+    game: "linkpreview",
     code: `// Edge function: fetch the page, scrape its OG tags, return JSON
 export const config = { runtime: 'edge' };
 
@@ -149,15 +149,15 @@ export default async function handler(req) {
 
   // ── Standalone toys ──────────────────────────────────────────
   {
-    id: 'magic8ball',
+    id: "magic8ball",
     channel: 5,
-    title: 'Modeling UI as a finite state machine',
+    title: "Modeling UI as a finite state machine",
     teaser:
-      'Five taps, a countdown, a reveal, all driven by an explicit FSM with four states. No boolean spaghetti, no impossible UI states. The machine makes illegal states unrepresentable.',
-    status: 'RUNNING',
-    accent: 'var(--classplus-purple)',
-    render: 'standalone',
-    game: 'magic8ball',
+      "Five taps, a countdown, a reveal, all driven by an explicit FSM with four states. No boolean spaghetti, no impossible UI states. The machine makes illegal states unrepresentable.",
+    status: "RUNNING",
+    accent: "var(--classplus-purple)",
+    render: "standalone",
+    game: "magic8ball",
     code: `type Phase = 'idle' | 'tapping' | 'counting' | 'revealed';
 
 // Transitions are pure functions: (phase, event) → next phase
@@ -176,15 +176,15 @@ function transition(phase: Phase, event: 'tap' | 'reset'): Phase {
 // TypeScript enforces it at the type level.`,
   },
   {
-    id: 'gacha',
+    id: "gacha",
     channel: 6,
-    title: 'Build a tiny SWR cache',
+    title: "Build a tiny SWR cache",
     teaser:
-      'Stale-while-revalidate: return cached data immediately, fetch fresh data in background, update when done. This ~40-line hook is the entire idea, no library needed for simple use cases.',
-    status: 'WRITING',
-    accent: 'var(--nivoda-gold)',
-    render: 'standalone',
-    game: 'gacha',
+      "Stale-while-revalidate: return cached data immediately, fetch fresh data in background, update when done. This ~40-line hook is the entire idea, no library needed for simple use cases.",
+    status: "WRITING",
+    accent: "var(--nivoda-gold)",
+    render: "standalone",
+    game: "gacha",
     code: `type Entry<T> = { data: T; ts: number };
 const cache = new Map<string, Entry<unknown>>();
 const pending = new Map<string, Promise<unknown>>();
@@ -216,16 +216,20 @@ function useSWR<T>(key: string, fetcher: () => Promise<T>, staleMs = 5000) {
   },
 ];
 
-export const TV_EXPERIMENTS = LAB_EXPERIMENTS.filter((e) => e.render === 'tv');
-export const TOY_EXPERIMENTS = LAB_EXPERIMENTS.filter((e) => e.render === 'standalone');
+export const TV_EXPERIMENTS = LAB_EXPERIMENTS.filter((e) => e.render === "tv");
+export const TOY_EXPERIMENTS = LAB_EXPERIMENTS.filter(
+  (e) => e.render === "standalone",
+);
 
 // Assert TV entries are contiguous (dev-only guard)
 if (import.meta.env.DEV) {
   let seenStandalone = false;
   for (const e of LAB_EXPERIMENTS) {
-    if (e.render === 'standalone') seenStandalone = true;
-    if (e.render === 'tv' && seenStandalone) {
-      throw new Error('labs.ts: all tv entries must appear before standalone entries');
+    if (e.render === "standalone") seenStandalone = true;
+    if (e.render === "tv" && seenStandalone) {
+      throw new Error(
+        "labs.ts: all tv entries must appear before standalone entries",
+      );
     }
   }
 }

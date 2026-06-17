@@ -6,7 +6,7 @@ import {
   useRef,
   type ReactNode,
   type RefObject,
-} from 'react';
+} from "react";
 
 type RegisterFn = (el: HTMLElement) => () => void;
 const Ctx = createContext<RegisterFn>(() => () => {});
@@ -21,18 +21,18 @@ export function ScrollProgressProvider({
   const elements = useRef<Set<HTMLElement>>(new Set());
   const rafRef = useRef<number>(0);
   const reducedMotion = useRef(
-    typeof window !== 'undefined'
-      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    typeof window !== "undefined"
+      ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
       : false,
   );
 
   useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     const onChange = (e: MediaQueryListEvent) => {
       reducedMotion.current = e.matches;
     };
-    mq.addEventListener('change', onChange);
-    return () => mq.removeEventListener('change', onChange);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
   }, []);
 
   useEffect(() => {
@@ -53,7 +53,7 @@ export function ScrollProgressProvider({
         const dist = Math.abs(elCenterY - stageCenterY);
         // p = 1 when centered in the stage, 0 when one full stage-height away
         const p = Math.max(0, Math.min(1, 1 - dist / stageH));
-        el.style.setProperty('--p', p.toFixed(3));
+        el.style.setProperty("--p", p.toFixed(3));
       }
     }
 

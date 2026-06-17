@@ -18,7 +18,7 @@ raw HTML and read only the `<head>` Open Graph meta. A Vite SPA serves the same
 `index.html` for every route, so every URL currently shares one set of OG tags.
 
 So we don't need full SSR — we need **per-route `<head>` meta injection** at
-request time. Google *does* run JS, so normal SEO already works; this is
+request time. Google _does_ run JS, so normal SEO already works; this is
 specifically for the social preview cards.
 
 GitHub Pages is static (and uses a 404.html hack for sub-routes), so it can't do
@@ -26,13 +26,13 @@ this. Vercel can, via a function + rewrite.
 
 ## 1. Locked decisions
 
-| Decision | Choice |
-| --- | --- |
-| Host | Vercel (framework preset: **Vite**) |
-| Domain | **Deferred** — centralize in `VITE_SITE_URL`; placeholder until chosen |
+| Decision          | Choice                                                                                        |
+| ----------------- | --------------------------------------------------------------------------------------------- |
+| Host              | Vercel (framework preset: **Vite**)                                                           |
+| Domain            | **Deferred** — centralize in `VITE_SITE_URL`; placeholder until chosen                        |
 | Preview mechanism | **Serverless function** rewrites `/blogs/:slug`, injects blog-specific meta into `index.html` |
-| Preview image | **`@vercel/og`** — auto-generated 1200×630 pixel-art card per blog |
-| Blog content | **MDX** — markdown posts that can import & embed the live POC game |
+| Preview image     | **`@vercel/og`** — auto-generated 1200×630 pixel-art card per blog                            |
+| Blog content      | **MDX** — markdown posts that can import & embed the live POC game                            |
 
 ## 2. Request flow (after deploy)
 
@@ -71,8 +71,8 @@ Create `src/config/site.ts`:
 // Single source of truth for absolute URLs (canonical, OG, sitemap).
 // No trailing slash. Set VITE_SITE_URL in .env + Vercel project env.
 export const SITE_URL = (
-  import.meta.env.VITE_SITE_URL ?? 'https://YOUR-APP.vercel.app'
-).replace(/\/$/, '');
+  import.meta.env.VITE_SITE_URL ?? "https://YOUR-APP.vercel.app"
+).replace(/\/$/, "");
 ```
 
 `.env` (and Vercel → Settings → Environment Variables):
@@ -118,13 +118,19 @@ npm i -D @types/mdx
 ### B2. `vite.config.ts`
 
 ```ts
-import mdx from '@mdx-js/rollup';
-import remarkGfm from 'remark-gfm';
+import mdx from "@mdx-js/rollup";
+import remarkGfm from "remark-gfm";
 
 export default defineConfig({
-  base: '/',
+  base: "/",
   plugins: [
-    { enforce: 'pre', ...mdx({ remarkPlugins: [remarkGfm], providerImportSource: '@mdx-js/react' }) },
+    {
+      enforce: "pre",
+      ...mdx({
+        remarkPlugins: [remarkGfm],
+        providerImportSource: "@mdx-js/react",
+      }),
+    },
     react(), // existing SWC react plugin — must come AFTER mdx
   ],
 });
@@ -133,8 +139,8 @@ export default defineConfig({
 Add to `src/vite-env.d.ts`:
 
 ```ts
-declare module '*.mdx' {
-  import type { ComponentType } from 'react';
+declare module "*.mdx" {
+  import type { ComponentType } from "react";
   const MDXComponent: ComponentType<Record<string, unknown>>;
   export default MDXComponent;
 }
@@ -142,7 +148,7 @@ declare module '*.mdx' {
 
 ### B3. Shared blog metadata (one source of truth, runtime-agnostic)
 
-The SPA *and* the Vercel functions need blog meta, but functions can't import
+The SPA _and_ the Vercel functions need blog meta, but functions can't import
 `.mdx`. Keep meta in plain JSON that both sides import.
 
 `blogs.config.json` (project root):
@@ -169,29 +175,37 @@ runs outside the browser. Mirror the Labs accents.)
 `src/blogs/<slug>.mdx` — body only; import the game to embed it:
 
 ```mdx
-import { Snake } from '../components/games/Snake';
+import { Snake } from "../components/games/Snake";
 
 React re-renders on every state change. A game loop fires 60×/second. If loop
 state lived in `useState`, you'd queue 60 re-renders a second...
 
-<div className="blog-demo"><Snake active /></div>
+<div className="blog-demo">
+  <Snake active />
+</div>
 
 ## Why refs win
+
 ...
 ```
 
 ### B5. Post loader — `src/blogs/index.ts`
 
 ```ts
-import meta from '../../blogs.config.json';
+import meta from "../../blogs.config.json";
 export interface BlogMeta {
-  slug: string; title: string; description: string;
-  date: string; tag: string; accent: string; gameKey?: string;
+  slug: string;
+  title: string;
+  description: string;
+  date: string;
+  tag: string;
+  accent: string;
+  gameKey?: string;
 }
 export const BLOGS = meta as BlogMeta[];
 export const getBlog = (slug: string) => BLOGS.find((b) => b.slug === slug);
 
-const mdx = import.meta.glob('./*.mdx'); // lazy
+const mdx = import.meta.glob("./*.mdx"); // lazy
 export const loadBlogBody = (slug: string) => mdx[`./${slug}.mdx`]?.();
 ```
 
@@ -217,18 +231,23 @@ Add `{ to: "/blogs", label: "> BLOGS", key: "blogs" }` to `NAV_LINKS` in
 `useDocumentMeta` hook (client-side mirror of what the function does for bots):
 
 ```ts
-export function useDocumentMeta(m: { title: string; description: string; url: string; image: string }) {
+export function useDocumentMeta(m: {
+  title: string;
+  description: string;
+  url: string;
+  image: string;
+}) {
   useEffect(() => {
     document.title = `${m.title} — Prakamya`;
     const set = (sel: string, attr: string, val: string) =>
       document.querySelector(sel)?.setAttribute(attr, val);
-    set('meta[name="description"]', 'content', m.description);
-    set('link[rel="canonical"]', 'href', m.url);
-    set('meta[property="og:title"]', 'content', m.title);
-    set('meta[property="og:description"]', 'content', m.description);
-    set('meta[property="og:url"]', 'content', m.url);
-    set('meta[property="og:image"]', 'content', m.image);
-    set('meta[name="twitter:image"]', 'content', m.image);
+    set('meta[name="description"]', "content", m.description);
+    set('link[rel="canonical"]', "href", m.url);
+    set('meta[property="og:title"]', "content", m.title);
+    set('meta[property="og:description"]', "content", m.description);
+    set('meta[property="og:url"]', "content", m.url);
+    set('meta[property="og:image"]', "content", m.image);
+    set('meta[name="twitter:image"]', "content", m.image);
   }, [m.title, m.description, m.url, m.image]);
 }
 ```
@@ -250,9 +269,10 @@ code as the teaser; the full post is the deep dive, so they don't conflict.)
 `api/page.js` (Node serverless):
 
 ```js
-import BLOGS from '../blogs.config.json' assert { type: 'json' };
+import BLOGS from "../blogs.config.json" assert { type: "json" };
 
-const esc = (s = '') => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+const esc = (s = "") =>
+  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
 
 export default async function handler(req, res) {
   const slug = req.query.slug;
@@ -278,16 +298,19 @@ export default async function handler(req, res) {
       <meta name="twitter:title" content="${esc(blog.title)}" />
       <meta name="twitter:description" content="${esc(blog.description)}" />
       <meta name="twitter:image" content="${image}" />`;
-    html = html.replace(/<!--SEO-->[\s\S]*?<!--\/SEO-->/, `<!--SEO-->${block}<!--/SEO-->`);
+    html = html.replace(
+      /<!--SEO-->[\s\S]*?<!--\/SEO-->/,
+      `<!--SEO-->${block}<!--/SEO-->`,
+    );
   }
 
-  res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400');
+  res.setHeader("Content-Type", "text/html; charset=utf-8");
+  res.setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate=86400");
   res.status(200).send(html);
 }
 ```
 
-In `index.html`, wrap the *replaceable* default meta in markers so the swap is
+In `index.html`, wrap the _replaceable_ default meta in markers so the swap is
 surgical:
 
 ```html
@@ -313,36 +336,56 @@ npm i @vercel/og
 `api/og.tsx` (Edge runtime):
 
 ```tsx
-import { ImageResponse } from '@vercel/og';
-import BLOGS from '../blogs.config.json';
+import { ImageResponse } from "@vercel/og";
+import BLOGS from "../blogs.config.json";
 
-export const config = { runtime: 'edge' };
+export const config = { runtime: "edge" };
 
 export default async function handler(req) {
   const { searchParams } = new URL(req.url);
-  const slug = searchParams.get('slug');
+  const slug = searchParams.get("slug");
   const blog = BLOGS.find((b) => b.slug === slug) ?? {
-    title: 'Prakamya — Labs', tag: 'LABS', accent: '#8b7ba8',
+    title: "Prakamya — Labs",
+    tag: "LABS",
+    accent: "#8b7ba8",
   };
 
   // Pixel font for the card (host the .ttf at /fonts/, fetch as ArrayBuffer)
-  const font = await fetch(new URL('/fonts/PressStart2P.ttf', req.url)).then((r) => r.arrayBuffer());
+  const font = await fetch(new URL("/fonts/PressStart2P.ttf", req.url)).then(
+    (r) => r.arrayBuffer(),
+  );
 
   return new ImageResponse(
-    (
-      <div style={{
-        width: '100%', height: '100%', display: 'flex', flexDirection: 'column',
-        justifyContent: 'space-between', padding: 72,
-        background: '#16141a', color: '#e8e4dc',
-        fontFamily: 'PressStart2P', backgroundImage:
-          'radial-gradient(#26222e 1px, transparent 1px)', backgroundSize: '24px 24px',
-      }}>
-        <div style={{ display: 'flex', fontSize: 22, color: blog.accent }}>{blog.tag}</div>
-        <div style={{ display: 'flex', fontSize: 52, lineHeight: 1.4 }}>{blog.title}</div>
-        <div style={{ display: 'flex', fontSize: 20, color: '#9b8ea0' }}>prakamya · labs</div>
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        padding: 72,
+        background: "#16141a",
+        color: "#e8e4dc",
+        fontFamily: "PressStart2P",
+        backgroundImage: "radial-gradient(#26222e 1px, transparent 1px)",
+        backgroundSize: "24px 24px",
+      }}
+    >
+      <div style={{ display: "flex", fontSize: 22, color: blog.accent }}>
+        {blog.tag}
       </div>
-    ),
-    { width: 1200, height: 630, fonts: [{ name: 'PressStart2P', data: font, style: 'normal' }] },
+      <div style={{ display: "flex", fontSize: 52, lineHeight: 1.4 }}>
+        {blog.title}
+      </div>
+      <div style={{ display: "flex", fontSize: 20, color: "#9b8ea0" }}>
+        prakamya · labs
+      </div>
+    </div>,
+    {
+      width: 1200,
+      height: 630,
+      fonts: [{ name: "PressStart2P", data: font, style: "normal" }],
+    },
   );
 }
 ```
@@ -398,8 +441,9 @@ Verify locally by opening `/api/og?slug=<slug>` — it returns a PNG.
 Topic: **"Rich link previews for a client-rendered SPA on Vercel."** Beats:
 crawlers don't run JS → only `<head>` matters → meta-injection function (not
 SSR) → on-the-fly OG images with `@vercel/og`. The POC is literally `api/page.js`
-+ `api/og.tsx` in this repo, and you can embed the live OG-card preview in the
-MDX post.
+
+- `api/og.tsx` in this repo, and you can embed the live OG-card preview in the
+  MDX post.
 
 ## 11. Alternative considered (and why not)
 
@@ -409,9 +453,11 @@ great fit for a small fixed set of posts. We chose the function path because it'
 dynamic (no rebuild per post), it's needed for `@vercel/og` anyway, and it's the
 better story to write about. If posts stay few and rarely change, prerender is
 the lower-maintenance option — easy to switch.
+
 ```
 
 ## Out of scope (v1)
 
 RSS feed, comments, reading-time/analytics, MDX syntax-highlight theme,
 multi-author. Add later.
+```

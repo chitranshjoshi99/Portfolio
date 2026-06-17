@@ -44,22 +44,25 @@ const TAP_MSGS: Record<number, string> = {
 
 // ── Component ─────────────────────────────────────────────────
 export function Magic8Ball() {
-  const [phase, setPhase]           = useState<Phase>("idle");
-  const [tapCount, setTapCount]     = useState(0);
-  const [countNum, setCountNum]     = useState<3 | 2 | 1>(3);
-  const [countKey, setCountKey]     = useState(0);
+  const [phase, setPhase] = useState<Phase>("idle");
+  const [tapCount, setTapCount] = useState(0);
+  const [countNum, setCountNum] = useState<3 | 2 | 1>(3);
+  const [countKey, setCountKey] = useState(0);
   const [showButtons, setShowButtons] = useState(false);
-  const navigate   = useNavigate();
-  const canvasRef  = useRef<HTMLCanvasElement>(null);
-  const ballRef    = useRef<HTMLButtonElement>(null);
-  const timers     = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const navigate = useNavigate();
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const ballRef = useRef<HTMLButtonElement>(null);
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   // Draw static ball shape once on mount
   useEffect(() => {
     if (canvasRef.current) drawBallShape(canvasRef.current);
   }, []);
 
-  const clear = () => { timers.current.forEach(clearTimeout); timers.current = []; };
+  const clear = () => {
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+  };
   useEffect(() => () => clear(), []);
 
   const after = (ms: number, fn: () => void) => {
@@ -133,23 +136,24 @@ export function Magic8Ball() {
     <div className="m8b">
       {/* ── Stage: ball and button-overlay share the exact same space ── */}
       <div className="m8b__stage">
-
         {/* The ball — fades out when showButtons is true */}
         <button
           ref={ballRef}
           className={[
             "m8b__ball",
             phase === "counting" && "m8b__ball--counting",
-            showButtons          && "m8b__ball--hidden",
-          ].filter(Boolean).join(" ")}
+            showButtons && "m8b__ball--hidden",
+          ]
+            .filter(Boolean)
+            .join(" ")}
           onClick={handleTap}
           disabled={phase === "counting" || phase === "revealed"}
           aria-label={
             phase === "idle"
               ? "Tap the Magic 8-Ball"
               : phase === "tapping"
-              ? `${MAX_TAPS - tapCount} more tap${MAX_TAPS - tapCount !== 1 ? "s" : ""}`
-              : "The oracle is deciding…"
+                ? `${MAX_TAPS - tapCount} more tap${MAX_TAPS - tapCount !== 1 ? "s" : ""}`
+                : "The oracle is deciding…"
           }
         >
           {/* Canvas: ball body + white window shape (no text content) */}
@@ -163,7 +167,6 @@ export function Magic8Ball() {
 
           {/* HTML overlay — sits exactly over the white window circle */}
           <div className="m8b__window" aria-hidden="true">
-
             {/* Idle / tapping — show "8" */}
             {(phase === "idle" || phase === "tapping") && (
               <span className="m8b__w-eight pixel-text">8</span>
@@ -184,7 +187,6 @@ export function Magic8Ball() {
                 <span>ON IT</span>
               </div>
             )}
-
           </div>
         </button>
 
@@ -197,7 +199,10 @@ export function Magic8Ball() {
           >
             <button
               className="btn btn--outline pixel-text"
-              onClick={() => { haptics.press(); navigate("/contact"); }}
+              onClick={() => {
+                haptics.press();
+                navigate("/contact");
+              }}
             >
               PROVE IT WRONG →
             </button>
@@ -206,7 +211,6 @@ export function Magic8Ball() {
             </button>
           </div>
         )}
-
       </div>
       {/* ── Status row — reserved height, no layout shift ── */}
       <div className="m8b__status" aria-live="polite">
@@ -219,7 +223,9 @@ export function Magic8Ball() {
           </span>
         )}
         {phase === "counting" && (
-          <span className="m8b__consulting vt-text">consulting the oracle…</span>
+          <span className="m8b__consulting vt-text">
+            consulting the oracle…
+          </span>
         )}
       </div>
     </div>

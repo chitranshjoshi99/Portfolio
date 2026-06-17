@@ -1,7 +1,7 @@
-import { Fragment, type CSSProperties } from 'react';
-import { haptics } from '../../utils/haptics';
-import type { LabExperiment } from '../../data/labs';
-import './style.css';
+import { Fragment, type CSSProperties } from "react";
+import { haptics } from "../../utils/haptics";
+import type { LabExperiment } from "../../data/labs";
+import "./style.css";
 
 interface Props {
   activeIdx: number; // 0 = hero/INIT, 1..N = experiments
@@ -9,10 +9,10 @@ interface Props {
   onJump: (idx: number) => void;
 }
 
-const STATUS_GLYPH: Record<LabExperiment['status'], string> = {
-  RUNNING: '●',
-  WRITING: '◎',
-  OFFLINE: '◌',
+const STATUS_GLYPH: Record<LabExperiment["status"], string> = {
+  RUNNING: "●",
+  WRITING: "◎",
+  OFFLINE: "◌",
 };
 
 export function LabsRail({ activeIdx, experiments, onJump }: Props) {
@@ -21,7 +21,7 @@ export function LabsRail({ activeIdx, experiments, onJump }: Props) {
     onJump(idx);
   };
 
-  let lastRender: LabExperiment['render'] | null = null;
+  let lastRender: LabExperiment["render"] | null = null;
 
   return (
     <nav className="labs-rail" aria-label="Lab sections">
@@ -29,9 +29,9 @@ export function LabsRail({ activeIdx, experiments, onJump }: Props) {
         {/* INIT / hero */}
         <li>
           <button
-            className={`labs-rail__item labs-rail__item--init${activeIdx === 0 ? ' is-active' : ''}`}
+            className={`labs-rail__item labs-rail__item--init${activeIdx === 0 ? " is-active" : ""}`}
             onClick={() => jump(0)}
-            aria-current={activeIdx === 0 ? 'true' : undefined}
+            aria-current={activeIdx === 0 ? "true" : undefined}
             aria-label="Go to Labs intro"
           >
             <span className="labs-rail__dot" aria-hidden="true" />
@@ -48,24 +48,24 @@ export function LabsRail({ activeIdx, experiments, onJump }: Props) {
           const showHeader = exp.render !== lastRender;
           lastRender = exp.render;
           const tag =
-            exp.render === 'tv'
-              ? `CH${String(exp.channel).padStart(2, '0')}`
-              : 'TOY';
+            exp.render === "tv"
+              ? `CH${String(exp.channel).padStart(2, "0")}`
+              : "TOY";
           return (
             <Fragment key={exp.id}>
               {showHeader && (
                 <li className="labs-rail__sep" aria-hidden="true">
                   <span className="labs-rail__sep-label pixel-text">
-                    {exp.render === 'tv' ? 'TV' : 'TOYS'}
+                    {exp.render === "tv" ? "TV" : "TOYS"}
                   </span>
                 </li>
               )}
               <li>
                 <button
-                  className={`labs-rail__item${isActive ? ' is-active' : ''}`}
-                  style={{ '--row-accent': exp.accent } as CSSProperties}
+                  className={`labs-rail__item${isActive ? " is-active" : ""}`}
+                  style={{ "--row-accent": exp.accent } as CSSProperties}
                   onClick={() => jump(idx)}
-                  aria-current={isActive ? 'true' : undefined}
+                  aria-current={isActive ? "true" : undefined}
                   aria-label={`Go to ${exp.title}`}
                 >
                   <span className="labs-rail__dot" aria-hidden="true" />

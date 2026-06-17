@@ -6,21 +6,21 @@ import "./style.css";
 import { asset } from "@/assets";
 
 const NAV_LINKS = [
-  { to: "/",        label: "> HOME",    key: "home"    },
-  { to: "/about",   label: "> ABOUT",   key: "about"   },
-  { to: "/labs",    label: "> LABS",    key: "labs"    },
-  { to: "/blogs",   label: "> BLOGS",   key: "blogs"   },
+  { to: "/", label: "> HOME", key: "home" },
+  { to: "/about", label: "> ABOUT", key: "about" },
+  { to: "/labs", label: "> LABS", key: "labs" },
+  { to: "/blogs", label: "> BLOGS", key: "blogs" },
   { to: "/contact", label: "> CONTACT", key: "contact" },
 ];
 
 export function Navbar() {
   const { isDark, toggleTheme } = useTheme();
-  const [scrolled, setScrolled]         = useState(false);
-  const [menuOpen, setMenuOpen]         = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   // true when the hero avatar has scrolled out of the viewport
   const [avatarHidden, setAvatarHidden] = useState(false);
   const location = useLocation();
-  const menuRef  = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   // Detect scroll to add backdrop blur
   useEffect(() => {
@@ -47,7 +47,7 @@ export function Navbar() {
       if (!target) return false;
       obs = new IntersectionObserver(
         ([entry]) => setAvatarHidden(!entry.isIntersecting),
-        { threshold: 0.1 }
+        { threshold: 0.1 },
       );
       obs.observe(target);
       return true;
@@ -139,12 +139,21 @@ export function Navbar() {
           >
             ↓ RESUME
           </a>
-          <ThemeToggleButton isDark={isDark} onToggle={() => { haptics.toggle(); toggleTheme(); }} />
+          <ThemeToggleButton
+            isDark={isDark}
+            onToggle={() => {
+              haptics.toggle();
+              toggleTheme();
+            }}
+          />
 
           {/* Mobile hamburger */}
           <button
             className={`navbar__burger ${menuOpen ? "navbar__burger--open" : ""}`}
-            onClick={() => { haptics.tap(); setMenuOpen((v) => !v); }}
+            onClick={() => {
+              haptics.tap();
+              setMenuOpen((v) => !v);
+            }}
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
             aria-controls="navbar-mobile-menu"

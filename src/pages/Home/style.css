@@ -25,7 +25,6 @@
   margin-bottom: var(--px8);
 }
 
-
 /* ── HERO ──────────────────────────────────────────────────── */
 
 .hero {
@@ -415,7 +414,6 @@
   border-color: var(--accent-primary);
 }
 
-
 /* ── RESPONSIVE ────────────────────────────────────────────── */
 
 @media (max-width: 768px) {
@@ -458,7 +456,6 @@
   .hero__scroll-prompt {
     bottom: var(--px8);
   }
-
 }
 
 @media (max-width: 480px) {

@@ -1,4 +1,4 @@
-import './style.css';
+import "./style.css";
 
 interface Props {
   code: string;
@@ -6,7 +6,7 @@ interface Props {
 }
 
 export function CodePanel({ code, filename }: Props) {
-  const lines = code.split('\n');
+  const lines = code.split("\n");
 
   return (
     <div className="code-panel">
@@ -18,11 +18,14 @@ export function CodePanel({ code, filename }: Props) {
         </div>
         <span className="pixel-text code-panel__filename">{filename}</span>
       </div>
-      <pre className="code-panel__body vt-text" aria-label={`Code snippet: ${filename}`}>
+      <pre
+        className="code-panel__body vt-text"
+        aria-label={`Code snippet: ${filename}`}
+      >
         {lines.map((line, i) => (
           <div key={i} className="code-panel__line">
             <span className="code-panel__ln" aria-hidden="true">
-              {String(i + 1).padStart(2, ' ')}
+              {String(i + 1).padStart(2, " ")}
             </span>
             <span>{line}</span>
           </div>

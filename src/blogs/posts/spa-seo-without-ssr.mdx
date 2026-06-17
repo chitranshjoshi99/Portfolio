@@ -9,7 +9,11 @@ The reflex is to reach for server-side rendering, but you do not always need tha
 On Vercel a single rule sends page routes to a serverless function instead of the static file:
 
 ```json
-{ "rewrites": [{ "source": "/blogs/:slug", "destination": "/api/page?slug=:slug" }] }
+{
+  "rewrites": [
+    { "source": "/blogs/:slug", "destination": "/api/page?slug=:slug" }
+  ]
+}
 ```
 
 The function fetches the already-built `index.html`, swaps a marked block in the head for route-specific tags, and returns it. Humans still get the full app. Crawlers get a correct card. No SSR framework, no hydration step, no rewrite of your stack.

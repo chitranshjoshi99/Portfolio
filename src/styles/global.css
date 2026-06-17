@@ -354,9 +354,16 @@ pre {
 }
 
 @keyframes btn-press {
-  0%   { transform: translate(0, 0); }
-  40%  { transform: translate(var(--px2), var(--px2)); box-shadow: 0 0 0 var(--accent-secondary); }
-  100% { transform: translate(0, 0); }
+  0% {
+    transform: translate(0, 0);
+  }
+  40% {
+    transform: translate(var(--px2), var(--px2));
+    box-shadow: 0 0 0 var(--accent-secondary);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
 }
 
 .btn--pressed {

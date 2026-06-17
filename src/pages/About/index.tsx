@@ -18,7 +18,9 @@ export default function About() {
   // must pass root: container — otherwise the viewport-root observer never fires.
   // On mobile scroll-snap is disabled and the document scrolls, so root must be
   // null (viewport). We listen to matchMedia so it stays correct on resize.
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= MOBILE_BP);
+  const [isMobile, setIsMobile] = useState(
+    () => window.innerWidth <= MOBILE_BP,
+  );
 
   useEffect(() => {
     const mq = window.matchMedia(`(max-width: ${MOBILE_BP}px)`);

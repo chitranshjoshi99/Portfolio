@@ -137,7 +137,9 @@ export default function Contact() {
   useEffect(() => {
     const isDirty = Object.values(form).some((v) => v.trim().length > 0);
     if (!isDirty) return;
-    const handler = (e: BeforeUnloadEvent) => { e.preventDefault(); };
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+    };
     window.addEventListener("beforeunload", handler);
     return () => window.removeEventListener("beforeunload", handler);
   }, [form]);
@@ -178,11 +180,7 @@ export default function Contact() {
               text="github.com/chitranshjoshi99"
               external
             />
-            <ContactLink
-              icon="▦"
-              label="Location"
-              text={PERSON.location}
-            />
+            <ContactLink icon="▦" label="Location" text={PERSON.location} />
           </ul>
 
           {/* Terminal decoration */}

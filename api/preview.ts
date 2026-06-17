@@ -45,10 +45,13 @@ export default async function handler(req: Request) {
         throw new Error("bad protocol");
       }
     } catch {
-      return new Response(JSON.stringify({ error: "Enter a valid http(s) URL" }), {
-        status: 400,
-        headers: cors,
-      });
+      return new Response(
+        JSON.stringify({ error: "Enter a valid http(s) URL" }),
+        {
+          status: 400,
+          headers: cors,
+        },
+      );
     }
 
     const r = await fetch(parsed.toString(), {
@@ -71,7 +74,10 @@ export default async function handler(req: Request) {
     // regex work tiny and well inside the Edge runtime's CPU limit.
     const full = await r.text();
     const headEnd = full.search(/<\/head>/i);
-    const html = (headEnd > -1 ? full.slice(0, headEnd) : full).slice(0, 120_000);
+    const html = (headEnd > -1 ? full.slice(0, headEnd) : full).slice(
+      0,
+      120_000,
+    );
 
     const titleTag = html.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1] ?? "";
     let image = meta(html, "og:image") || meta(html, "twitter:image");

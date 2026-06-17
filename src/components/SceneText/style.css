@@ -28,7 +28,7 @@
 }
 
 /* Blink the WRITING badge */
-.scene-text__badge[style*='nivoda-gold'] {
+.scene-text__badge[style*="nivoda-gold"] {
   animation: blink 1.6s step-end infinite;
 }
 
@@ -96,8 +96,14 @@
 }
 
 @keyframes code-panel-in {
-  from { opacity: 0; transform: translateY(-6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Reduced motion: kill transforms */

@@ -1,14 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
-import { ChannelStatic } from '../ChannelStatic';
-import { Snake } from '../games/Snake';
-import { Pong } from '../games/Pong';
-import { DinoRun } from '../games/DinoRun';
-import { LinkPreview } from '../games/LinkPreview';
-import type { LabExperiment } from '../../data/labs';
-import type { GameProps } from '../games/types';
-import './style.css';
+import { useEffect, useRef, useState } from "react";
+import { ChannelStatic } from "../ChannelStatic";
+import { Snake } from "../games/Snake";
+import { Pong } from "../games/Pong";
+import { DinoRun } from "../games/DinoRun";
+import { LinkPreview } from "../games/LinkPreview";
+import type { LabExperiment } from "../../data/labs";
+import type { GameProps } from "../games/types";
+import "./style.css";
 
-type TVStatus = 'live' | 'static';
+type TVStatus = "live" | "static";
 
 const GAME_MAP: Record<string, React.ComponentType<GameProps>> = {
   snake: Snake,
@@ -24,7 +24,7 @@ interface Props {
 
 export function TVScreen({ activeChannel, tvExperiments }: Props) {
   const [displayChannel, setDisplayChannel] = useState(activeChannel);
-  const [status, setStatus] = useState<TVStatus>('live');
+  const [status, setStatus] = useState<TVStatus>("live");
   const prevChannel = useRef(activeChannel);
 
   useEffect(() => {
@@ -32,10 +32,10 @@ export function TVScreen({ activeChannel, tvExperiments }: Props) {
     prevChannel.current = activeChannel;
 
     // Trigger static burst, then switch
-    setStatus('static');
+    setStatus("static");
     const t = setTimeout(() => {
       setDisplayChannel(activeChannel);
-      setStatus('live');
+      setStatus("live");
     }, 280);
     return () => clearTimeout(t);
   }, [activeChannel]);
@@ -48,9 +48,9 @@ export function TVScreen({ activeChannel, tvExperiments }: Props) {
     <div
       className={`tv-screen tv-screen--${status}`}
       aria-live="polite"
-      aria-label={`Channel ${displayChannel}${exp ? `: ${exp.title}` : ''}`}
+      aria-label={`Channel ${displayChannel}${exp ? `: ${exp.title}` : ""}`}
     >
-      {status === 'static' && (
+      {status === "static" && (
         <>
           <ChannelStatic />
           <div
@@ -58,15 +58,15 @@ export function TVScreen({ activeChannel, tvExperiments }: Props) {
             style={{ color: incomingExp?.accent }}
             aria-hidden="true"
           >
-            CH {String(activeChannel).padStart(2, '0')}
+            CH {String(activeChannel).padStart(2, "0")}
           </div>
         </>
       )}
-      {status === 'live' && GameComponent && (
+      {status === "live" && GameComponent && (
         /* key ensures fresh mount (and fresh state) on channel change */
         <GameComponent key={displayChannel} active={true} />
       )}
-      {status === 'live' && !GameComponent && (
+      {status === "live" && !GameComponent && (
         <div className="tv-screen__nosignal pixel-text" aria-label="No signal">
           NO SIGNAL
         </div>

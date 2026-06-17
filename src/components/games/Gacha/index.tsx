@@ -1,18 +1,18 @@
-import { useEffect, useRef, useState } from 'react';
-import { haptics } from '../../../utils/haptics';
-import type { GameProps } from '../types';
-import './style.css';
+import { useEffect, useRef, useState } from "react";
+import { haptics } from "../../../utils/haptics";
+import type { GameProps } from "../types";
+import "./style.css";
 
-const SYMBOLS = ['◈', '◆', '◉', '●', '◎', '▲', '▼', '★'];
+const SYMBOLS = ["◈", "◆", "◉", "●", "◎", "▲", "▼", "★"];
 
 const RARITIES = [
-  { name: 'LEGENDARY', symbol: '◈', prob: 0.05, color: 'var(--nivoda-gold)' },
-  { name: 'EPIC', symbol: '◆', prob: 0.15, color: 'var(--classplus-purple)' },
-  { name: 'RARE', symbol: '◉', prob: 0.30, color: 'var(--delhivery-red)' },
-  { name: 'COMMON', symbol: '●', prob: 0.50, color: 'var(--text-muted)' },
+  { name: "LEGENDARY", symbol: "◈", prob: 0.05, color: "var(--nivoda-gold)" },
+  { name: "EPIC", symbol: "◆", prob: 0.15, color: "var(--classplus-purple)" },
+  { name: "RARE", symbol: "◉", prob: 0.3, color: "var(--delhivery-red)" },
+  { name: "COMMON", symbol: "●", prob: 0.5, color: "var(--text-muted)" },
 ] as const;
 
-type GachaPhase = 'idle' | 'spinning' | 'result';
+type GachaPhase = "idle" | "spinning" | "result";
 
 function pickRarity() {
   const r = Math.random();
@@ -29,8 +29,8 @@ function randSym() {
 }
 
 export function Gacha({ active }: GameProps) {
-  const [phase, setPhase] = useState<GachaPhase>('idle');
-  const [reels, setReels] = useState<string[]>(['●', '●', '●']);
+  const [phase, setPhase] = useState<GachaPhase>("idle");
+  const [reels, setReels] = useState<string[]>(["●", "●", "●"]);
   const [result, setResult] = useState<(typeof RARITIES)[number] | null>(null);
   const [pulls, setPulls] = useState(0);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -50,18 +50,18 @@ export function Gacha({ active }: GameProps) {
   useEffect(() => {
     if (!active) {
       clearAll();
-      setPhase('idle');
-      setReels(['●', '●', '●']);
+      setPhase("idle");
+      setReels(["●", "●", "●"]);
       setResult(null);
     }
   }, [active]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handlePull = () => {
-    if (phase !== 'idle') return;
+    if (phase !== "idle") return;
     haptics.press();
     const picked = pickRarity();
 
-    setPhase('spinning');
+    setPhase("spinning");
     setResult(null);
 
     // Spin all reels during animation
@@ -85,7 +85,7 @@ export function Gacha({ active }: GameProps) {
       spinInterval.current = null;
       setReels([picked.symbol, picked.symbol, picked.symbol]);
       setResult(picked);
-      setPhase('result');
+      setPhase("result");
       haptics.reveal();
       setPulls((n) => n + 1);
     }, 1400);
@@ -96,8 +96,8 @@ export function Gacha({ active }: GameProps) {
   const handleReset = () => {
     clearAll();
     haptics.tap();
-    setPhase('idle');
-    setReels(['●', '●', '●']);
+    setPhase("idle");
+    setReels(["●", "●", "●"]);
     setResult(null);
   };
 
@@ -109,13 +109,19 @@ export function Gacha({ active }: GameProps) {
         <div className="gacha__plate pixel-text">GACHA_v1.exe</div>
 
         {/* Reel display */}
-        <div className="gacha__display" aria-live="polite" aria-label="Slot reels">
+        <div
+          className="gacha__display"
+          aria-live="polite"
+          aria-label="Slot reels"
+        >
           <div className="gacha__reels">
             {reels.map((sym, i) => (
               <div
                 key={i}
-                className={`gacha__reel${phase === 'spinning' ? ' gacha__reel--spinning' : ''}`}
-                style={{ '--reel-delay': `${i * 0.04}s` } as React.CSSProperties}
+                className={`gacha__reel${phase === "spinning" ? " gacha__reel--spinning" : ""}`}
+                style={
+                  { "--reel-delay": `${i * 0.04}s` } as React.CSSProperties
+                }
                 aria-hidden="true"
               >
                 <span
@@ -133,11 +139,11 @@ export function Gacha({ active }: GameProps) {
 
           {/* Rarity badge */}
           <div
-            className={`pixel-text gacha__rarity${result ? ' gacha__rarity--visible' : ''}`}
+            className={`pixel-text gacha__rarity${result ? " gacha__rarity--visible" : ""}`}
             style={result ? { color: result.color } : undefined}
             aria-live="assertive"
           >
-            {result ? result.name : ' '}
+            {result ? result.name : " "}
           </div>
         </div>
 
@@ -152,12 +158,12 @@ export function Gacha({ active }: GameProps) {
           <button
             className="pixel-text gacha__pull-btn"
             onClick={handlePull}
-            disabled={phase !== 'idle'}
+            disabled={phase !== "idle"}
             aria-label="Pull the gacha lever"
           >
-            {phase === 'spinning' ? '◌ SPINNING' : '[ PULL ]'}
+            {phase === "spinning" ? "◌ SPINNING" : "[ PULL ]"}
           </button>
-          {phase === 'result' && (
+          {phase === "result" && (
             <button
               className="pixel-text gacha__retry-btn"
               onClick={handleReset}
@@ -168,9 +174,7 @@ export function Gacha({ active }: GameProps) {
           )}
         </div>
 
-        {pulls > 0 && (
-          <p className="pixel-text gacha__pulls">PULLS: {pulls}</p>
-        )}
+        {pulls > 0 && <p className="pixel-text gacha__pulls">PULLS: {pulls}</p>}
       </div>
     </div>
   );
