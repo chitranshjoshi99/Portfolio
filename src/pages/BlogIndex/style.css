@@ -65,13 +65,13 @@
 }
 
 .blog-index__card-title {
-  font-size: 0.7rem;
+  font-size: var(--font-size-sm);
   line-height: 1.6;
   color: var(--text-primary);
 }
 
 .blog-index__card-desc {
-  font-size: 1.25rem;
+  font-size: 1.05rem;
   color: var(--text-secondary);
   line-height: 1.5;
 }

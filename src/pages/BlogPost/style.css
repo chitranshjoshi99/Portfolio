@@ -21,6 +21,9 @@
   text-decoration: none;
   padding: var(--px2) var(--px3);
   border: var(--px) solid var(--border-primary);
+  background: none;
+  cursor: pointer;
+  font-family: var(--font-pixel);
 }
 
 .blog-post__back:hover {

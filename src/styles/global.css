@@ -36,7 +36,7 @@
 }
 
 html {
-  font-size: 16px;
+  font-size: 100%;
   scroll-behavior: smooth;
   /* Pixel-crisp image rendering */
   image-rendering: pixelated;
@@ -179,6 +179,18 @@ pre {
   }
   50% {
     opacity: 0;
+  }
+}
+
+/* Softer blink — for persistent chrome elements (navbar cursor) that would
+   otherwise compete with page-level blink animations */
+@keyframes blink-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.12;
   }
 }
 

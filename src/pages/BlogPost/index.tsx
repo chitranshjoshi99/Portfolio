@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ComponentType } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { getBlog, ogImageUrl } from "../../blogs/meta";
 import { loadBlogBody } from "../../blogs/content";
 import { useDocumentMeta } from "../../hooks/useDocumentMeta";
@@ -8,6 +8,7 @@ import "./style.css";
 
 export default function BlogPost() {
   const { slug = "" } = useParams();
+  const navigate = useNavigate();
   const blog = getBlog(slug);
   const [Body, setBody] = useState<ComponentType | null>(null);
 
@@ -52,9 +53,12 @@ export default function BlogPost() {
   return (
     <main className="blog-post" id="main-content">
       <article className="blog-post__inner">
-        <Link to="/labs" className="blog-post__back pixel-text">
-          ← BACK TO LABS
-        </Link>
+        <button
+          className="blog-post__back pixel-text"
+          onClick={() => window.history.length > 1 ? navigate(-1) : navigate("/blogs")}
+        >
+          ← BACK
+        </button>
         <p className="pixel-text blog-post__tag" style={{ color: blog.accent }}>
           {blog.tag}
         </p>

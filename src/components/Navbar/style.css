@@ -63,16 +63,16 @@
   opacity: 0;
   transform: scale(0.6) translateX(-6px);
   transition:
-    width      var(--transition-spring),
-    opacity    var(--transition-base),
-    transform  var(--transition-spring);
+    width var(--transition-spring),
+    opacity var(--transition-base),
+    transform var(--transition-spring);
   flex-shrink: 0;
   display: flex;
   align-items: center;
 }
 
 .navbar__mini-avatar--visible {
-  width: 32px;      /* expands to show the avatar */
+  width: 32px; /* expands to show the avatar */
   opacity: 1;
   transform: scale(1) translateX(0);
   margin-right: var(--px2);
@@ -102,7 +102,7 @@
   content: "▮";
   font-size: var(--font-size-xs);
   color: var(--accent-primary);
-  animation: blink 1s step-end infinite;
+  animation: blink-soft 2s ease-in-out infinite;
   margin-left: 2px;
 }
 
@@ -156,8 +156,8 @@
 .navbar__resume {
   font-family: var(--font-pixel);
   font-size: 8px;
-  color: var(--nivoda-gold);
-  border: var(--px) solid var(--nivoda-gold);
+  color: var(--classplus-purple);
+  border: var(--px) solid var(--classplus-purple);
   padding: var(--px2) var(--px3);
   letter-spacing: 0.06em;
   white-space: nowrap;

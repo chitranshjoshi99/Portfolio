@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { PERSON } from "../../data/resume";
 import "./style.css";
 
@@ -28,7 +28,7 @@ interface FormState {
 }
 
 type SendMode = "whatsapp" | "email";
-type FormStatus = "idle" | "sending" | "sent" | "error";
+type FormStatus = "idle" | "sending" | "sent" | "whatsapp-opened" | "error";
 
 const INITIAL: FormState = { name: "", email: "", subject: "", message: "" };
 
@@ -82,11 +82,7 @@ export default function Contact() {
       "_blank",
       "noopener,noreferrer",
     );
-    setStatus("sent");
-    setTimeout(() => {
-      setForm(INITIAL);
-      setStatus("idle");
-    }, 3000);
+    setStatus("whatsapp-opened");
   };
 
   // ── Email — Formspree fetch OR mailto fallback ───────────────
@@ -138,6 +134,14 @@ export default function Contact() {
 
   const isSending = status === "sending";
 
+  useEffect(() => {
+    const isDirty = Object.values(form).some((v) => v.trim().length > 0);
+    if (!isDirty) return;
+    const handler = (e: BeforeUnloadEvent) => { e.preventDefault(); };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [form]);
+
   return (
     <main className="contact-page" id="main-content">
       <div className="container contact-inner">
@@ -177,7 +181,6 @@ export default function Contact() {
             <ContactLink
               icon="▦"
               label="Location"
-              href="#"
               text={PERSON.location}
             />
           </ul>
@@ -215,6 +218,13 @@ export default function Contact() {
         <div className="contact-form-wrap">
           {status === "sent" ? (
             <SuccessState
+              onReset={() => {
+                setForm(INITIAL);
+                setStatus("idle");
+              }}
+            />
+          ) : status === "whatsapp-opened" ? (
+            <WhatsAppOpenedState
               onReset={() => {
                 setForm(INITIAL);
                 setStatus("idle");
@@ -312,7 +322,7 @@ export default function Contact() {
                 </button>
 
                 {status === "error" && (
-                  <p className="form-send-error pixel-text">
+                  <p className="form-send-error pixel-text" role="alert">
                     ✕ Send failed — try WhatsApp instead
                   </p>
                 )}
@@ -338,7 +348,7 @@ export default function Contact() {
 interface ContactLinkProps {
   icon: string;
   label: string;
-  href: string;
+  href?: string;
   text: string;
   external?: boolean;
 }
@@ -351,15 +361,23 @@ function ContactLink({ icon, label, href, text, external }: ContactLinkProps) {
       </span>
       <div>
         <p className="contact-link__label pixel-text">{label}</p>
-        <a
-          href={href}
-          className="contact-link__value"
-          {...(external
-            ? { target: "_blank", rel: "noopener noreferrer" }
-            : {})}
-        >
-          {text}
-        </a>
+        {href ? (
+          <a
+            href={href}
+            className="contact-link__value"
+            {...(external
+              ? {
+                  target: "_blank",
+                  rel: "noopener noreferrer",
+                  "aria-label": `${text} (opens in new tab)`,
+                }
+              : {})}
+          >
+            {text}
+          </a>
+        ) : (
+          <span className="contact-link__value">{text}</span>
+        )}
       </div>
     </li>
   );
@@ -421,6 +439,23 @@ function SuccessState({ onReset }: { onReset: () => void }) {
       <p className="contact-success__title pixel-text">MESSAGE_SENT</p>
       <p className="contact-success__sub">
         Message dispatched. I'll get back to you within 24 hours.
+      </p>
+      <button className="btn btn--outline pixel-text" onClick={onReset}>
+        ↩ SEND ANOTHER
+      </button>
+    </div>
+  );
+}
+
+function WhatsAppOpenedState({ onReset }: { onReset: () => void }) {
+  return (
+    <div className="contact-success">
+      <div className="contact-success__icon pixel-text" aria-hidden="true">
+        ◉
+      </div>
+      <p className="contact-success__title pixel-text">WHATSAPP_OPEN</p>
+      <p className="contact-success__sub">
+        WhatsApp opened in a new tab. Finish sending your message there.
       </p>
       <button className="btn btn--outline pixel-text" onClick={onReset}>
         ↩ SEND ANOTHER

@@ -9,7 +9,7 @@
 /* ── Section shared styles ─────────────────────────────────── */
 
 .section-title {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-md);
   color: var(--text-primary);
   letter-spacing: 0.06em;
   margin-bottom: var(--px3);
@@ -274,7 +274,7 @@
 .hero__scroll-prompt {
   position: absolute;
   bottom: var(--px6);
-
+  left: 50%;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;

@@ -75,7 +75,7 @@ src/
 | `src/data/resume.ts`                  | **Only place resume content lives.** Edit here; pages pick it up automatically.                                                                                            |
 | `src/data/labs.ts`                    | **Only place Labs content lives.** All experiments, channels, teasers, code snippets. See §Labs internals.                                                                  |
 | `src/styles/tokens.css`               | All CSS custom properties — palette, spacing, fonts, shadows. Edit colours here, not inline.                                                                               |
-| `src/styles/global.css`               | Reset, utility classes (`.pixel-text`, `.vt-text`, animations). **Also owns all `.btn` / `.btn--*` variants** — moved here from Home so Magic8Ball buttons work on Labs too. |
+| `src/styles/global.css`               | Reset, utility classes (`.pixel-text`, `.vt-text`, animations), **all `.btn` / `.btn--*` variants**, and two blink keyframes: `blink` (step-end, for cursors/CTAs) and `blink-soft` (ease-in-out fade, for persistent chrome like the navbar cursor). |
 | `src/contexts/ThemeContext.tsx`       | Dark/light theme. Reads `prefers-color-scheme` as default; persists override in `localStorage` under key `cj-portfolio-theme`. Applies `data-theme` attribute to `<html>`. |
 | `src/contexts/ScrollProgressContext.tsx` | One shared rAF loop writing `--p` (0→1) onto registered scene elements. Used by Labs SceneText for entry animations. |
 | `src/pages/Contact/index.tsx`         | Has `FORMSPREE_ID` constant at the top — set it to enable direct email.                                                                                                    |
@@ -307,6 +307,14 @@ when the block is ≥60% visible in the viewport. Implementation in `Home.tsx`:
 
 ---
 
+## BlogPost — back navigation
+
+The back button in `src/pages/BlogPost/index.tsx` is a `<button>` (not a `<Link>`) that calls `navigate(-1)` from React Router's `useNavigate`. If `window.history.length <= 1` (direct URL, no history), it falls back to `navigate("/blogs")`.
+
+Do not change this back to `<Link to="/labs">` — blog posts are reachable from both `/blogs` (BlogIndex) and `/labs` (SceneText "READ FULL POST →"), so a static link destination is always wrong for one of those entry paths.
+
+---
+
 ## Contact page — send modes
 
 Two send paths, both declared at the top of `Contact.tsx`:
@@ -316,9 +324,14 @@ const FORMSPREE_ID = ""; // empty = mailto fallback
 const WA_NUMBER = "918126196827";
 ```
 
-- **WhatsApp**: always works, opens `https://wa.me/${WA_NUMBER}?text=...`
-- **Email (Formspree)**: `fetch` POST to `https://formspree.io/f/${FORMSPREE_ID}`.
-  When `FORMSPREE_ID` is empty, falls back to `mailto:`.
+- **WhatsApp**: opens `https://wa.me/${WA_NUMBER}?text=...` in a new tab, then sets status to `"whatsapp-opened"` (NOT `"sent"`). The `WhatsAppOpenedState` component renders, telling the user to finish in WhatsApp. The form is **not** auto-reset — the user must click "SEND ANOTHER" to clear it.
+- **Email (Formspree)**: `fetch` POST to `https://formspree.io/f/${FORMSPREE_ID}`. On HTTP 200, sets status to `"sent"` and renders `SuccessState`. When `FORMSPREE_ID` is empty, falls back to `mailto:`.
+
+**`FormStatus` values:** `"idle" | "sending" | "sent" | "whatsapp-opened" | "error"`
+
+**`ContactLinkProps.href` is optional.** When omitted (or left out), the component renders a `<span>` instead of `<a>` — this is intentional for the Location entry which has no URL. External links (`external: true`) automatically get `aria-label="text (opens in new tab)"`.
+
+**`beforeunload` protection:** a `useEffect` registers a `beforeunload` listener whenever any form field is non-empty, preventing accidental navigation from wiping in-progress messages.
 
 ---
 
@@ -357,6 +370,7 @@ git commit --no-verify -m "chore: ..."
 - No backend. Email delivery requires Formspree (free tier covers ~50/month).
 - The right-side progress dots (`journey-progress`) are hidden on screens ≤900px via `display: none`.
 - The scroll-snap journey disables on mobile (`scroll-snap-type: none`) because full-height snap cards feel wrong on small screens. Cards stack vertically instead.
+- **Labs page has no mobile navigation.** `LabsRail` is `display: none` on mobile (≤768px). Users scroll through labs sections with no section index or jump nav. A future fix would be a fixed bottom dot-strip using the existing `activeIdx` state.
 - Fonts load from Google Fonts CDN — add a local fallback or `font-display: swap` if offline performance matters.
 - No analytics, no cookie banner, no service worker. Add those if deploying to production.
 

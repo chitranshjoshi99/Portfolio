@@ -65,15 +65,23 @@ export function Navbar() {
     return () => obs?.disconnect();
   }, [location.pathname]);
 
-  // Close menu on outside click
+  // Close menu on outside click or Escape key
   useEffect(() => {
+    if (!menuOpen) return;
     const onClickOutside = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
         setMenuOpen(false);
       }
     };
-    if (menuOpen) document.addEventListener("mousedown", onClickOutside);
-    return () => document.removeEventListener("mousedown", onClickOutside);
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+    document.addEventListener("mousedown", onClickOutside);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", onClickOutside);
+      document.removeEventListener("keydown", onKeyDown);
+    };
   }, [menuOpen]);
 
   return (
@@ -129,7 +137,7 @@ export function Navbar() {
             aria-label="Download resume"
             onClick={() => haptics.press()}
           >
-            ↓ CV
+            ↓ RESUME
           </a>
           <ThemeToggleButton isDark={isDark} onToggle={() => { haptics.toggle(); toggleTheme(); }} />
 
@@ -139,6 +147,7 @@ export function Navbar() {
             onClick={() => { haptics.tap(); setMenuOpen((v) => !v); }}
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
+            aria-controls="navbar-mobile-menu"
           >
             <span />
             <span />
@@ -148,6 +157,7 @@ export function Navbar() {
 
         {/* Mobile dropdown */}
         <div
+          id="navbar-mobile-menu"
           className={`navbar__mobile-menu ${menuOpen ? "navbar__mobile-menu--open" : ""}`}
         >
           <ul role="list">
@@ -205,7 +215,7 @@ function ThemeToggleButton({
           className={`theme-toggle__thumb ${isDark ? "theme-toggle__thumb--dark" : ""}`}
         />
       </span>
-      <span className="theme-toggle__label">{isDark ? "DARK" : "LITE"}</span>
+      <span className="theme-toggle__label">{isDark ? "DARK" : "LIGHT"}</span>
     </button>
   );
 }
