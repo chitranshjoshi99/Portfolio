@@ -96,6 +96,18 @@ All theming is done through CSS variables in `tokens.css`. There is no
 Tailwind, no CSS-in-JS. When adding styles, extend tokens first before
 hardcoding hex values inline.
 
+### Scrollbar — floating + stable gutter
+
+`global.css` sets `html { scrollbar-gutter: stable }` so the scrollbar's space is
+always reserved. Without it, content shifts horizontally when navigating between
+document-scrolling pages (Home/About/Contact) and Labs (a full-height nested
+scroller where the document doesn't overflow, so the root scrollbar vanishes).
+The `::-webkit-scrollbar` styling is a **floating overlay** look: transparent
+track, and a thumb inset via `border: 3px solid transparent` + `background-clip:
+padding-box` so it reads as a slim pill over the content. Firefox uses
+`scrollbar-width: thin` + `scrollbar-color: thumb transparent`. These rules are
+global (universal selector), so they also style the nested Labs/About scrollers.
+
 ### One CSS file per component/page
 
 Each `.tsx` file has a sibling `.css` file. Global utilities live in

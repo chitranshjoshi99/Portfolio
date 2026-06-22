@@ -41,6 +41,13 @@ html {
   /* Pixel-crisp image rendering */
   image-rendering: pixelated;
   image-rendering: crisp-edges;
+  /* Reserve a consistent scrollbar gutter so content width never changes
+     between pages that scroll (Home/About/Contact) and pages that don't
+     (Labs uses a full-height nested scroller). Kills cross-page layout shift. */
+  scrollbar-gutter: stable;
+  /* Firefox: thin, floating-style scrollbar with no visible track */
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
 }
 
 body {
@@ -117,21 +124,32 @@ pre {
    ============================================================ */
 
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 12px;
+  height: 12px;
 }
 
+/* Floating look: no visible track strip */
 ::-webkit-scrollbar-track {
-  background: var(--scrollbar-track);
+  background: transparent;
 }
 
+/* The transparent border + padding-box clip insets the thumb, so it reads as a
+   slim pill floating over the content rather than a chunky bar in a track. */
 ::-webkit-scrollbar-thumb {
   background: var(--scrollbar-thumb);
-  border: 2px solid var(--scrollbar-track);
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--accent-primary);
+  background-clip: padding-box;
+}
+
+/* Don't draw the little corner box where two scrollbars meet */
+::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 /* ============================================================
