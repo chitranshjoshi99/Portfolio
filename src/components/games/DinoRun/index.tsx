@@ -74,18 +74,21 @@ function step(s: DinoState, dt: number) {
     s.onGround = true;
   }
 
-  // Obstacles
+  // Obstacles — move existing ones left, cull once fully off-screen
   for (const obs of s.obstacles) {
     obs.x -= s.speed * dt;
   }
   s.obstacles = s.obstacles.filter((o) => o.x > -OBS_W - 10);
 
-  if (CW - s.nextObs < 0) {
+  // Spawn on a distance countdown: tick it down, and when it elapses drop a
+  // new obstacle and re-arm with the next random gap. (Previously this compared
+  // nextObs against CW, which only ever spawned a single obstacle.)
+  s.nextObs -= s.speed * dt;
+  if (s.nextObs <= 0) {
     const h = OBS_MIN_H + Math.floor(Math.random() * (OBS_MAX_H - OBS_MIN_H));
     s.obstacles.push({ x: CW + 4, h });
     s.nextObs = OBS_GAP_MIN + Math.random() * (OBS_GAP_MAX - OBS_GAP_MIN);
   }
-  s.nextObs -= s.speed * dt;
 
   // Collision (AABB, shrunk inset)
   const dx = DINO_X + 3;
