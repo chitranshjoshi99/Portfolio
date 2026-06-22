@@ -1,6 +1,10 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { haptics } from "../../utils/haptics";
 import { CodePanel } from "../CodePanel";
+import { CodePopup } from "../CodePopup";
+import { Handheld } from "../Handheld";
+import { useIsMobile } from "../../hooks/useIsMobile";
 import { getBlogByGame } from "../../blogs/meta";
 import type { LabExperiment } from "../../data/labs";
 import "./style.css";
@@ -16,6 +20,10 @@ const STATUS_GLYPHS: Record<LabExperiment["status"], string> = {
 };
 
 export function SceneText({ experiment: exp }: Props) {
+  const isMobile = useIsMobile();
+  const [showCode, setShowCode] = useState(false);
+  const [showPlay, setShowPlay] = useState(false);
+
   const channelLabel =
     exp.render === "tv" ? `CH ${String(exp.channel).padStart(2, "0")}` : "TOY";
 
@@ -34,9 +42,37 @@ export function SceneText({ experiment: exp }: Props) {
       <h2 className="pixel-text scene-text__title">{exp.title}</h2>
       <p className="vt-text scene-text__teaser">{exp.teaser}</p>
 
-      <div className="scene-text__code-wrap">
-        <CodePanel code={exp.code} filename={filename} />
-      </div>
+      {isMobile ? (
+        /* Mobile: don't render the heavy inline code / TV — gate behind buttons */
+        <div className="scene-text__actions">
+          <button
+            type="button"
+            className="btn btn--outline scene-text__action"
+            onClick={() => {
+              haptics.press();
+              setShowCode(true);
+            }}
+          >
+            {"</> SHOW CODE"}
+          </button>
+          {exp.device === "HH" && (
+            <button
+              type="button"
+              className="btn btn--primary scene-text__action"
+              onClick={() => {
+                haptics.press();
+                setShowPlay(true);
+              }}
+            >
+              ▶ SEE IN ACTION
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="scene-text__code-wrap">
+          <CodePanel code={exp.code} filename={filename} />
+        </div>
+      )}
 
       {post && (
         <Link
@@ -46,6 +82,18 @@ export function SceneText({ experiment: exp }: Props) {
         >
           READ FULL POST →
         </Link>
+      )}
+
+      {showCode && (
+        <CodePopup
+          code={exp.code}
+          filename={filename}
+          accent={exp.accent}
+          onClose={() => setShowCode(false)}
+        />
+      )}
+      {showPlay && exp.device === "HH" && (
+        <Handheld experiment={exp} onClose={() => setShowPlay(false)} />
       )}
     </div>
   );

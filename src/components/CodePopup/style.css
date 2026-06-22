@@ -1,0 +1,147 @@
+/* ============================================================
+   CODE POPUP — 3D terminal that unfolds out of the button (mobile)
+   ============================================================ */
+
+.code-popup-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--px4);
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(2px);
+  animation: cp-fade 0.2s ease both;
+  overflow-y: auto;
+}
+
+.code-popup {
+  --cp-accent: var(--accent-primary);
+  width: 100%;
+  max-width: 460px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--px3);
+  /* iOS-style app open: grow up out of the button (no flip). */
+  transform-origin: 50% 100%;
+  animation: cp-open 0.36s cubic-bezier(0.32, 1.5, 0.5, 1) both;
+}
+
+.code-popup--closing {
+  /* shrink back down into the button */
+  animation: cp-close 0.22s cubic-bezier(0.4, 0, 0.8, 0.4) both;
+}
+
+@keyframes cp-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.code-popup-overlay--closing {
+  animation: cp-fade 0.22s ease both reverse;
+}
+
+@keyframes cp-open {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.32);
+  }
+  50% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes cp-close {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(18px) scale(0.32);
+  }
+}
+
+/* Accent the reused CodePanel + a glow that sells the "powered terminal" look */
+.code-popup__inner {
+  box-shadow:
+    var(--px2) var(--px2) 0 var(--shadow-color),
+    0 0 24px color-mix(in srgb, var(--cp-accent) 30%, transparent);
+}
+
+.code-popup__inner .code-panel {
+  border-color: var(--cp-accent);
+}
+
+/* Stagger the lines in like they're being printed to the terminal */
+.code-popup__inner .code-panel__line {
+  animation: cp-line 0.5s ease both;
+}
+.code-popup__inner .code-panel__line:nth-child(1) {
+  animation-delay: 0.18s;
+}
+.code-popup__inner .code-panel__line:nth-child(2) {
+  animation-delay: 0.21s;
+}
+.code-popup__inner .code-panel__line:nth-child(3) {
+  animation-delay: 0.24s;
+}
+.code-popup__inner .code-panel__line:nth-child(4) {
+  animation-delay: 0.27s;
+}
+.code-popup__inner .code-panel__line:nth-child(5) {
+  animation-delay: 0.3s;
+}
+.code-popup__inner .code-panel__line:nth-child(n + 6) {
+  animation-delay: 0.33s;
+}
+
+@keyframes cp-line {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.code-popup__close {
+  align-self: center;
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  padding: var(--px2) var(--px4);
+  border: var(--px) solid var(--cp-accent);
+  background: var(--bg-card);
+  color: var(--cp-accent);
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.code-popup__close:hover {
+  background: color-mix(in srgb, var(--cp-accent) 16%, transparent);
+}
+
+.code-popup__close:active {
+  transform: translate(1px, 1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .code-popup-overlay,
+  .code-popup,
+  .code-popup__inner .code-panel__line {
+    animation: none;
+  }
+}

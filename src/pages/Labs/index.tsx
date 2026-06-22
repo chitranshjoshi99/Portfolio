@@ -1,6 +1,7 @@
 import { forwardRef, useEffect, useRef, useState } from "react";
 import { ScrollProgressProvider } from "../../contexts/ScrollProgressContext";
 import { useScrollProgress } from "../../hooks/useScrollProgress";
+import { useIsMobile } from "../../hooks/useIsMobile";
 import { LabsRail } from "../../components/LabsRail";
 import { TVSet } from "../../components/TVSet";
 import { SceneText } from "../../components/SceneText";
@@ -58,12 +59,16 @@ function HeroScene({
 interface TVBlogSceneProps {
   experiment: LabExperiment;
   isActive: boolean;
+  isMobile: boolean;
 }
 
 const TVBlogScene = forwardRef<HTMLElement, TVBlogSceneProps>(
-  ({ experiment, isActive }, forwardedRef) => {
+  ({ experiment, isActive, isMobile }, forwardedRef) => {
     const ref = useRef<HTMLElement | null>(null);
     useScrollProgress(ref);
+    // On mobile the shared sticky CRT is gone. TV-device experiments
+    // (LinkPreview) keep a small inline CRT here so they stay "in action".
+    const showInlineTV = isMobile && experiment.device === "TV";
     return (
       <article
         ref={(el) => {
@@ -76,6 +81,14 @@ const TVBlogScene = forwardRef<HTMLElement, TVBlogSceneProps>(
       >
         <div className="tv-blog-scene__inner">
           <SceneText experiment={experiment} />
+          {showInlineTV && (
+            <div className="tv-blog-scene__mobile-tv">
+              <TVSet
+                activeChannel={experiment.channel}
+                tvExperiments={TV_EXPERIMENTS}
+              />
+            </div>
+          )}
         </div>
       </article>
     );
@@ -128,6 +141,7 @@ export default function Labs() {
   const sectionRefs = useRef<(HTMLElement | null)[]>([]);
   const [activeIdx, setActiveIdx] = useState(0);
   const [activeChannel, setActiveChannel] = useState(1);
+  const isMobile = useIsMobile();
 
   const TV_COUNT = TV_EXPERIMENTS.length;
 
@@ -136,7 +150,6 @@ export default function Labs() {
     const container = stageRef.current;
     if (!container) return;
 
-    const isMobile = window.innerWidth <= 768;
     const root = isMobile ? null : container;
 
     const obs = new IntersectionObserver(
@@ -160,7 +173,7 @@ export default function Labs() {
 
     sectionRefs.current.forEach((el) => el && obs.observe(el));
     return () => obs.disconnect();
-  }, [TV_COUNT]);
+  }, [TV_COUNT, isMobile]);
 
   const scrollToSection = (idx: number) => {
     const container = stageRef.current;
@@ -201,6 +214,7 @@ export default function Labs() {
                   key={exp.id}
                   experiment={exp}
                   isActive={activeChannel === exp.channel}
+                  isMobile={isMobile}
                   ref={(el) => {
                     sectionRefs.current[i + 1] = el;
                   }}
@@ -208,15 +222,19 @@ export default function Labs() {
               ))}
             </div>
 
-            {/* Right: sticky CRT TV (channel-switching) */}
-            <div className="tv-zone__right">
-              <div className="tv-set-wrapper">
-                <TVSet
-                  activeChannel={activeChannel}
-                  tvExperiments={TV_EXPERIMENTS}
-                />
+            {/* Right: sticky CRT TV (channel-switching) — desktop only.
+                On mobile each channel renders its own surface (handheld
+                button for HH, inline CRT for TV) inside TVBlogScene. */}
+            {!isMobile && (
+              <div className="tv-zone__right">
+                <div className="tv-set-wrapper">
+                  <TVSet
+                    activeChannel={activeChannel}
+                    tvExperiments={TV_EXPERIMENTS}
+                  />
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Toy Scenes */}

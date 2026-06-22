@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import type { GameProps } from "../types";
 import "./style.css";
 
@@ -191,11 +191,12 @@ function draw(ctx: CanvasRenderingContext2D, s: DinoState) {
   }
 }
 
-export function DinoRun({ active }: GameProps) {
+export function DinoRun({ active, controlRef }: GameProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef<DinoState>(initState());
 
-  const doJump = () => {
+  // Stable (refs-only) — shared by keyboard, canvas tap, and Handheld pad.
+  const doJump = useCallback(() => {
     const s = stateRef.current;
     if (s.dead) {
       stateRef.current = initState();
@@ -210,7 +211,21 @@ export function DinoRun({ active }: GameProps) {
       s.dinoVY = JUMP_VY;
       s.onGround = false;
     }
-  };
+  }, []);
+
+  // Publish the imperative handle for the Handheld console (mobile)
+  useEffect(() => {
+    const ref = controlRef;
+    if (!ref) return;
+    ref.current = {
+      input: (action, phase) => {
+        if (phase === "down" && action === "action") doJump();
+      },
+    };
+    return () => {
+      ref.current = null;
+    };
+  }, [controlRef, doJump]);
 
   useEffect(() => {
     if (!active) return;
@@ -222,7 +237,7 @@ export function DinoRun({ active }: GameProps) {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [active]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [active, doJump]);
 
   useEffect(() => {
     if (!active) return;

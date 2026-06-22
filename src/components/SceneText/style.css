@@ -74,6 +74,19 @@
   animation: code-panel-in 0.2s ease both;
 }
 
+/* Mobile action buttons (replace inline code/TV on small screens) */
+.scene-text__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--px3);
+  margin-top: var(--px2);
+}
+
+.scene-text__action {
+  font-size: 8px;
+  padding: var(--px3) var(--px4);
+}
+
 .scene-text__readmore {
   align-self: flex-start;
   margin-top: var(--px2);

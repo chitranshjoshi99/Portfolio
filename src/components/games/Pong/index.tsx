@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import type { GameProps } from "../types";
+import { useCallback, useEffect, useRef } from "react";
+import type { GameAction, GameProps } from "../types";
 import "./style.css";
 
 const CW = 280;
@@ -159,9 +159,28 @@ function draw(ctx: CanvasRenderingContext2D, s: PongState) {
   ctx.fillRect(s.ball.x, s.ball.y, BALL, BALL);
 }
 
-export function Pong({ active }: GameProps) {
+export function Pong({ active, controlRef }: GameProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef<PongState>(initState());
+
+  // Held-input setter shared by keyboard + the Handheld touch pad.
+  const setKey = useCallback((action: GameAction, down: boolean) => {
+    const k = stateRef.current.keys;
+    if (action === "up") k.up = down;
+    if (action === "down") k.down = down;
+  }, []);
+
+  // Publish the imperative handle for the Handheld console (mobile)
+  useEffect(() => {
+    const ref = controlRef;
+    if (!ref) return;
+    ref.current = {
+      input: (action, phase) => setKey(action, phase === "down"),
+    };
+    return () => {
+      ref.current = null;
+    };
+  }, [controlRef, setKey]);
 
   useEffect(() => {
     if (!active) return;

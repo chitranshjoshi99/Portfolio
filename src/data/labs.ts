@@ -7,6 +7,16 @@ export type GameKey =
   | "magic8ball"
   | "gacha";
 
+// Where the interactive piece renders on MOBILE (desktop is unaffected — it
+// always uses `render`/the sticky CRT). See §Mobile in CLAUDE.md.
+//   TV   → keep it in an inline CRT (e.g. paste-a-URL LinkPreview)
+//   HH   → behind a "See in Action" button → Handheld console with touch pad
+//   NONE → render the component inline, as-is (already touch-friendly toys)
+export type MobileDevice = "TV" | "HH" | "NONE";
+
+// Touch-control layout the Handheld shows for an HH game.
+export type ControlScheme = "dpad" | "updown" | "single";
+
 export interface LabExperiment {
   id: string;
   channel: number; // 1-based; CH number in rail + TV overlay
@@ -16,6 +26,8 @@ export interface LabExperiment {
   accent: string; // CSS custom property reference
   render: RenderType;
   game: GameKey;
+  device: MobileDevice; // mobile interactive surface (TV / HH / NONE)
+  controls?: ControlScheme; // required when device === 'HH'
   code: string; // core-logic snippet shown in expand panel
   postSlug?: string; // reserved for future full article route
 }
@@ -32,6 +44,8 @@ export const LAB_EXPERIMENTS: LabExperiment[] = [
     accent: "var(--classplus-purple)",
     render: "tv",
     game: "snake",
+    device: "HH",
+    controls: "dpad",
     code: `// All game state lives in refs, zero re-renders per frame
 const stateRef = useRef({ snake: [[10,10]], dir: [1,0], food: [5,5] });
 
@@ -62,6 +76,8 @@ useEffect(() => {
     accent: "var(--delhivery-red)",
     render: "tv",
     game: "pong",
+    device: "HH",
+    controls: "updown",
     code: `const STEP = 1 / 60;   // 60 Hz physics tick
 let acc = 0, prev = performance.now();
 
@@ -92,6 +108,8 @@ function intersects(a: Rect, b: Rect): boolean {
     accent: "var(--nivoda-gold)",
     render: "tv",
     game: "dino",
+    device: "HH",
+    controls: "single",
     code: `// Raw: fires immediately on keydown (used in the game)
 window.addEventListener('keydown', e => {
   if (e.code === 'Space') jump();
@@ -127,6 +145,7 @@ function throttle<T extends unknown[]>(fn: (...a: T) => void, ms: number) {
     accent: "var(--delhivery-red)",
     render: "tv",
     game: "linkpreview",
+    device: "TV",
     code: `// Edge function: fetch the page, scrape its OG tags, return JSON
 export const config = { runtime: 'edge' };
 
@@ -158,6 +177,7 @@ export default async function handler(req) {
     accent: "var(--classplus-purple)",
     render: "standalone",
     game: "magic8ball",
+    device: "NONE",
     code: `type Phase = 'idle' | 'tapping' | 'counting' | 'revealed';
 
 // Transitions are pure functions: (phase, event) → next phase
@@ -185,6 +205,7 @@ function transition(phase: Phase, event: 'tap' | 'reset'): Phase {
     accent: "var(--nivoda-gold)",
     render: "standalone",
     game: "gacha",
+    device: "NONE",
     code: `type Entry<T> = { data: T; ts: number };
 const cache = new Map<string, Entry<unknown>>();
 const pending = new Map<string, Promise<unknown>>();

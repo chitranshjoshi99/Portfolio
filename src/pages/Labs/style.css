@@ -158,33 +158,43 @@
   /* No max-width — SceneText fills the column */
 }
 
+/* Inline CRT for TV-device experiments on mobile (e.g. LinkPreview) */
+.tv-blog-scene__mobile-tv {
+  margin-top: var(--px6);
+  display: flex;
+  justify-content: center;
+}
+
 /* ══════════════════════════════════════════════════════════════
    TOY SCENES — text left, toy right
    ══════════════════════════════════════════════════════════════ */
 
 .toy-scene {
-  padding: var(--px8) var(--px6);
+  /* Mirror the TV zone exactly: full-width row, text left, widget right.
+     (Padding lives on the children so the columns line up with .tv-zone.) */
+  padding: 0;
 }
 
 .toy-scene__inner {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: var(--px12);
-  max-width: 860px;
+  gap: 0;
   width: 100%;
 }
 
 .toy-scene__text {
   flex: 1;
   min-width: 0;
+  padding: var(--px12) var(--px8); /* mirror .tv-blog-scene */
 }
 
 .toy-scene__game {
-  flex-shrink: 0;
+  flex: 0 0 46%; /* mirror .tv-zone__right */
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: var(--px6); /* mirror .tv-set-wrapper */
   /* Scroll-driven parallax — reads --p (0..1) from the registered .toy-scene */
   opacity: calc(0.35 + var(--p, 1) * 0.65);
   transform: translateX(calc((1 - var(--p, 1)) * 36px))
@@ -203,8 +213,9 @@
    RESPONSIVE
    ══════════════════════════════════════════════════════════════ */
 
-/* Tablet / mobile: disable snap, stack everything */
-@media (max-width: 768px) {
+/* Tablet / mobile: disable snap, stack everything.
+   Breakpoint mirrors useIsMobile(): narrow OR coarse-pointer up to 899px. */
+@media (max-width: 768px), (pointer: coarse) and (max-width: 899px) {
   .labs-stage {
     height: auto;
     overflow-y: visible;
@@ -246,7 +257,18 @@
   .toy-scene__inner {
     flex-direction: column;
     gap: var(--px6);
-    align-items: flex-start;
+    align-items: stretch;
+  }
+
+  .toy-scene__text {
+    padding: 0;
+  }
+
+  /* Centre the toy (Magic8Ball / Gacha) horizontally on phones */
+  .toy-scene__game {
+    flex: none;
+    align-self: center;
+    padding: 0;
   }
 
   .toy-scene {

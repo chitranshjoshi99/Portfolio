@@ -155,21 +155,22 @@ export function Gacha({ active }: GameProps) {
 
         {/* Controls */}
         <div className="gacha__controls">
-          <button
-            className="pixel-text gacha__pull-btn"
-            onClick={handlePull}
-            disabled={phase !== "idle"}
-            aria-label="Pull the gacha lever"
-          >
-            {phase === "spinning" ? "◌ SPINNING" : "[ PULL ]"}
-          </button>
-          {phase === "result" && (
+          {phase === "result" ? (
             <button
               className="pixel-text gacha__retry-btn"
               onClick={handleReset}
               aria-label="Pull again"
             >
               ↺ AGAIN
+            </button>
+          ) : (
+            <button
+              className="pixel-text gacha__pull-btn"
+              onClick={handlePull}
+              disabled={phase !== "idle"}
+              aria-label="Pull the gacha lever"
+            >
+              {phase === "spinning" ? "◌ SPINNING" : "[ PULL ]"}
             </button>
           )}
         </div>

@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import type { GameProps } from "../types";
+import { useCallback, useEffect, useRef } from "react";
+import type { GameAction, GameProps } from "../types";
 import "./style.css";
 
 const GRID = 20;
@@ -123,61 +123,77 @@ function draw(ctx: CanvasRenderingContext2D, s: SnakeState, started: boolean) {
   }
 }
 
-export function Snake({ active }: GameProps) {
+export function Snake({ active, controlRef }: GameProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef<SnakeState>(init());
   const startedRef = useRef(false);
+
+  // Shared input handler — used by both keyboard and the Handheld touch pad.
+  // Only reads refs, so it's stable across renders.
+  const press = useCallback((action: GameAction) => {
+    const s = stateRef.current;
+    if (s.dead) {
+      stateRef.current = init();
+      startedRef.current = false;
+      return;
+    }
+    switch (action) {
+      case "up":
+        s.nextDir = [0, -1];
+        break;
+      case "down":
+        s.nextDir = [0, 1];
+        break;
+      case "left":
+        s.nextDir = [-1, 0];
+        break;
+      case "right":
+        s.nextDir = [1, 0];
+        break;
+      default:
+        return; // 'action' is a no-op for Snake
+    }
+    startedRef.current = true;
+  }, []);
+
+  const KEY_MAP: Record<string, GameAction> = {
+    ArrowUp: "up",
+    w: "up",
+    ArrowDown: "down",
+    s: "down",
+    ArrowLeft: "left",
+    a: "left",
+    ArrowRight: "right",
+    d: "right",
+  };
 
   // Keyboard input — only when active
   useEffect(() => {
     if (!active) return;
     const onKey = (e: KeyboardEvent) => {
-      const s = stateRef.current;
-      if (s.dead) {
-        stateRef.current = init();
-        startedRef.current = false;
-        return;
-      }
-      switch (e.key) {
-        case "ArrowUp":
-        case "w":
-          s.nextDir = [0, -1];
-          e.preventDefault();
-          break;
-        case "ArrowDown":
-        case "s":
-          s.nextDir = [0, 1];
-          e.preventDefault();
-          break;
-        case "ArrowLeft":
-        case "a":
-          s.nextDir = [-1, 0];
-          e.preventDefault();
-          break;
-        case "ArrowRight":
-        case "d":
-          s.nextDir = [1, 0];
-          e.preventDefault();
-          break;
-      }
-      if (
-        [
-          "ArrowUp",
-          "ArrowDown",
-          "ArrowLeft",
-          "ArrowRight",
-          "w",
-          "a",
-          "s",
-          "d",
-        ].includes(e.key)
-      ) {
-        startedRef.current = true;
-      }
+      const action = KEY_MAP[e.key];
+      if (!action) return;
+      e.preventDefault();
+      press(action);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [active]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active, press]);
+
+  // Publish the imperative handle for the Handheld console (mobile touch pad)
+  useEffect(() => {
+    const ref = controlRef;
+    if (!ref) return;
+    ref.current = {
+      input: (action, phase) => {
+        if (phase === "down") press(action);
+      },
+    };
+    return () => {
+      ref.current = null;
+    };
+  }, [controlRef, press]);
 
   // rAF game loop — pauses when inactive
   useEffect(() => {

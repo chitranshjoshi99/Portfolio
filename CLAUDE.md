@@ -26,7 +26,9 @@ src/
 ├── components/
 │   ├── ChannelStatic/    index.tsx + style.css   ← TV static noise canvas (on-demand only)
 │   ├── CodePanel/        index.tsx + style.css   ← expandable code window (titlebar + pre)
+│   ├── CodePopup/        index.tsx + style.css   ← mobile "Show Code" popup; iOS-style zoom open/close (reuses CodePanel)
 │   ├── ExperienceCard/   index.tsx + style.css
+│   ├── Handheld/         index.tsx + style.css   ← mobile "See in Action" brick-game console modal (HH games)
 │   ├── JourneyProgress/  index.tsx + style.css
 │   ├── LabsRail/         index.tsx + style.css   ← Labs nav rail (fixed desktop / sticky mobile)
 │   ├── Magic8Ball/       index.tsx + style.css   ← pixel-art oracle game (unchanged)
@@ -54,6 +56,7 @@ src/
 │   ├── labs.ts            ← Labs content (experiments, TV channels, toys)
 │   └── resume.ts          ← single source of truth for all content
 ├── hooks/
+│   ├── useIsMobile.ts        ← matchMedia mobile flag (≤768px or coarse-pointer ≤899px); drives Labs mobile branch
 │   ├── useScrollProgress.ts  ← registers element with ScrollProgressContext
 │   └── useTypewriter.ts
 ├── pages/
@@ -189,6 +192,8 @@ Labs (page)
 
 **Column order (TV zone):** TEXT is LEFT, TV is RIGHT. This is the opposite of the original spec — text fills the wide left column, the CRT TV sticks on the right.
 
+**ToyScene mirrors the TV zone** so the layout stays uniform when scrolling from channels into toys: `.toy-scene__inner` is a full-width row (no `max-width`/centering), `.toy-scene__text` is `flex: 1` with the same `var(--px12) var(--px8)` padding as `.tv-blog-scene`, and `.toy-scene__game` is `flex: 0 0 46%` (matching `.tv-zone__right`) so the toy's horizontal centre lines up with the CRT. On mobile the inner stacks (`align-items: stretch`) and the toy is re-centred via `align-self: center` (`flex: none`).
+
 New components: `LabsRail`, `TVSet`, `TVScreen`, `ChannelStatic`, `CodePanel`, `SceneText`, `games/Snake`, `games/Pong`, `games/DinoRun`, `games/Gacha`.
 
 ### Sticky TV pattern
@@ -235,11 +240,12 @@ Inactive TV games are **unmounted** (via `key={displayChannel}` conditional). No
 
 ### Game component contract
 
-All games in `src/components/games/` implement `GameProps { active: boolean }`:
+All games in `src/components/games/` implement `GameProps { active: boolean; controlRef?: MutableRefObject<GameHandle | null> }` (see `games/types.ts`):
 
-- rAF loops must **not run** when `active` is false.
+- rAF loops must **not run** when `active` is false. The mobile `Handheld` uses this as **pause/resume**: START/STOP just flips `active`. Because all game state lives in `useRef`, toggling `active` off then on freezes and resumes without losing state (the component is never unmounted).
 - DinoRun shows a "SPACE / TAP TO START" overlay until first input (avoids auto-death on channel switch).
 - Keep game state in `useRef`, not `useState`, inside the loop — zero re-renders per frame.
+- **`controlRef` (touch input):** arcade games (Snake, Pong, DinoRun) publish a `GameHandle { input(action, phase) }` onto `controlRef` so the `Handheld` console can drive them with on-screen buttons. The handler is a single stable (`useCallback([])`, refs-only) `press`/`setKey` function shared with the keyboard listener — **keyboard behaviour is unchanged**. Momentary games react to `phase === 'down'`; Pong (held paddle) uses both `down`/`up`. `controlRef` is optional and ignored on desktop and by LinkPreview.
 
 ### SceneText + CodePanel
 
@@ -251,17 +257,38 @@ All games in `src/components/games/` implement `GameProps { active: boolean }`:
 
 **Registration is required for any of this to animate.** Each scene (`HeroScene`, `TVBlogScene`, `ToyScene`) creates an internal ref and calls `useScrollProgress(ref)` to register itself; for the forwardRef scenes the internal ref is merged with the parent's section ref via `assignRef`. `--p` is set on the section and inherits to descendants. Consumers: `SceneText` (`.scene-text__title` / `.scene-text__teaser` → `translateY` + `opacity`) and `.toy-scene__game` (parallax `translateX` + `scale`). Do **not** add an `@supports (animation-timeline: view())` block that zeroes these transforms unless you also define a real native scroll-timeline animation — an earlier version did and silently disabled the effect on modern Chrome/Safari.
 
-### Mobile (≤768px)
+### Mobile experience (rebuilt — `device` routing)
 
-- `.labs-stage` → `height: auto; overflow-y: visible; scroll-snap-type: none`
-- `.tv-zone` → `flex-direction: column`; TV column (`tv-zone__right`) renders first (order: 0), text column second (order: 1); `.tv-set-wrapper` → `position: static`
-- `LabsRail` → `display: none` (no mobile rail at all)
-- Toy scene: stacks to column; game centered
+The old mobile layout just stacked the sticky CRT into the page so it scrolled
+away and games stayed keyboard-only (unplayable on touch). Mobile is now a
+distinct, touch-first experience driven by a per-experiment **`device` field**
+in `labs.ts` — `'TV' | 'HH' | 'NONE'` — that says where the interactive piece
+renders on small screens. **Desktop is untouched**: it always uses `render` +
+the shared sticky CRT.
+
+Mobile detection is `useIsMobile()` (`src/hooks/useIsMobile.ts`): matches
+`(max-width: 768px) OR ((pointer: coarse) and (max-width: 899px))`. The Labs
+`style.css` mobile block uses the **same** media-query string so CSS and JS flip
+together; the IntersectionObserver root also keys off `isMobile`.
+
+On mobile (`useIsMobile()` true):
+
+- `Labs/index.tsx` **does not render** the shared `.tv-zone__right` CRT (gated by `!isMobile`), so it can't scroll away.
+- `SceneText` hides the inline `CodePanel` and renders two buttons: **`</> SHOW CODE`** (all experiments) and **`▶ SEE IN ACTION`** (only `device === 'HH'`).
+- **`device: 'HH'`** (Snake, Pong, Dino) → "See in Action" opens `Handheld` — a brick-game console modal that mounts the *real* game in its screen and drives it via `controlRef`. Buttons come from `experiment.controls` (`'dpad' | 'updown' | 'single'`). START/STOP = pause/resume (`active`), POWER (`OFF`) closes the modal.
+- **`device: 'TV'`** (LinkPreview) → renders a single-channel inline `<TVSet activeChannel={exp.channel}>` inside `TVBlogScene` (`.tv-blog-scene__mobile-tv`). It's already touch-friendly (paste a URL), so no handheld.
+- **`device: 'NONE'`** (Magic8Ball, Gacha) → the toy renders inline in `ToyScene` exactly as before (already tap-driven). Only "Show Code" is added.
+- `LabsRail` → still `display: none`.
+
+New mobile components (each own folder + `style.css`):
+
+- `Handheld/` — the retro console modal. Game map (`HH_GAMES`) for snake/pong/dino lives here. Lock body scroll + Esc-to-close while open.
+- `CodePopup/` — the "Show Code" terminal. Opens with an **iOS-style zoom** (scale `0.32 → 1` from `transform-origin: 50% 100%`, spring ease, backdrop fade) — _not_ a 3D flip — and plays a reverse **close** animation before unmounting. The exit is driven by a `closing` state + a `CLOSE_MS` timeout that must stay in sync with the `cp-close` duration in `style.css`; backdrop tap, ✕ CLOSE, and Esc all route through `requestClose()`. Code lines still stagger in (`cp-line`). Reuses `CodePanel` for the body.
 
 ### Adding a new lab experiment
 
-1. Add an entry to `LAB_EXPERIMENTS` in `src/data/labs.ts` (keep all `tv` entries before `standalone`).
-2. If it's a TV game, create `src/components/games/YourGame/index.tsx + style.css` implementing `GameProps`, then add it to `GAME_MAP` in `TVScreen/index.tsx`.
+1. Add an entry to `LAB_EXPERIMENTS` in `src/data/labs.ts` (keep all `tv` entries before `standalone`). **Set `device`** (`'TV' | 'HH' | 'NONE'`); if `'HH'`, also set `controls`.
+2. If it's a TV game, create `src/components/games/YourGame/index.tsx + style.css` implementing `GameProps`, then add it to `GAME_MAP` in `TVScreen/index.tsx`. If it should be playable on mobile via the handheld (`device: 'HH'`), expose a `controlRef` `GameHandle` and add it to `HH_GAMES` in `Handheld/index.tsx`.
 3. If it's a toy, add a `game === 'yourkey'` branch in the `ToyScene` component inside `Labs/index.tsx`.
 4. No section ref wiring needed — the Labs page maps `LAB_EXPERIMENTS` dynamically.
 
@@ -377,7 +404,7 @@ git commit --no-verify -m "chore: ..."
 - No backend. Email delivery requires Formspree (free tier covers ~50/month).
 - The right-side progress dots (`journey-progress`) are hidden on screens ≤900px via `display: none`.
 - The scroll-snap journey disables on mobile (`scroll-snap-type: none`) because full-height snap cards feel wrong on small screens. Cards stack vertically instead.
-- **Labs page has no mobile navigation.** `LabsRail` is `display: none` on mobile (≤768px). Users scroll through labs sections with no section index or jump nav. A future fix would be a fixed bottom dot-strip using the existing `activeIdx` state.
+- **Labs page has no mobile section navigation.** `LabsRail` is `display: none` on mobile. The mobile experience is now interactive (per-`device` handheld / code-popup / inline surfaces — see §Mobile experience), but there's still no section index or jump nav; users scroll. A future fix would be a fixed bottom dot-strip using the existing `activeIdx` state.
 - Fonts load from Google Fonts CDN — add a local fallback or `font-display: swap` if offline performance matters.
 - No analytics, no cookie banner, no service worker. Add those if deploying to production.
 
