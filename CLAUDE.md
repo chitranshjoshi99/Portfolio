@@ -337,6 +337,8 @@ when the block is ≥60% visible in the viewport. Implementation in `Home.tsx`:
 - `keydown` listener on `window` that checks `ctaInView && !ctaPressed`
 - 320ms delay before `navigate('/about')` for the press animation to complete
 
+**Mobile hero CTAs:** at `≤768px` only the **↓ RESUME** download button is shown — `Home/style.css` hides the others with `.hero__ctas .btn:not(.btn--resume) { display: none }`. VIEW JOURNEY / HIRE ME stay reachable from the nav, so the mobile hero isn't cluttered with buttons. Keep this selector keyed off `.btn--resume`, not button order.
+
 ---
 
 ## BlogPost — back navigation
@@ -398,6 +400,25 @@ git commit --no-verify -m "chore: ..."
 **What triggers the check:** any staged file matching `src/**` — `.tsx`, `.ts`, `.css`, anything.
 
 ---
+
+## Mobile behaviour — exceptions index
+
+Single place that lists every spot where mobile diverges from desktop. **Detail
+lives in each feature's own section; this is the lookup.** "Mobile" is whatever
+`useIsMobile()` matches — `(max-width: 768px) OR ((pointer: coarse) and (max-width: 899px))` — and the relevant CSS media queries use the **same** string so JS and CSS flip together.
+
+| Area | Desktop | Mobile exception | Where |
+| --- | --- | --- | --- |
+| **Labs interactive surface** | Shared sticky CRT cycles channels; inline `CodePanel` under each scene | Shared CRT not rendered. Per-experiment `device` routes it: `HH` → `</> SHOW CODE` + `▶ SEE IN ACTION` buttons; `TV` → inline single-channel CRT; `NONE` → toy inline. See §Mobile experience. | `Labs/index.tsx`, `SceneText`, `labs.ts` (`device`/`controls`) |
+| **Show Code** | Inline `CodePanel` | `CodePopup` modal — iOS-style zoom open + animated close | `CodePopup/` |
+| **See in Action (HH games)** | Game plays in the CRT, keyboard input | `Handheld` console modal; touch D-pad/up-down/single drives the real game via `controlRef`; START/STOP = pause/resume, POWER = close | `Handheld/`, `games/*` `GameHandle` |
+| **Toy scenes** | text left / toy right, mirrors TV zone | inner stacks; toy re-centred (`align-self: center`, `flex: none`) | `Labs/style.css` |
+| **LabsRail** | left floating pill index | `display: none` (no section nav) | `LabsRail/style.css` |
+| **Labs scroll-snap** | `scroll-snap-type: y mandatory`, nested scroll container | snap off; `.labs-stage` `overflow: visible`, sections stack | `Labs/style.css` |
+| **Home hero CTAs** | RESUME + VIEW JOURNEY + HIRE ME | only **↓ RESUME**; others hidden via `.hero__ctas .btn:not(.btn--resume)` | `Home/style.css` |
+| **About journey** | nested scroll-snap journey + right-side `journey-progress` dots | snap disabled, cards stack; progress dots hidden `≤900px` | `About/`, `JourneyProgress` |
+
+When you add a new mobile divergence, add a row here **and** document the detail in the feature's own section.
 
 ## Known limitations / future work
 

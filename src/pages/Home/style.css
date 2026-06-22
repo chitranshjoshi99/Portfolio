@@ -421,6 +421,12 @@
     padding-bottom: 96px; /* extra room so scroll prompt clears the stacked CTAs */
   }
 
+  /* Mobile hero: keep only the Resume download — drop the other CTAs
+     (VIEW JOURNEY / HIRE ME are reachable from the nav). */
+  .hero__ctas .btn:not(.btn--resume) {
+    display: none;
+  }
+
   .hero__inner {
     grid-template-columns: 1fr;
     gap: var(--px8);
