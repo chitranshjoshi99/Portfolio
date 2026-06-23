@@ -1,3 +1,13 @@
+---
+title: "A game loop in React without re-rendering"
+description: "React re-renders on every state change, but a game loop fires 60 times a second. Keep mutable state in refs, run one requestAnimationFrame loop, and let React own only the canvas element."
+date: "2026-06-14"
+tag: "CH01 · SNAKE"
+accent: "#8b7ba8"
+gameKey: "snake"
+order: 3
+---
+
 import { Snake } from "../../components/games/Snake";
 
 React re-renders a component every time its state changes. That's exactly what

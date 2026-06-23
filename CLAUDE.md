@@ -461,8 +461,28 @@ update the host in `public/sitemap.xml` + `public/robots.txt`. That's it.
 ### Blogs + LinkedIn link previews
 
 - Posts are **MDX** in `src/blogs/posts/<slug>.mdx` (can import & embed the live
-  Labs game). Metadata is shared in root `blogs.config.ts` — imported by BOTH the
-  app and the Vercel functions, which is why it's a typed `.ts`, not JSON.
+  Labs game). **The MDX file is the single source of truth** — its YAML
+  frontmatter holds all the metadata. Required: `title`, `description`, `date`,
+  `tag`, `accent`. Optional: `order` (sort hint) and `gameKey` (omit it for posts
+  not tied to a Lab game — it defaults to `""` so `getBlogByGame` never matches
+  them). There is **no `blogs.config.ts`** anymore.
+  - **The app** reads metadata from the `virtual:blogs` module, produced by
+    `vite-plugin-blogs.mjs` (it scans `src/blogs/posts/*.mdx` frontmatter via
+    `scripts/lib/blogs.mjs` → `loadBlogs()`, sorts by `order`, and ships **only
+    metadata** — no post bodies — to the client; HMR re-runs it when a post is
+    added/edited/removed). `src/blogs/meta.ts` re-exports `BLOGS` + the
+    `BlogMeta` type from it and hosts `getBlog`, `getBlogByGame`, `ogImageUrl`.
+    `virtual:blogs` is typed in `src/blogs/virtual-blogs.d.ts`.
+  - **The edge crawler** (`api/page.ts`) can't import shared TS, so its inlined
+    `BLOGS` array (between the `// <blogs:start>` / `// <blogs:end>` markers) is
+    **auto-generated** from the same frontmatter by
+    `scripts/gen-blog-manifest.mjs` (`pnpm gen:blogs`, also runs in `predev` +
+    `prebuild`). Never hand-edit that block.
+  - `scripts/lib/blogs.mjs`, `vite-plugin-blogs.mjs`, and the two scripts are
+    plain **`.mjs`** on purpose: `gray-matter` (the frontmatter parser) stays out
+    of the app's TypeScript graph — the app only ever sees typed `virtual:blogs`.
+  - `order` preserves the **curated** list order (not date-sorted). `loadBlogs`
+    sorts by `order`, then newest `date`, then slug.
 - Routes: `/blogs` (`BlogIndex`) and `/blogs/:slug` (`BlogPost`, lazy-loads the
   MDX body via `src/blogs/content.ts`). `useDocumentMeta` mirrors per-route meta
   into the head for users + Google.
@@ -476,15 +496,18 @@ update the host in `public/sitemap.xml` + `public/robots.txt`. That's it.
   home/profile card). Humans + Google still get the SPA.
 - `api/og.tsx` (`@vercel/og`, edge runtime) renders a 1200×630 pixel-art card per
   post. It's **self-contained** — reads `title`/`tag`/`accent` from query params
-  (built by `ogImageUrl()` in `blogs.config.ts`), so the edge bundle has no
+  (built by `ogImageUrl()` in `src/blogs/meta.ts`), so the edge bundle has no
   cross-module imports to choke on. `api/tsconfig.json` enables JSX
   (`jsx: react-jsx`) for the function build. Refresh LinkedIn's cache via the
   Post Inspector after each deploy.
-- **Add a post:** create the `.mdx`, add an entry to `blogs.config.ts` (set
-  `gameKey` to match a Lab experiment's `game` to get the "READ FULL POST →"
-  button in Labs) **and the same entry to the inlined `BLOGS` in `api/page.ts`**
-  (the function can't import the shared config), then add a `<loc>` to
-  `public/sitemap.xml`.
+- **Add a post:** run `pnpm new:blog --title "My Post Title"` — it slugifies the
+  title, refuses to overwrite an existing slug, and scaffolds
+  `src/blogs/posts/<slug>.mdx` with frontmatter boilerplate (`date` = today,
+  `order` = max + 1, placeholder `tag`/`accent`/`gameKey`). Then fill in the
+  frontmatter + body (set `gameKey` to match a Lab experiment's `game` to get the
+  "READ FULL POST →" button in Labs). The listing/routing pick it up
+  automatically; `api/page.ts` re-syncs on the next `pnpm gen:blogs`/build. Add a
+  `<loc>` to `public/sitemap.xml` (still manual).
 - There is one post per Lab feature. The `spa-seo-without-ssr` post (top of the
   list) is tied to the `linkpreview` channel. That channel (`games/LinkPreview`)
   takes a pasted URL, calls the `api/preview.ts` edge function which fetches the
@@ -492,16 +515,20 @@ update the host in `public/sitemap.xml` + `public/robots.txt`. That's it.
   CRT — a working demo of the meta the SEO post is about.
 
 The MDX toolchain is `@mdx-js/rollup` (vite plugin, `enforce: 'pre'`, before the
-SWC react plugin) + `@mdx-js/react` + `remark-gfm`. `*.mdx` is typed in
-`src/vite-env.d.ts`.
+SWC react plugin) + `@mdx-js/react` + `remark-gfm` + **`remark-frontmatter`**
+(strips the YAML `---` block out of the rendered body) + **`remark-mdx-frontmatter`**
+(also exposes it as a `frontmatter` named export — the eager-glob fallback path to
+`virtual:blogs`). `*.mdx` is typed in `src/vite-env.d.ts`.
 
 ---
 
 ## Commands
 
 ```bash
-npm run dev      # dev server on :5173
-npm run build    # production build → dist/
-npm run preview  # serve dist/ locally
-npm run lint     # ESLint
+pnpm dev                       # dev server on :5173 (predev → gen:blogs)
+pnpm build                     # tsc -b && vite build (prebuild → gen:blogs)
+pnpm preview                   # serve dist/ locally
+pnpm lint                      # ESLint
+pnpm gen:blogs                 # regenerate api/page.ts BLOGS from MDX frontmatter
+pnpm new:blog --title "..."    # scaffold a new src/blogs/posts/<slug>.mdx
 ```

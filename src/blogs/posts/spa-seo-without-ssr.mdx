@@ -1,3 +1,13 @@
+---
+title: "SPAs can have great link previews without SSR"
+description: "Single-page apps hand crawlers an empty shell, so every shared link looks the same. Here is how to get correct, per-page social previews on Vercel with a thin meta-injection layer at the edge, no SSR required."
+date: "2026-06-15"
+tag: "SEO · PREVIEWS"
+accent: "#b87a72"
+gameKey: "linkpreview"
+order: 2
+---
+
 import { LinkPreview } from "../../components/games/LinkPreview";
 
 Single-page apps ship one nearly empty `index.html` and paint everything with JavaScript after load. That is great for users and awkward for the machines that read your pages. Social crawlers like LinkedIn, Slack, and X do not run JavaScript at all. They fetch the raw HTML, read the `<head>`, and leave. So every route of a vanilla SPA hands them the same default tags, and every link you share looks identical.

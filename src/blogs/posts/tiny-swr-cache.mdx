@@ -1,3 +1,13 @@
+---
+title: "Build a tiny stale-while-revalidate cache"
+description: "Stale-while-revalidate shows cached data instantly, refetches in the background, and swaps in the fresh copy. The core is about forty lines: a cache map plus an in-flight map for request dedupe."
+date: "2026-06-15"
+tag: "TOY · GACHA"
+accent: "#9e8562"
+gameKey: "gacha"
+order: 7
+---
+
 import { Gacha } from "../../components/games/Gacha";
 
 Stale-while-revalidate is a caching idea with a good bedside manner: show what you already have right now, quietly fetch a fresh copy, swap it in when it arrives. The user never stares at a spinner for data you loaded a moment ago, and the screen still ends up current. You do not need a library to get the core of it.

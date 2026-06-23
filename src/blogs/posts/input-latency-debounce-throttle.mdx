@@ -1,3 +1,13 @@
+---
+title: "Raw, debounce, or throttle: handling event streams"
+description: "Raw, debounce, and throttle are three answers to a stream of events. Game input wants raw immediacy, a search box wants debounce, a scroll handler wants throttle. Pick wrong and users feel it."
+date: "2026-06-15"
+tag: "CH03 · DINO"
+accent: "#9e8562"
+gameKey: "dino"
+order: 5
+---
+
 import { DinoRun } from "../../components/games/DinoRun";
 
 The dino jumps the instant you press space because the handler is raw: keydown fires, jump runs, done. That immediacy is the whole point of a game control. The same immediacy would be a disaster on a search box that hits an API on every keystroke. Same event, opposite needs. The tools that bridge them are debounce and throttle.

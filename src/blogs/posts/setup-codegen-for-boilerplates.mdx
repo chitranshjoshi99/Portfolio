@@ -1,0 +1,57 @@
+---
+title: "Make code generation a daily habit"
+description: "Boilerplate is code you have already written, just not yet. A small generator hands it to you deterministically — and when you pair with an AI, it stops you spending tokens to have a model re-derive structure it already knows cold."
+date: "2026-06-23"
+tag: "CODEGEN · WORKFLOW"
+accent: "#b87a72"
+order: 1
+---
+
+Boilerplate is the code you have already written, just not yet. A new route, a new component folder, a new blog post — each one starts life as the same skeleton you typed last week with three names changed. Most of us reach for one of two habits here: copy the nearest existing file and edit it, or ask an AI to produce the scaffold again. Both work, and both quietly leak effort. Copy-paste drifts — you forget to rename one thing and ship a bug. The AI route is slower than it looks and spends tokens regenerating structure nobody needed regenerated. A tiny generator removes the choice entirely.
+
+## The payoff is consistency, not just speed
+
+The obvious win is that one command beats copying a file. The real win is that the generator becomes the canonical shape. It encodes your conventions — the folder layout, the required frontmatter, the order field — in exactly one place, so everything it produces is correct by construction. There is no "I forgot the `index.css`" variant, because the template never forgets. And because the output is deterministic, a generator pairs naturally with a sync step: regenerate a derived file from source and you get byte-identical output every time, which is exactly how this site keeps its edge crawler's metadata in lockstep with the MDX it is built from.
+
+This post did not get its skeleton by hand — a small `.mjs` script wrote it. Here is that generator, trimmed but real:
+
+```js
+// scripts/new-blog.mjs — run as: pnpm new:blog --title "..."
+import fs from "node:fs";
+import path from "node:path";
+import { POSTS_DIR, slugify, nextOrder } from "./lib/blogs.mjs";
+
+const title = parseArgs(process.argv.slice(2)).title?.trim();
+if (!title) process.exit(1);
+
+const slug = slugify(title); // title → url-safe filename
+const file = path.join(POSTS_DIR, `${slug}.mdx`);
+if (fs.existsSync(file)) {
+  console.error(`Refusing to overwrite ${slug}.mdx`); // never clobber a post
+  process.exit(1);
+}
+
+fs.writeFileSync(
+  file,
+  `---
+title: ${JSON.stringify(title)}
+date: ${JSON.stringify(new Date().toISOString().slice(0, 10))}
+order: ${nextOrder()}
+---
+
+Opening paragraph — set up the problem this post solves.
+`,
+);
+```
+
+The conventions live in one place — the template string and `nextOrder()` — so every post it writes is correct by construction. That replaces a decision you would otherwise make by hand, slightly differently, every single time.
+
+## Where it quietly saves LLM tokens
+
+This is the part that changed once AI joined the workflow. When you ask a model to "create a new blog post with the usual frontmatter and imports," you pay twice: once in input tokens describing the skeleton you want, and again in output tokens for the model to type it back out. The model is not reasoning about anything novel there — it is re-deriving structure it, and you, already know by heart. A generator produces that skeleton for free, deterministically, with no model in the loop at all.
+
+What is left for the AI is the part that actually needs a brain: the post's argument, the tricky reducer, the one function that is genuinely new. You hand the model a generated scaffold and say "fill in this one piece." The prompt is shorter, the output is smaller, and the context window stays clean. Tighter prompts also give the model fewer chances to wander — it cannot invent a slightly-different folder convention if it never had to generate the folder. Codegen and LLMs are not competitors here. The generator handles the deterministic ninety percent, and you spend the expensive, non-deterministic tokens only on the ten percent that earns them.
+
+## When to reach for it
+
+The threshold is simple: the third time you write the same shape, or the second time you catch yourself prompting an AI for a skeleton you have prompted for before, write the generator instead. Keep it small and deterministic — a generator that tries to be clever is a generator you stop trusting. The ones that earn their keep are boring: read a couple of inputs, refuse to overwrite, write the file. This very site runs on two of them, and adding this post took a single command.

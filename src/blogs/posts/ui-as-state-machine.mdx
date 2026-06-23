@@ -1,3 +1,13 @@
+---
+title: "Model your UI as a state machine"
+description: "Most UI bugs are impossible states made possible by a pile of booleans. Model the flow as one state variable with explicit transitions and the illegal combinations stop being representable."
+date: "2026-06-15"
+tag: "TOY · ORACLE"
+accent: "#8b7ba8"
+gameKey: "magic8ball"
+order: 6
+---
+
 import { Magic8Ball } from "../../components/Magic8Ball";
 
 Most UI bugs are impossible states that we accidentally made possible. A loading flag that is true while an error is also showing. A modal that is open and closed at once. These slip in because we model UI with a pile of independent booleans, and booleans multiply: four of them describe sixteen combinations, and most of those should never exist.
