@@ -7,6 +7,7 @@ import { haptics } from "../../utils/haptics";
 import { PERSON, STATS, SKILLS } from "../../data/resume";
 import "./style.css";
 import { asset } from "@/assets";
+import { AvatarEyes } from "../../components/AvatarEyes";
 
 // ── Pixel decorations ────────────────────────────────────────
 const PIXEL_DECO = ["◆", "▲", "●", "■", "◇", "△", "○", "□"];
@@ -180,12 +181,12 @@ export default function Home() {
             <div className="hero__avatar-wrap" id="hero-avatar">
               <div className="hero__avatar-frame">
                 <div className="hero__avatar-inner">
-                  <img
+                  <AvatarEyes
                     src={asset("/profile.jpeg")}
                     alt={`${PERSON.name} — pixel art avatar`}
-                    className="hero__avatar-img"
-                    width="240"
-                    height="240"
+                    imgClassName="hero__avatar-img"
+                    width={240}
+                    height={240}
                   />
                 </div>
                 {/* Corner decorations */}

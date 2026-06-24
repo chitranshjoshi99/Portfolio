@@ -1,0 +1,54 @@
+.avatar-eyes {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Hide overlays entirely on touch/coarse-pointer devices (no cursor = no tracking) */
+@media (pointer: coarse) {
+  .avatar-eyes__mask,
+  .avatar-eyes__pupil {
+    display: none;
+  }
+}
+
+.avatar-eyes img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* White mask that hides the static pixel pupil in the image */
+.avatar-eyes__mask {
+  position: absolute;
+  left: var(--eye-cx);
+  top: var(--eye-cy);
+  width: var(--mask-px);
+  height: var(--mask-px);
+  transform: translate(-50%, -50%);
+  background: #e8e8e8; /* matches the eye-white in the pixel art */
+  pointer-events: none;
+}
+
+/* Movable pixel pupil */
+.avatar-eyes__pupil {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--pupil-px);
+  height: var(--pupil-px);
+  transform: translate(-50%, -50%);
+  background: #1a1a1a;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* Dark theme: slightly lighter eye white and darker pupil */
+[data-theme="dark"] .avatar-eyes__mask {
+  background: #e0e0e0;
+}
+
+[data-theme="dark"] .avatar-eyes__pupil {
+  background: #0a0a0a;
+}

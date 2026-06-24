@@ -24,6 +24,7 @@ Every component and page lives in its own folder with exactly two files:
 ```
 src/
 ├── components/
+│   ├── AvatarEyes/       index.tsx + style.css   ← hero profile pic with cursor-tracking pixel pupils
 │   ├── ChannelStatic/    index.tsx + style.css   ← TV static noise canvas (on-demand only)
 │   ├── CodePanel/        index.tsx + style.css   ← expandable code window (titlebar + pre)
 │   ├── CodePopup/        index.tsx + style.css   ← mobile "Show Code" popup; iOS-style zoom open/close (reuses CodePanel)
