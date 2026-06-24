@@ -12,14 +12,14 @@
 /* ── Profile intro ─────────────────────────────────────────── */
 
 .about-intro {
-  padding: var(--px16) 0;
+  padding: var(--px12) 0 var(--px16);
   border-bottom: var(--px) solid var(--border-primary);
 }
 
 .about-intro__inner {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--px16);
+  gap: var(--px12);
   align-items: start;
 }
 
@@ -32,14 +32,14 @@
 
 .about-intro__name {
   font-size: clamp(0.9rem, 2.5vw, 1.4rem);
-  margin-bottom: var(--px2);
+  margin-bottom: var(--px4);
   line-height: 1.5;
 }
 
 .about-intro__role {
   font-size: 1.5rem;
   color: var(--accent-secondary);
-  margin-bottom: var(--px4);
+  margin-bottom: var(--px6);
   letter-spacing: 0.04em;
 }
 
@@ -54,7 +54,7 @@
   display: flex;
   gap: var(--px4);
   align-items: flex-start;
-  padding: var(--px4);
+  padding: var(--px3) var(--px4);
   border: var(--px) solid var(--border-primary);
   background: var(--bg-card);
   box-shadow: var(--px2) var(--px2) 0 var(--border-primary);
@@ -108,10 +108,8 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--px8);
-  padding-top: var(
-    --px8
-  ); /* ↑ generous top gap so heading clears the rule above */
-  padding-bottom: var(--px6);
+  padding-top: var(--px6); /* ↑ top gap so heading clears the rule above */
+  padding-bottom: var(--px4);
   flex-wrap: wrap;
 }
 
@@ -145,7 +143,7 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 2px;
-  padding: var(--px3) var(--px5, 20px);
+  padding: var(--px2) var(--px4);
   background: var(--bg-card);
   border: var(--px) solid var(--border-primary);
   border-right-width: 0;

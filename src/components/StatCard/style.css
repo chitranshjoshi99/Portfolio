@@ -25,35 +25,19 @@
   box-shadow: var(--px2) var(--px2) 0 var(--stat-color);
 }
 
+.stat-card__metric {
+  font-size: 2.2rem;
+  color: var(--stat-color);
+  line-height: 1;
+  font-weight: 600;
+}
+
 .stat-card__label {
   font-size: 7px;
   color: var(--text-muted);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-}
-
-.stat-card__values {
-  display: flex;
-  align-items: baseline;
-  gap: var(--px2);
-}
-
-.stat-card__before {
-  font-size: 1.4rem;
-  color: var(--text-muted);
-  text-decoration: line-through;
-  text-decoration-color: var(--text-muted);
-}
-
-.stat-card__arrow {
-  font-size: 9px;
-  color: var(--stat-color);
-}
-
-.stat-card__after {
-  font-size: 1.8rem;
-  color: var(--stat-color);
-  font-weight: 600;
+  margin-top: var(--px);
 }
 
 .stat-card__bar {
@@ -61,6 +45,7 @@
   background: var(--bg-secondary);
   border: 1px solid var(--border-secondary);
   overflow: hidden;
+  margin-top: var(--px2);
 }
 
 .stat-card__fill {

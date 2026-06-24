@@ -4,6 +4,8 @@
 
 .home-page {
   padding-top: 56px; /* navbar */
+  height: calc(100vh - 56px);
+  overflow: hidden;
 }
 
 /* ── Section shared styles ─────────────────────────────────── */
@@ -22,28 +24,50 @@
 .section-subtitle {
   font-size: var(--font-size-base);
   color: var(--text-muted);
-  margin-bottom: var(--px8);
+  margin-bottom: var(--px6);
+}
+
+/* ── SNAP CONTAINER ────────────────────────────────────────── */
+
+.home-snap {
+  height: calc(100vh - 56px);
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.home-snap::-webkit-scrollbar {
+  display: none;
+}
+
+.home-snap__section {
+  height: calc(100vh - 56px);
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  position: relative;
+  z-index: 1;
 }
 
 /* ── HERO ──────────────────────────────────────────────────── */
 
 .hero {
-  position: relative;
-  min-height: calc(100vh - 56px);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  padding: var(--px12) 0 var(--px16);
+  padding: var(--px16) 0 var(--px16);
 }
 
-/* Pixel deco floating elements */
+/* Pixel deco — fixed viewport background, visible behind all snap sections */
 .hero__deco {
-  position: absolute;
-  inset: 0;
+  position: fixed;
+  top: 56px;
+  left: 0;
+  right: 0;
+  bottom: 0;
   pointer-events: none;
-  overflow: hidden;
+  z-index: 0;
 }
 
 .hero__deco-dot {
@@ -69,23 +93,11 @@
 
 /* ── Left content ─────────────────────────────────────────── */
 
-.hero__boot {
-  font-size: 9px;
-  color: var(--text-muted);
-  margin-bottom: var(--px4);
-  letter-spacing: 0.08em;
-}
-
-.hero__boot-prefix {
-  color: var(--accent-primary);
-  margin-right: var(--px2);
-}
-
 /* Name */
 .hero__name {
-  font-size: clamp(1rem, 3vw, 1.6rem);
+  font-size: clamp(1.1rem, 3vw, 1.8rem);
   line-height: 1.5;
-  margin-bottom: var(--px4);
+  margin-bottom: var(--px6);
   display: flex;
   flex-wrap: wrap;
   gap: var(--px3);
@@ -102,7 +114,7 @@
 .hero__role {
   font-size: var(--font-size-xs);
   color: var(--accent-secondary);
-  margin-bottom: var(--px2);
+  margin-bottom: var(--px3);
   letter-spacing: 0.05em;
   min-height: 1.4em;
 }
@@ -126,7 +138,7 @@
 .hero__location {
   font-size: 1.1rem;
   color: var(--text-muted);
-  margin-bottom: var(--px6);
+  margin-bottom: var(--px8);
   letter-spacing: 0.05em;
   min-height: 1.3em;
 }
@@ -137,42 +149,7 @@
   color: var(--text-secondary);
   line-height: 1.7;
   max-width: 540px;
-  margin-bottom: var(--px6);
-}
-
-/* Badges */
-.hero__badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--px2);
-  margin-bottom: var(--px6);
-}
-
-.hero__badge {
-  font-size: 7px;
-  letter-spacing: 0.06em;
-  padding: var(--px) var(--px3);
-  border: var(--px) solid var(--border-primary);
-  color: var(--text-muted);
-  background: var(--bg-secondary);
-}
-
-.hero__badge--gold {
-  color: var(--nivoda-gold);
-  border-color: var(--nivoda-gold);
-  background: rgba(158, 133, 98, 0.08);
-}
-
-.hero__badge--purple {
-  color: var(--classplus-purple);
-  border-color: var(--classplus-purple);
-  background: rgba(139, 123, 168, 0.08);
-}
-
-.hero__badge--red {
-  color: var(--delhivery-red);
-  border-color: var(--delhivery-red);
-  background: rgba(122, 158, 122, 0.08);
+  margin-bottom: var(--px8);
 }
 
 /* CTAs */
@@ -196,6 +173,7 @@
   position: relative;
   width: 240px;
   height: 240px;
+  /* box-shadow: var(--px2) var(--px2) 0 var(--accent-primary); */
 }
 
 .hero__avatar-inner {
@@ -294,39 +272,53 @@
   color: var(--accent-primary);
 }
 
-/* ── STATS ─────────────────────────────────────────────────── */
+/* ── IMPACT + SKILLS (snap section 2) ─────────────────────── */
 
-.stats-section {
-  padding: var(--px16) 0;
-  border-top: var(--px) solid var(--border-primary);
-  background: var(--bg-secondary);
+.impact-skills-section {
+  display: flex;
+  align-items: center;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.impact-skills-section::-webkit-scrollbar {
+  display: none;
+}
+
+.impact-skills-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  gap: var(--px8);
+  padding: var(--px8) var(--px6);
+  width: 100%;
+  height: 100%;
+}
+
+.impact-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--px4);
 }
 
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--px4);
-}
-
-/* ── SKILLS ────────────────────────────────────────────────── */
-
-.skills-section {
-  padding: var(--px16) 0;
-  border-top: var(--px) solid var(--border-primary);
+  gap: var(--px6);
 }
 
 .skills-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: var(--px6);
+  gap: var(--px8);
 }
 
 /* ── CTA SECTION ───────────────────────────────────────────── */
 
 .home-cta-section {
-  padding: var(--px16) 0;
-  border-top: var(--px) solid var(--border-primary);
-  background: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Centered single-column layout */
@@ -414,6 +406,60 @@
   border-color: var(--accent-primary);
 }
 
+/* ── Nav card grid (section 3) ────────────────────────────── */
+
+.home-nav-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--px3);
+  width: 100%;
+  max-width: 720px;
+}
+
+.home-nav-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--px2);
+  padding: var(--px4);
+  border: var(--px) solid var(--border-primary);
+  text-decoration: none;
+  box-shadow: var(--px) var(--px) 0 var(--border-secondary);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.home-nav-card:hover {
+  border-color: var(--accent-primary);
+  box-shadow: var(--px2) var(--px2) 0 var(--accent-primary);
+  background: var(--accent-glow);
+}
+
+.home-nav-card__num {
+  font-size: 7px;
+  color: var(--accent-primary);
+  letter-spacing: 0.08em;
+}
+
+.home-nav-card__title {
+  font-size: 8px;
+  color: var(--text-primary);
+  letter-spacing: 0.05em;
+  transition: color var(--transition-fast);
+}
+
+.home-nav-card:hover .home-nav-card__title {
+  color: var(--accent-primary);
+}
+
+.home-nav-card__desc {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  line-height: 1.4;
+  font-family: var(--font-body);
+}
+
 /* ── RESPONSIVE ────────────────────────────────────────────── */
 
 @media (max-width: 768px) {
@@ -462,6 +508,58 @@
   .hero__scroll-prompt {
     bottom: var(--px8);
   }
+
+  /* Disable snap scroll on mobile — sections stack normally */
+  .home-page {
+    height: auto;
+    overflow: visible;
+  }
+
+  .home-snap {
+    height: auto;
+    overflow-y: visible;
+    scroll-snap-type: none;
+  }
+
+  .home-snap__section {
+    height: auto;
+    min-height: 100svh;
+    scroll-snap-align: none;
+    scroll-snap-stop: unset;
+  }
+
+  /* Impact+skills section: restore normal padding */
+  .impact-skills-section {
+    align-items: flex-start;
+    overflow-y: visible;
+  }
+
+  .impact-skills-inner {
+    padding: var(--px8) var(--px6);
+  }
+
+  /* Nav cards: 2 columns on mobile */
+  .home-nav-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* CTA section: restore padding */
+  .home-cta-section {
+    padding: var(--px12) 0;
+    align-items: flex-start;
+  }
+
+  .home-cta-inner {
+    padding: 0 var(--px6);
+  }
+
+  /* Deco: revert to absolute on mobile (fixed causes issues with mobile scroll) */
+  .hero__deco {
+    position: absolute;
+    top: 0;
+    bottom: auto;
+    height: 100svh;
+  }
 }
 
 @media (max-width: 480px) {
@@ -476,5 +574,10 @@
 
   .btn {
     justify-content: center;
+  }
+
+  /* Nav cards: single column on very small screens */
+  .home-nav-grid {
+    grid-template-columns: 1fr 1fr;
   }
 }

@@ -143,7 +143,7 @@ export default function About() {
           <div className="about-intro__stats">
             <p className="pixel-text about-intro__stats-title">SKILL_TREE</p>
             <div className="about-stats-grid">
-              {SKILLS.slice(0, 8).map((s, i) => (
+              {SKILLS.slice(0, 6).map((s, i) => (
                 <XPBar
                   key={s.label}
                   label={s.label}

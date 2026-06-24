@@ -78,7 +78,7 @@ src/
 | `src/data/resume.ts`                     | **Only place resume content lives.** Edit here; pages pick it up automatically.                                                                                                                                                                       |
 | `src/data/labs.ts`                       | **Only place Labs content lives.** All experiments, channels, teasers, code snippets. See §Labs internals.                                                                                                                                            |
 | `src/styles/tokens.css`                  | All CSS custom properties — palette, spacing, fonts, shadows. Edit colours here, not inline.                                                                                                                                                          |
-| `src/styles/global.css`                  | Reset, utility classes (`.pixel-text`, `.vt-text`, animations), **all `.btn` / `.btn--*` variants**, and two blink keyframes: `blink` (step-end, for cursors/CTAs) and `blink-soft` (ease-in-out fade, for persistent chrome like the navbar cursor). |
+| `src/styles/global.css`                  | Reset, utility classes (`.pixel-text`, `.vt-text`, animations), **all `.btn` / `.btn--*` variants** (each sets `--btn-shadow` for the 3D-press mechanic — see §Button system), and two blink keyframes: `blink` (step-end, for cursors/CTAs) and `blink-soft` (ease-in-out fade, for persistent chrome like the navbar cursor). |
 | `src/contexts/ThemeContext.tsx`          | Dark/light theme. Reads `prefers-color-scheme` as default; persists override in `localStorage` under key `cj-portfolio-theme`. Applies `data-theme` attribute to `<html>`.                                                                            |
 | `src/contexts/ScrollProgressContext.tsx` | One shared rAF loop writing `--p` (0→1) onto registered scene elements. Used by Labs SceneText for entry animations.                                                                                                                                  |
 | `src/pages/Contact/index.tsx`            | Has `FORMSPREE_ID` constant at the top — set it to enable direct email.                                                                                                                                                                               |
@@ -120,6 +120,10 @@ Each `.tsx` file has a sibling `.css` file. Global utilities live in
 - Box shadows use the pixel drop-shadow pattern: `Xpx Xpx 0 <color>` (hard offset, no blur)
 - Image rendering: `image-rendering: pixelated` on the avatar
 
+### Navbar theme toggle — icon only
+
+`.theme-toggle__label` in `Navbar/style.css` has `display: none` — the "DARK"/"LIGHT" text label is hidden. Only the toggle track (sun/moon icons + sliding thumb) renders. Do not restore the label unless you also check that it fits in the navbar bar on narrow desktops.
+
 ### Company accent colours
 
 Three muted accent colours used throughout the experience cards:
@@ -129,6 +133,37 @@ Three muted accent colours used throughout the experience cards:
 - `--classplus-purple` (#8B7BA8) — Classplus
 
 These are defined in both light and dark themes in `tokens.css`.
+
+### Button system — `--btn-shadow` and 3D press
+
+All `.btn` variants in `global.css` carry a `--btn-shadow` CSS custom property that controls both the resting drop-shadow colour **and** the 3D press collapse. The pattern:
+
+```css
+.btn {
+  --btn-shadow: var(--border-primary); /* base default */
+}
+.btn--primary { --btn-shadow: var(--accent-primary); box-shadow: var(--px) var(--px) 0 var(--btn-shadow); }
+/* On hover, set --btn-shadow to the hover colour too, so :active collapses the right shade */
+.btn--primary:hover { --btn-shadow: var(--accent-secondary); ... }
+
+/* 3D press: translate exactly the shadow depth (4px = var(--px)), collapse shadow to 0 */
+.btn:active {
+  transform: translate(var(--px), var(--px));
+  box-shadow: 0 0 0 var(--btn-shadow) !important;
+}
+```
+
+Shadow depth is **4px (`var(--px)`)** — not 8px. A 4px shadow + 4px translate means the button shifts into the exact space the shadow occupied, giving a clean physical press with no floating artifact. The `@keyframes btn-press` animation (used for the ENTER-key CTA trigger) animates the same translate + shadow collapse + restore.
+
+**Contact-page buttons** (`.btn--whatsapp`, `.btn--email`) in `Contact/style.css` are custom variants that follow the same 4px shadow and `translate(var(--px), var(--px))` active rule — they don't extend `.btn` but mirror the pattern.
+
+---
+
+## StatCard component
+
+`src/components/StatCard/` — displays a single impact metric. The component accepts `before`, `after`, `pct`, `unit`, `label`, `color`, and `delay` props but **renders only the `after` value** as the headline metric — the before/after comparison row was removed. The `before` prop is destructured as `_before` (satisfies no-unused-vars) and intentionally ignored.
+
+Layout: accent-colored metric number (`vt-text`, 2.2rem) → label → XP-style fill bar → percentage. No strikethrough "before" figure.
 
 ---
 
@@ -156,7 +191,7 @@ These are defined in both light and dark themes in `tokens.css`.
 
 **CSS classes of note:** `.m8b__ball--shake[data-intensity="1-5"]`, `.m8b__ball--counting`, `.m8b__ball--hidden`, `.m8b__btns-overlay`.
 
-**Home CTA section layout:** `.home-cta-inner` is a centered flex column — `PRESS START` pixel-screen above the `VIEW EXPERIENCE` button. (Was previously a two-column grid with Magic8Ball on the left; simplified after Magic8Ball moved to Labs.)
+**Home CTA section layout:** `.home-cta-inner` is a centered flex column — `PRESS START` pixel-screen → `▶ VIEW EXPERIENCE` button → `.home-nav-grid` (4 quick-nav cards). (Was previously a two-column grid with Magic8Ball on the left; simplified after Magic8Ball moved to Labs. Nav cards added in the UI declutter pass.)
 
 ---
 
@@ -339,10 +374,52 @@ not the document scroll. This has two important consequences:
 
 ---
 
-## Home page — ENTER key on CTA
+## Home page — layout and interactions
 
-The "PRESS START" pixel screen block triggers navigation to `/about` on ENTER
-when the block is ≥60% visible in the viewport. Implementation in `Home.tsx`:
+### Snap-scroll architecture (3 sections)
+
+`src/pages/Home/` uses a **nested scroll container** (`div.home-snap`) for
+scroll-snap, keeping the snap isolated to the home route.
+
+```
+main.home-page
+├── div.hero__deco          ← floating pixel symbols, position: fixed (desktop)
+└── div.home-snap           ← height: calc(100vh−56px), overflow-y: scroll,
+                               scroll-snap-type: y mandatory, scrollbar hidden
+     ├── section.hero.home-snap__section           ← Hero
+     ├── section.impact-skills-section.home-snap__section  ← Stats + Skills
+     └── section.home-cta-section.home-snap__section       ← CTA + nav cards
+```
+
+Key rules:
+- `.home-page`: `height: calc(100vh−56px); overflow: hidden` — clips the snap container to the viewport.
+- `.home-snap__section`: `height: calc(100vh−56px); scroll-snap-align: start; scroll-snap-stop: always; z-index: 1`. **Never `min-height`** — that breaks snap.
+- `scrollDown` (the ▼ scroll prompt) calls `snapRef.current.scrollTo({ top: snapRef.current.clientHeight, behavior: "smooth" })`. Do **not** use `scrollIntoView` — it doesn't work on a nested scroll container.
+- **No section divider borders or alternate backgrounds** — all three sections share the same `--bg-primary` background for a seamless look.
+
+### Section 1 — Hero
+
+Unchanged two-column layout: text left, avatar right. The floating deco (`div.hero__deco`) is a sibling of `.home-snap`, positioned **outside** the snap container so it persists across all three sections as a fixed background layer.
+
+- **Desktop:** `position: fixed; top: 56px; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 0` — the deco floats behind the snap sections (which are `z-index: 1`).
+- **Mobile:** `position: absolute; top: 0; height: 100svh` — reverts to avoid mobile scroll conflicts.
+
+### Section 2 — Impact + Skills
+
+`.impact-skills-section` merges what were previously separate stats and skills sections. Layout: centered flex column with `overflow-y: auto` (scrollable within snap if content overflows on small screens). Contains two `.impact-block` divs — `IMPACT.log` (all `STATS`) and `SKILL_TREE` (first 8 `SKILLS`).
+
+### Section 3 — CTA + nav card grid
+
+`.home-cta-section`: centered flex column with `PRESS START` pixel-screen, `▶ VIEW EXPERIENCE` button, and a 4-card nav grid (`.home-nav-grid`).
+
+Nav grid:
+- `grid-template-columns: repeat(4, 1fr); max-width: 720px` on desktop
+- `repeat(2, 1fr)` on mobile (≤768px)
+- Each `.home-nav-card` links to `/about`, `/labs`, `/blogs`, `/contact` with a `pixel-text` number, title, and short description.
+
+### ENTER key on CTA
+
+The "PRESS START" pixel screen triggers navigation to `/about` on ENTER when ≥60% visible. Implementation in `Home.tsx`:
 
 - `ctaRef` → the pixel-screen div
 - `ctaInView` state via IntersectionObserver
@@ -427,6 +504,7 @@ lives in each feature's own section; this is the lookup.** "Mobile" is whatever
 | **Toy scenes** | text left / toy right, mirrors TV zone | inner stacks; toy re-centred (`align-self: center`, `flex: none`) | `Labs/style.css` |
 | **LabsRail** | left floating pill index | `display: none` (no section nav) | `LabsRail/style.css` |
 | **Labs scroll-snap** | `scroll-snap-type: y mandatory`, nested scroll container | snap off; `.labs-stage` `overflow: visible`, sections stack | `Labs/style.css` |
+| **Home snap-scroll** | 3-section `div.home-snap` nested scroll container with `scroll-snap-type: y mandatory`; hero deco `position: fixed` | snap off (`scroll-snap-type: none`); sections stack with `min-height: 100svh`; deco reverts to `position: absolute` | `Home/style.css` |
 | **Home hero CTAs** | RESUME + VIEW JOURNEY + HIRE ME | only **↓ RESUME**; others hidden via `.hero__ctas .btn:not(.btn--resume)` | `Home/style.css` |
 | **About journey** | nested scroll-snap journey + right-side `journey-progress` dots | snap disabled, cards stack; progress dots hidden `≤900px` | `About/`, `JourneyProgress` |
 

@@ -139,7 +139,7 @@
   color: var(--accent-primary);
   border-color: var(--accent-primary);
   background: var(--accent-glow);
-  box-shadow: var(--px2) var(--px2) 0 var(--accent-primary);
+  box-shadow: var(--px) var(--px) 0 var(--accent-primary);
 }
 
 /* ── Controls ─────────────────────────────────────────────── */
@@ -246,6 +246,7 @@
   font-size: 8px;
   min-width: 26px;
   letter-spacing: 0.05em;
+  display: none;
 }
 
 /* ── Burger (mobile) ──────────────────────────────────────── */

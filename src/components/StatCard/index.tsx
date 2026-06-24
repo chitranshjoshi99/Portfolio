@@ -13,7 +13,7 @@ interface StatCardProps {
 
 export function StatCard({
   label,
-  before,
+  before: _before,
   after,
   pct,
   unit,
@@ -50,12 +50,8 @@ export function StatCard({
         } as React.CSSProperties
       }
     >
+      <span className="stat-card__metric vt-text">{after}</span>
       <span className="stat-card__label pixel-text">{label}</span>
-      <div className="stat-card__values">
-        <span className="stat-card__before vt-text">{before}</span>
-        <span className="stat-card__arrow pixel-text">→</span>
-        <span className="stat-card__after vt-text">{after}</span>
-      </div>
       <div className="stat-card__bar">
         <div
           className="stat-card__fill"
@@ -65,9 +61,7 @@ export function StatCard({
           }}
         />
       </div>
-      <span className="stat-card__pct pixel-text">
-        {pct}% {unit}
-      </span>
+      <span className="stat-card__pct pixel-text">{pct}% {unit}</span>
     </div>
   );
 }
