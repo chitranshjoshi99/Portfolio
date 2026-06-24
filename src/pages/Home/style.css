@@ -3,7 +3,7 @@
    ============================================================ */
 
 .home-page {
-  padding-top: 56px; /* navbar */
+  margin-top: 56px; /* navbar */
   height: calc(100vh - 56px);
   overflow: hidden;
 }
