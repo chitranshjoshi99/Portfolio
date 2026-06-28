@@ -20,7 +20,7 @@
   /* fallback accent if none provided */
   --hh-accent: var(--accent-primary);
   width: 100%;
-  max-width: 300px;
+  height: 100%;
   padding: var(--px4) var(--px4) var(--px5);
   background: var(--bg-secondary);
   border: var(--px) solid var(--border-primary);
