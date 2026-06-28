@@ -74,18 +74,18 @@ src/
 
 ## Critical files
 
-| File                                     | Purpose                                                                                                                                                                                                                                               |
-| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/data/resume.ts`                     | **Only place resume content lives.** Edit here; pages pick it up automatically.                                                                                                                                                                       |
-| `src/data/labs.ts`                       | **Only place Labs content lives.** All experiments, channels, teasers, code snippets. See §Labs internals.                                                                                                                                            |
-| `src/styles/tokens.css`                  | All CSS custom properties — palette, spacing, fonts, shadows. Edit colours here, not inline.                                                                                                                                                          |
+| File                                     | Purpose                                                                                                                                                                                                                                                                                                                         |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/data/resume.ts`                     | **Only place resume content lives.** Edit here; pages pick it up automatically.                                                                                                                                                                                                                                                 |
+| `src/data/labs.ts`                       | **Only place Labs content lives.** All experiments, channels, teasers, code snippets. See §Labs internals.                                                                                                                                                                                                                      |
+| `src/styles/tokens.css`                  | All CSS custom properties — palette, spacing, fonts, shadows. Edit colours here, not inline.                                                                                                                                                                                                                                    |
 | `src/styles/global.css`                  | Reset, utility classes (`.pixel-text`, `.vt-text`, animations), **all `.btn` / `.btn--*` variants** (each sets `--btn-shadow` for the 3D-press mechanic — see §Button system), and two blink keyframes: `blink` (step-end, for cursors/CTAs) and `blink-soft` (ease-in-out fade, for persistent chrome like the navbar cursor). |
-| `src/contexts/ThemeContext.tsx`          | Dark/light theme. Reads `prefers-color-scheme` as default; persists override in `localStorage` under key `cj-portfolio-theme`. Applies `data-theme` attribute to `<html>`.                                                                            |
-| `src/contexts/ScrollProgressContext.tsx` | One shared rAF loop writing `--p` (0→1) onto registered scene elements. Used by Labs SceneText for entry animations.                                                                                                                                  |
-| `src/pages/Contact/index.tsx`            | Has `FORMSPREE_ID` constant at the top — set it to enable direct email.                                                                                                                                                                               |
-| `src/utils/haptics.ts`                   | Thin wrapper around `navigator.vibrate` + stub for future haptic patterns. Import `haptics` and call `.tap()`, `.press()`, `.toggle()`, `.reveal()`.                                                                                                  |
-| `src/components/Magic8Ball/index.tsx`    | Self-contained pixel-art oracle game. Lives in **Labs → magic8ball toy scene**. See §Magic8Ball below.                                                                                                                                                |
-| `src/components/TVScreen/index.tsx`      | Channel host FSM (`live` / `static`). `GAME_MAP` here maps `GameKey → Component`. Add new TV games here.                                                                                                                                              |
+| `src/contexts/ThemeContext.tsx`          | Dark/light theme. Reads `prefers-color-scheme` as default; persists override in `localStorage` under key `cj-portfolio-theme`. Applies `data-theme` attribute to `<html>`.                                                                                                                                                      |
+| `src/contexts/ScrollProgressContext.tsx` | One shared rAF loop writing `--p` (0→1) onto registered scene elements. Used by Labs SceneText for entry animations.                                                                                                                                                                                                            |
+| `src/pages/Contact/index.tsx`            | Has `FORMSPREE_ID` constant at the top — set it to enable direct email.                                                                                                                                                                                                                                                         |
+| `src/utils/haptics.ts`                   | Thin wrapper around `navigator.vibrate` + stub for future haptic patterns. Import `haptics` and call `.tap()`, `.press()`, `.toggle()`, `.reveal()`.                                                                                                                                                                            |
+| `src/components/Magic8Ball/index.tsx`    | Self-contained pixel-art oracle game. Lives in **Labs → magic8ball toy scene**. See §Magic8Ball below.                                                                                                                                                                                                                          |
+| `src/components/TVScreen/index.tsx`      | Channel host FSM (`live` / `static`). `GAME_MAP` here maps `GameKey → Component`. Add new TV games here.                                                                                                                                                                                                                        |
 
 ---
 
@@ -323,7 +323,7 @@ On mobile (`useIsMobile()` true):
 
 - `Labs/index.tsx` **does not render** the shared `.tv-zone__right` CRT (gated by `!isMobile`), so it can't scroll away.
 - `SceneText` hides the inline `CodePanel` and renders two buttons: **`</> SHOW CODE`** (all experiments) and **`▶ SEE IN ACTION`** (only `device === 'HH'`).
-- **`device: 'HH'`** (Snake, Pong, Dino) → "See in Action" opens `Handheld` — a brick-game console modal that mounts the *real* game in its screen and drives it via `controlRef`. Buttons come from `experiment.controls` (`'dpad' | 'updown' | 'single'`). START/STOP = pause/resume (`active`), POWER (`OFF`) closes the modal.
+- **`device: 'HH'`** (Snake, Pong, Dino) → "See in Action" opens `Handheld` — a brick-game console modal that mounts the _real_ game in its screen and drives it via `controlRef`. Buttons come from `experiment.controls` (`'dpad' | 'updown' | 'single'`). START/STOP = pause/resume (`active`), POWER (`OFF`) closes the modal.
 - **`device: 'TV'`** (LinkPreview) → renders a single-channel inline `<TVSet activeChannel={exp.channel}>` inside `TVBlogScene` (`.tv-blog-scene__mobile-tv`). It's already touch-friendly (paste a URL), so no handheld.
 - **`device: 'NONE'`** (Magic8Ball, Gacha) → the toy renders inline in `ToyScene` exactly as before (already tap-driven). Only "Show Code" is added.
 - `LabsRail` → still `display: none`.
@@ -344,34 +344,16 @@ New mobile components (each own folder + `style.css`):
 
 ## About page — scroll-snap internals
 
-The experience journey uses a **nested scroll container** (`div.journey-scroll`),
-not the document scroll. This has two important consequences:
+The About experience now uses a **single full-height snap stage** (`.about-stage`) on the page itself. The intro section and each experience card are treated as snap sections, and the page scrolls through them in one continuous flow.
 
-1. **`scrollIntoView` will not work** for programmatic scrolling to cards.
-   Use `container.scrollTo({ top: cardRect - containerRect + scrollTop, behavior: 'smooth' })`.
-   The `scrollToCard` function in `About.tsx` implements this correctly.
+Key behaviors:
 
-2. **IntersectionObserver must use `root: journeyRef.current`** (the scroll
-   container), not the default viewport root. Otherwise `activeIdx` will never
-   update past 0 and achievements for Delhivery/Classplus won't appear.
-
-3. **`ref` on `ExperienceCard` requires `forwardRef`**. React 18 silently drops
-   `ref` passed as a plain prop to a function component. `ExperienceCard` is
-   wrapped in `React.forwardRef` — keep it that way. Do not refactor it back
-   to a regular function with a `cardRef` plain prop without testing.
-
-4. **Card height must be exactly `100%`** of the `journey-scroll` container
-   (which is `height: calc(100vh - 56px)`). `min-height: 100%` breaks snap
-   because the container can't identify fixed snap targets.
-
-5. **Dock-before-scroll (desktop):** a `scroll`/`resize` effect in `About`
-   toggles `journey-scroll`'s inline `overflow-y` — `hidden` until the container
-   is docked under the sticky `.journey-header` (so the wheel bubbles to the page
-   and finishes scrolling the section into view), then `scroll` so the cards take
-   over. Without this the nested container "captures" the wheel while the intro
-   is still visible. The effect clears the inline style on mobile so the
-   `overflow-y: visible` media query wins. `scrollToCard` also docks the section
-   (via `window.scrollTo`) before placing a card when a tab is clicked undocked.
+1. The intro section should fill the viewport height (`min-height: calc(100dvh - 56px)`) so it feels like a true first screen.
+2. The page-level scroll container uses `scroll-snap-type: y mandatory` on `.about-stage`; each section uses `scroll-snap-align: start`.
+3. Programmatic section jumps use the stage container directly via `container.scrollTo({ top: target.offsetTop, behavior: "smooth" })` rather than `scrollIntoView`.
+4. `IntersectionObserver` watches the intro and each card section from the same root container so `activeIdx` updates as the user scrolls through the page.
+5. The journey progress rail is shown for the intro and every experience card. Its tooltip appears only for the active section, with a 1s delay after the section becomes active and a 2s display duration before it hides again.
+6. The old separate journey header and nested journey scroller were removed; the progress rail now serves as the primary section navigator.
 
 ---
 
@@ -393,6 +375,7 @@ main.home-page
 ```
 
 Key rules:
+
 - `.home-page`: `height: calc(100vh−56px); overflow: hidden` — clips the snap container to the viewport.
 - `.home-snap__section`: `height: calc(100vh−56px); scroll-snap-align: start; scroll-snap-stop: always; z-index: 1`. **Never `min-height`** — that breaks snap.
 - `scrollDown` (the ▼ scroll prompt) calls `snapRef.current.scrollTo({ top: snapRef.current.clientHeight, behavior: "smooth" })`. Do **not** use `scrollIntoView` — it doesn't work on a nested scroll container.
@@ -414,6 +397,7 @@ Unchanged two-column layout: text left, avatar right. The floating deco (`div.he
 `.home-cta-section`: centered flex column with `PRESS START` pixel-screen, `▶ VIEW EXPERIENCE` button, and a 4-card nav grid (`.home-nav-grid`).
 
 Nav grid:
+
 - `grid-template-columns: repeat(4, 1fr); max-width: 720px` on desktop
 - `repeat(2, 1fr)` on mobile (≤768px)
 - Each `.home-nav-card` links to `/about`, `/labs`, `/blogs`, `/contact` with a `pixel-text` number, title, and short description.
@@ -497,17 +481,17 @@ Single place that lists every spot where mobile diverges from desktop. **Detail
 lives in each feature's own section; this is the lookup.** "Mobile" is whatever
 `useIsMobile()` matches — `(max-width: 768px) OR ((pointer: coarse) and (max-width: 899px))` — and the relevant CSS media queries use the **same** string so JS and CSS flip together.
 
-| Area | Desktop | Mobile exception | Where |
-| --- | --- | --- | --- |
-| **Labs interactive surface** | Shared sticky CRT cycles channels; inline `CodePanel` under each scene | Shared CRT not rendered. Per-experiment `device` routes it: `HH` → `</> SHOW CODE` + `▶ SEE IN ACTION` buttons; `TV` → inline single-channel CRT; `NONE` → toy inline. See §Mobile experience. | `Labs/index.tsx`, `SceneText`, `labs.ts` (`device`/`controls`) |
-| **Show Code** | Inline `CodePanel` | `CodePopup` modal — iOS-style zoom open + animated close | `CodePopup/` |
-| **See in Action (HH games)** | Game plays in the CRT, keyboard input | `Handheld` console modal; touch D-pad/up-down/single drives the real game via `controlRef`; START/STOP = pause/resume, POWER = close | `Handheld/`, `games/*` `GameHandle` |
-| **Toy scenes** | text left / toy right, mirrors TV zone | inner stacks; toy re-centred (`align-self: center`, `flex: none`) | `Labs/style.css` |
-| **LabsRail** | left floating pill index | `display: none` (no section nav) | `LabsRail/style.css` |
-| **Labs scroll-snap** | `scroll-snap-type: y mandatory`, nested scroll container | snap off; `.labs-stage` `overflow: visible`, sections stack | `Labs/style.css` |
-| **Home snap-scroll** | 3-section `div.home-snap` nested scroll container with `scroll-snap-type: y mandatory`; hero deco `position: fixed` | snap off (`scroll-snap-type: none`); sections stack with `min-height: 100svh`; deco reverts to `position: absolute` | `Home/style.css` |
-| **Home hero CTAs** | RESUME + VIEW JOURNEY + HIRE ME | only **↓ RESUME**; others hidden via `.hero__ctas .btn:not(.btn--resume)` | `Home/style.css` |
-| **About journey** | nested scroll-snap journey + right-side `journey-progress` dots | snap disabled, cards stack; progress dots hidden `≤900px` | `About/`, `JourneyProgress` |
+| Area                         | Desktop                                                                                                             | Mobile exception                                                                                                                                                                               | Where                                                          |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| **Labs interactive surface** | Shared sticky CRT cycles channels; inline `CodePanel` under each scene                                              | Shared CRT not rendered. Per-experiment `device` routes it: `HH` → `</> SHOW CODE` + `▶ SEE IN ACTION` buttons; `TV` → inline single-channel CRT; `NONE` → toy inline. See §Mobile experience. | `Labs/index.tsx`, `SceneText`, `labs.ts` (`device`/`controls`) |
+| **Show Code**                | Inline `CodePanel`                                                                                                  | `CodePopup` modal — iOS-style zoom open + animated close                                                                                                                                       | `CodePopup/`                                                   |
+| **See in Action (HH games)** | Game plays in the CRT, keyboard input                                                                               | `Handheld` console modal; touch D-pad/up-down/single drives the real game via `controlRef`; START/STOP = pause/resume, POWER = close                                                           | `Handheld/`, `games/*` `GameHandle`                            |
+| **Toy scenes**               | text left / toy right, mirrors TV zone                                                                              | inner stacks; toy re-centred (`align-self: center`, `flex: none`)                                                                                                                              | `Labs/style.css`                                               |
+| **LabsRail**                 | left floating pill index                                                                                            | `display: none` (no section nav)                                                                                                                                                               | `LabsRail/style.css`                                           |
+| **Labs scroll-snap**         | `scroll-snap-type: y mandatory`, nested scroll container                                                            | snap off; `.labs-stage` `overflow: visible`, sections stack                                                                                                                                    | `Labs/style.css`                                               |
+| **Home snap-scroll**         | 3-section `div.home-snap` nested scroll container with `scroll-snap-type: y mandatory`; hero deco `position: fixed` | snap off (`scroll-snap-type: none`); sections stack with `min-height: 100svh`; deco reverts to `position: absolute`                                                                            | `Home/style.css`                                               |
+| **Home hero CTAs**           | RESUME + VIEW JOURNEY + HIRE ME                                                                                     | only **↓ RESUME**; others hidden via `.hero__ctas .btn:not(.btn--resume)`                                                                                                                      | `Home/style.css`                                               |
+| **About journey**            | nested scroll-snap journey + right-side `journey-progress` dots                                                     | snap disabled, cards stack; progress dots hidden `≤900px`                                                                                                                                      | `About/`, `JourneyProgress`                                    |
 
 When you add a new mobile divergence, add a row here **and** document the detail in the feature's own section.
 

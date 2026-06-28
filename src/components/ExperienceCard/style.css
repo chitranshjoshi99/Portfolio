@@ -5,7 +5,8 @@
 .exp-card {
   scroll-snap-align: start;
   scroll-snap-stop: always;
-  height: 100%; /* 100% of journey-scroll = 100vh - 56px */
+  min-height: calc(100dvh - 56px);
+  height: calc(100dvh - 56px);
   display: flex;
   flex-direction: column;
   justify-content: center;

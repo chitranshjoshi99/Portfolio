@@ -5,224 +5,138 @@ import JourneyProgress from "../../components/JourneyProgress";
 import { PERSON, EXPERIENCE, EDUCATION, SKILLS } from "../../data/resume";
 import "./style.css";
 
-// Breakpoint that matches the CSS rule that disables scroll-snap
-const MOBILE_BP = 900;
-
 export default function About() {
   const [activeIdx, setActiveIdx] = useState(0);
-  const cardRefs = useRef<(HTMLElement | null)[]>([null, null, null]);
-  const journeyRef = useRef<HTMLDivElement>(null);
-
-  // Track whether we're on mobile so we pick the correct IntersectionObserver root.
-  // On desktop the cards live inside a nested scroll container (journeyRef) so we
-  // must pass root: container — otherwise the viewport-root observer never fires.
-  // On mobile scroll-snap is disabled and the document scrolls, so root must be
-  // null (viewport). We listen to matchMedia so it stays correct on resize.
-  const [isMobile, setIsMobile] = useState(
-    () => window.innerWidth <= MOBILE_BP,
-  );
+  const stageRef = useRef<HTMLDivElement>(null);
+  const sectionRefs = useRef<(HTMLElement | null)[]>([
+    null,
+    ...Array(EXPERIENCE.length).fill(null),
+  ]);
 
   useEffect(() => {
-    const mq = window.matchMedia(`(max-width: ${MOBILE_BP}px)`);
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-
-  useEffect(() => {
-    const container = journeyRef.current;
+    const container = stageRef.current;
     if (!container) return;
 
-    // root: null → viewport (mobile, document scroll)
-    // root: container → nested scroll box (desktop)
-    const root = isMobile ? null : container;
-    const observers: IntersectionObserver[] = [];
+    const sectionIndexMap = new WeakMap<HTMLElement, number>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleEntry = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
 
-    cardRefs.current.forEach((el, i) => {
+        if (!visibleEntry) return;
+
+        const index = sectionIndexMap.get(visibleEntry.target as HTMLElement);
+        if (typeof index === "number") setActiveIdx(index);
+      },
+      { root: container, threshold: [0.35, 0.6, 0.8] },
+    );
+
+    sectionRefs.current.forEach((el, index) => {
       if (!el) return;
-      const obs = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) setActiveIdx(i);
-        },
-        { root, threshold: 0.5 },
-      );
-      obs.observe(el);
-      observers.push(obs);
+      sectionIndexMap.set(el, index);
+      observer.observe(el);
     });
 
-    return () => observers.forEach((o) => o.disconnect());
-  }, [isMobile]); // rebuild observers whenever mobile/desktop flips
+    return () => observer.disconnect();
+  }, []);
 
-  // ── Dock-before-scroll ────────────────────────────────────────
-  // Desktop: keep the nested card-scroll LOCKED until the journey section is
-  // docked — i.e. the sticky `.journey-header` is pinned under the navbar, which
-  // means the intro has scrolled away. Until then the inner container would
-  // "capture" the wheel and advance cards while the intro is still on screen.
-  // The header has `top: 56px`, so once pinned its rect.top === 56; while the
-  // intro is visible it's > 56. Undocked → overflow:hidden (wheel bubbles to the
-  // page so it docks first); docked → overflow:scroll (cards scroll). Scrolling
-  // up past the first card chains back to the page and un-docks.
-  useEffect(() => {
-    const container = journeyRef.current;
-    if (!container) return;
-    if (isMobile) {
-      container.style.overflowY = ""; // let the mobile CSS (visible) win
-      return;
-    }
-    const header = document.querySelector<HTMLElement>(".journey-header");
+  const scrollToSection = (index: number) => {
+    const container = stageRef.current;
+    const target = sectionRefs.current[index];
+    if (!container || !target) return;
 
-    const sync = () => {
-      const docked = !header || header.getBoundingClientRect().top <= 57;
-      const want = docked ? "scroll" : "hidden";
-      if (container.style.overflowY !== want) container.style.overflowY = want;
-    };
+    container.scrollTo({ top: target.offsetTop, behavior: "smooth" });
+  };
 
-    sync();
-    window.addEventListener("scroll", sync, { passive: true });
-    window.addEventListener("resize", sync);
-    return () => {
-      window.removeEventListener("scroll", sync);
-      window.removeEventListener("resize", sync);
-    };
-  }, [isMobile]);
+  const progressItems = [
+    {
+      id: "intro",
+      company: "PROFILE",
+      accentHex: "var(--accent-primary)",
+      period: "ABOUT",
+    },
+    ...EXPERIENCE.map((exp) => ({
+      id: exp.id,
+      company: exp.company,
+      accentHex: exp.accentHex,
+      period: exp.period,
+    })),
+  ];
 
-  // Scroll within journey-scroll (scrollIntoView scrolls the document, not the container)
-  const scrollToCard = (i: number) => {
-    const container = journeyRef.current;
-    const card = cardRefs.current[i];
-    if (!container || !card) return;
-
-    const cardTop =
-      card.getBoundingClientRect().top -
-      container.getBoundingClientRect().top +
-      container.scrollTop;
-
-    // Desktop: if not docked, pin the header under the navbar first (so the inner
-    // scroll is visible), then place the card.
-    if (!isMobile) {
-      const header = document.querySelector<HTMLElement>(".journey-header");
-      if (header && header.getBoundingClientRect().top > 57) {
-        const targetWinY =
-          header.getBoundingClientRect().top + window.scrollY - 56;
-        container.style.overflowY = "scroll";
-        container.scrollTop = cardTop;
-        window.scrollTo({ top: targetWinY, behavior: "smooth" });
-        return;
-      }
-    }
-
-    container.scrollTo({ top: cardTop, behavior: "smooth" });
+  const setSectionRef = (index: number) => (el: HTMLElement | null) => {
+    sectionRefs.current[index] = el;
   };
 
   return (
     <main className="about-page" id="main-content">
-      {/* ── Profile intro ──────────────────────────────────── */}
-      <section className="about-intro" aria-label="About Chitransh">
-        <div className="container about-intro__inner">
-          <div className="about-intro__text">
-            <p className="about-intro__label pixel-text">// PLAYER_PROFILE</p>
-            <h1 className="about-intro__name pixel-text">{PERSON.name}</h1>
-            <p className="about-intro__role vt-text">{PERSON.tagline}</p>
-            <p className="about-intro__bio">{PERSON.bio}</p>
+      <div className="about-stage" ref={stageRef}>
+        <section
+          className="about-intro"
+          aria-label="About Chitransh"
+          ref={setSectionRef(0)}
+        >
+          <div className="container about-intro__inner">
+            <div className="about-intro__text">
+              <p className="about-intro__label pixel-text">// PLAYER_PROFILE</p>
+              <h1 className="about-intro__name pixel-text">{PERSON.name}</h1>
+              <p className="about-intro__role vt-text">{PERSON.tagline}</p>
+              <p className="about-intro__bio">{PERSON.bio}</p>
 
-            <div className="edu-card">
-              <span className="edu-card__icon" aria-hidden="true">
-                🎓
-              </span>
-              <div>
-                <p className="edu-card__degree pixel-text">
-                  {EDUCATION.degree}
-                </p>
-                <p className="edu-card__school">
-                  {EDUCATION.school} · {EDUCATION.period}
-                </p>
+              <div className="edu-card">
+                <span className="edu-card__icon" aria-hidden="true">
+                  🎓
+                </span>
+                <div>
+                  <p className="edu-card__degree pixel-text">
+                    {EDUCATION.degree}
+                  </p>
+                  <p className="edu-card__school">
+                    {EDUCATION.school} · {EDUCATION.period}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="about-intro__stats">
+              <p className="pixel-text about-intro__stats-title">SKILL_TREE</p>
+              <div className="about-stats-grid">
+                {SKILLS.slice(0, 6).map((s, i) => (
+                  <XPBar
+                    key={s.label}
+                    label={s.label}
+                    value={s.xp}
+                    color={
+                      s.category === "frontend"
+                        ? "var(--accent-primary)"
+                        : s.category === "data"
+                          ? "var(--nivoda-gold)"
+                          : s.category === "backend"
+                            ? "var(--delhivery-red)"
+                            : "var(--classplus-purple)"
+                    }
+                    delay={i * 70}
+                  />
+                ))}
               </div>
             </div>
           </div>
+        </section>
 
-          <div className="about-intro__stats">
-            <p className="pixel-text about-intro__stats-title">SKILL_TREE</p>
-            <div className="about-stats-grid">
-              {SKILLS.slice(0, 6).map((s, i) => (
-                <XPBar
-                  key={s.label}
-                  label={s.label}
-                  value={s.xp}
-                  color={
-                    s.category === "frontend"
-                      ? "var(--accent-primary)"
-                      : s.category === "data"
-                        ? "var(--nivoda-gold)"
-                        : s.category === "backend"
-                          ? "var(--delhivery-red)"
-                          : "var(--classplus-purple)"
-                  }
-                  delay={i * 70}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Journey heading + company tab nav ─────────────── */}
-      <div className="journey-header">
-        <div className="container journey-header__inner">
-          <div className="journey-header__titles">
-            <h2 className="pixel-text journey-header__title">
-              <span className="journey-header__prefix">// </span>
-              EXPERIENCE.map()
-            </h2>
-            <p className="journey-header__sub">
-              Three companies. Five years. Scroll through.
-            </p>
-          </div>
-
-          <nav className="journey-tabs" aria-label="Jump to experience">
-            {EXPERIENCE.map((exp, i) => (
-              <button
-                key={exp.id}
-                className={`journey-tab ${activeIdx === i ? "journey-tab--active" : ""}`}
-                style={{ "--tab-color": exp.accentHex } as React.CSSProperties}
-                onClick={() => scrollToCard(i)}
-                aria-label={`Go to ${exp.company}`}
-                aria-current={activeIdx === i ? "true" : undefined}
-              >
-                <span className="journey-tab__num pixel-text">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <span className="journey-tab__name pixel-text">
-                  {exp.company}
-                </span>
-                <span className="journey-tab__period">
-                  {exp.period.split("–")[0].trim()}
-                </span>
-              </button>
-            ))}
-          </nav>
-        </div>
-      </div>
-
-      {/* ── Scroll-snap cards + progress dots ─────────────── */}
-      <div className="journey-scroll-wrap">
-        <div className="journey-scroll" ref={journeyRef}>
-          {EXPERIENCE.map((exp, i) => (
-            <ExperienceCard
-              key={exp.id}
-              exp={exp}
-              index={i}
-              isActive={activeIdx === i}
-              ref={(el: HTMLElement | null) => {
-                cardRefs.current[i] = el;
-              }}
-            />
-          ))}
-        </div>
+        {EXPERIENCE.map((exp, i) => (
+          <ExperienceCard
+            key={exp.id}
+            exp={exp}
+            index={i}
+            isActive={activeIdx === i + 1}
+            ref={setSectionRef(i + 1)}
+          />
+        ))}
 
         <JourneyProgress
-          experiences={EXPERIENCE}
+          items={progressItems}
           activeIdx={activeIdx}
-          onDotClick={scrollToCard}
+          onDotClick={scrollToSection}
         />
       </div>
     </main>

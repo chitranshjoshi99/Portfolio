@@ -3,7 +3,7 @@
    ============================================================ */
 
 .journey-progress {
-  position: absolute;
+  position: fixed;
   right: 20px;
   top: 50%;
   transform: translateY(-50%);
@@ -133,7 +133,7 @@
 }
 
 .jp-dot:hover .jp-dot__tooltip,
-.jp-dot--active .jp-dot__tooltip {
+.jp-dot--revealed .jp-dot__tooltip {
   opacity: 1;
 }
 

@@ -32,6 +32,10 @@
 .labs-section {
   height: calc(100vh - 56px);
   scroll-snap-align: start;
+  /* Prevent fast wheel/momentum from skipping past this snap target */
+  scroll-snap-stop: always;
+  /* Make programmatic/smooth scrolling behave consistently */
+  scroll-behavior: smooth;
   display: flex;
   align-items: center;
   justify-content: center;
