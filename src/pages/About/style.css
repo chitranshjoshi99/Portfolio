@@ -118,4 +118,12 @@
   .about-intro__inner {
     grid-template-columns: 1fr;
   }
+
+  .edu-card {
+    display: none;
+  }
+
+  .about-stage {
+    scroll-snap-type: unset;
+  }
 }
