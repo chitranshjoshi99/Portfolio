@@ -145,7 +145,7 @@ export default function Home() {
                 <a
                   href={asset("/resume.pdf")}
                   download="ChitranshJoshi-Resume.pdf"
-                  className="btn btn--resume pixel-text"
+                  className="btn btn--primary btn--resume pixel-text"
                   aria-label="Download resume PDF"
                   onClick={() => haptics.press()}
                 >

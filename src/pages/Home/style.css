@@ -460,6 +460,11 @@
   font-family: var(--font-body);
 }
 
+@media (min-width: 768px) {
+  .btn--resume {
+    display: none !important; /* Resume download is only shown on mobile, where the other CTAs are hidden */
+  }
+}
 /* ── RESPONSIVE ────────────────────────────────────────────── */
 
 @media (max-width: 768px) {

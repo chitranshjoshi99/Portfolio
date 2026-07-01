@@ -109,10 +109,15 @@
   --border-accent: var(--accent-primary);
 
   /* Accent */
-  --accent-primary: #7a6e8e; /* muted purple-slate */
+  --accent-primary: #3e3614; /* muted purple-slate */
   --accent-secondary: #9e8562; /* nivoda gold */
   --accent-tertiary: #b87a72; /* delhivery coral */
-  --accent-glow: rgba(122, 110, 142, 0.28); /* stronger wash (was 0.15) so outline/glow buttons read against sky blue */
+  --accent-glow: rgba(
+    122,
+    110,
+    142,
+    0.28
+  ); /* stronger wash (was 0.15) so outline/glow buttons read against sky blue */
 
   /* Pixel shadow — tied to accent-primary (not the old cream-toned grey) so it reads intentional against the sky-blue background */
   --shadow-color: color-mix(in srgb, var(--accent-primary) 55%, white);

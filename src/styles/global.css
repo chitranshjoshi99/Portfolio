@@ -63,6 +63,7 @@ body {
 
   /* Subtle scanline overlay — the pixel-art texture */
   position: relative;
+  user-select: none;
 }
 
 body::before {
@@ -317,6 +318,14 @@ pre {
 }
 
 .btn--primary {
+  --btn-shadow: var(--border-primary);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border-color: var(--border-primary);
+  box-shadow: var(--px) var(--px) 0 var(--btn-shadow);
+}
+
+.btn--primary:hover {
   --btn-shadow: var(--accent-primary);
   background: var(--accent-primary);
   color: var(--text-inverse);
@@ -324,20 +333,12 @@ pre {
   box-shadow: var(--px) var(--px) 0 var(--btn-shadow);
 }
 
-.btn--primary:hover {
-  --btn-shadow: var(--accent-secondary);
-  background: var(--accent-secondary);
-  border-color: var(--accent-secondary);
-  box-shadow: var(--px) var(--px) 0 var(--btn-shadow);
-  color: var(--text-inverse);
-}
-
 .btn--outline {
-  --btn-shadow: var(--border-primary);
-  background: transparent;
-  color: var(--accent-primary);
-  border-color: var(--accent-primary);
-  box-shadow: var(--px) var(--px) 0 var(--btn-shadow);
+  --btn-shadow: var(--border-secondary);
+  /* background: transparent; */
+  color: var(--text-secondary);
+  border-color: var(--border-primary);
+  box-shadow: var(--px) var(--px) 0 var(--accent-glow);
 }
 
 .btn--outline:hover {
@@ -366,19 +367,19 @@ pre {
   font-size: 10px;
 }
 
-.btn--resume {
+/* .btn--resume {
   --btn-shadow: var(--delhivery-red);
   background: transparent;
   color: var(--delhivery-red);
   border-color: var(--delhivery-red);
   box-shadow: var(--px) var(--px) 0 var(--btn-shadow);
-}
+} */
 
-.btn--resume:hover {
+/* .btn--resume:hover {
   background: color-mix(in srgb, var(--delhivery-red) 12%, transparent);
   color: var(--delhivery-red);
   box-shadow: var(--px) var(--px) 0 var(--btn-shadow);
-}
+} */
 
 /* 3D press animation for programmatic triggers (ENTER key on CTA) */
 @keyframes btn-press {
