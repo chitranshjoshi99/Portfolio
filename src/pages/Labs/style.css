@@ -40,7 +40,6 @@
   align-items: center;
   justify-content: center;
   width: 95%;
-  background: var(--bg-primary);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -146,8 +145,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--px6);
-  /* Unified background — no color separation */
-  background: var(--bg-primary);
+  /* Unified background — no color separation; shared SpaceBackground shows through in dark theme */
 }
 
 /* ── TV Blog Scene (text for one channel) ────────────────────── */

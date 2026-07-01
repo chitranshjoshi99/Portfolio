@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 import type { GameAction, GameProps } from "../types";
+import { useTheme } from "../../../contexts/ThemeContext";
 import "./style.css";
 
 const CW = 280;
@@ -126,7 +127,7 @@ function physics(s: PongState, dt: number) {
   }
 }
 
-function draw(ctx: CanvasRenderingContext2D, s: PongState) {
+function draw(ctx: CanvasRenderingContext2D, s: PongState, accent: string) {
   ctx.fillStyle = "#0c0a0e";
   ctx.fillRect(0, 0, CW, CH);
 
@@ -155,13 +156,22 @@ function draw(ctx: CanvasRenderingContext2D, s: PongState) {
   ctx.fillRect(CW - 8 - PAD_W, s.padR, PAD_W, PAD_H);
 
   // Ball
-  ctx.fillStyle = "#9b8ea0";
+  ctx.fillStyle = accent;
   ctx.fillRect(s.ball.x, s.ball.y, BALL, BALL);
 }
+
+// Mirrors --accent-primary's dark/light token values (canvas can't read CSS vars directly).
+const ACCENT_DARK = "#9b8ea0";
+const ACCENT_LIGHT = "#7a6e8e";
 
 export function Pong({ active, controlRef }: GameProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef<PongState>(initState());
+  const { isDark } = useTheme();
+  const accentRef = useRef(isDark ? ACCENT_DARK : ACCENT_LIGHT);
+  useEffect(() => {
+    accentRef.current = isDark ? ACCENT_DARK : ACCENT_LIGHT;
+  }, [isDark]);
 
   // Held-input setter shared by keyboard + the Handheld touch pad.
   const setKey = useCallback((action: GameAction, down: boolean) => {
@@ -228,7 +238,7 @@ export function Pong({ active, controlRef }: GameProps) {
         physics(stateRef.current, STEP);
         acc -= STEP;
       }
-      draw(ctx!, stateRef.current);
+      draw(ctx!, stateRef.current, accentRef.current);
     }
 
     raf = requestAnimationFrame(loop);

@@ -427,6 +427,18 @@ pre {
 }
 
 /* ============================================================
+   CUSTOM CURSOR (CursorRocket) — hide native cursor everywhere.
+   Overrides all `cursor: pointer/default/not-allowed` set throughout
+   the app (buttons, links, disabled states, etc).
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  cursor: none !important;
+}
+
+/* ============================================================
    REDUCED MOTION
    ============================================================ */
 

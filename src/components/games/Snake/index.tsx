@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 import type { GameAction, GameProps } from "../types";
+import { useTheme } from "../../../contexts/ThemeContext";
 import "./style.css";
 
 const GRID = 20;
@@ -67,7 +68,12 @@ function step(s: SnakeState) {
   }
 }
 
-function draw(ctx: CanvasRenderingContext2D, s: SnakeState, started: boolean) {
+function draw(
+  ctx: CanvasRenderingContext2D,
+  s: SnakeState,
+  started: boolean,
+  accent: string,
+) {
   ctx.fillStyle = "#0c0a0e";
   ctx.fillRect(0, 0, W, H);
 
@@ -80,7 +86,7 @@ function draw(ctx: CanvasRenderingContext2D, s: SnakeState, started: boolean) {
   }
 
   // Food
-  ctx.fillStyle = "#9b8ea0";
+  ctx.fillStyle = accent;
   ctx.fillRect(s.food[0] * CELL + 1, s.food[1] * CELL + 1, CELL - 2, CELL - 2);
 
   // Snake
@@ -92,7 +98,7 @@ function draw(ctx: CanvasRenderingContext2D, s: SnakeState, started: boolean) {
   // Score strip
   ctx.fillStyle = "rgba(0,0,0,0.75)";
   ctx.fillRect(0, 0, W, 14);
-  ctx.fillStyle = "#9b8ea0";
+  ctx.fillStyle = accent;
   ctx.font = '8px "Press Start 2P"';
   ctx.textBaseline = "top";
   ctx.fillText(`${s.score}`, 4, 3);
@@ -123,10 +129,19 @@ function draw(ctx: CanvasRenderingContext2D, s: SnakeState, started: boolean) {
   }
 }
 
+// Mirrors --accent-primary's dark/light token values (canvas can't read CSS vars directly).
+const ACCENT_DARK = "#9b8ea0";
+const ACCENT_LIGHT = "#7a6e8e";
+
 export function Snake({ active, controlRef }: GameProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef<SnakeState>(init());
   const startedRef = useRef(false);
+  const { isDark } = useTheme();
+  const accentRef = useRef(isDark ? ACCENT_DARK : ACCENT_LIGHT);
+  useEffect(() => {
+    accentRef.current = isDark ? ACCENT_DARK : ACCENT_LIGHT;
+  }, [isDark]);
 
   // Shared input handler — used by both keyboard and the Handheld touch pad.
   // Only reads refs, so it's stable across renders.
@@ -212,7 +227,7 @@ export function Snake({ active, controlRef }: GameProps) {
         step(stateRef.current);
         last = now;
       }
-      draw(ctx!, stateRef.current, startedRef.current);
+      draw(ctx!, stateRef.current, startedRef.current, accentRef.current);
     }
 
     raf = requestAnimationFrame(loop);

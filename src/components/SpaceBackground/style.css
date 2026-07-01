@@ -1,0 +1,135 @@
+/* Fixed, app-wide background scene — dark shows space, light shows sky.
+   Sits at var(--z-bg) (negative) so it paints behind all normal in-flow
+   page content without any page needing explicit positioning. */
+.space-bg {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-bg);
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.space-bg--dark {
+  background: #05040a; /* ponytail: one-off near-black space color, not worth a token for a single use */
+}
+
+.space-bg--light {
+  background: #bfe3f5; /* ponytail: one-off soft sky blue, muted so it doesn't fight foreground contrast */
+}
+
+.space-bg__star {
+  position: absolute;
+  left: var(--star-x);
+  top: var(--star-y);
+  width: var(--star-size);
+  height: var(--star-size);
+  background: var(--text-secondary);
+  opacity: 0.5;
+}
+
+.space-bg__star--twinkle {
+  animation: space-bg-twinkle var(--star-dur, 3s) ease-in-out var(--star-delay, 0s)
+    infinite;
+}
+
+.space-bg--reduced-motion .space-bg__star--twinkle {
+  animation: none;
+  opacity: 0.5;
+}
+
+@keyframes space-bg-twinkle {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+.space-bg__moon {
+  position: absolute;
+  top: 12%;
+  right: 10%;
+  width: 64px;
+  height: 64px;
+  fill: var(--accent-secondary);
+  opacity: 0.6;
+}
+
+.space-bg__moon-crater {
+  fill: var(--bg-primary);
+  opacity: 0.35;
+}
+
+@media (max-width: 480px) {
+  .space-bg__moon {
+    width: 44px;
+    height: 44px;
+    top: 8%;
+  }
+}
+
+.space-bg__sun {
+  position: absolute;
+  top: 10%;
+  right: 12%;
+  width: 72px;
+  height: 72px;
+  fill: var(--nivoda-gold);
+  opacity: 0.75;
+  animation: space-bg-sun-glow 5s ease-in-out infinite;
+}
+
+.space-bg--reduced-motion .space-bg__sun {
+  animation: none;
+  opacity: 0.75;
+}
+
+@keyframes space-bg-sun-glow {
+  0%,
+  100% {
+    opacity: 0.65;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+.space-bg__cloud {
+  position: absolute;
+  left: var(--cloud-x);
+  top: var(--cloud-y);
+  width: calc(96px * var(--cloud-scale, 1));
+  height: calc(48px * var(--cloud-scale, 1));
+  fill: var(--bg-card);
+  opacity: 0.8;
+  animation: space-bg-cloud-drift 18s ease-in-out var(--cloud-delay, 0s) infinite;
+}
+
+.space-bg--reduced-motion .space-bg__cloud {
+  animation: none;
+}
+
+@keyframes space-bg-cloud-drift {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(12px);
+  }
+}
+
+@media (max-width: 480px) {
+  .space-bg__sun {
+    width: 50px;
+    height: 50px;
+    top: 6%;
+  }
+
+  .space-bg__cloud {
+    width: calc(64px * var(--cloud-scale, 1));
+    height: calc(32px * var(--cloud-scale, 1));
+  }
+}

@@ -78,9 +78,11 @@
   --shadow-pixel-lg: 8px 8px 0px var(--shadow-color);
 
   /* ---------- Z-INDEX ---------- */
+  --z-bg: -1; /* intentionally negative: fixed space background paints behind all in-flow content (CSS stacking rule) without every page needing explicit position/z-index */
   --z-nav: 100;
   --z-overlay: 200;
   --z-modal: 300;
+  --z-cursor: 400; /* must render above modals (Handheld, CodePopup use --z-modal) */
 }
 
 /* ============================================================
@@ -97,12 +99,12 @@
 
   /* Text */
   --text-primary: #2a2520; /* warm near-black */
-  --text-secondary: #5c5852; /* muted mid */
-  --text-muted: #9e9690;
+  --text-secondary: #4f4b45; /* muted mid — darkened vs cream-tuned #5c5852 for contrast against the sky background */
+  --text-muted: #7d766f; /* darkened vs cream-tuned #9e9690 — was too low-contrast on sky blue */
   --text-inverse: #f5f3ef;
 
   /* Borders */
-  --border-primary: #c8c3ba;
+  --border-primary: #b3ad9f; /* darkened vs cream-tuned #c8c3ba so borders stay visible on sky-blue background */
   --border-secondary: #e0dbd3;
   --border-accent: var(--accent-primary);
 
@@ -110,10 +112,10 @@
   --accent-primary: #7a6e8e; /* muted purple-slate */
   --accent-secondary: #9e8562; /* nivoda gold */
   --accent-tertiary: #b87a72; /* delhivery coral */
-  --accent-glow: rgba(122, 110, 142, 0.15);
+  --accent-glow: rgba(122, 110, 142, 0.28); /* stronger wash (was 0.15) so outline/glow buttons read against sky blue */
 
-  /* Pixel shadow */
-  --shadow-color: #c8c3ba;
+  /* Pixel shadow — tied to accent-primary (not the old cream-toned grey) so it reads intentional against the sky-blue background */
+  --shadow-color: color-mix(in srgb, var(--accent-primary) 55%, white);
   --shadow-dark: rgba(42, 37, 32, 0.12);
 
   /* Scrollbar */

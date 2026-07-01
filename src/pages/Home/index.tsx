@@ -30,7 +30,6 @@ const CAT_COLOR: Record<string, string> = {
 export default function Home() {
   const snapRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
-  const ctaBtnRef = useRef<HTMLAnchorElement>(null);
   const [ctaInView, setCtaInView] = useState(false);
   const [ctaPressed, setCtaPressed] = useState(false);
   const navigate = useNavigate();
@@ -311,7 +310,7 @@ export default function Home() {
               <span className="pixel-screen__hint pixel-text">[ ENTER ]</span>
             </div>
 
-            <Link
+            {/* <Link
               to="/about"
               ref={ctaBtnRef}
               className={`btn btn--primary btn--lg pixel-text ${ctaPressed ? "btn--pressed" : ""}`}
@@ -321,55 +320,57 @@ export default function Home() {
               }}
             >
               ▶ VIEW EXPERIENCE
-            </Link>
+            </Link> */}
 
-          {/* Quick-nav grid */}
-          <div className="home-nav-grid">
-            <Link
-              to="/about"
-              className="home-nav-card"
-              onClick={() => haptics.tap()}
-            >
-              <span className="home-nav-card__num pixel-text">01</span>
-              <span className="home-nav-card__title pixel-text">EXPERIENCE</span>
-              <span className="home-nav-card__desc">
-                5+ years · 3 companies
-              </span>
-            </Link>
-            <Link
-              to="/labs"
-              className="home-nav-card"
-              onClick={() => haptics.tap()}
-            >
-              <span className="home-nav-card__num pixel-text">02</span>
-              <span className="home-nav-card__title pixel-text">LABS</span>
-              <span className="home-nav-card__desc">
-                Live interactive experiments
-              </span>
-            </Link>
-            <Link
-              to="/blogs"
-              className="home-nav-card"
-              onClick={() => haptics.tap()}
-            >
-              <span className="home-nav-card__num pixel-text">03</span>
-              <span className="home-nav-card__title pixel-text">BLOG</span>
-              <span className="home-nav-card__desc">
-                What I've been building
-              </span>
-            </Link>
-            <Link
-              to="/contact"
-              className="home-nav-card"
-              onClick={() => haptics.tap()}
-            >
-              <span className="home-nav-card__num pixel-text">04</span>
-              <span className="home-nav-card__title pixel-text">CONTACT</span>
-              <span className="home-nav-card__desc">
-                Let's build something
-              </span>
-            </Link>
-          </div>
+            {/* Quick-nav grid */}
+            <div className="home-nav-grid">
+              <Link
+                to="/about"
+                className="home-nav-card"
+                onClick={() => haptics.tap()}
+              >
+                <span className="home-nav-card__num pixel-text">01</span>
+                <span className="home-nav-card__title pixel-text">
+                  EXPERIENCE
+                </span>
+                <span className="home-nav-card__desc">
+                  5+ years · 3 companies
+                </span>
+              </Link>
+              <Link
+                to="/labs"
+                className="home-nav-card"
+                onClick={() => haptics.tap()}
+              >
+                <span className="home-nav-card__num pixel-text">02</span>
+                <span className="home-nav-card__title pixel-text">LABS</span>
+                <span className="home-nav-card__desc">
+                  Live interactive experiments
+                </span>
+              </Link>
+              <Link
+                to="/blogs"
+                className="home-nav-card"
+                onClick={() => haptics.tap()}
+              >
+                <span className="home-nav-card__num pixel-text">03</span>
+                <span className="home-nav-card__title pixel-text">BLOG</span>
+                <span className="home-nav-card__desc">
+                  What I've been building
+                </span>
+              </Link>
+              <Link
+                to="/contact"
+                className="home-nav-card"
+                onClick={() => haptics.tap()}
+              >
+                <span className="home-nav-card__num pixel-text">04</span>
+                <span className="home-nav-card__title pixel-text">CONTACT</span>
+                <span className="home-nav-card__desc">
+                  Let's build something
+                </span>
+              </Link>
+            </div>
           </div>
         </section>
       </div>
