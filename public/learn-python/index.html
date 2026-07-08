@@ -1089,12 +1089,14 @@
       // ---- planets ----
       // one position per module; extend the receding path if the course grows
       const PLANET_POS = [
+        new THREE.Vector3(-72, -2, 30),
         new THREE.Vector3(-45, -4, 0),
         new THREE.Vector3(10, 4, -40),
         new THREE.Vector3(62, -2, -88),
         new THREE.Vector3(24, 8, -140),
         new THREE.Vector3(-40, -6, -186),
         new THREE.Vector3(30, 10, -238),
+        new THREE.Vector3(58, -14, -290),
       ].slice(0, MODULES.length);
       const planets = MODULES.map((m, i) => {
         const grp = new THREE.Group();
