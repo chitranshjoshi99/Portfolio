@@ -5,6 +5,8 @@
     { "source": "/blogs", "destination": "/api/page?route=blogs" },
     { "source": "/blogs/:slug", "destination": "/api/page?slug=:slug" },
     { "source": "/contact", "destination": "/api/page?route=contact" },
+    { "source": "/learn-python", "destination": "/learn-python/index.html" },
+    { "source": "/learn-python/", "destination": "/learn-python/index.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
