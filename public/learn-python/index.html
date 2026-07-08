@@ -4,7 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/learn-python/favicon.svg" />
-    <link rel="icon" type="image/jpeg" href="/learn-python/profile.jpeg" sizes="any" />
+    <link
+      rel="icon"
+      type="image/jpeg"
+      href="/learn-python/profile.jpeg"
+      sizes="any"
+    />
     <link rel="apple-touch-icon" href="/learn-python/profile.jpeg" />
     <title>Nebula Academy v2 — Astronaut-Engineer Training</title>
     <meta
@@ -901,9 +906,18 @@
       import * as THREE from "three";
 
       /* ================================================================
-   COURSE DATA — loaded from course.json (single source of truth)
+   COURSE DATA — course.json is a manifest (ranks, badges, module file
+   paths); each module's content lives in its own file under modules/
+   (see modules/*.json) so a single module can be read/edited on its own.
 ================================================================ */
-      const COURSE = await fetch("./course.json").then((r) => r.json());
+      const manifest = await fetch("./course.json").then((r) => r.json());
+      const COURSE = {
+        ranks: manifest.ranks,
+        badges: manifest.badges,
+        modules: await Promise.all(
+          manifest.modules.map((path) => fetch(path).then((r) => r.json())),
+        ),
+      };
       const hex = (v) => (typeof v === "string" ? Number(v) : v);
       const compileStep = (s) => {
         s.re = new RegExp(s.re);
@@ -974,7 +988,11 @@
       const rank = () => RANKS[Math.min(level(), RANKS.length) - 1];
       const stepsDone = (m) => state.steps[m.id] || 0;
       const isComplete = (m) => !!state.completed[m.id];
-      const isUnlocked = (i) => i === 0 || isComplete(MODULES[i - 1]);
+      // dev-only unlock: localStorage.bypassPin === "2604" opens every planet/
+      // checkpoint/lesson for browsing, but runCode() still blocks submitting
+      const bypassActive = () => localStorage.getItem("bypassPin") === "2604";
+      const isUnlocked = (i) =>
+        bypassActive() || i === 0 || isComplete(MODULES[i - 1]);
       const curPlanetIdx = () => {
         for (let i = 0; i < MODULES.length; i++)
           if (!isComplete(MODULES[i])) return i;
@@ -1204,7 +1222,8 @@
       function syncMoons() {
         moonRigs.forEach((rig) => {
           const m = MODULES[rig.mi];
-          const done = stepsDone(m) >= m.checkpoints[rig.ci].end; // checkpoint cleared
+          const done =
+            bypassActive() || stepsDone(m) >= m.checkpoints[rig.ci].end; // checkpoint cleared
           if (done && !rig.lit) {
             rig.lit = true;
             litMaterialTargets(rig, m.color);
@@ -1317,7 +1336,7 @@
       });
       function syncArtifacts() {
         artifacts.forEach((a) => {
-          const earned = state.badges.includes(a.badge.id);
+          const earned = bypassActive() || state.badges.includes(a.badge.id);
           if (earned && !a.earned) {
             a.earned = true;
             a.mesh.material = toon(a.badge.color);
@@ -1690,7 +1709,7 @@
       }
       function renderBadges() {
         $("badgeList").innerHTML = BADGES.map((b) => {
-          const got = state.badges.includes(b.id);
+          const got = bypassActive() || state.badges.includes(b.id);
           const c = "#" + b.color.toString(16).padStart(6, "0");
           return `<div class="flex items-center justify-between gap-2">
       <span class="${got ? "text-white font-bold" : "text-slate-500"}">${b.name}</span>
@@ -1779,11 +1798,17 @@
         ed.value = "";
         ed.placeholder = s.ph;
         ed.focus();
-        // dots for the current checkpoint's questions only
+        // dots for the current checkpoint's questions only — bypass mode
+        // widens this to every question in the module, so any lesson is browsable
+        const bypass = bypassActive();
+        const [dotStart, dotEnd] = bypass
+          ? [0, m.questions.length]
+          : [cp.start, cp.end];
         let dots = "";
-        for (let i = cp.start; i < cp.end; i++) {
+        for (let i = dotStart; i < dotEnd; i++) {
           const done = i < stepsDone(m);
-          dots += `<span class="dot ${done ? "done" : ""} ${i === curS ? "cur" : ""}" data-step="${i}" style="cursor:${i <= stepsDone(m) ? "pointer" : "default"}"></span>`;
+          const reachable = i <= stepsDone(m) || bypass;
+          dots += `<span class="dot ${done ? "done" : ""} ${i === curS ? "cur" : ""}" data-step="${i}" style="cursor:${reachable ? "pointer" : "default"}"></span>`;
         }
         $("lsDots").innerHTML = dots;
         $("lsDots")
@@ -1791,7 +1816,7 @@
           .forEach((d) =>
             d.addEventListener("click", () => {
               const i = +d.dataset.step;
-              if (i <= stepsDone(m)) {
+              if (i <= stepsDone(m) || bypassActive()) {
                 curS = Math.min(i, m.questions.length - 1);
                 renderStep();
               }
@@ -1923,14 +1948,25 @@
         }, delay);
       }
       let running = false;
-      function runCode() {
+      async function runCode() {
         if (running) return;
         const m = MODULES[curM],
           s = m.questions[curS];
         const code = $("editor").value.trim().replace(/\s+$/gm, "");
         echo(">>> " + (code || "(empty)"), "t-in");
+        if (curS > stepsDone(m)) {
+          echo(
+            "LOCKED: reach this lesson through the checkpoint first — bypass is browse-only",
+            "t-err",
+          );
+          return;
+        }
         if (!code) {
           echo("SyntaxError: nothing to run", "t-err");
+          return;
+        }
+        if (s.tests) {
+          await runTests(s, code);
           return;
         }
         if (s.re.test(code)) {
@@ -1960,6 +1996,169 @@
             120,
           );
           echo("HINT: expected shape: " + s.ph, "t-hint", 300);
+        }
+      }
+
+      /* ---- interpreter-backed test verification (real CPython via Pyodide) ----
+         A question with `s.tests` is graded LeetCode-style: the learner's code
+         is executed for real, once per test case (fresh globals each time), then
+         either a call/read expression or captured stdout is compared against the
+         expected value. A settrace deadline guards against learner infinite loops
+         hanging the tab (e.g. a `while` that never terminates). */
+      const GUARD_SRC = `import sys as _g_sys, time as _g_time
+_g_deadline = _g_time.time() + 3
+def _g_guard(frame, event, arg):
+    if _g_time.time() > _g_deadline:
+        raise TimeoutError("execution exceeded 3s — check for an infinite loop")
+    return _g_guard
+_g_sys.settrace(_g_guard)
+_g_sys._getframe(0).f_trace = _g_guard
+`;
+      function toJS(v) {
+        if (v && typeof v === "object" && typeof v.toJs === "function") {
+          const j = v.toJs({ dict_converter: Object.fromEntries });
+          if (typeof v.destroy === "function") v.destroy();
+          return j;
+        }
+        return v;
+      }
+      function fmt(v) {
+        if (v instanceof Set) return `{${[...v].sort().join(", ")}}`;
+        return JSON.stringify(v);
+      }
+      function deepEqual(a, b) {
+        if (a instanceof Set) {
+          const as = [...a].sort(),
+            bs = [...(Array.isArray(b) ? b : [])].sort();
+          return JSON.stringify(as) === JSON.stringify(bs);
+        }
+        if (b === null) return a === null || a === undefined;
+        if (typeof a === "number" && typeof b === "number")
+          return Math.abs(a - b) < 1e-9;
+        if (Array.isArray(a) && Array.isArray(b))
+          return a.length === b.length && a.every((x, i) => deepEqual(x, b[i]));
+        if (a && b && typeof a === "object" && typeof b === "object") {
+          const ak = Object.keys(a),
+            bk = Object.keys(b);
+          return (
+            ak.length === bk.length && ak.every((k) => deepEqual(a[k], b[k]))
+          );
+        }
+        return a === b;
+      }
+      async function runOneCase(py, s, code, tc) {
+        const ctx = tc.ctx ?? s.ctx ?? "";
+        const tail = tc.call
+          ? `_g_result = ${tc.call}`
+          : tc.read
+            ? `_g_result = ${tc.read}`
+            : "";
+        const fullSrc = `${GUARD_SRC}
+import io as _g_io
+_g_orig_stdout = _g_sys.stdout
+_g_sys.stdout = _g_io.StringIO()
+${ctx ? ctx + "\n" : ""}${code}
+${tail}
+_g_captured = _g_sys.stdout.getvalue()
+_g_sys.stdout = _g_orig_stdout
+`;
+        const ns = py.globals.get("dict")();
+        try {
+          await py.runPythonAsync(fullSrc, { globals: ns });
+          const stdout = toJS(ns.get("_g_captured"));
+          const value =
+            tc.call || tc.read ? toJS(ns.get("_g_result")) : undefined;
+          return { stdout, value };
+        } finally {
+          py.runPython("import sys as _g_sys2; _g_sys2.settrace(None)");
+          ns.destroy();
+        }
+      }
+      function failHint(s, code) {
+        running = false;
+        $("btnRun").disabled = false;
+        for (const c of s.checks || []) {
+          const hit = new RegExp(c.re).test(code);
+          if (c.bad ? hit : !hit) {
+            echo("HINT: " + c.msg, "t-hint", 260);
+            return;
+          }
+        }
+        echo("HINT: expected shape: " + s.ph, "t-hint", 260);
+      }
+      async function runTests(s, code) {
+        running = true;
+        $("btnRun").disabled = true;
+        try {
+          echo(
+            _py ? "running tests…" : "booting CPython (first run ~5s)…",
+            "t-out",
+          );
+          const py = await getPyodide();
+          for (let i = 0; i < s.tests.length; i++) {
+            const tc = s.tests[i];
+            const label = tc.call || tc.read || "(script)";
+            let out;
+            try {
+              out = await runOneCase(py, s, code, tc);
+            } catch (e) {
+              echo(
+                `Test ${i + 1}/${s.tests.length} — runtime error`,
+                "t-err",
+                60,
+              );
+              String(e.message || e)
+                .split("\n")
+                .filter(Boolean)
+                .slice(-6)
+                .forEach((l, j) => echo(l, "t-err", 100 + j * 40));
+              return failHint(s, code);
+            }
+            if (tc.stdout !== undefined) {
+              const got = (out.stdout || "").replace(/\s+$/, "");
+              const want = tc.stdout.replace(/\s+$/, "");
+              if (got !== want) {
+                echo(
+                  `Test ${i + 1}/${s.tests.length} failed — ${label}`,
+                  "t-err",
+                  60,
+                );
+                echo(
+                  `  expected output: ${JSON.stringify(want)}`,
+                  "t-out",
+                  120,
+                );
+                echo(`  got:             ${JSON.stringify(got)}`, "t-err", 180);
+                return failHint(s, code);
+              }
+            } else if (!deepEqual(out.value, tc.expected)) {
+              echo(
+                `Test ${i + 1}/${s.tests.length} failed — ${label}`,
+                "t-err",
+                60,
+              );
+              echo(`  expected: ${fmt(tc.expected)}`, "t-out", 120);
+              echo(`  got:      ${fmt(out.value)}`, "t-err", 180);
+              return failHint(s, code);
+            }
+            echo(
+              `Test ${i + 1}/${s.tests.length} ✓ ${label}${tc.expected !== undefined ? " -> " + fmt(tc.expected) : ""}`,
+              i === s.tests.length - 1 ? "t-ok" : "t-out",
+              60 + i * 40,
+            );
+          }
+          setTimeout(
+            () => {
+              running = false;
+              $("btnRun").disabled = false;
+              stepVerified();
+            },
+            120 + s.tests.length * 40,
+          );
+        } catch (e) {
+          running = false;
+          $("btnRun").disabled = false;
+          echo("Python runtime failed to load: " + (e.message || e), "t-err");
         }
       }
       function stepVerified() {
@@ -2197,7 +2396,7 @@
         }
       });
       $("editor").addEventListener("keydown", (e) => {
-        if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+        if (e.key === "Enter" && !e.shiftKey) {
           e.preventDefault();
           runCode();
         }

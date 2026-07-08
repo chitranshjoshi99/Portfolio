@@ -1,0 +1,365 @@
+{
+  "id": "PY-PREREQ",
+  "name": "Ignition Prereqs",
+  "tier": "Cadet",
+  "planet": "Ignition",
+  "desc": "Environment setup, tracebacks, and the math primers ML assumes silently.",
+  "xp": 10,
+  "color": "0x9ee6ff",
+  "viz": null,
+  "badge": "prereq",
+  "checkpoints": [
+    {
+      "id": "setup",
+      "name": "Setup",
+      "questions": [
+        {
+          "t": "venv create",
+          "card": "<p><b class='text-white'>What:</b> A <b>virtual environment</b> (<code class='mono'>venv</code>) is a private, throwaway copy of Python and its installed packages, kept inside your project folder instead of shared system-wide.</p><p><b class='text-white'>Why:</b> Two projects almost never need the exact same package versions — installing everything globally means the second project you set up can silently break the first. A venv per project means <code class='mono'>rm -rf .venv</code> undoes every install with zero risk to anything else on the machine.</p><p><b class='text-white'>How:</b> Open a real terminal, make a folder for this project, move into it, then create the venv inside it — <code class='mono'>.venv</code> becomes a subfolder holding a private Python install.</p><div class='codeblock'>mkdir myproject\ncd myproject\npython -m venv .venv\n<span class='cm'># .venv/ now exists inside myproject/</span></div>",
+          "mission": "Command line to make <code class='mono'>.venv</code>.",
+          "ph": "python -m venv .venv",
+          "sol": "python -m venv .venv",
+          "re": "^python\\s+-m\\s+venv\\s+\\.venv$",
+          "ok": [
+            "venv created"
+          ],
+          "checks": [
+            {
+              "re": "-m\\s+venv",
+              "msg": "Use -m venv."
+            }
+          ]
+        },
+        {
+          "t": "activate venv",
+          "card": "<p><b class='text-white'>What:</b> Activating puts the venv's own <code class='mono'>python</code>/<code class='mono'>pip</code> at the front of your shell's <code class='mono'>PATH</code>, so those commands resolve to the venv's copies instead of the system-wide ones.</p><p><b class='text-white'>Why:</b> Without activating, <code class='mono'>pip install</code> installs into the SYSTEM Python (or refuses, with a permission error) — completely defeating the point of having created an isolated <code class='mono'>.venv</code> in the first place.</p><p><b class='text-white'>How:</b> Run this in the terminal, from the same folder where <code class='mono'>.venv</code> lives. Your prompt changes to show the venv name — that's your confirmation it's active.</p><div class='codeblock'>source .venv/bin/activate\n(.venv) $ which python\n<span class='cm'># .../myproject/.venv/bin/python</span></div>",
+          "mission": "Activate on macOS/Linux.",
+          "ph": "source .venv/bin/activate",
+          "sol": "source .venv/bin/activate",
+          "re": "^source\\s+\\.venv/bin/activate$",
+          "ok": [
+            "env active"
+          ],
+          "checks": [
+            {
+              "re": "source",
+              "msg": "Use source."
+            }
+          ]
+        },
+        {
+          "t": "pip install",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>pip</code> is Python's package installer — it downloads a library from PyPI (the Python Package Index) and adds it to whichever Python environment is currently active.</p><p><b class='text-white'>Why:</b> Nobody hand-writes numeric arrays or HTTP clients from scratch — the entire Python ecosystem (NumPy, pandas, requests, everything) is distributed and installed this exact way, one <code class='mono'>pip install</code> at a time.</p><p><b class='text-white'>How:</b> With the venv activated, <code class='mono'>pip install &lt;name&gt;</code> fetches the package and installs it ONLY into <code class='mono'>.venv</code> — the system Python is untouched.</p><div class='codeblock'>(.venv) $ pip install numpy\n<span class='cm'># Successfully installed numpy-...</span></div>",
+          "mission": "Install <code class='mono'>numpy</code>.",
+          "ph": "pip install numpy",
+          "sol": "pip install numpy",
+          "re": "^pip\\s+install\\s+numpy$",
+          "ok": [
+            "installed"
+          ],
+          "checks": [
+            {
+              "re": "pip\\s+install",
+              "msg": "pip install."
+            }
+          ]
+        },
+        {
+          "t": "freeze requirements",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>pip freeze</code> lists every installed package with its EXACT version; redirecting it into <code class='mono'>requirements.txt</code> saves that list to a file.</p><p><b class='text-white'>Why:</b> \"Works on my machine\" is usually a version mismatch — a teammate (or your future self, or a deploy server) running <code class='mono'>pip install -r requirements.txt</code> reproduces your exact environment instead of guessing at versions.</p><p><b class='text-white'>How:</b> Redirect <code class='mono'>pip freeze</code>'s output into a file with <code class='mono'>&gt;</code>; commit that file alongside your code.</p><div class='codeblock'>(.venv) $ pip freeze &gt; requirements.txt\n<span class='cm'># elsewhere: pip install -r requirements.txt</span></div>",
+          "mission": "Write to <code class='mono'>requirements.txt</code>.",
+          "ph": "pip freeze > requirements.txt",
+          "sol": "pip freeze > requirements.txt",
+          "re": "^pip\\s+freeze\\s*>\\s*requirements\\.txt$",
+          "ok": [
+            "pinned"
+          ],
+          "checks": [
+            {
+              "re": "freeze",
+              "msg": "Use pip freeze."
+            }
+          ]
+        },
+        {
+          "t": "run a script",
+          "card": "<p><b class='text-white'>What:</b> Running <code class='mono'>python file.py</code> hands the file to the Python interpreter, which executes it top to bottom.</p><p><b class='text-white'>Why:</b> It's the most basic feedback loop there is: write code, run it, see what happens — every larger workflow (tests, servers, notebooks) is built on top of this same single command.</p><p><b class='text-white'>How:</b> From the terminal, with the venv active (so it's using the right interpreter and packages), name the file after <code class='mono'>python</code>.</p><div class='codeblock'>(.venv) $ python main.py\n<span class='cm'># runs main.py top to bottom</span></div>",
+          "mission": "Run <code class='mono'>main.py</code>.",
+          "ph": "python main.py",
+          "sol": "python main.py",
+          "re": "^python\\s+main\\.py$",
+          "ok": [
+            "running"
+          ],
+          "checks": [
+            {
+              "re": "python\\s+main",
+              "msg": "Invoke python main.py."
+            }
+          ]
+        },
+        {
+          "t": "shebang line",
+          "card": "<p><b class='text-white'>What:</b> A <b>shebang</b> is a special first line (<code class='mono'>#!...</code>) telling the OS which interpreter should run the rest of the file, so the file can be executed directly instead of via <code class='mono'>python file.py</code>.</p><p><b class='text-white'>Why:</b> It's what makes a script feel like a real standalone program — CLI tools you install (<code class='mono'>black</code>, <code class='mono'>pip</code> itself) are plain Python files that work as bare commands specifically because of this line.</p><p><b class='text-white'>How:</b> <code class='mono'>#!/usr/bin/env python3</code> asks the OS to look up <code class='mono'>python3</code> on <code class='mono'>PATH</code> (portable across machines) rather than hardcoding an absolute path. It must be the very first line, and the file needs execute permission.</p><div class='codeblock'><span class='cm'>#!/usr/bin/env python3</span>\nprint(&quot;hi&quot;)\n\n<span class='cm'># then: chmod +x file.py &amp;&amp; ./file.py</span></div>",
+          "mission": "First line for portable scripts.",
+          "ph": "#!/usr/bin/env python3",
+          "sol": "#!/usr/bin/env python3",
+          "re": "^#!\\/usr\\/bin\\/env\\s+python3$",
+          "ok": [
+            "shebang set"
+          ],
+          "checks": [
+            {
+              "re": "#!\\/usr\\/bin\\/env",
+              "msg": "Use env-based shebang."
+            }
+          ]
+        },
+        {
+          "t": "inspect traceback",
+          "card": "<p><b class='text-white'>What:</b> A <b>traceback</b> is the block Python prints when a program crashes — it's the full call chain that led to the error, ending with the exception type and message.</p><p><b class='text-white'>Why:</b> New Python devs often panic at the wall of text and miss that the answer is always on the LAST line — reading tracebacks calmly and bottom-up is the single highest-leverage debugging skill there is.</p><p><b class='text-white'>How:</b> Ignore the middle (the call stack, useful later for locating WHERE); the last line has the shape <code class='mono'>ExceptionType: message</code> — that's the error's name and why it happened.</p><div class='codeblock'>Traceback (most recent call last):\n  File &quot;main.py&quot;, line 3, in &lt;module&gt;\n    1 / 0\nZeroDivisionError: division by zero\n<span class='cm'># &lt;- read this last line first</span></div>",
+          "mission": "Assign the error name into <b class='text-white'>err</b>.",
+          "ph": "err = 'ZeroDivisionError'",
+          "sol": "err = 'ZeroDivisionError'",
+          "re": "^err\\s*=\\s*['\"]ZeroDivisionError['\"]$",
+          "ok": [
+            "identified"
+          ],
+          "checks": [
+            {
+              "re": "ZeroDivisionError",
+              "msg": "Name that error."
+            }
+          ]
+        },
+        {
+          "t": "__main__ guard",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>if __name__ == \"__main__\":</code> guards code so it only runs when the file is executed directly — not when it's imported as a module by another file.</p><p><b class='text-white'>Why:</b> Without it, importing your file to reuse a function elsewhere would ALSO re-run every top-level statement (print output, script logic) as a side effect — the guard is what lets a file be both a runnable script AND a safely importable module.</p><p><b class='text-white'>How:</b> Python sets the special variable <code class='mono'>__name__</code> to <code class='mono'>\"__main__\"</code> only when a file is run directly (never when imported) — so code inside this <code class='mono'>if</code> is the \"only when run directly\" section.</p><div class='codeblock'>def main():\n    print(&quot;running&quot;)\n\nif __name__ == &quot;__main__&quot;:\n    main()</div>",
+          "mission": "Type the guard.",
+          "ph": "if __name__ == '__main__':",
+          "sol": "if __name__ == '__main__':",
+          "re": "^if\\s+__name__\\s*==\\s*['\"]__main__['\"]\\s*:$",
+          "ok": [
+            "guarded"
+          ],
+          "checks": [
+            {
+              "re": "__name__\\s*==",
+              "msg": "Compare __name__."
+            }
+          ]
+        },
+        {
+          "t": "uv install",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>uv</code> is a modern, much faster drop-in replacement for the <code class='mono'>pip</code> + <code class='mono'>venv</code> combo, written in Rust.</p><p><b class='text-white'>Why:</b> The classic workflow (<code class='mono'>python -m venv</code>, then <code class='mono'>pip install</code> one at a time) is reliable but slow — <code class='mono'>uv</code> does the same job in a fraction of the time and is fast becoming the default choice for new projects.</p><p><b class='text-white'>How:</b> <code class='mono'>uv add &lt;package&gt;</code> creates the venv if needed AND installs the package, tracking it in a project file automatically — one command instead of two.</p><div class='codeblock'>$ uv add pandas\n<span class='cm'># venv created (if missing) + pandas installed + tracked</span></div>",
+          "mission": "Add <code class='mono'>pandas</code>.",
+          "ph": "uv add pandas",
+          "sol": "uv add pandas",
+          "re": "^uv\\s+add\\s+pandas$",
+          "ok": [
+            "added"
+          ],
+          "checks": [
+            {
+              "re": "uv\\s+add",
+              "msg": "Use uv add."
+            }
+          ]
+        },
+        {
+          "t": "jupyter kernel",
+          "card": "<p><b class='text-white'>What:</b> A Jupyter <b>kernel</b> is the specific Python environment a notebook actually runs code in — registering one makes your project's venv show up as a selectable option inside Jupyter.</p><p><b class='text-white'>Why:</b> Without registering a kernel, a notebook silently falls back to some OTHER Python (often the system one) — you install a package in your venv, then can't understand why the notebook says it's missing.</p><p><b class='text-white'>How:</b> <code class='mono'>python -m ipykernel install</code>, run with the venv active, registers THIS Python as a named kernel Jupyter can list and select.</p><div class='codeblock'>(.venv) $ python -m ipykernel install --user --name proj\n<span class='cm'># then in Jupyter: Kernel &gt; Change Kernel &gt; proj</span></div>",
+          "mission": "Name it <code class='mono'>proj</code>.",
+          "ph": "python -m ipykernel install --user --name proj",
+          "sol": "python -m ipykernel install --user --name proj",
+          "re": "^python\\s+-m\\s+ipykernel\\s+install\\s+--user\\s+--name\\s+proj$",
+          "ok": [
+            "kernel added"
+          ],
+          "checks": [
+            {
+              "re": "ipykernel\\s+install",
+              "msg": "Use ipykernel install."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "math-primer",
+      "name": "Math Primer",
+      "questions": [
+        {
+          "t": "dot product",
+          "card": "<p><b class='text-white'>What:</b> The <b>dot product</b> of two vectors multiplies them element-by-element and sums the results into a single number: <code class='mono'>Σ aᵢbᵢ</code>.</p><p><b class='text-white'>Why:</b> It's the single most-repeated operation underneath machine learning — every neuron in a neural network computes a dot product between its inputs and its weights before anything else happens.</p><p><b class='text-white'>How:</b> <code class='mono'>np.dot(a, b)</code> does the multiply-and-sum in one compiled call instead of a Python loop over indices.</p><div class='codeblock'>a = np.array([1, 2, 3])\nb = np.array([4, 5, 6])\nd = np.dot(a, b)  <span class='cm'># 1*4 + 2*5 + 3*6 = 32</span></div>",
+          "mission": "Compute into <b class='text-white'>d</b>.",
+          "ph": "d = np.dot(a, b)",
+          "sol": "d = np.dot(a, b)",
+          "re": "^d\\s*=\\s*np\\.dot\\(\\s*a\\s*,\\s*b\\s*\\)$",
+          "ok": [
+            "scalar out"
+          ],
+          "checks": [
+            {
+              "re": "np\\.dot\\(",
+              "msg": "Use np.dot."
+            }
+          ]
+        },
+        {
+          "t": "matmul",
+          "card": "<p><b class='text-white'>What:</b> <b>Matrix multiplication</b> combines two matrices (or a matrix and a vector) via <code class='mono'>@</code> — each output entry is a dot product of a row from the left and a column from the right.</p><p><b class='text-white'>Why:</b> A whole layer of a neural network processing a whole batch of inputs at once is exactly one matrix multiply — it's how thousands of dot products happen in a single, GPU-friendly instruction instead of a Python loop.</p><p><b class='text-white'>How:</b> <code class='mono'>M @ v</code> multiplies matrix <code class='mono'>M</code> by vector <code class='mono'>v</code>; shapes must line up (M's column count = v's length).</p><div class='codeblock'>M = np.array([[1, 2], [3, 4]])\nv = np.array([5, 6])\nout = M @ v  <span class='cm'># [1*5+2*6, 3*5+4*6] = [17, 39]</span></div>",
+          "mission": "Compute <code class='mono'>M @ v</code> into <b class='text-white'>out</b>.",
+          "ph": "out = M @ v",
+          "sol": "out = M @ v",
+          "re": "^out\\s*=\\s*M\\s*@\\s*v$",
+          "ok": [
+            "(m,) shape"
+          ],
+          "checks": [
+            {
+              "re": "@",
+              "msg": "Use the @ operator."
+            }
+          ]
+        },
+        {
+          "t": "transpose",
+          "card": "<p><b class='text-white'>What:</b> <b>Transpose</b> (<code class='mono'>.T</code>) flips a matrix over its diagonal — rows become columns and columns become rows.</p><p><b class='text-white'>Why:</b> Matrix shapes have to match exactly to multiply — transpose is the standard fix when your data is laid out sideways from what an operation expects (a very common real bug: \"shapes (3,4) and (3,2) not aligned\").</p><p><b class='text-white'>How:</b> <code class='mono'>M.T</code> returns a new view where <code class='mono'>M.T[i][j] == M[j][i]</code> — an (m, n) matrix becomes (n, m).</p><div class='codeblock'>M = np.array([[1, 2, 3], [4, 5, 6]])\nMT = M.T\nprint(MT.shape)  <span class='cm'># (3, 2), was (2, 3)</span></div>",
+          "mission": "Compute <b class='text-white'>MT</b>.",
+          "ph": "MT = M.T",
+          "sol": "MT = M.T",
+          "re": "^MT\\s*=\\s*M\\.T$",
+          "ok": [
+            "transposed"
+          ],
+          "checks": [
+            {
+              "re": "\\.T\\b",
+              "msg": "Use .T."
+            }
+          ]
+        },
+        {
+          "t": "norm",
+          "card": "<p><b class='text-white'>What:</b> The <b>L2 norm</b> (<code class='mono'>‖v‖</code>) of a vector is its length — the square root of the sum of its squared components, the straight-line distance from the origin.</p><p><b class='text-white'>Why:</b> \"How big is this vector\" comes up constantly: normalizing a vector to length 1, measuring how far a prediction is from the truth, and regularization terms in ML loss functions all start from this exact quantity.</p><p><b class='text-white'>How:</b> <code class='mono'>np.linalg.norm(v)</code> computes it directly, equivalent to <code class='mono'>sqrt(sum(v**2))</code>.</p><div class='codeblock'>v = np.array([3, 4])\nn = np.linalg.norm(v)  <span class='cm'># sqrt(9 + 16) = 5.0</span></div>",
+          "mission": "Compute into <b class='text-white'>n</b>.",
+          "ph": "n = np.linalg.norm(v)",
+          "sol": "n = np.linalg.norm(v)",
+          "re": "^n\\s*=\\s*np\\.linalg\\.norm\\(\\s*v\\s*\\)$",
+          "ok": [
+            "|v|"
+          ],
+          "checks": [
+            {
+              "re": "linalg\\.norm\\(",
+              "msg": "Use np.linalg.norm."
+            }
+          ]
+        },
+        {
+          "t": "inverse",
+          "card": "<p><b class='text-white'>What:</b> The <b>inverse</b> of a matrix <code class='mono'>M</code> is the matrix <code class='mono'>M⁻¹</code> such that <code class='mono'>M @ M⁻¹</code> gives the identity matrix — the matrix equivalent of \"1/x\".</p><p><b class='text-white'>Why:</b> It's how you solve a linear system directly (<code class='mono'>x = M⁻¹ @ b</code> solves <code class='mono'>M @ x = b</code>) — the same algebra behind fitting a linear regression's coefficients in closed form.</p><p><b class='text-white'>How:</b> <code class='mono'>np.linalg.inv(M)</code> computes it — only defined for square matrices, and only when <code class='mono'>M</code> is non-singular (its determinant isn't zero).</p><div class='codeblock'>M = np.array([[2, 0], [0, 4]])\ninv = np.linalg.inv(M)  <span class='cm'># [[0.5, 0], [0, 0.25]]</span></div>",
+          "mission": "Invert <code class='mono'>M</code>.",
+          "ph": "inv = np.linalg.inv(M)",
+          "sol": "inv = np.linalg.inv(M)",
+          "re": "^inv\\s*=\\s*np\\.linalg\\.inv\\(\\s*M\\s*\\)$",
+          "ok": [
+            "inverse"
+          ],
+          "checks": [
+            {
+              "re": "linalg\\.inv\\(",
+              "msg": "Use np.linalg.inv."
+            }
+          ]
+        },
+        {
+          "t": "sigmoid",
+          "card": "<p><b class='text-white'>What:</b> The <b>sigmoid</b> function <code class='mono'>σ(x) = 1/(1+e⁻ˣ)</code> squashes any real number into the open interval (0, 1), with an S-shaped curve centered at 0.5.</p><p><b class='text-white'>Why:</b> Squashing an unbounded number into (0, 1) is exactly what's needed to interpret an output as a PROBABILITY — sigmoid is the classic activation for binary classification's final layer, for exactly this reason.</p><p><b class='text-white'>How:</b> <code class='mono'>np.exp(-x)</code> computes <code class='mono'>e⁻ˣ</code>; large positive <code class='mono'>x</code> pushes the result toward 1, large negative <code class='mono'>x</code> toward 0.</p><div class='codeblock'>x = 0\ns = 1 / (1 + np.exp(-x))  <span class='cm'># 0.5, the midpoint</span></div>",
+          "mission": "Compute into <b class='text-white'>s</b>.",
+          "ph": "s = 1 / (1 + np.exp(-x))",
+          "sol": "s = 1 / (1 + np.exp(-x))",
+          "re": "^s\\s*=\\s*1\\s*/\\s*\\(\\s*1\\s*\\+\\s*np\\.exp\\(\\s*-\\s*x\\s*\\)\\s*\\)$",
+          "ok": [
+            "(0,1)"
+          ],
+          "checks": [
+            {
+              "re": "np\\.exp\\(",
+              "msg": "Use np.exp."
+            }
+          ]
+        },
+        {
+          "t": "softmax denominator",
+          "card": "<p><b class='text-white'>What:</b> <b>Softmax</b> turns a list of raw scores into probabilities that sum to 1 — exponentiate each score, then divide by the sum of all the exponentials.</p><p><b class='text-white'>Why:</b> It's the standard last layer for multi-class classification (\"which of these 10 digits is this\") — this step specifically (subtracting the max before exponentiating) is what keeps <code class='mono'>np.exp</code> from overflowing on large scores, a real numerical-stability bug beginners hit immediately without it.</p><p><b class='text-white'>How:</b> <code class='mono'>x - x.max()</code> shifts every score so the largest becomes 0 before exponentiating — the final probabilities are identical, but nothing overflows.</p><div class='codeblock'>x = np.array([1000, 1001, 1002])\ne = np.exp(x - x.max())  <span class='cm'># safe: exponents are now &lt;= 0</span></div>",
+          "mission": "Numerator <code class='mono'>e = np.exp(x - x.max())</code>.",
+          "ph": "e = np.exp(x - x.max())",
+          "sol": "e = np.exp(x - x.max())",
+          "re": "^e\\s*=\\s*np\\.exp\\(\\s*x\\s*-\\s*x\\.max\\(\\s*\\)\\s*\\)$",
+          "ok": [
+            "stable"
+          ],
+          "checks": [
+            {
+              "re": "x\\.max\\(",
+              "msg": "Subtract the max."
+            }
+          ]
+        },
+        {
+          "t": "gradient descent",
+          "card": "<p><b class='text-white'>What:</b> <b>Gradient descent</b> is the update rule that trains almost every ML model: nudge the parameters a little in the direction that most reduces the loss, repeat.</p><p><b class='text-white'>Why:</b> It's the mechanism underneath \"training\" for everything from linear regression to giant neural networks — every framework's <code class='mono'>optimizer.step()</code> is ultimately doing this one line of math, just with extra bookkeeping.</p><p><b class='text-white'>How:</b> <code class='mono'>grad</code> points in the direction of STEEPEST INCREASE of the loss, so subtracting it moves downhill; <code class='mono'>eta</code> (the learning rate) controls how big each step is.</p><div class='codeblock'>theta = theta - eta * grad\n<span class='cm'># eta too big -&gt; overshoots; too small -&gt; trains forever</span></div>",
+          "mission": "Update <code class='mono'>theta</code>.",
+          "ph": "theta = theta - eta * grad",
+          "sol": "theta = theta - eta * grad",
+          "re": "^theta\\s*=\\s*theta\\s*-\\s*eta\\s*\\*\\s*grad$",
+          "ok": [
+            "stepped"
+          ],
+          "checks": [
+            {
+              "re": "theta\\s*-\\s*eta\\s*\\*",
+              "msg": "Descend along the gradient."
+            }
+          ]
+        },
+        {
+          "t": "mean squared error",
+          "card": "<p><b class='text-white'>What:</b> <b>Mean squared error (MSE)</b> measures how wrong a model's predictions are: subtract, square (so errors can't cancel and big misses are punished more), then average.</p><p><b class='text-white'>Why:</b> It's the default loss function for regression — training a model IS the process of adjusting parameters to make this exact number smaller, which is why it needs to be differentiable (squaring is; absolute value has a kink at zero).</p><p><b class='text-white'>How:</b> <code class='mono'>(y - yhat) ** 2</code> gives the squared error for every example; <code class='mono'>.mean()</code> collapses that array into one number summarizing overall performance.</p><div class='codeblock'>y = np.array([3, 5])\nyhat = np.array([2.5, 5.5])\nL = ((y - yhat) ** 2).mean()  <span class='cm'># ((0.5)^2 + (0.5)^2) / 2 = 0.25</span></div>",
+          "mission": "Compute into <b class='text-white'>L</b>.",
+          "ph": "L = ((y - yhat) ** 2).mean()",
+          "sol": "L = ((y - yhat) ** 2).mean()",
+          "re": "^L\\s*=\\s*\\(\\s*\\(\\s*y\\s*-\\s*yhat\\s*\\)\\s*\\*\\*\\s*2\\s*\\)\\.mean\\(\\s*\\)$",
+          "ok": [
+            "MSE"
+          ],
+          "checks": [
+            {
+              "re": "\\*\\*\\s*2",
+              "msg": "Square the residual."
+            }
+          ]
+        },
+        {
+          "t": "Bayes rule fragment",
+          "card": "<p><b class='text-white'>What:</b> <b>Bayes' rule</b> — <code class='mono'>P(A|B) = P(B|A)·P(A)/P(B)</code> — updates a belief about A after observing evidence B, in terms of quantities that are easier to know directly.</p><p><b class='text-white'>Why:</b> It's the mathematical backbone of an entire family of ML approaches (naive Bayes classifiers, Bayesian inference, spam filters historically) — anywhere you update a probability given new evidence, this is the rule doing it.</p><p><b class='text-white'>How:</b> <code class='mono'>lik</code> (likelihood, P(B|A)) times <code class='mono'>prior</code> (P(A), belief before evidence) gives the numerator; dividing by <code class='mono'>evidence</code> (P(B)) normalizes it back into a valid probability.</p><div class='codeblock'>lik, prior, evidence = 0.9, 0.01, 0.1\npost = lik * prior / evidence  <span class='cm'># updated belief in A, given B</span></div>",
+          "mission": "Compute into <b class='text-white'>post</b>.",
+          "ph": "post = lik * prior / evidence",
+          "sol": "post = lik * prior / evidence",
+          "re": "^post\\s*=\\s*lik\\s*\\*\\s*prior\\s*/\\s*evidence$",
+          "ok": [
+            "posterior"
+          ],
+          "checks": [
+            {
+              "re": "lik\\s*\\*\\s*prior",
+              "msg": "Multiply lik × prior."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

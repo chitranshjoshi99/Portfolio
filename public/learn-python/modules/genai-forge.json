@@ -1,0 +1,1675 @@
+{
+  "id": "GENAI-FORGE",
+  "name": "Generative AI",
+  "tier": "Pro",
+  "planet": "Nexus Prime",
+  "desc": "LLMs in production — tokenize, sample, embed, retrieve, and force structured tool calls.",
+  "xp": 40,
+  "color": "0xff5d9e",
+  "viz": null,
+  "badge": "genai",
+  "checkpoints": [
+    {
+      "id": "tokenizers-models",
+      "name": "Tokenizers & Models",
+      "questions": [
+        {
+          "t": "Load a tokenizer",
+          "card": "<p><code class='mono text-cyan-300'>from_pretrained</code> fetches the matching tokenizer.</p>",
+          "mission": "Load the <code class='mono'>gpt2</code> tokenizer into <b class='text-white'>tok</b>.",
+          "ph": "tok = AutoTokenizer.from_pretrained(\"gpt2\")",
+          "sol": "tok = AutoTokenizer.from_pretrained(\"gpt2\")",
+          "re": "^tok\\s*=\\s*AutoTokenizer\\.from_pretrained\\(\\s*([\"'])gpt2\\1\\s*\\)$",
+          "ok": [
+            "tokenizer loaded"
+          ],
+          "checks": [
+            {
+              "re": "AutoTokenizer\\.from_pretrained\\(",
+              "msg": "AutoTokenizer.from_pretrained(\"gpt2\")."
+            }
+          ]
+        },
+        {
+          "t": "Encode a prompt",
+          "card": "<p>Models read token ids; <code class='mono'>return_tensors=\"pt\"</code> = torch.</p>",
+          "mission": "Encode <code class='mono'>prompt</code> to torch tensors into <b class='text-white'>ids</b>.",
+          "ctx": "prompt = \"Summarize the report.\"",
+          "ph": "ids = tokenizer(prompt, return_tensors=\"pt\")",
+          "sol": "ids = tokenizer(prompt, return_tensors=\"pt\")",
+          "re": "^ids\\s*=\\s*tokenizer\\(\\s*prompt\\s*,\\s*return_tensors\\s*=\\s*([\"'])pt\\1\\s*\\)$",
+          "ok": [
+            "input_ids: tensor([[...]])"
+          ],
+          "checks": [
+            {
+              "re": "tokenizer\\(\\s*prompt",
+              "msg": "Tokenize the prompt."
+            },
+            {
+              "re": "return_tensors\\s*=\\s*([\"'])pt",
+              "msg": "return_tensors=\"pt\"."
+            }
+          ]
+        },
+        {
+          "t": "Load the model",
+          "card": "<p>Causal LMs predict the next token.</p>",
+          "mission": "Load <code class='mono'>gpt2</code> as a causal LM into <b class='text-white'>model</b>.",
+          "ph": "model = AutoModelForCausalLM.from_pretrained(\"gpt2\")",
+          "sol": "model = AutoModelForCausalLM.from_pretrained(\"gpt2\")",
+          "re": "^model\\s*=\\s*AutoModelForCausalLM\\.from_pretrained\\(\\s*([\"'])gpt2\\1\\s*\\)$",
+          "ok": [
+            "weights loaded"
+          ],
+          "checks": [
+            {
+              "re": "AutoModelForCausalLM\\.from_pretrained\\(",
+              "msg": "AutoModelForCausalLM.from_pretrained(\"gpt2\")."
+            }
+          ]
+        },
+        {
+          "t": "Generate",
+          "card": "<p><code class='mono'>max_new_tokens</code> caps the output length.</p>",
+          "mission": "Generate up to 50 new tokens from <code class='mono'>ids</code> into <b class='text-white'>out</b>.",
+          "ph": "out = model.generate(**ids, max_new_tokens=50)",
+          "sol": "out = model.generate(**ids, max_new_tokens=50)",
+          "re": "^out\\s*=\\s*model\\.generate\\(\\s*\\*\\*ids\\s*,\\s*max_new_tokens\\s*=\\s*50\\s*\\)$",
+          "ok": [
+            "50 tokens"
+          ],
+          "checks": [
+            {
+              "re": "\\*\\*ids",
+              "msg": "Unpack **ids."
+            },
+            {
+              "re": "max_new_tokens\\s*=\\s*50",
+              "msg": "max_new_tokens=50."
+            }
+          ]
+        },
+        {
+          "t": "Decode the ids",
+          "card": "<p><code class='mono text-cyan-300'>decode</code> turns ids back into text.</p>",
+          "mission": "Decode the first sequence of <code class='mono'>out</code> into <b class='text-white'>text</b>.",
+          "ph": "text = tokenizer.decode(out[0])",
+          "sol": "text = tokenizer.decode(out[0])",
+          "re": "^text\\s*=\\s*tokenizer\\.decode\\(\\s*out\\[\\s*0\\s*\\]\\s*\\)$",
+          "ok": [
+            "'Summarize the report...'"
+          ],
+          "checks": [
+            {
+              "re": "tokenizer\\.decode\\(",
+              "msg": "tokenizer.decode(...)."
+            },
+            {
+              "re": "out\\[\\s*0\\s*\\]",
+              "msg": "Decode out[0]."
+            }
+          ]
+        },
+        {
+          "t": "Batch decode",
+          "card": "<p>Decode a whole batch at once.</p>",
+          "mission": "Decode every sequence in <code class='mono'>out</code> into <b class='text-white'>texts</b>.",
+          "ph": "texts = tokenizer.batch_decode(out)",
+          "sol": "texts = tokenizer.batch_decode(out)",
+          "re": "^texts\\s*=\\s*tokenizer\\.batch_decode\\(\\s*out\\s*\\)$",
+          "ok": [
+            "list of strings"
+          ],
+          "checks": [
+            {
+              "re": "tokenizer\\.batch_decode\\(\\s*out",
+              "msg": "tokenizer.batch_decode(out)."
+            }
+          ]
+        },
+        {
+          "t": "Move to GPU",
+          "card": "<p>Ship the model to the accelerator.</p>",
+          "mission": "Move <code class='mono'>model</code> to <code class='mono'>device</code>.",
+          "ph": "model = model.to(device)",
+          "sol": "model = model.to(device)",
+          "re": "^model\\s*=\\s*model\\.to\\(\\s*device\\s*\\)$",
+          "ok": [
+            "on device"
+          ],
+          "checks": [
+            {
+              "re": "model\\.to\\(\\s*device",
+              "msg": "model.to(device)."
+            }
+          ]
+        },
+        {
+          "t": "Task pipeline",
+          "card": "<p><code class='mono text-cyan-300'>pipeline</code> wraps tokenizer + model for a task.</p>",
+          "mission": "Build a sentiment <b class='text-white'>clf</b> pipeline.",
+          "ph": "clf = pipeline(\"sentiment-analysis\")",
+          "sol": "clf = pipeline(\"sentiment-analysis\")",
+          "re": "^clf\\s*=\\s*pipeline\\(\\s*([\"'])sentiment-analysis\\1\\s*\\)$",
+          "ok": [
+            "one-call inference"
+          ],
+          "checks": [
+            {
+              "re": "pipeline\\(\\s*([\"'])sentiment-analysis",
+              "msg": "pipeline(\"sentiment-analysis\")."
+            }
+          ]
+        },
+        {
+          "t": "Set a pad token",
+          "card": "<p>Decoder-only models often reuse EOS as PAD.</p>",
+          "mission": "Point <code class='mono'>pad_token</code> at <code class='mono'>eos_token</code>.",
+          "ph": "tokenizer.pad_token = tokenizer.eos_token",
+          "sol": "tokenizer.pad_token = tokenizer.eos_token",
+          "re": "^tokenizer\\.pad_token\\s*=\\s*tokenizer\\.eos_token$",
+          "ok": [
+            "padding enabled"
+          ],
+          "checks": [
+            {
+              "re": "tokenizer\\.pad_token\\s*=\\s*tokenizer\\.eos_token",
+              "msg": "pad_token = eos_token."
+            }
+          ]
+        },
+        {
+          "t": "Vocabulary size",
+          "card": "<p><code class='mono'>len(tokenizer)</code> is the vocab size.</p>",
+          "mission": "Store the vocab size in <b class='text-white'>vocab</b>.",
+          "ph": "vocab = len(tokenizer)",
+          "sol": "vocab = len(tokenizer)",
+          "re": "^vocab\\s*=\\s*len\\(\\s*tokenizer\\s*\\)$",
+          "ok": [
+            "50257"
+          ],
+          "checks": [
+            {
+              "re": "len\\(\\s*tokenizer",
+              "msg": "len(tokenizer)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sampling-decoding",
+      "name": "Sampling & Decoding",
+      "questions": [
+        {
+          "t": "Temperature sampling",
+          "card": "<p><code class='mono'>do_sample=True</code> + temperature softens the distribution.</p>",
+          "mission": "Sample from <code class='mono'>ids</code> at temperature 0.7 into <b class='text-white'>out</b>.",
+          "ph": "out = model.generate(**ids, do_sample=True, temperature=0.7)",
+          "sol": "out = model.generate(**ids, do_sample=True, temperature=0.7)",
+          "re": "^out\\s*=\\s*model\\.generate\\(\\s*\\*\\*ids\\s*,\\s*do_sample\\s*=\\s*True\\s*,\\s*temperature\\s*=\\s*0\\.7\\s*\\)$",
+          "ok": [
+            "sampled output"
+          ],
+          "checks": [
+            {
+              "re": "do_sample\\s*=\\s*True",
+              "msg": "Enable do_sample=True."
+            },
+            {
+              "re": "temperature\\s*=\\s*0\\.7",
+              "msg": "temperature=0.7."
+            }
+          ]
+        },
+        {
+          "t": "Nucleus (top-p)",
+          "card": "<p>Keep only the smallest set of tokens summing to p.</p>",
+          "mission": "Generate with <code class='mono'>top_p=0.9</code> into <b class='text-white'>out</b>.",
+          "ph": "out = model.generate(**ids, top_p=0.9)",
+          "sol": "out = model.generate(**ids, top_p=0.9)",
+          "re": "^out\\s*=\\s*model\\.generate\\(\\s*\\*\\*ids\\s*,\\s*top_p\\s*=\\s*0\\.9\\s*\\)$",
+          "ok": [
+            "nucleus sampling"
+          ],
+          "checks": [
+            {
+              "re": "top_p\\s*=\\s*0\\.9",
+              "msg": "top_p=0.9."
+            }
+          ]
+        },
+        {
+          "t": "Top-k",
+          "card": "<p>Restrict to the k most likely tokens.</p>",
+          "mission": "Generate with <code class='mono'>top_k=50</code> into <b class='text-white'>out</b>.",
+          "ph": "out = model.generate(**ids, top_k=50)",
+          "sol": "out = model.generate(**ids, top_k=50)",
+          "re": "^out\\s*=\\s*model\\.generate\\(\\s*\\*\\*ids\\s*,\\s*top_k\\s*=\\s*50\\s*\\)$",
+          "ok": [
+            "top-k sampling"
+          ],
+          "checks": [
+            {
+              "re": "top_k\\s*=\\s*50",
+              "msg": "top_k=50."
+            }
+          ]
+        },
+        {
+          "t": "Greedy decoding",
+          "card": "<p><code class='mono'>do_sample=False</code> always takes the argmax.</p>",
+          "mission": "Greedy-decode <code class='mono'>ids</code> into <b class='text-white'>out</b>.",
+          "ph": "out = model.generate(**ids, do_sample=False)",
+          "sol": "out = model.generate(**ids, do_sample=False)",
+          "re": "^out\\s*=\\s*model\\.generate\\(\\s*\\*\\*ids\\s*,\\s*do_sample\\s*=\\s*False\\s*\\)$",
+          "ok": [
+            "deterministic"
+          ],
+          "checks": [
+            {
+              "re": "do_sample\\s*=\\s*False",
+              "msg": "do_sample=False."
+            }
+          ]
+        },
+        {
+          "t": "Beam search",
+          "card": "<p>Track several hypotheses in parallel.</p>",
+          "mission": "Generate with <code class='mono'>num_beams=4</code> into <b class='text-white'>out</b>.",
+          "ph": "out = model.generate(**ids, num_beams=4)",
+          "sol": "out = model.generate(**ids, num_beams=4)",
+          "re": "^out\\s*=\\s*model\\.generate\\(\\s*\\*\\*ids\\s*,\\s*num_beams\\s*=\\s*4\\s*\\)$",
+          "ok": [
+            "4 beams"
+          ],
+          "checks": [
+            {
+              "re": "num_beams\\s*=\\s*4",
+              "msg": "num_beams=4."
+            }
+          ]
+        },
+        {
+          "t": "Penalize repetition",
+          "card": "<p><code class='mono'>repetition_penalty</code> discourages loops.</p>",
+          "mission": "Generate with a repetition penalty of 1.2 into <b class='text-white'>out</b>.",
+          "ph": "out = model.generate(**ids, repetition_penalty=1.2)",
+          "sol": "out = model.generate(**ids, repetition_penalty=1.2)",
+          "re": "^out\\s*=\\s*model\\.generate\\(\\s*\\*\\*ids\\s*,\\s*repetition_penalty\\s*=\\s*1\\.2\\s*\\)$",
+          "ok": [
+            "less looping"
+          ],
+          "checks": [
+            {
+              "re": "repetition_penalty\\s*=\\s*1\\.2",
+              "msg": "repetition_penalty=1.2."
+            }
+          ]
+        },
+        {
+          "t": "Seed for reproducibility",
+          "card": "<p>Fix the RNG so sampling repeats.</p>",
+          "mission": "Seed generation with 42.",
+          "ph": "set_seed(42)",
+          "sol": "set_seed(42)",
+          "re": "^set_seed\\(\\s*42\\s*\\)$",
+          "ok": [
+            "deterministic sampling"
+          ],
+          "checks": [
+            {
+              "re": "set_seed\\(\\s*42",
+              "msg": "set_seed(42)."
+            }
+          ]
+        },
+        {
+          "t": "Stop at EOS",
+          "card": "<p>Pass an explicit end-of-sequence id.</p>",
+          "mission": "Generate with <code class='mono'>eos_token_id=tokenizer.eos_token_id</code> into <b class='text-white'>out</b>.",
+          "ph": "out = model.generate(**ids, eos_token_id=tokenizer.eos_token_id)",
+          "sol": "out = model.generate(**ids, eos_token_id=tokenizer.eos_token_id)",
+          "re": "^out\\s*=\\s*model\\.generate\\(\\s*\\*\\*ids\\s*,\\s*eos_token_id\\s*=\\s*tokenizer\\.eos_token_id\\s*\\)$",
+          "ok": [
+            "stops cleanly"
+          ],
+          "checks": [
+            {
+              "re": "eos_token_id\\s*=\\s*tokenizer\\.eos_token_id",
+              "msg": "eos_token_id=tokenizer.eos_token_id."
+            }
+          ]
+        },
+        {
+          "t": "Generation config",
+          "card": "<p>Bundle decoding params in a <code class='mono text-cyan-300'>GenerationConfig</code>.</p>",
+          "mission": "Config with temperature 0.7, top_p 0.9 into <b class='text-white'>cfg</b>.",
+          "ph": "cfg = GenerationConfig(temperature=0.7, top_p=0.9)",
+          "sol": "cfg = GenerationConfig(temperature=0.7, top_p=0.9)",
+          "re": "^cfg\\s*=\\s*GenerationConfig\\(\\s*temperature\\s*=\\s*0\\.7\\s*,\\s*top_p\\s*=\\s*0\\.9\\s*\\)$",
+          "ok": [
+            "reusable config"
+          ],
+          "checks": [
+            {
+              "re": "GenerationConfig\\(",
+              "msg": "GenerationConfig(...)."
+            },
+            {
+              "re": "temperature\\s*=\\s*0\\.7",
+              "msg": "temperature=0.7."
+            }
+          ]
+        },
+        {
+          "t": "Token streamer",
+          "card": "<p>Stream tokens as they are produced.</p>",
+          "mission": "Wrap <code class='mono'>tokenizer</code> in a <b class='text-white'>streamer</b>.",
+          "ph": "streamer = TextStreamer(tokenizer)",
+          "sol": "streamer = TextStreamer(tokenizer)",
+          "re": "^streamer\\s*=\\s*TextStreamer\\(\\s*tokenizer\\s*\\)$",
+          "ok": [
+            "streams tokens"
+          ],
+          "checks": [
+            {
+              "re": "TextStreamer\\(\\s*tokenizer",
+              "msg": "TextStreamer(tokenizer)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "embeddings-similarity",
+      "name": "Embeddings & Similarity",
+      "questions": [
+        {
+          "t": "Load an embedder",
+          "card": "<p>Sentence models project text into a shared vector space.</p>",
+          "mission": "Load <code class='mono'>all-MiniLM-L6-v2</code> into <b class='text-white'>embedder</b>.",
+          "ph": "embedder = SentenceTransformer(\"all-MiniLM-L6-v2\")",
+          "sol": "embedder = SentenceTransformer(\"all-MiniLM-L6-v2\")",
+          "re": "^embedder\\s*=\\s*SentenceTransformer\\(\\s*([\"'])all-MiniLM-L6-v2\\1\\s*\\)$",
+          "ok": [
+            "384-d embedder"
+          ],
+          "checks": [
+            {
+              "re": "SentenceTransformer\\(",
+              "msg": "SentenceTransformer(\"all-MiniLM-L6-v2\")."
+            }
+          ]
+        },
+        {
+          "t": "Embed the corpus",
+          "card": "<p><code class='mono text-cyan-300'>.encode</code> maps texts to vectors.</p>",
+          "mission": "Embed <code class='mono'>docs</code> into <b class='text-white'>vecs</b>.",
+          "ctx": "docs = load_chunks(\"kb/*.md\")",
+          "ph": "vecs = embedder.encode(docs)",
+          "sol": "vecs = embedder.encode(docs)",
+          "re": "^vecs\\s*=\\s*embedder\\.encode\\(\\s*docs\\s*\\)$",
+          "ok": [
+            "(N, 384)"
+          ],
+          "checks": [
+            {
+              "re": "embedder\\.encode\\(\\s*docs",
+              "msg": "embedder.encode(docs)."
+            }
+          ]
+        },
+        {
+          "t": "Normalize on encode",
+          "card": "<p>Unit vectors make cosine = dot product.</p>",
+          "mission": "Embed <code class='mono'>docs</code> normalized into <b class='text-white'>vnorm</b>.",
+          "ph": "vnorm = embedder.encode(docs, normalize_embeddings=True)",
+          "sol": "vnorm = embedder.encode(docs, normalize_embeddings=True)",
+          "re": "^vnorm\\s*=\\s*embedder\\.encode\\(\\s*docs\\s*,\\s*normalize_embeddings\\s*=\\s*True\\s*\\)$",
+          "ok": [
+            "unit vectors"
+          ],
+          "checks": [
+            {
+              "re": "normalize_embeddings\\s*=\\s*True",
+              "msg": "normalize_embeddings=True."
+            }
+          ]
+        },
+        {
+          "t": "Embed the query",
+          "card": "<p>The question goes through the same encoder.</p>",
+          "mission": "Embed <code class='mono'>[query]</code> into <b class='text-white'>q_vec</b>.",
+          "ctx": "query = \"What caused the outage?\"",
+          "ph": "q_vec = embedder.encode([query])",
+          "sol": "q_vec = embedder.encode([query])",
+          "re": "^q_vec\\s*=\\s*embedder\\.encode\\(\\s*\\[\\s*query\\s*\\]\\s*\\)$",
+          "ok": [
+            "1×384"
+          ],
+          "checks": [
+            {
+              "re": "embedder\\.encode\\(\\s*\\[\\s*query",
+              "msg": "embedder.encode([query])."
+            }
+          ]
+        },
+        {
+          "t": "Cosine similarity",
+          "card": "<p><code class='mono text-cyan-300'>cosine_similarity</code> scores query vs corpus.</p>",
+          "mission": "Similarities of <code class='mono'>q_vec</code> to <code class='mono'>vecs</code> into <b class='text-white'>sims</b>.",
+          "ph": "sims = cosine_similarity(q_vec, vecs)",
+          "sol": "sims = cosine_similarity(q_vec, vecs)",
+          "re": "^sims\\s*=\\s*cosine_similarity\\(\\s*q_vec\\s*,\\s*vecs\\s*\\)$",
+          "ok": [
+            "similarity row"
+          ],
+          "checks": [
+            {
+              "re": "cosine_similarity\\(\\s*q_vec\\s*,\\s*vecs",
+              "msg": "cosine_similarity(q_vec, vecs)."
+            }
+          ]
+        },
+        {
+          "t": "Utility cos_sim",
+          "card": "<p>sentence-transformers ships <code class='mono'>util.cos_sim</code>.</p>",
+          "mission": "Same, via <code class='mono'>util.cos_sim</code> into <b class='text-white'>sims</b>.",
+          "ph": "sims = util.cos_sim(q_vec, vecs)",
+          "sol": "sims = util.cos_sim(q_vec, vecs)",
+          "re": "^sims\\s*=\\s*util\\.cos_sim\\(\\s*q_vec\\s*,\\s*vecs\\s*\\)$",
+          "ok": [
+            "torch tensor of sims"
+          ],
+          "checks": [
+            {
+              "re": "util\\.cos_sim\\(\\s*q_vec\\s*,\\s*vecs",
+              "msg": "util.cos_sim(q_vec, vecs)."
+            }
+          ]
+        },
+        {
+          "t": "Embedding dimension",
+          "card": "<p>The second axis is the vector width.</p>",
+          "mission": "Read the embedding dim of <code class='mono'>vecs</code> into <b class='text-white'>dim</b>.",
+          "ph": "dim = vecs.shape[1]",
+          "sol": "dim = vecs.shape[1]",
+          "re": "^dim\\s*=\\s*vecs\\.shape\\[\\s*1\\s*\\]$",
+          "ok": [
+            "384"
+          ],
+          "checks": [
+            {
+              "re": "vecs\\.shape\\[\\s*1\\s*\\]",
+              "msg": "vecs.shape[1]."
+            }
+          ]
+        },
+        {
+          "t": "Best match",
+          "card": "<p>The most similar chunk is the argmax.</p>",
+          "mission": "Index of the best match in <code class='mono'>sims</code> into <b class='text-white'>best</b>.",
+          "ph": "best = sims.argmax()",
+          "sol": "best = sims.argmax()",
+          "re": "^best\\s*=\\s*sims\\.argmax\\(\\s*\\)$",
+          "ok": [
+            "top chunk index"
+          ],
+          "checks": [
+            {
+              "re": "sims\\.argmax\\(",
+              "msg": "sims.argmax()."
+            }
+          ]
+        },
+        {
+          "t": "Top-k matches",
+          "card": "<p>Sort and slice the tail for the k best.</p>",
+          "mission": "Indices of the 3 best in <code class='mono'>sims</code> into <b class='text-white'>top</b>.",
+          "ph": "top = sims.argsort()[-3:]",
+          "sol": "top = sims.argsort()[-3:]",
+          "re": "^top\\s*=\\s*sims\\.argsort\\(\\s*\\)\\[\\s*-\\s*3\\s*:\\s*\\]$",
+          "ok": [
+            "3 nearest"
+          ],
+          "checks": [
+            {
+              "re": "sims\\.argsort\\(",
+              "msg": "sims.argsort()."
+            },
+            {
+              "re": "\\[\\s*-\\s*3\\s*:",
+              "msg": "Take the last 3: [-3:]."
+            }
+          ]
+        },
+        {
+          "t": "Dot of unit vectors",
+          "card": "<p>For normalized vectors, cosine is just the dot.</p>",
+          "mission": "Dot <code class='mono'>a</code> with <code class='mono'>b</code> into <b class='text-white'>score</b>.",
+          "ctx": "# a, b are unit vectors",
+          "ph": "score = np.dot(a, b)",
+          "sol": "score = np.dot(a, b)",
+          "re": "^score\\s*=\\s*(np\\.dot\\(\\s*a\\s*,\\s*b\\s*\\)|a\\s*@\\s*b)$",
+          "ok": [
+            "cosine score"
+          ],
+          "checks": [
+            {
+              "re": "np\\.dot\\(\\s*a\\s*,\\s*b|a\\s*@\\s*b",
+              "msg": "np.dot(a, b)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rag-vector-dbs",
+      "name": "RAG & Vector DBs",
+      "questions": [
+        {
+          "t": "Vector DB client",
+          "card": "<p>Chroma stores embeddings + metadata.</p>",
+          "mission": "Create a Chroma client into <b class='text-white'>client</b>.",
+          "ph": "client = chromadb.Client()",
+          "sol": "client = chromadb.Client()",
+          "re": "^client\\s*=\\s*chromadb\\.Client\\(\\s*\\)$",
+          "ok": [
+            "client ready"
+          ],
+          "checks": [
+            {
+              "re": "chromadb\\.Client\\(",
+              "msg": "chromadb.Client()."
+            }
+          ]
+        },
+        {
+          "t": "Create a collection",
+          "card": "<p>Collections group related vectors.</p>",
+          "mission": "Create a <code class='mono'>docs</code> collection into <b class='text-white'>collection</b>.",
+          "ph": "collection = client.create_collection(\"docs\")",
+          "sol": "collection = client.create_collection(\"docs\")",
+          "re": "^collection\\s*=\\s*client\\.create_collection\\(\\s*([\"'])docs\\1\\s*\\)$",
+          "ok": [
+            "collection created"
+          ],
+          "checks": [
+            {
+              "re": "client\\.create_collection\\(\\s*([\"'])docs",
+              "msg": "client.create_collection(\"docs\")."
+            }
+          ]
+        },
+        {
+          "t": "Add documents",
+          "card": "<p>Chroma embeds text for you on add.</p>",
+          "mission": "Add <code class='mono'>docs</code> with <code class='mono'>ids</code> to the collection.",
+          "ph": "collection.add(documents=docs, ids=ids)",
+          "sol": "collection.add(documents=docs, ids=ids)",
+          "re": "^collection\\.add\\(\\s*documents\\s*=\\s*docs\\s*,\\s*ids\\s*=\\s*ids\\s*\\)$",
+          "ok": [
+            "indexed"
+          ],
+          "checks": [
+            {
+              "re": "collection\\.add\\(",
+              "msg": "collection.add(...)."
+            },
+            {
+              "re": "documents\\s*=\\s*docs",
+              "msg": "documents=docs."
+            },
+            {
+              "re": "ids\\s*=\\s*ids",
+              "msg": "ids=ids."
+            }
+          ]
+        },
+        {
+          "t": "Retrieve top-k",
+          "card": "<p>Query returns the nearest chunks.</p>",
+          "mission": "Retrieve the 4 nearest for <code class='mono'>q</code> into <b class='text-white'>hits</b>.",
+          "ctx": "q = \"What caused the outage?\"",
+          "ph": "hits = collection.query(query_texts=[q], n_results=4)",
+          "sol": "hits = collection.query(query_texts=[q], n_results=4)",
+          "re": "^hits\\s*=\\s*collection\\.query\\(\\s*query_texts\\s*=\\s*\\[\\s*q\\s*\\]\\s*,\\s*n_results\\s*=\\s*4\\s*\\)$",
+          "ok": [
+            "4 chunks"
+          ],
+          "checks": [
+            {
+              "re": "collection\\.query\\(",
+              "msg": "collection.query(...)."
+            },
+            {
+              "re": "n_results\\s*=\\s*4",
+              "msg": "n_results=4."
+            }
+          ]
+        },
+        {
+          "t": "Metadata filter",
+          "card": "<p><code class='mono'>where</code> restricts by metadata.</p>",
+          "mission": "Query with a filter <code class='mono'>{\"year\": 2026}</code> into <b class='text-white'>hits</b>.",
+          "ph": "hits = collection.query(query_texts=[q], where={\"year\": 2026})",
+          "sol": "hits = collection.query(query_texts=[q], where={\"year\": 2026})",
+          "re": "^hits\\s*=\\s*collection\\.query\\(\\s*query_texts\\s*=\\s*\\[\\s*q\\s*\\]\\s*,\\s*where\\s*=\\s*\\{\\s*([\"'])year\\1\\s*:\\s*2026\\s*\\}\\s*\\)$",
+          "ok": [
+            "filtered retrieval"
+          ],
+          "checks": [
+            {
+              "re": "where\\s*=\\s*\\{",
+              "msg": "Add a where={...} filter."
+            },
+            {
+              "re": "([\"'])year\\1\\s*:\\s*2026",
+              "msg": "{\"year\": 2026}."
+            }
+          ]
+        },
+        {
+          "t": "FAISS index",
+          "card": "<p>FAISS is a fast in-memory ANN index.</p>",
+          "mission": "Flat L2 index over 384-d vectors into <b class='text-white'>index</b>.",
+          "ph": "index = faiss.IndexFlatL2(384)",
+          "sol": "index = faiss.IndexFlatL2(384)",
+          "re": "^index\\s*=\\s*faiss\\.IndexFlatL2\\(\\s*384\\s*\\)$",
+          "ok": [
+            "index built"
+          ],
+          "checks": [
+            {
+              "re": "faiss\\.IndexFlatL2\\(\\s*384",
+              "msg": "faiss.IndexFlatL2(384)."
+            }
+          ]
+        },
+        {
+          "t": "Add vectors to FAISS",
+          "card": "<p>Populate the index with your embeddings.</p>",
+          "mission": "Add <code class='mono'>vecs</code> to <code class='mono'>index</code>.",
+          "ph": "index.add(vecs)",
+          "sol": "index.add(vecs)",
+          "re": "^index\\.add\\(\\s*vecs\\s*\\)$",
+          "ok": [
+            "vectors indexed"
+          ],
+          "checks": [
+            {
+              "re": "index\\.add\\(\\s*vecs",
+              "msg": "index.add(vecs)."
+            }
+          ]
+        },
+        {
+          "t": "Search FAISS",
+          "card": "<p>Search returns distances and indices.</p>",
+          "mission": "Search the 4 nearest to <code class='mono'>q_vec</code> into <b class='text-white'>D, I</b>.",
+          "ph": "D, I = index.search(q_vec, 4)",
+          "sol": "D, I = index.search(q_vec, 4)",
+          "re": "^D\\s*,\\s*I\\s*=\\s*index\\.search\\(\\s*q_vec\\s*,\\s*4\\s*\\)$",
+          "ok": [
+            "distances + indices"
+          ],
+          "checks": [
+            {
+              "re": "index\\.search\\(\\s*q_vec\\s*,\\s*4",
+              "msg": "index.search(q_vec, 4)."
+            }
+          ]
+        },
+        {
+          "t": "Chunk the text",
+          "card": "<p>Split long docs into fixed windows before embedding.</p>",
+          "mission": "Chunk <code class='mono'>text</code> into 500-char slices into <b class='text-white'>chunks</b>.",
+          "ph": "chunks = [text[i:i+500] for i in range(0, len(text), 500)]",
+          "sol": "chunks = [text[i:i+500] for i in range(0, len(text), 500)]",
+          "re": "^chunks\\s*=\\s*\\[\\s*text\\[\\s*i\\s*:\\s*i\\s*\\+\\s*500\\s*\\]\\s+for\\s+i\\s+in\\s+range\\(\\s*0\\s*,\\s*len\\(\\s*text\\s*\\)\\s*,\\s*500\\s*\\)\\s*\\]$",
+          "ok": [
+            "fixed-size chunks"
+          ],
+          "checks": [
+            {
+              "re": "text\\[\\s*i\\s*:\\s*i\\s*\\+\\s*500\\s*\\]",
+              "msg": "Slice text[i:i+500]."
+            },
+            {
+              "re": "range\\(\\s*0\\s*,\\s*len\\(\\s*text\\s*\\)\\s*,\\s*500",
+              "msg": "Step by 500."
+            }
+          ]
+        },
+        {
+          "t": "Build the context",
+          "card": "<p>Join retrieved chunks into the prompt context.</p>",
+          "mission": "Join <code class='mono'>hits</code> with spaces into <b class='text-white'>context</b>.",
+          "ph": "context = \" \".join(hits)",
+          "sol": "context = \" \".join(hits)",
+          "re": "^context\\s*=\\s*([\"']) \\1\\.join\\(\\s*hits\\s*\\)$",
+          "ok": [
+            "stuffed context"
+          ],
+          "checks": [
+            {
+              "re": "\\.join\\(\\s*hits",
+              "msg": "\" \".join(hits)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "agents-tools",
+      "name": "Agents & Tool Calling",
+      "questions": [
+        {
+          "t": "Tool schema",
+          "card": "<p>Describe a tool the model can call.</p>",
+          "mission": "Define <b class='text-white'>tool</b> with a <code class='mono'>name</code> and <code class='mono'>parameters</code>.",
+          "ctx": "params = {\"type\": \"object\"}",
+          "ph": "tool = {\"name\": \"get_weather\", \"parameters\": params}",
+          "sol": "tool = {\"name\": \"get_weather\", \"parameters\": params}",
+          "re": "^tool\\s*=\\s*\\{\\s*([\"'])name\\1\\s*:\\s*([\"'])get_weather\\2\\s*,\\s*([\"'])parameters\\3\\s*:\\s*params\\s*\\}$",
+          "ok": [
+            "tool declared"
+          ],
+          "checks": [
+            {
+              "re": "([\"'])name\\1\\s*:\\s*([\"'])get_weather",
+              "msg": "\"name\": \"get_weather\"."
+            },
+            {
+              "re": "([\"'])parameters\\1\\s*:\\s*params",
+              "msg": "\"parameters\": params."
+            }
+          ]
+        },
+        {
+          "t": "Force a tool call",
+          "card": "<p><code class='mono'>tool_choice=\"required\"</code> forces structured output.</p>",
+          "mission": "Call the model with <code class='mono'>msgs</code> + <code class='mono'>tools</code>, forcing a call, into <b class='text-white'>resp</b>.",
+          "ph": "resp = client.chat(messages=msgs, tools=tools, tool_choice=\"required\")",
+          "sol": "resp = client.chat(messages=msgs, tools=tools, tool_choice=\"required\")",
+          "re": "^resp\\s*=\\s*client\\.chat\\(\\s*messages\\s*=\\s*msgs\\s*,\\s*tools\\s*=\\s*tools\\s*,\\s*tool_choice\\s*=\\s*([\"'])required\\1\\s*\\)$",
+          "ok": [
+            "tool_call emitted"
+          ],
+          "checks": [
+            {
+              "re": "tools\\s*=\\s*tools",
+              "msg": "Expose tools=tools."
+            },
+            {
+              "re": "tool_choice\\s*=\\s*([\"'])required",
+              "msg": "tool_choice=\"required\"."
+            }
+          ]
+        },
+        {
+          "t": "Read the tool call",
+          "card": "<p>The call rides on the response message.</p>",
+          "mission": "Pull the first tool call from <code class='mono'>resp</code> into <b class='text-white'>call</b>.",
+          "ph": "call = resp.choices[0].message.tool_calls[0]",
+          "sol": "call = resp.choices[0].message.tool_calls[0]",
+          "re": "^call\\s*=\\s*resp\\.choices\\[\\s*0\\s*\\]\\.message\\.tool_calls\\[\\s*0\\s*\\]$",
+          "ok": [
+            "the tool call"
+          ],
+          "checks": [
+            {
+              "re": "\\.tool_calls\\[\\s*0\\s*\\]",
+              "msg": "…message.tool_calls[0]."
+            }
+          ]
+        },
+        {
+          "t": "Parse the arguments",
+          "card": "<p>Tool args arrive as a JSON string.</p>",
+          "mission": "Parse <code class='mono'>call.function.arguments</code> into <b class='text-white'>args</b>.",
+          "ph": "args = json.loads(call.function.arguments)",
+          "sol": "args = json.loads(call.function.arguments)",
+          "re": "^args\\s*=\\s*json\\.loads\\(\\s*call\\.function\\.arguments\\s*\\)$",
+          "ok": [
+            "{'city': 'Paris'}"
+          ],
+          "checks": [
+            {
+              "re": "json\\.loads\\(\\s*call\\.function\\.arguments",
+              "msg": "json.loads(call.function.arguments)."
+            }
+          ]
+        },
+        {
+          "t": "Tool registry",
+          "card": "<p>Map tool names to the real functions.</p>",
+          "mission": "Map <code class='mono'>\"get_weather\"</code> to <code class='mono'>get_weather</code> into <b class='text-white'>registry</b>.",
+          "ph": "registry = {\"get_weather\": get_weather}",
+          "sol": "registry = {\"get_weather\": get_weather}",
+          "re": "^registry\\s*=\\s*\\{\\s*([\"'])get_weather\\1\\s*:\\s*get_weather\\s*\\}$",
+          "ok": [
+            "dispatch table"
+          ],
+          "checks": [
+            {
+              "re": "\\{\\s*([\"'])get_weather\\1\\s*:\\s*get_weather\\s*\\}",
+              "msg": "{\"get_weather\": get_weather}."
+            }
+          ]
+        },
+        {
+          "t": "Dispatch the call",
+          "card": "<p>Look up the function and spread the args.</p>",
+          "mission": "Call <code class='mono'>registry[name]</code> with <code class='mono'>**args</code> into <b class='text-white'>result</b>.",
+          "ph": "result = registry[name](**args)",
+          "sol": "result = registry[name](**args)",
+          "re": "^result\\s*=\\s*registry\\[\\s*name\\s*\\]\\(\\s*\\*\\*args\\s*\\)$",
+          "ok": [
+            "tool executed"
+          ],
+          "checks": [
+            {
+              "re": "registry\\[\\s*name\\s*\\]",
+              "msg": "Look up registry[name]."
+            },
+            {
+              "re": "\\*\\*args",
+              "msg": "Spread **args."
+            }
+          ]
+        },
+        {
+          "t": "Return the result",
+          "card": "<p>Feed the tool output back as a message.</p>",
+          "mission": "Append a <code class='mono'>tool</code> message with <code class='mono'>result</code> to <code class='mono'>messages</code>.",
+          "ph": "messages.append({\"role\": \"tool\", \"content\": result})",
+          "sol": "messages.append({\"role\": \"tool\", \"content\": result})",
+          "re": "^messages\\.append\\(\\s*\\{\\s*([\"'])role\\1\\s*:\\s*([\"'])tool\\2\\s*,\\s*([\"'])content\\3\\s*:\\s*result\\s*\\}\\s*\\)$",
+          "ok": [
+            "loop continues"
+          ],
+          "checks": [
+            {
+              "re": "messages\\.append\\(",
+              "msg": "messages.append({...})."
+            },
+            {
+              "re": "([\"'])role\\1\\s*:\\s*([\"'])tool",
+              "msg": "\"role\": \"tool\"."
+            }
+          ]
+        },
+        {
+          "t": "System prompt",
+          "card": "<p>Prepend the agent's instructions.</p>",
+          "mission": "Append a <code class='mono'>system</code> message with <code class='mono'>prompt</code> to <code class='mono'>messages</code>.",
+          "ph": "messages.append({\"role\": \"system\", \"content\": prompt})",
+          "sol": "messages.append({\"role\": \"system\", \"content\": prompt})",
+          "re": "^messages\\.append\\(\\s*\\{\\s*([\"'])role\\1\\s*:\\s*([\"'])system\\2\\s*,\\s*([\"'])content\\3\\s*:\\s*prompt\\s*\\}\\s*\\)$",
+          "ok": [
+            "agent framed"
+          ],
+          "checks": [
+            {
+              "re": "([\"'])role\\1\\s*:\\s*([\"'])system",
+              "msg": "\"role\": \"system\"."
+            },
+            {
+              "re": "([\"'])content\\1\\s*:\\s*prompt",
+              "msg": "\"content\": prompt."
+            }
+          ]
+        },
+        {
+          "t": "Bind tools",
+          "card": "<p>LangChain attaches tools to the LLM.</p>",
+          "mission": "Bind <code class='mono'>tools</code> to <code class='mono'>llm</code> into <b class='text-white'>agent</b>.",
+          "ph": "agent = llm.bind_tools(tools)",
+          "sol": "agent = llm.bind_tools(tools)",
+          "re": "^agent\\s*=\\s*llm\\.bind_tools\\(\\s*tools\\s*\\)$",
+          "ok": [
+            "tool-aware LLM"
+          ],
+          "checks": [
+            {
+              "re": "llm\\.bind_tools\\(\\s*tools",
+              "msg": "llm.bind_tools(tools)."
+            }
+          ]
+        },
+        {
+          "t": "Invoke the agent",
+          "card": "<p>Run the reasoning loop over the messages.</p>",
+          "mission": "Invoke <code class='mono'>agent</code> on <code class='mono'>messages</code> into <b class='text-white'>reply</b>.",
+          "ph": "reply = agent.invoke(messages)",
+          "sol": "reply = agent.invoke(messages)",
+          "re": "^reply\\s*=\\s*agent\\.invoke\\(\\s*messages\\s*\\)$",
+          "ok": [
+            "agent responds"
+          ],
+          "checks": [
+            {
+              "re": "agent\\.invoke\\(\\s*messages",
+              "msg": "agent.invoke(messages)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "prompt-engineering",
+      "name": "Prompt Engineering",
+      "questions": [
+        {
+          "t": "system prompt",
+          "card": "<p>The system message sets the assistant's persona / constraints.</p>",
+          "mission": "Set role <code class='mono'>system</code>, content <code class='mono'>Be concise.</code>.",
+          "ph": "system = {'role': 'system', 'content': 'Be concise.'}",
+          "sol": "system = {'role': 'system', 'content': 'Be concise.'}",
+          "re": "^system\\s*=\\s*\\{\\s*['\"]role['\"]\\s*:\\s*['\"]system['\"]\\s*,\\s*['\"]content['\"]\\s*:\\s*['\"]Be concise\\.['\"]\\s*\\}$",
+          "ok": [
+            "system set"
+          ],
+          "checks": [
+            {
+              "re": "['\"]role['\"]\\s*:\\s*['\"]system['\"]",
+              "msg": "Role must be system."
+            }
+          ]
+        },
+        {
+          "t": "few-shot example",
+          "card": "<p>Give input→output pairs so the model imitates the pattern.</p>",
+          "mission": "Insert an example: <code class='mono'>{'role': 'user', 'content': 'hi'}</code>.",
+          "ph": "example = {'role': 'user', 'content': 'hi'}",
+          "sol": "example = {'role': 'user', 'content': 'hi'}",
+          "re": "^example\\s*=\\s*\\{\\s*['\"]role['\"]\\s*:\\s*['\"]user['\"]\\s*,\\s*['\"]content['\"]\\s*:\\s*['\"]hi['\"]\\s*\\}$",
+          "ok": [
+            "shot added"
+          ],
+          "checks": [
+            {
+              "re": "role['\"]\\s*:\\s*['\"]user",
+              "msg": "user role."
+            }
+          ]
+        },
+        {
+          "t": "chain-of-thought",
+          "card": "<p>Ask the model to think step by step; often improves accuracy.</p>",
+          "mission": "Set instruction: <code class='mono'>Think step by step.</code>.",
+          "ph": "cot = 'Think step by step.'",
+          "sol": "cot = 'Think step by step.'",
+          "re": "^cot\\s*=\\s*['\"]Think step by step\\.['\"]$",
+          "ok": [
+            "CoT armed"
+          ],
+          "checks": [
+            {
+              "re": "step by step",
+              "msg": "Ask for step-by-step reasoning."
+            }
+          ]
+        },
+        {
+          "t": "ReAct pattern",
+          "card": "<p>Reason + act loops: <code class='mono text-cyan-300'>Thought / Action / Observation</code>.</p>",
+          "mission": "Start line: <code class='mono'>Thought: I need to search.</code>.",
+          "ph": "step = 'Thought: I need to search.'",
+          "sol": "step = 'Thought: I need to search.'",
+          "re": "^step\\s*=\\s*['\"]Thought: I need to search\\.['\"]$",
+          "ok": [
+            "react step"
+          ],
+          "checks": [
+            {
+              "re": "Thought:",
+              "msg": "Prefix with Thought:."
+            }
+          ]
+        },
+        {
+          "t": "self-consistency",
+          "card": "<p>Sample N reasoning paths, pick majority answer.</p>",
+          "mission": "Set <code class='mono'>n = 5</code>, then <code class='mono'>answer = majority(votes)</code>.",
+          "ph": "answer = majority(votes)",
+          "sol": "answer = majority(votes)",
+          "re": "^answer\\s*=\\s*majority\\(\\s*votes\\s*\\)$",
+          "ok": [
+            "vote result"
+          ],
+          "checks": [
+            {
+              "re": "majority\\(",
+              "msg": "Vote via majority()."
+            }
+          ]
+        },
+        {
+          "t": "stop sequences",
+          "card": "<p><code class='mono text-cyan-300'>stop</code> aborts generation when hit.</p>",
+          "mission": "Stop at <code class='mono'>[END]</code>.",
+          "ph": "stop = ['[END]']",
+          "sol": "stop = ['[END]']",
+          "re": "^stop\\s*=\\s*\\[\\s*['\"]\\[END\\]['\"]\\s*\\]$",
+          "ok": [
+            "stop set"
+          ],
+          "checks": [
+            {
+              "re": "\\[END\\]",
+              "msg": "Include [END]."
+            }
+          ]
+        },
+        {
+          "t": "output schema",
+          "card": "<p>Constrain outputs with JSON schema / <code class='mono text-cyan-300'>pydantic</code>.</p>",
+          "mission": "Declare class header for <code class='mono'>Answer</code> extending <code class='mono'>BaseModel</code>.",
+          "ph": "class Answer(BaseModel):",
+          "sol": "class Answer(BaseModel):",
+          "re": "^class\\s+Answer\\(\\s*BaseModel\\s*\\)\\s*:$",
+          "ok": [
+            "pydantic ready"
+          ],
+          "checks": [
+            {
+              "re": "BaseModel",
+              "msg": "Subclass BaseModel."
+            }
+          ]
+        },
+        {
+          "t": "temperature 0",
+          "card": "<p><code class='mono text-cyan-300'>temperature=0</code> — deterministic decoding.</p>",
+          "mission": "Set config <code class='mono'>temperature=0</code>.",
+          "ph": "cfg = {\"temperature\": 0}",
+          "sol": "cfg = {\"temperature\": 0}",
+          "re": "^cfg\\s*=\\s*\\{\\s*[\"']temperature[\"']\\s*:\\s*0\\s*\\}$",
+          "ok": [
+            "t=0"
+          ],
+          "checks": [
+            {
+              "re": "temperature",
+              "msg": "Add temperature key."
+            }
+          ]
+        },
+        {
+          "t": "prompt template",
+          "card": "<p><code class='mono text-cyan-300'>str.format</code> injects variables into a prompt template.</p>",
+          "mission": "Fill <code class='mono'>tpl</code> with <code class='mono'>topic='python'</code> into <b class='text-white'>p</b>.",
+          "ph": "p = tpl.format(topic='python')",
+          "sol": "p = tpl.format(topic='python')",
+          "re": "^p\\s*=\\s*tpl\\.format\\(\\s*topic\\s*=\\s*['\"]python['\"]\\s*\\)$",
+          "ok": [
+            "filled"
+          ],
+          "checks": [
+            {
+              "re": "\\.format\\(",
+              "msg": "Call .format()."
+            }
+          ]
+        },
+        {
+          "t": "injection guard",
+          "card": "<p>Never pipe raw user text into a system prompt.</p>",
+          "mission": "Strip control chars: <code class='mono'>safe = user.replace('\\\\n', ' ')</code>.",
+          "ph": "safe = user.replace('\\n', ' ')",
+          "sol": "safe = user.replace('\\n', ' ')",
+          "re": "^safe\\s*=\\s*user\\.replace\\(\\s*['\"]\\\\n['\"]\\s*,\\s*['\"] ['\"]\\s*\\)$",
+          "ok": [
+            "neutralized"
+          ],
+          "checks": [
+            {
+              "re": "\\.replace\\(",
+              "msg": "Use .replace on user input."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lora-finetune",
+      "name": "LoRA & Fine-Tuning",
+      "questions": [
+        {
+          "t": "LoraConfig",
+          "card": "<p><code class='mono text-cyan-300'>LoraConfig</code> — the PEFT recipe.</p>",
+          "mission": "Build with <code class='mono'>r=8</code>, <code class='mono'>lora_alpha=16</code>.",
+          "ph": "cfg = LoraConfig(r=8, lora_alpha=16)",
+          "sol": "cfg = LoraConfig(r=8, lora_alpha=16)",
+          "re": "^cfg\\s*=\\s*LoraConfig\\(\\s*r\\s*=\\s*8\\s*,\\s*lora_alpha\\s*=\\s*16\\s*\\)$",
+          "ok": [
+            "lora cfg"
+          ],
+          "checks": [
+            {
+              "re": "LoraConfig\\(",
+              "msg": "Use LoraConfig."
+            },
+            {
+              "re": "r\\s*=\\s*8",
+              "msg": "Set r=8."
+            }
+          ]
+        },
+        {
+          "t": "get_peft_model",
+          "card": "<p><code class='mono text-cyan-300'>get_peft_model(model, cfg)</code> wraps the base model.</p>",
+          "mission": "Wrap into <b class='text-white'>peft_model</b>.",
+          "ph": "peft_model = get_peft_model(model, cfg)",
+          "sol": "peft_model = get_peft_model(model, cfg)",
+          "re": "^peft_model\\s*=\\s*get_peft_model\\(\\s*model\\s*,\\s*cfg\\s*\\)$",
+          "ok": [
+            "wrapped"
+          ],
+          "checks": [
+            {
+              "re": "get_peft_model\\(",
+              "msg": "Call get_peft_model."
+            }
+          ]
+        },
+        {
+          "t": "4-bit quantization",
+          "card": "<p><code class='mono text-cyan-300'>BitsAndBytesConfig(load_in_4bit=True)</code> shrinks memory.</p>",
+          "mission": "Build <b class='text-white'>bnb</b>.",
+          "ph": "bnb = BitsAndBytesConfig(load_in_4bit=True)",
+          "sol": "bnb = BitsAndBytesConfig(load_in_4bit=True)",
+          "re": "^bnb\\s*=\\s*BitsAndBytesConfig\\(\\s*load_in_4bit\\s*=\\s*True\\s*\\)$",
+          "ok": [
+            "4bit ready"
+          ],
+          "checks": [
+            {
+              "re": "load_in_4bit\\s*=\\s*True",
+              "msg": "Set load_in_4bit=True."
+            }
+          ]
+        },
+        {
+          "t": "TrainingArguments",
+          "card": "<p><code class='mono text-cyan-300'>TrainingArguments</code> — HF Trainer config.</p>",
+          "mission": "output_dir=<code class='mono'>out</code>, 3 epochs.",
+          "ph": "args = TrainingArguments(output_dir='out', num_train_epochs=3)",
+          "sol": "args = TrainingArguments(output_dir='out', num_train_epochs=3)",
+          "re": "^args\\s*=\\s*TrainingArguments\\(\\s*output_dir\\s*=\\s*['\"]out['\"]\\s*,\\s*num_train_epochs\\s*=\\s*3\\s*\\)$",
+          "ok": [
+            "args set"
+          ],
+          "checks": [
+            {
+              "re": "TrainingArguments\\(",
+              "msg": "Use TrainingArguments."
+            }
+          ]
+        },
+        {
+          "t": "SFTTrainer",
+          "card": "<p><code class='mono text-cyan-300'>SFTTrainer</code> — supervised fine-tuning helper.</p>",
+          "mission": "Build <b class='text-white'>trainer</b>.",
+          "ph": "trainer = SFTTrainer(model=model, train_dataset=ds, args=args)",
+          "sol": "trainer = SFTTrainer(model=model, train_dataset=ds, args=args)",
+          "re": "^trainer\\s*=\\s*SFTTrainer\\(\\s*model\\s*=\\s*model\\s*,\\s*train_dataset\\s*=\\s*ds\\s*,\\s*args\\s*=\\s*args\\s*\\)$",
+          "ok": [
+            "trainer up"
+          ],
+          "checks": [
+            {
+              "re": "SFTTrainer\\(",
+              "msg": "Use SFTTrainer."
+            }
+          ]
+        },
+        {
+          "t": "trainer.train()",
+          "card": "<p>Kick off training.</p>",
+          "mission": "Call it.",
+          "ph": "trainer.train()",
+          "sol": "trainer.train()",
+          "re": "^trainer\\.train\\(\\s*\\)$",
+          "ok": [
+            "training..."
+          ],
+          "checks": [
+            {
+              "re": "trainer\\.train\\(",
+              "msg": "Call trainer.train."
+            }
+          ]
+        },
+        {
+          "t": "push_to_hub",
+          "card": "<p>Publish weights to the Hugging Face Hub.</p>",
+          "mission": "Push under <code class='mono'>me/my-lora</code>.",
+          "ph": "peft_model.push_to_hub('me/my-lora')",
+          "sol": "peft_model.push_to_hub('me/my-lora')",
+          "re": "^peft_model\\.push_to_hub\\(\\s*['\"]me/my-lora['\"]\\s*\\)$",
+          "ok": [
+            "uploaded"
+          ],
+          "checks": [
+            {
+              "re": "push_to_hub\\(",
+              "msg": "Call push_to_hub."
+            }
+          ]
+        },
+        {
+          "t": "perplexity",
+          "card": "<p>Perplexity = e^loss.</p>",
+          "mission": "Compute into <b class='text-white'>ppl</b>.",
+          "ph": "ppl = math.exp(loss)",
+          "sol": "ppl = math.exp(loss)",
+          "re": "^ppl\\s*=\\s*math\\.exp\\(\\s*loss\\s*\\)$",
+          "ok": [
+            "perplexity"
+          ],
+          "checks": [
+            {
+              "re": "math\\.exp\\(",
+              "msg": "Use math.exp."
+            }
+          ]
+        },
+        {
+          "t": "DPO trainer",
+          "card": "<p><code class='mono text-cyan-300'>DPOTrainer</code> aligns with preference pairs.</p>",
+          "mission": "Build with <code class='mono'>beta=0.1</code>.",
+          "ph": "dpo = DPOTrainer(model=model, beta=0.1, train_dataset=pref)",
+          "sol": "dpo = DPOTrainer(model=model, beta=0.1, train_dataset=pref)",
+          "re": "^dpo\\s*=\\s*DPOTrainer\\(\\s*model\\s*=\\s*model\\s*,\\s*beta\\s*=\\s*0\\.1\\s*,\\s*train_dataset\\s*=\\s*pref\\s*\\)$",
+          "ok": [
+            "DPO ready"
+          ],
+          "checks": [
+            {
+              "re": "DPOTrainer\\(",
+              "msg": "Use DPOTrainer."
+            },
+            {
+              "re": "beta\\s*=",
+              "msg": "Set beta."
+            }
+          ]
+        },
+        {
+          "t": "merge lora",
+          "card": "<p><code class='mono text-cyan-300'>merge_and_unload</code> folds LoRA into base weights.</p>",
+          "mission": "Merge into <b class='text-white'>merged</b>.",
+          "ph": "merged = peft_model.merge_and_unload()",
+          "sol": "merged = peft_model.merge_and_unload()",
+          "re": "^merged\\s*=\\s*peft_model\\.merge_and_unload\\(\\s*\\)$",
+          "ok": [
+            "single model"
+          ],
+          "checks": [
+            {
+              "re": "merge_and_unload\\(",
+              "msg": "Call merge_and_unload."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eval-safety",
+      "name": "Eval & Safety",
+      "questions": [
+        {
+          "t": "BLEU",
+          "card": "<p><code class='mono text-cyan-300'>sacrebleu</code> — translation quality (n-gram overlap).</p>",
+          "mission": "Score into <b class='text-white'>bleu</b>.",
+          "ph": "bleu = sacrebleu.corpus_bleu(preds, [refs])",
+          "sol": "bleu = sacrebleu.corpus_bleu(preds, [refs])",
+          "re": "^bleu\\s*=\\s*sacrebleu\\.corpus_bleu\\(\\s*preds\\s*,\\s*\\[\\s*refs\\s*\\]\\s*\\)$",
+          "ok": [
+            "BLEU"
+          ],
+          "checks": [
+            {
+              "re": "corpus_bleu\\(",
+              "msg": "Use corpus_bleu."
+            }
+          ]
+        },
+        {
+          "t": "ROUGE-L",
+          "card": "<p><code class='mono text-cyan-300'>rouge_scorer</code> — summarization overlap.</p>",
+          "mission": "Build for <code class='mono'>rougeL</code>.",
+          "ph": "scorer = rouge_scorer.RougeScorer(['rougeL'])",
+          "sol": "scorer = rouge_scorer.RougeScorer(['rougeL'])",
+          "re": "^scorer\\s*=\\s*rouge_scorer\\.RougeScorer\\(\\s*\\[\\s*['\"]rougeL['\"]\\s*\\]\\s*\\)$",
+          "ok": [
+            "scorer ready"
+          ],
+          "checks": [
+            {
+              "re": "RougeScorer\\(",
+              "msg": "Use RougeScorer."
+            }
+          ]
+        },
+        {
+          "t": "LLM as judge",
+          "card": "<p>Ask an LLM to grade another LLM's output on a rubric.</p>",
+          "mission": "Set instruction: <code class='mono'>Rate the answer 1–5.</code>.",
+          "ph": "judge_prompt = 'Rate the answer 1-5.'",
+          "sol": "judge_prompt = 'Rate the answer 1-5.'",
+          "re": "^judge_prompt\\s*=\\s*['\"]Rate the answer 1-5\\.['\"]$",
+          "ok": [
+            "rubric"
+          ],
+          "checks": [
+            {
+              "re": "Rate the answer",
+              "msg": "Explicit rating prompt."
+            }
+          ]
+        },
+        {
+          "t": "RAGAS faithfulness",
+          "card": "<p><code class='mono text-cyan-300'>ragas</code> scores RAG on faithfulness/answer_relevancy.</p>",
+          "mission": "Evaluate into <b class='text-white'>score</b>.",
+          "ph": "score = evaluate(ds, metrics=[faithfulness])",
+          "sol": "score = evaluate(ds, metrics=[faithfulness])",
+          "re": "^score\\s*=\\s*evaluate\\(\\s*ds\\s*,\\s*metrics\\s*=\\s*\\[\\s*faithfulness\\s*\\]\\s*\\)$",
+          "ok": [
+            "scored"
+          ],
+          "checks": [
+            {
+              "re": "faithfulness",
+              "msg": "Pass faithfulness metric."
+            }
+          ]
+        },
+        {
+          "t": "PII redaction",
+          "card": "<p>Strip emails etc before storing/logging.</p>",
+          "mission": "Redact emails in <code class='mono'>text</code>.",
+          "ph": "clean = re.sub(r'\\S+@\\S+', '[email]', text)",
+          "sol": "clean = re.sub(r'\\S+@\\S+', '[email]', text)",
+          "re": "^clean\\s*=\\s*re\\.sub\\(\\s*r?['\"]\\\\S\\+@\\\\S\\+['\"]\\s*,\\s*['\"]\\[email\\]['\"]\\s*,\\s*text\\s*\\)$",
+          "ok": [
+            "redacted"
+          ],
+          "checks": [
+            {
+              "re": "re\\.sub\\(",
+              "msg": "Use re.sub."
+            }
+          ]
+        },
+        {
+          "t": "output schema validate",
+          "card": "<p><code class='mono text-cyan-300'>pydantic</code> validates model output on parse.</p>",
+          "mission": "Parse via <code class='mono'>Answer.model_validate_json(raw)</code>.",
+          "ph": "obj = Answer.model_validate_json(raw)",
+          "sol": "obj = Answer.model_validate_json(raw)",
+          "re": "^obj\\s*=\\s*Answer\\.model_validate_json\\(\\s*raw\\s*\\)$",
+          "ok": [
+            "validated"
+          ],
+          "checks": [
+            {
+              "re": "model_validate_json\\(",
+              "msg": "Call model_validate_json."
+            }
+          ]
+        },
+        {
+          "t": "refusal detection",
+          "card": "<p>Detect refusal via prefix match.</p>",
+          "mission": "Test: <code class='mono'>refused = text.startswith('I cannot')</code>.",
+          "ph": "refused = text.startswith('I cannot')",
+          "sol": "refused = text.startswith('I cannot')",
+          "re": "^refused\\s*=\\s*text\\.startswith\\(\\s*['\"]I cannot['\"]\\s*\\)$",
+          "ok": [
+            "flag"
+          ],
+          "checks": [
+            {
+              "re": "\\.startswith\\(",
+              "msg": "Use startswith."
+            }
+          ]
+        },
+        {
+          "t": "max_tokens cap",
+          "card": "<p>Cap generation to bound cost/latency.</p>",
+          "mission": "Set <code class='mono'>max_tokens=512</code>.",
+          "ph": "cfg = {'max_tokens': 512}",
+          "sol": "cfg = {'max_tokens': 512}",
+          "re": "^cfg\\s*=\\s*\\{\\s*['\"]max_tokens['\"]\\s*:\\s*512\\s*\\}$",
+          "ok": [
+            "capped"
+          ],
+          "checks": [
+            {
+              "re": "max_tokens",
+              "msg": "Set max_tokens."
+            }
+          ]
+        },
+        {
+          "t": "cost tracking",
+          "card": "<p>Track tokens × price per 1K.</p>",
+          "mission": "Compute: <code class='mono'>cost = tokens / 1000 * price</code>.",
+          "ph": "cost = tokens / 1000 * price",
+          "sol": "cost = tokens / 1000 * price",
+          "re": "^cost\\s*=\\s*tokens\\s*/\\s*1000\\s*\\*\\s*price$",
+          "ok": [
+            "$$$"
+          ],
+          "checks": [
+            {
+              "re": "/\\s*1000\\s*\\*",
+              "msg": "Multiply after /1000."
+            }
+          ]
+        },
+        {
+          "t": "guardrails jailbreak",
+          "card": "<p>Simple check for adversarial prompt patterns.</p>",
+          "mission": "Flag: <code class='mono'>bad = 'ignore previous' in text.lower()</code>.",
+          "ph": "bad = 'ignore previous' in text.lower()",
+          "sol": "bad = 'ignore previous' in text.lower()",
+          "re": "^bad\\s*=\\s*['\"]ignore previous['\"]\\s+in\\s+text\\.lower\\(\\s*\\)$",
+          "ok": [
+            "detected"
+          ],
+          "checks": [
+            {
+              "re": "ignore previous",
+              "msg": "Check for the phrase."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "serving-observability",
+      "name": "Serving & Observability",
+      "questions": [
+        {
+          "t": "FastAPI app",
+          "card": "<p><code class='mono text-cyan-300'>FastAPI()</code> — declare an app.</p>",
+          "mission": "Instantiate as <b class='text-white'>app</b>.",
+          "ph": "app = FastAPI()",
+          "sol": "app = FastAPI()",
+          "re": "^app\\s*=\\s*FastAPI\\(\\s*\\)$",
+          "ok": [
+            "app up"
+          ],
+          "checks": [
+            {
+              "re": "FastAPI\\(",
+              "msg": "Use FastAPI."
+            }
+          ]
+        },
+        {
+          "t": "POST route",
+          "card": "<p>Decorate a handler with <code class='mono text-cyan-300'>@app.post</code>.</p>",
+          "mission": "Route <code class='mono'>/chat</code>.",
+          "ph": "@app.post('/chat')",
+          "sol": "@app.post('/chat')",
+          "re": "^@app\\.post\\(\\s*['\"]/chat['\"]\\s*\\)$",
+          "ok": [
+            "route bound"
+          ],
+          "checks": [
+            {
+              "re": "@app\\.post\\(",
+              "msg": "Use @app.post."
+            }
+          ]
+        },
+        {
+          "t": "stream response",
+          "card": "<p><code class='mono text-cyan-300'>StreamingResponse</code> — token-by-token.</p>",
+          "mission": "Return <code class='mono'>StreamingResponse(gen())</code>.",
+          "ph": "return StreamingResponse(gen())",
+          "sol": "return StreamingResponse(gen())",
+          "re": "^return\\s+StreamingResponse\\(\\s*gen\\(\\s*\\)\\s*\\)$",
+          "ok": [
+            "streaming"
+          ],
+          "checks": [
+            {
+              "re": "StreamingResponse\\(",
+              "msg": "Use StreamingResponse."
+            }
+          ]
+        },
+        {
+          "t": "uvicorn run",
+          "card": "<p><code class='mono text-cyan-300'>uvicorn</code> — ASGI server.</p>",
+          "mission": "Run on port 8000.",
+          "ph": "uvicorn.run(app, host='0.0.0.0', port=8000)",
+          "sol": "uvicorn.run(app, host='0.0.0.0', port=8000)",
+          "re": "^uvicorn\\.run\\(\\s*app\\s*,\\s*host\\s*=\\s*['\"]0\\.0\\.0\\.0['\"]\\s*,\\s*port\\s*=\\s*8000\\s*\\)$",
+          "ok": [
+            "listening"
+          ],
+          "checks": [
+            {
+              "re": "uvicorn\\.run\\(",
+              "msg": "Call uvicorn.run."
+            }
+          ]
+        },
+        {
+          "t": "redis cache",
+          "card": "<p>Cache prompt→response.</p>",
+          "mission": "Set: <code class='mono'>r.set(key, val, ex=3600)</code>.",
+          "ph": "r.set(key, val, ex=3600)",
+          "sol": "r.set(key, val, ex=3600)",
+          "re": "^r\\.set\\(\\s*key\\s*,\\s*val\\s*,\\s*ex\\s*=\\s*3600\\s*\\)$",
+          "ok": [
+            "cached"
+          ],
+          "checks": [
+            {
+              "re": "ex\\s*=\\s*3600",
+              "msg": "Set TTL 3600."
+            }
+          ]
+        },
+        {
+          "t": "langfuse observation",
+          "card": "<p><code class='mono text-cyan-300'>langfuse.trace</code> logs an LLM span.</p>",
+          "mission": "Create trace named <code class='mono'>chat</code>.",
+          "ph": "trace = langfuse.trace(name='chat')",
+          "sol": "trace = langfuse.trace(name='chat')",
+          "re": "^trace\\s*=\\s*langfuse\\.trace\\(\\s*name\\s*=\\s*['\"]chat['\"]\\s*\\)$",
+          "ok": [
+            "traced"
+          ],
+          "checks": [
+            {
+              "re": "langfuse\\.trace\\(",
+              "msg": "Use langfuse.trace."
+            }
+          ]
+        },
+        {
+          "t": "batch generate",
+          "card": "<p><code class='mono text-cyan-300'>vLLM</code> batches many prompts on one GPU.</p>",
+          "mission": "Call <code class='mono'>llm.generate(prompts)</code>.",
+          "ph": "outputs = llm.generate(prompts)",
+          "sol": "outputs = llm.generate(prompts)",
+          "re": "^outputs\\s*=\\s*llm\\.generate\\(\\s*prompts\\s*\\)$",
+          "ok": [
+            "batched"
+          ],
+          "checks": [
+            {
+              "re": "llm\\.generate\\(",
+              "msg": "Call llm.generate."
+            }
+          ]
+        },
+        {
+          "t": "Dockerfile FROM",
+          "card": "<p><code class='mono text-cyan-300'>FROM</code> starts the base image.</p>",
+          "mission": "Base on <code class='mono'>python:3.11-slim</code>.",
+          "ph": "line = 'FROM python:3.11-slim'",
+          "sol": "line = 'FROM python:3.11-slim'",
+          "re": "^line\\s*=\\s*['\"]FROM python:3\\.11-slim['\"]$",
+          "ok": [
+            "base image"
+          ],
+          "checks": [
+            {
+              "re": "FROM\\s+python",
+              "msg": "FROM python:..."
+            }
+          ]
+        },
+        {
+          "t": "HuggingFace endpoint",
+          "card": "<p><code class='mono text-cyan-300'>InferenceClient</code> — hosted inference.</p>",
+          "mission": "Point at <code class='mono'>meta-llama/Llama-3-8b-instruct</code>.",
+          "ph": "client = InferenceClient(model='meta-llama/Llama-3-8b-instruct')",
+          "sol": "client = InferenceClient(model='meta-llama/Llama-3-8b-instruct')",
+          "re": "^client\\s*=\\s*InferenceClient\\(\\s*model\\s*=\\s*['\"]meta-llama/Llama-3-8b-instruct['\"]\\s*\\)$",
+          "ok": [
+            "endpoint set"
+          ],
+          "checks": [
+            {
+              "re": "InferenceClient\\(",
+              "msg": "Use InferenceClient."
+            }
+          ]
+        },
+        {
+          "t": "health route",
+          "card": "<p>Simple <code class='mono'>/health</code> route for k8s liveness probes.</p>",
+          "mission": "Add route via <code class='mono'>@app.get('/health')</code>.",
+          "ph": "@app.get('/health')",
+          "sol": "@app.get('/health')",
+          "re": "^@app\\.get\\(\\s*['\"]/health['\"]\\s*\\)$",
+          "ok": [
+            "probe up"
+          ],
+          "checks": [
+            {
+              "re": "/health",
+              "msg": "Route /health."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

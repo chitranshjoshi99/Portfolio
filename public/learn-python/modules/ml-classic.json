@@ -1,0 +1,1705 @@
+{
+  "id": "ML-CLASSIC",
+  "name": "Machine Learning",
+  "tier": "Engineer",
+  "planet": "Modelia",
+  "desc": "A leakage-safe scikit-learn pipeline end to end — split, fit, predict, score.",
+  "xp": 30,
+  "color": "0xff9f2e",
+  "viz": null,
+  "badge": "ml",
+  "checkpoints": [
+    {
+      "id": "preprocess-split",
+      "name": "Preprocess & Split",
+      "questions": [
+        {
+          "t": "Reproducible split",
+          "card": "<p>Hold out data + fix the seed so the split repeats.</p>",
+          "mission": "Split <code class='mono'>X, y</code> — 20% test, fixed seed — into the four names.",
+          "ctx": "# X: (200, 4)  y: (200,)",
+          "ph": "X_train, X_test, y_train, y_test = train_test_split(...)",
+          "sol": "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)",
+          "re": "^X_train\\s*,\\s*X_test\\s*,\\s*y_train\\s*,\\s*y_test\\s*=\\s*train_test_split\\(\\s*X\\s*,\\s*y\\s*,\\s*test_size\\s*=\\s*0\\.2\\s*,\\s*random_state\\s*=\\s*\\d+\\s*\\)$",
+          "ok": [
+            "train (160,4)  test (40,4)"
+          ],
+          "checks": [
+            {
+              "re": "test_size\\s*=\\s*0\\.2",
+              "msg": "test_size=0.2."
+            },
+            {
+              "re": "random_state\\s*=",
+              "msg": "Fix random_state."
+            }
+          ]
+        },
+        {
+          "t": "Make a scaler",
+          "card": "<p><code class='mono text-cyan-300'>StandardScaler</code> standardizes to mean 0, std 1.</p>",
+          "mission": "Instantiate a <b class='text-white'>scaler</b>.",
+          "ph": "scaler = StandardScaler()",
+          "sol": "scaler = StandardScaler()",
+          "re": "^scaler\\s*=\\s*StandardScaler\\(\\s*\\)$",
+          "ok": [
+            "scaler ready"
+          ],
+          "checks": [
+            {
+              "re": "StandardScaler\\(",
+              "msg": "StandardScaler()."
+            }
+          ]
+        },
+        {
+          "t": "Fit on train",
+          "card": "<p><code class='mono text-cyan-300'>fit_transform</code> learns stats + applies them — on train only.</p>",
+          "mission": "Learn + scale the training features into <b class='text-white'>X_train_s</b>.",
+          "ph": "X_train_s = scaler.fit_transform(X_train)",
+          "sol": "X_train_s = scaler.fit_transform(X_train)",
+          "re": "^X_train_s\\s*=\\s*scaler\\.fit_transform\\(\\s*X_train\\s*\\)$",
+          "ok": [
+            "scaled train set"
+          ],
+          "checks": [
+            {
+              "re": "\\.fit_transform\\(\\s*X_train",
+              "msg": "fit_transform on X_train."
+            }
+          ]
+        },
+        {
+          "t": "Transform the test",
+          "card": "<p>Reuse the training stats — <b>never</b> refit on test.</p>",
+          "mission": "Scale the test features into <b class='text-white'>X_test_s</b>.",
+          "ph": "X_test_s = scaler.transform(X_test)",
+          "sol": "X_test_s = scaler.transform(X_test)",
+          "re": "^X_test_s\\s*=\\s*scaler\\.transform\\(\\s*X_test\\s*\\)$",
+          "ok": [
+            "scaled with train stats"
+          ],
+          "checks": [
+            {
+              "re": "fit_transform\\(\\s*X_test",
+              "bad": true,
+              "msg": "Never fit on test — leakage. Use transform()."
+            },
+            {
+              "re": "\\.transform\\(\\s*X_test",
+              "msg": "scaler.transform(X_test)."
+            }
+          ]
+        },
+        {
+          "t": "Min-max scaler",
+          "card": "<p><code class='mono text-cyan-300'>MinMaxScaler</code> squashes to [0, 1].</p>",
+          "mission": "Instantiate a <b class='text-white'>mm</b> scaler.",
+          "ph": "mm = MinMaxScaler()",
+          "sol": "mm = MinMaxScaler()",
+          "re": "^mm\\s*=\\s*MinMaxScaler\\(\\s*\\)$",
+          "ok": [
+            "ready"
+          ],
+          "checks": [
+            {
+              "re": "MinMaxScaler\\(",
+              "msg": "MinMaxScaler()."
+            }
+          ]
+        },
+        {
+          "t": "One-hot encode",
+          "card": "<p>Turn categories into indicator columns.</p>",
+          "mission": "Make a <b class='text-white'>enc</b> that ignores unseen categories.",
+          "ph": "enc = OneHotEncoder(handle_unknown=\"ignore\")",
+          "sol": "enc = OneHotEncoder(handle_unknown=\"ignore\")",
+          "re": "^enc\\s*=\\s*OneHotEncoder\\(\\s*handle_unknown\\s*=\\s*([\"'])ignore\\1\\s*\\)$",
+          "ok": [
+            "safe on new categories"
+          ],
+          "checks": [
+            {
+              "re": "OneHotEncoder\\(",
+              "msg": "OneHotEncoder(...)."
+            },
+            {
+              "re": "handle_unknown\\s*=\\s*([\"'])ignore",
+              "msg": "handle_unknown=\"ignore\"."
+            }
+          ]
+        },
+        {
+          "t": "Encode labels",
+          "card": "<p><code class='mono text-cyan-300'>LabelEncoder</code> maps classes to integers.</p>",
+          "mission": "Encode <code class='mono'>y</code> into <b class='text-white'>y_enc</b> in one call.",
+          "ph": "y_enc = LabelEncoder().fit_transform(y)",
+          "sol": "y_enc = LabelEncoder().fit_transform(y)",
+          "re": "^y_enc\\s*=\\s*LabelEncoder\\(\\s*\\)\\.fit_transform\\(\\s*y\\s*\\)$",
+          "ok": [
+            "classes → ints"
+          ],
+          "checks": [
+            {
+              "re": "LabelEncoder\\(\\s*\\)\\.fit_transform\\(\\s*y",
+              "msg": "LabelEncoder().fit_transform(y)."
+            }
+          ]
+        },
+        {
+          "t": "Impute missing",
+          "card": "<p><code class='mono text-cyan-300'>SimpleImputer</code> fills gaps.</p>",
+          "mission": "Make an imputer <b class='text-white'>imp</b> that fills with the mean.",
+          "ph": "imp = SimpleImputer(strategy=\"mean\")",
+          "sol": "imp = SimpleImputer(strategy=\"mean\")",
+          "re": "^imp\\s*=\\s*SimpleImputer\\(\\s*strategy\\s*=\\s*([\"'])mean\\1\\s*\\)$",
+          "ok": [
+            "fills with column mean"
+          ],
+          "checks": [
+            {
+              "re": "SimpleImputer\\(",
+              "msg": "SimpleImputer(...)."
+            },
+            {
+              "re": "strategy\\s*=\\s*([\"'])mean",
+              "msg": "strategy=\"mean\"."
+            }
+          ]
+        },
+        {
+          "t": "Stratified split",
+          "card": "<p><code class='mono'>stratify=y</code> keeps class balance in both splits.</p>",
+          "mission": "Split preserving class balance into the four names.",
+          "ph": "... = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)",
+          "sol": "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)",
+          "re": "^X_train\\s*,\\s*X_test\\s*,\\s*y_train\\s*,\\s*y_test\\s*=\\s*train_test_split\\(\\s*X\\s*,\\s*y\\s*,\\s*test_size\\s*=\\s*0\\.2\\s*,\\s*stratify\\s*=\\s*y\\s*,\\s*random_state\\s*=\\s*\\d+\\s*\\)$",
+          "ok": [
+            "balanced split"
+          ],
+          "checks": [
+            {
+              "re": "stratify\\s*=\\s*y",
+              "msg": "Pass stratify=y."
+            },
+            {
+              "re": "random_state\\s*=",
+              "msg": "Fix the seed."
+            }
+          ]
+        },
+        {
+          "t": "Leakage-safe pipeline",
+          "card": "<p>A pipeline refits the scaler inside each fold.</p>",
+          "mission": "Build <b class='text-white'>pipe</b>: StandardScaler → LogisticRegression.",
+          "ph": "pipe = make_pipeline(StandardScaler(), LogisticRegression())",
+          "sol": "pipe = make_pipeline(StandardScaler(), LogisticRegression())",
+          "re": "^pipe\\s*=\\s*make_pipeline\\(\\s*StandardScaler\\(\\s*\\)\\s*,\\s*LogisticRegression\\([^)]*\\)\\s*\\)$",
+          "ok": [
+            "no leakage"
+          ],
+          "checks": [
+            {
+              "re": "make_pipeline\\(",
+              "msg": "make_pipeline(...)."
+            },
+            {
+              "re": "StandardScaler\\(\\s*\\)\\s*,\\s*LogisticRegression",
+              "msg": "Scale first, then the model."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "models",
+      "name": "Models",
+      "questions": [
+        {
+          "t": "Logistic regression",
+          "card": "<p>The linear classifier baseline.</p>",
+          "mission": "Instantiate <b class='text-white'>model</b>.",
+          "ph": "model = LogisticRegression()",
+          "sol": "model = LogisticRegression()",
+          "re": "^model\\s*=\\s*LogisticRegression\\(\\s*\\)$",
+          "ok": [
+            "classifier ready"
+          ],
+          "checks": [
+            {
+              "re": "LogisticRegression\\(",
+              "msg": "LogisticRegression()."
+            }
+          ]
+        },
+        {
+          "t": "Fit the model",
+          "card": "<p><code class='mono text-cyan-300'>.fit</code> learns from the training split.</p>",
+          "mission": "Fit <code class='mono'>model</code> on the training data.",
+          "ph": "model.fit(X_train, y_train)",
+          "sol": "model.fit(X_train, y_train)",
+          "re": "^model\\.fit\\(\\s*X_train\\s*,\\s*y_train\\s*\\)$",
+          "ok": [
+            "trained"
+          ],
+          "checks": [
+            {
+              "re": "X_test|y_test",
+              "bad": true,
+              "msg": "Fit on train only — not test."
+            },
+            {
+              "re": "\\.fit\\(\\s*X_train\\s*,\\s*y_train",
+              "msg": "model.fit(X_train, y_train)."
+            }
+          ]
+        },
+        {
+          "t": "Predict",
+          "card": "<p>Run the fitted model on unseen features.</p>",
+          "mission": "Predict on <code class='mono'>X_test</code> into <b class='text-white'>preds</b>.",
+          "ph": "preds = model.predict(X_test)",
+          "sol": "preds = model.predict(X_test)",
+          "re": "^preds\\s*=\\s*model\\.predict\\(\\s*X_test\\s*\\)$",
+          "ok": [
+            "class predictions"
+          ],
+          "checks": [
+            {
+              "re": "\\.predict\\(\\s*X_test",
+              "msg": "model.predict(X_test)."
+            }
+          ]
+        },
+        {
+          "t": "Linear regression",
+          "card": "<p>For continuous targets.</p>",
+          "mission": "Instantiate a <b class='text-white'>reg</b>.",
+          "ph": "reg = LinearRegression()",
+          "sol": "reg = LinearRegression()",
+          "re": "^reg\\s*=\\s*LinearRegression\\(\\s*\\)$",
+          "ok": [
+            "regressor ready"
+          ],
+          "checks": [
+            {
+              "re": "LinearRegression\\(",
+              "msg": "LinearRegression()."
+            }
+          ]
+        },
+        {
+          "t": "Decision tree",
+          "card": "<p>Cap depth to fight overfitting.</p>",
+          "mission": "Make a <b class='text-white'>tree</b> with <code class='mono'>max_depth=5</code>.",
+          "ph": "tree = DecisionTreeClassifier(max_depth=5)",
+          "sol": "tree = DecisionTreeClassifier(max_depth=5)",
+          "re": "^tree\\s*=\\s*DecisionTreeClassifier\\(\\s*max_depth\\s*=\\s*5\\s*\\)$",
+          "ok": [
+            "depth-limited tree"
+          ],
+          "checks": [
+            {
+              "re": "DecisionTreeClassifier\\(",
+              "msg": "DecisionTreeClassifier(...)."
+            },
+            {
+              "re": "max_depth\\s*=\\s*5",
+              "msg": "max_depth=5."
+            }
+          ]
+        },
+        {
+          "t": "Support vector machine",
+          "card": "<p>The RBF kernel bends the boundary.</p>",
+          "mission": "Make an <b class='text-white'>svm</b> with an <code class='mono'>rbf</code> kernel.",
+          "ph": "svm = SVC(kernel=\"rbf\")",
+          "sol": "svm = SVC(kernel=\"rbf\")",
+          "re": "^svm\\s*=\\s*SVC\\(\\s*kernel\\s*=\\s*([\"'])rbf\\1\\s*\\)$",
+          "ok": [
+            "kernel SVM"
+          ],
+          "checks": [
+            {
+              "re": "SVC\\(",
+              "msg": "SVC(...)."
+            },
+            {
+              "re": "kernel\\s*=\\s*([\"'])rbf",
+              "msg": "kernel=\"rbf\"."
+            }
+          ]
+        },
+        {
+          "t": "k-nearest neighbours",
+          "card": "<p>Vote among the k closest points.</p>",
+          "mission": "Make a <b class='text-white'>knn</b> with 5 neighbours.",
+          "ph": "knn = KNeighborsClassifier(n_neighbors=5)",
+          "sol": "knn = KNeighborsClassifier(n_neighbors=5)",
+          "re": "^knn\\s*=\\s*KNeighborsClassifier\\(\\s*n_neighbors\\s*=\\s*5\\s*\\)$",
+          "ok": [
+            "k=5"
+          ],
+          "checks": [
+            {
+              "re": "KNeighborsClassifier\\(",
+              "msg": "KNeighborsClassifier(...)."
+            },
+            {
+              "re": "n_neighbors\\s*=\\s*5",
+              "msg": "n_neighbors=5."
+            }
+          ]
+        },
+        {
+          "t": "Class probabilities",
+          "card": "<p><code class='mono text-cyan-300'>predict_proba</code> returns per-class scores.</p>",
+          "mission": "Probabilities on <code class='mono'>X_test</code> into <b class='text-white'>probs</b>.",
+          "ph": "probs = model.predict_proba(X_test)",
+          "sol": "probs = model.predict_proba(X_test)",
+          "re": "^probs\\s*=\\s*model\\.predict_proba\\(\\s*X_test\\s*\\)$",
+          "ok": [
+            "probability matrix"
+          ],
+          "checks": [
+            {
+              "re": "\\.predict_proba\\(\\s*X_test",
+              "msg": "model.predict_proba(X_test)."
+            }
+          ]
+        },
+        {
+          "t": "Quick score",
+          "card": "<p><code class='mono text-cyan-300'>.score</code> gives default accuracy/R².</p>",
+          "mission": "Score <code class='mono'>model</code> on the test split into <b class='text-white'>acc</b>.",
+          "ph": "acc = model.score(X_test, y_test)",
+          "sol": "acc = model.score(X_test, y_test)",
+          "re": "^acc\\s*=\\s*model\\.score\\(\\s*X_test\\s*,\\s*y_test\\s*\\)$",
+          "ok": [
+            "0.93"
+          ],
+          "checks": [
+            {
+              "re": "\\.score\\(\\s*X_test\\s*,\\s*y_test",
+              "msg": "model.score(X_test, y_test)."
+            }
+          ]
+        },
+        {
+          "t": "Read the weights",
+          "card": "<p>Fitted linear models expose <code class='mono text-cyan-300'>coef_</code>.</p>",
+          "mission": "Grab the coefficients into <b class='text-white'>weights</b>.",
+          "ph": "weights = model.coef_",
+          "sol": "weights = model.coef_",
+          "re": "^weights\\s*=\\s*model\\.coef_$",
+          "ok": [
+            "learned weights"
+          ],
+          "checks": [
+            {
+              "re": "model\\.coef_",
+              "msg": "model.coef_ (trailing underscore = learned)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ensembles",
+      "name": "Ensembles",
+      "questions": [
+        {
+          "t": "Random forest",
+          "card": "<p>Many trees vote — the workhorse baseline.</p>",
+          "mission": "Make an <b class='text-white'>rf</b>: 100 trees, fixed seed.",
+          "ph": "rf = RandomForestClassifier(n_estimators=100, random_state=42)",
+          "sol": "rf = RandomForestClassifier(n_estimators=100, random_state=42)",
+          "re": "^rf\\s*=\\s*RandomForestClassifier\\(\\s*n_estimators\\s*=\\s*100\\s*,\\s*random_state\\s*=\\s*\\d+\\s*\\)$",
+          "ok": [
+            "forest ready"
+          ],
+          "checks": [
+            {
+              "re": "RandomForestClassifier\\(",
+              "msg": "RandomForestClassifier(...)."
+            },
+            {
+              "re": "n_estimators\\s*=\\s*100",
+              "msg": "n_estimators=100."
+            },
+            {
+              "re": "random_state\\s*=",
+              "msg": "Fix the seed."
+            }
+          ]
+        },
+        {
+          "t": "Fit the forest",
+          "card": "<p>Same fit API across every estimator.</p>",
+          "mission": "Fit <code class='mono'>rf</code> on the training data.",
+          "ph": "rf.fit(X_train, y_train)",
+          "sol": "rf.fit(X_train, y_train)",
+          "re": "^rf\\.fit\\(\\s*X_train\\s*,\\s*y_train\\s*\\)$",
+          "ok": [
+            "trained"
+          ],
+          "checks": [
+            {
+              "re": "\\.fit\\(\\s*X_train\\s*,\\s*y_train",
+              "msg": "rf.fit(X_train, y_train)."
+            }
+          ]
+        },
+        {
+          "t": "Feature importances",
+          "card": "<p>Forests rank inputs by contribution.</p>",
+          "mission": "Read <code class='mono'>rf</code>'s importances into <b class='text-white'>imp</b>.",
+          "ph": "imp = rf.feature_importances_",
+          "sol": "imp = rf.feature_importances_",
+          "re": "^imp\\s*=\\s*rf\\.feature_importances_$",
+          "ok": [
+            "per-feature weight"
+          ],
+          "checks": [
+            {
+              "re": "rf\\.feature_importances_",
+              "msg": "rf.feature_importances_."
+            }
+          ]
+        },
+        {
+          "t": "Gradient boosting",
+          "card": "<p>Sequential trees that fix prior errors.</p>",
+          "mission": "Instantiate a <b class='text-white'>gb</b>.",
+          "ph": "gb = GradientBoostingClassifier()",
+          "sol": "gb = GradientBoostingClassifier()",
+          "re": "^gb\\s*=\\s*GradientBoostingClassifier\\(\\s*\\)$",
+          "ok": [
+            "boosted ensemble"
+          ],
+          "checks": [
+            {
+              "re": "GradientBoostingClassifier\\(",
+              "msg": "GradientBoostingClassifier()."
+            }
+          ]
+        },
+        {
+          "t": "Limit tree depth",
+          "card": "<p>Shallower trees generalize better.</p>",
+          "mission": "Forest <b class='text-white'>rf2</b> with <code class='mono'>max_depth=8</code>.",
+          "ph": "rf2 = RandomForestClassifier(max_depth=8)",
+          "sol": "rf2 = RandomForestClassifier(max_depth=8)",
+          "re": "^rf2\\s*=\\s*RandomForestClassifier\\(\\s*max_depth\\s*=\\s*8\\s*\\)$",
+          "ok": [
+            "depth-limited"
+          ],
+          "checks": [
+            {
+              "re": "max_depth\\s*=\\s*8",
+              "msg": "max_depth=8."
+            }
+          ]
+        },
+        {
+          "t": "Predict with the forest",
+          "card": "<p>Ensembles predict just like a single model.</p>",
+          "mission": "Predict on <code class='mono'>X_test</code> into <b class='text-white'>preds</b>.",
+          "ph": "preds = rf.predict(X_test)",
+          "sol": "preds = rf.predict(X_test)",
+          "re": "^preds\\s*=\\s*rf\\.predict\\(\\s*X_test\\s*\\)$",
+          "ok": [
+            "forest votes"
+          ],
+          "checks": [
+            {
+              "re": "rf\\.predict\\(\\s*X_test",
+              "msg": "rf.predict(X_test)."
+            }
+          ]
+        },
+        {
+          "t": "Soft voting",
+          "card": "<p><code class='mono text-cyan-300'>VotingClassifier</code> averages several models.</p>",
+          "mission": "Combine <code class='mono'>models</code> with soft voting into <b class='text-white'>vote</b>.",
+          "ctx": "models = [(\"rf\", rf), (\"gb\", gb)]",
+          "ph": "vote = VotingClassifier(estimators=models, voting=\"soft\")",
+          "sol": "vote = VotingClassifier(estimators=models, voting=\"soft\")",
+          "re": "^vote\\s*=\\s*VotingClassifier\\(\\s*estimators\\s*=\\s*models\\s*,\\s*voting\\s*=\\s*([\"'])soft\\1\\s*\\)$",
+          "ok": [
+            "ensemble of ensembles"
+          ],
+          "checks": [
+            {
+              "re": "VotingClassifier\\(",
+              "msg": "VotingClassifier(...)."
+            },
+            {
+              "re": "voting\\s*=\\s*([\"'])soft",
+              "msg": "voting=\"soft\"."
+            }
+          ]
+        },
+        {
+          "t": "More trees",
+          "card": "<p>More estimators → lower variance, slower.</p>",
+          "mission": "Forest <b class='text-white'>rf3</b> with 300 trees.",
+          "ph": "rf3 = RandomForestClassifier(n_estimators=300)",
+          "sol": "rf3 = RandomForestClassifier(n_estimators=300)",
+          "re": "^rf3\\s*=\\s*RandomForestClassifier\\(\\s*n_estimators\\s*=\\s*300\\s*\\)$",
+          "ok": [
+            "300 trees"
+          ],
+          "checks": [
+            {
+              "re": "n_estimators\\s*=\\s*300",
+              "msg": "n_estimators=300."
+            }
+          ]
+        },
+        {
+          "t": "Out-of-bag score",
+          "card": "<p><code class='mono'>oob_score=True</code> validates for free on unused samples.</p>",
+          "mission": "Forest <b class='text-white'>rf4</b> with OOB scoring on.",
+          "ph": "rf4 = RandomForestClassifier(oob_score=True)",
+          "sol": "rf4 = RandomForestClassifier(oob_score=True)",
+          "re": "^rf4\\s*=\\s*RandomForestClassifier\\(\\s*oob_score\\s*=\\s*True\\s*\\)$",
+          "ok": [
+            "free validation"
+          ],
+          "checks": [
+            {
+              "re": "oob_score\\s*=\\s*True",
+              "msg": "oob_score=True."
+            }
+          ]
+        },
+        {
+          "t": "Bagging",
+          "card": "<p><code class='mono text-cyan-300'>BaggingClassifier</code> trains on bootstrap samples.</p>",
+          "mission": "Make a <b class='text-white'>bag</b> of 10 estimators.",
+          "ph": "bag = BaggingClassifier(n_estimators=10)",
+          "sol": "bag = BaggingClassifier(n_estimators=10)",
+          "re": "^bag\\s*=\\s*BaggingClassifier\\(\\s*n_estimators\\s*=\\s*10\\s*\\)$",
+          "ok": [
+            "bootstrap ensemble"
+          ],
+          "checks": [
+            {
+              "re": "BaggingClassifier\\(",
+              "msg": "BaggingClassifier(...)."
+            },
+            {
+              "re": "n_estimators\\s*=\\s*10",
+              "msg": "n_estimators=10."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "evaluation",
+      "name": "Evaluation",
+      "questions": [
+        {
+          "t": "Accuracy",
+          "card": "<p>Share of correct predictions.</p>",
+          "mission": "Accuracy of <code class='mono'>preds</code> vs <code class='mono'>y_test</code> into <b class='text-white'>acc</b>.",
+          "ph": "acc = accuracy_score(y_test, preds)",
+          "sol": "acc = accuracy_score(y_test, preds)",
+          "re": "^acc\\s*=\\s*accuracy_score\\(\\s*y_test\\s*,\\s*preds\\s*\\)$",
+          "ok": [
+            "0.93"
+          ],
+          "checks": [
+            {
+              "re": "accuracy_score\\(\\s*y_test\\s*,\\s*preds",
+              "msg": "accuracy_score(y_test, preds)."
+            }
+          ]
+        },
+        {
+          "t": "F1 score",
+          "card": "<p>Harmonic mean of precision & recall.</p>",
+          "mission": "F1 into <b class='text-white'>f1</b>.",
+          "ph": "f1 = f1_score(y_test, preds)",
+          "sol": "f1 = f1_score(y_test, preds)",
+          "re": "^f1\\s*=\\s*f1_score\\(\\s*y_test\\s*,\\s*preds\\s*\\)$",
+          "ok": [
+            "0.91"
+          ],
+          "checks": [
+            {
+              "re": "f1_score\\(\\s*y_test\\s*,\\s*preds",
+              "msg": "f1_score(y_test, preds)."
+            }
+          ]
+        },
+        {
+          "t": "Precision",
+          "card": "<p>Of predicted positives, how many were right.</p>",
+          "mission": "Precision into <b class='text-white'>p</b>.",
+          "ph": "p = precision_score(y_test, preds)",
+          "sol": "p = precision_score(y_test, preds)",
+          "re": "^p\\s*=\\s*precision_score\\(\\s*y_test\\s*,\\s*preds\\s*\\)$",
+          "ok": [
+            "0.9"
+          ],
+          "checks": [
+            {
+              "re": "precision_score\\(\\s*y_test\\s*,\\s*preds",
+              "msg": "precision_score(y_test, preds)."
+            }
+          ]
+        },
+        {
+          "t": "Recall",
+          "card": "<p>Of actual positives, how many we caught.</p>",
+          "mission": "Recall into <b class='text-white'>r</b>.",
+          "ph": "r = recall_score(y_test, preds)",
+          "sol": "r = recall_score(y_test, preds)",
+          "re": "^r\\s*=\\s*recall_score\\(\\s*y_test\\s*,\\s*preds\\s*\\)$",
+          "ok": [
+            "0.92"
+          ],
+          "checks": [
+            {
+              "re": "recall_score\\(\\s*y_test\\s*,\\s*preds",
+              "msg": "recall_score(y_test, preds)."
+            }
+          ]
+        },
+        {
+          "t": "Confusion matrix",
+          "card": "<p>Counts of TP/FP/FN/TN.</p>",
+          "mission": "Confusion matrix into <b class='text-white'>cm</b>.",
+          "ph": "cm = confusion_matrix(y_test, preds)",
+          "sol": "cm = confusion_matrix(y_test, preds)",
+          "re": "^cm\\s*=\\s*confusion_matrix\\(\\s*y_test\\s*,\\s*preds\\s*\\)$",
+          "ok": [
+            "[[TN FP][FN TP]]"
+          ],
+          "checks": [
+            {
+              "re": "confusion_matrix\\(\\s*y_test\\s*,\\s*preds",
+              "msg": "confusion_matrix(y_test, preds)."
+            }
+          ]
+        },
+        {
+          "t": "Full report",
+          "card": "<p><code class='mono text-cyan-300'>classification_report</code> — per-class metrics.</p>",
+          "mission": "Build the report into <b class='text-white'>report</b>.",
+          "ph": "report = classification_report(y_test, preds)",
+          "sol": "report = classification_report(y_test, preds)",
+          "re": "^report\\s*=\\s*classification_report\\(\\s*y_test\\s*,\\s*preds\\s*\\)$",
+          "ok": [
+            "precision/recall/f1 per class"
+          ],
+          "checks": [
+            {
+              "re": "classification_report\\(\\s*y_test\\s*,\\s*preds",
+              "msg": "classification_report(y_test, preds)."
+            }
+          ]
+        },
+        {
+          "t": "ROC AUC",
+          "card": "<p>Ranking quality across thresholds — pass probabilities.</p>",
+          "mission": "AUC of <code class='mono'>probs</code> vs <code class='mono'>y_test</code> into <b class='text-white'>auc</b>.",
+          "ph": "auc = roc_auc_score(y_test, probs)",
+          "sol": "auc = roc_auc_score(y_test, probs)",
+          "re": "^auc\\s*=\\s*roc_auc_score\\(\\s*y_test\\s*,\\s*probs\\s*\\)$",
+          "ok": [
+            "0.97"
+          ],
+          "checks": [
+            {
+              "re": "roc_auc_score\\(\\s*y_test\\s*,\\s*probs",
+              "msg": "roc_auc_score(y_test, probs)."
+            }
+          ]
+        },
+        {
+          "t": "Mean squared error",
+          "card": "<p>Regression loss — lower is better.</p>",
+          "mission": "MSE of <code class='mono'>preds</code> vs <code class='mono'>y_test</code> into <b class='text-white'>mse</b>.",
+          "ph": "mse = mean_squared_error(y_test, preds)",
+          "sol": "mse = mean_squared_error(y_test, preds)",
+          "re": "^mse\\s*=\\s*mean_squared_error\\(\\s*y_test\\s*,\\s*preds\\s*\\)$",
+          "ok": [
+            "12.4"
+          ],
+          "checks": [
+            {
+              "re": "mean_squared_error\\(\\s*y_test\\s*,\\s*preds",
+              "msg": "mean_squared_error(y_test, preds)."
+            }
+          ]
+        },
+        {
+          "t": "R² score",
+          "card": "<p>Variance explained — 1.0 is perfect.</p>",
+          "mission": "R² into <b class='text-white'>r2</b>.",
+          "ph": "r2 = r2_score(y_test, preds)",
+          "sol": "r2 = r2_score(y_test, preds)",
+          "re": "^r2\\s*=\\s*r2_score\\(\\s*y_test\\s*,\\s*preds\\s*\\)$",
+          "ok": [
+            "0.88"
+          ],
+          "checks": [
+            {
+              "re": "r2_score\\(\\s*y_test\\s*,\\s*preds",
+              "msg": "r2_score(y_test, preds)."
+            }
+          ]
+        },
+        {
+          "t": "Cross-validate",
+          "card": "<p><code class='mono text-cyan-300'>cross_val_score</code> — k folds, honest estimate.</p>",
+          "mission": "5-fold CV scores of <code class='mono'>model</code> into <b class='text-white'>scores</b>.",
+          "ph": "scores = cross_val_score(model, X, y, cv=5)",
+          "sol": "scores = cross_val_score(model, X, y, cv=5)",
+          "re": "^scores\\s*=\\s*cross_val_score\\(\\s*model\\s*,\\s*X\\s*,\\s*y\\s*,\\s*cv\\s*=\\s*5\\s*\\)$",
+          "ok": [
+            "5 fold scores"
+          ],
+          "checks": [
+            {
+              "re": "cross_val_score\\(\\s*model\\s*,\\s*X\\s*,\\s*y",
+              "msg": "cross_val_score(model, X, y, ...)."
+            },
+            {
+              "re": "cv\\s*=\\s*5",
+              "msg": "cv=5."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tuning-pipelines",
+      "name": "Tuning & Pipelines",
+      "questions": [
+        {
+          "t": "Parameter grid",
+          "card": "<p>A dict of hyperparameters to search.</p>",
+          "mission": "Grid over <code class='mono'>n_estimators</code> ∈ [100, 300] into <b class='text-white'>grid</b>.",
+          "ph": "grid = {\"n_estimators\": [100, 300]}",
+          "sol": "grid = {\"n_estimators\": [100, 300]}",
+          "re": "^grid\\s*=\\s*\\{\\s*([\"'])n_estimators\\1\\s*:\\s*\\[\\s*100\\s*,\\s*300\\s*\\]\\s*\\}$",
+          "ok": [
+            "2 candidates"
+          ],
+          "checks": [
+            {
+              "re": "([\"'])n_estimators\\1",
+              "msg": "Key \"n_estimators\"."
+            },
+            {
+              "re": "\\[\\s*100\\s*,\\s*300\\s*\\]",
+              "msg": "Values [100, 300]."
+            }
+          ]
+        },
+        {
+          "t": "Grid search",
+          "card": "<p><code class='mono text-cyan-300'>GridSearchCV</code> tries every combo with CV.</p>",
+          "mission": "Search <code class='mono'>model</code> over <code class='mono'>grid</code>, 5-fold, into <b class='text-white'>search</b>.",
+          "ph": "search = GridSearchCV(model, grid, cv=5)",
+          "sol": "search = GridSearchCV(model, grid, cv=5)",
+          "re": "^search\\s*=\\s*GridSearchCV\\(\\s*model\\s*,\\s*grid\\s*,\\s*cv\\s*=\\s*5\\s*\\)$",
+          "ok": [
+            "exhaustive search"
+          ],
+          "checks": [
+            {
+              "re": "GridSearchCV\\(\\s*model\\s*,\\s*grid",
+              "msg": "GridSearchCV(model, grid, ...)."
+            },
+            {
+              "re": "cv\\s*=\\s*5",
+              "msg": "cv=5."
+            }
+          ]
+        },
+        {
+          "t": "Run the search",
+          "card": "<p>Fitting a search runs the whole sweep.</p>",
+          "mission": "Fit <code class='mono'>search</code> on the training data.",
+          "ph": "search.fit(X_train, y_train)",
+          "sol": "search.fit(X_train, y_train)",
+          "re": "^search\\.fit\\(\\s*X_train\\s*,\\s*y_train\\s*\\)$",
+          "ok": [
+            "swept + refit"
+          ],
+          "checks": [
+            {
+              "re": "search\\.fit\\(\\s*X_train\\s*,\\s*y_train",
+              "msg": "search.fit(X_train, y_train)."
+            }
+          ]
+        },
+        {
+          "t": "Best parameters",
+          "card": "<p>The winning combo lands in <code class='mono text-cyan-300'>best_params_</code>.</p>",
+          "mission": "Read the best params into <b class='text-white'>best</b>.",
+          "ph": "best = search.best_params_",
+          "sol": "best = search.best_params_",
+          "re": "^best\\s*=\\s*search\\.best_params_$",
+          "ok": [
+            "{'n_estimators': 300}"
+          ],
+          "checks": [
+            {
+              "re": "search\\.best_params_",
+              "msg": "search.best_params_."
+            }
+          ]
+        },
+        {
+          "t": "Best score",
+          "card": "<p><code class='mono text-cyan-300'>best_score_</code> = the winner's CV score.</p>",
+          "mission": "Read the best CV score into <b class='text-white'>bscore</b>.",
+          "ph": "bscore = search.best_score_",
+          "sol": "bscore = search.best_score_",
+          "re": "^bscore\\s*=\\s*search\\.best_score_$",
+          "ok": [
+            "0.95"
+          ],
+          "checks": [
+            {
+              "re": "search\\.best_score_",
+              "msg": "search.best_score_."
+            }
+          ]
+        },
+        {
+          "t": "Randomized search",
+          "card": "<p>Sample the space — cheaper on big grids.</p>",
+          "mission": "Random search: 10 draws, 5-fold, into <b class='text-white'>rsearch</b>.",
+          "ph": "rsearch = RandomizedSearchCV(model, grid, n_iter=10, cv=5)",
+          "sol": "rsearch = RandomizedSearchCV(model, grid, n_iter=10, cv=5)",
+          "re": "^rsearch\\s*=\\s*RandomizedSearchCV\\(\\s*model\\s*,\\s*grid\\s*,\\s*n_iter\\s*=\\s*10\\s*,\\s*cv\\s*=\\s*5\\s*\\)$",
+          "ok": [
+            "10 sampled configs"
+          ],
+          "checks": [
+            {
+              "re": "RandomizedSearchCV\\(",
+              "msg": "RandomizedSearchCV(...)."
+            },
+            {
+              "re": "n_iter\\s*=\\s*10",
+              "msg": "n_iter=10."
+            }
+          ]
+        },
+        {
+          "t": "K-fold splitter",
+          "card": "<p><code class='mono text-cyan-300'>KFold</code> defines the cross-validation folds.</p>",
+          "mission": "5 shuffled folds, fixed seed, into <b class='text-white'>kf</b>.",
+          "ph": "kf = KFold(n_splits=5, shuffle=True, random_state=42)",
+          "sol": "kf = KFold(n_splits=5, shuffle=True, random_state=42)",
+          "re": "^kf\\s*=\\s*KFold\\(\\s*n_splits\\s*=\\s*5\\s*,\\s*shuffle\\s*=\\s*True\\s*,\\s*random_state\\s*=\\s*\\d+\\s*\\)$",
+          "ok": [
+            "5 folds"
+          ],
+          "checks": [
+            {
+              "re": "KFold\\(",
+              "msg": "KFold(...)."
+            },
+            {
+              "re": "n_splits\\s*=\\s*5",
+              "msg": "n_splits=5."
+            },
+            {
+              "re": "shuffle\\s*=\\s*True",
+              "msg": "shuffle=True."
+            }
+          ]
+        },
+        {
+          "t": "Named pipeline",
+          "card": "<p>A list of <code class='mono'>(name, step)</code> tuples.</p>",
+          "mission": "Build <b class='text-white'>pipe</b>: <code class='mono'>(\"scaler\", StandardScaler())</code> then <code class='mono'>(\"model\", LogisticRegression())</code>.",
+          "ph": "pipe = Pipeline([(\"scaler\", StandardScaler()), (\"model\", LogisticRegression())])",
+          "sol": "pipe = Pipeline([\n    (\"scaler\", StandardScaler()),\n    (\"model\", LogisticRegression()),\n])",
+          "re": "^pipe\\s*=\\s*Pipeline\\(\\s*\\[\\s*\\(\\s*([\"'])scaler\\1\\s*,\\s*StandardScaler\\(\\s*\\)\\s*\\)\\s*,\\s*\\(\\s*([\"'])model\\2\\s*,\\s*LogisticRegression\\(\\s*\\)\\s*\\)\\s*,?\\s*\\]\\s*\\)$",
+          "ok": [
+            "named steps"
+          ],
+          "checks": [
+            {
+              "re": "Pipeline\\(\\s*\\[",
+              "msg": "Pipeline([ ... ])."
+            },
+            {
+              "re": "([\"'])scaler\\1\\s*,\\s*StandardScaler",
+              "msg": "(\"scaler\", StandardScaler())."
+            },
+            {
+              "re": "([\"'])model\\1\\s*,\\s*LogisticRegression",
+              "msg": "(\"model\", LogisticRegression())."
+            }
+          ]
+        },
+        {
+          "t": "Fit the pipeline",
+          "card": "<p>One fit trains every step in order.</p>",
+          "mission": "Fit <code class='mono'>pipe</code> on the training data.",
+          "ph": "pipe.fit(X_train, y_train)",
+          "sol": "pipe.fit(X_train, y_train)",
+          "re": "^pipe\\.fit\\(\\s*X_train\\s*,\\s*y_train\\s*\\)$",
+          "ok": [
+            "scaler + model trained"
+          ],
+          "checks": [
+            {
+              "re": "pipe\\.fit\\(\\s*X_train\\s*,\\s*y_train",
+              "msg": "pipe.fit(X_train, y_train)."
+            }
+          ]
+        },
+        {
+          "t": "Score a pipeline with CV",
+          "card": "<p>Cross-validate the whole pipeline — leak-free.</p>",
+          "mission": "10-fold F1 CV of <code class='mono'>pipe</code> into <b class='text-white'>scores</b>.",
+          "ph": "scores = cross_val_score(pipe, X, y, cv=10, scoring=\"f1\")",
+          "sol": "scores = cross_val_score(pipe, X, y, cv=10, scoring=\"f1\")",
+          "re": "^scores\\s*=\\s*cross_val_score\\(\\s*pipe\\s*,\\s*X\\s*,\\s*y\\s*,\\s*cv\\s*=\\s*10\\s*,\\s*scoring\\s*=\\s*([\"'])f1\\1\\s*\\)$",
+          "ok": [
+            "honest F1 estimate"
+          ],
+          "checks": [
+            {
+              "re": "cross_val_score\\(\\s*pipe",
+              "msg": "CV the whole pipe."
+            },
+            {
+              "re": "scoring\\s*=\\s*([\"'])f1",
+              "msg": "scoring=\"f1\"."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "regression",
+      "name": "Regression",
+      "questions": [
+        {
+          "t": "LinearRegression",
+          "card": "<p><code class='mono text-cyan-300'>LinearRegression</code> fits <code class='mono'>y = Xβ + ε</code>.</p>",
+          "mission": "Build <b class='text-white'>lr</b>.",
+          "ph": "lr = LinearRegression()",
+          "sol": "lr = LinearRegression()",
+          "re": "^lr\\s*=\\s*LinearRegression\\(\\s*\\)$",
+          "ok": [
+            "linear ready"
+          ],
+          "checks": [
+            {
+              "re": "LinearRegression\\(",
+              "msg": "Use LinearRegression."
+            }
+          ]
+        },
+        {
+          "t": "fit regressor",
+          "card": "<p>Same fit/predict API.</p>",
+          "mission": "Fit <code class='mono'>lr</code> on <code class='mono'>X, y</code>.",
+          "ph": "lr.fit(X, y)",
+          "sol": "lr.fit(X, y)",
+          "re": "^lr\\.fit\\(\\s*X\\s*,\\s*y\\s*\\)$",
+          "ok": [
+            "fit done"
+          ],
+          "checks": [
+            {
+              "re": "lr\\.fit\\(",
+              "msg": "Call lr.fit."
+            }
+          ]
+        },
+        {
+          "t": "Ridge alpha",
+          "card": "<p>Ridge = L2 penalty; larger <code class='mono'>alpha</code>, smaller weights.</p>",
+          "mission": "Build with <code class='mono'>alpha=1.0</code>.",
+          "ph": "ridge = Ridge(alpha=1.0)",
+          "sol": "ridge = Ridge(alpha=1.0)",
+          "re": "^ridge\\s*=\\s*Ridge\\(\\s*alpha\\s*=\\s*1\\.0\\s*\\)$",
+          "ok": [
+            "L2 model"
+          ],
+          "checks": [
+            {
+              "re": "Ridge\\(",
+              "msg": "Use Ridge."
+            },
+            {
+              "re": "alpha\\s*=",
+              "msg": "Set alpha."
+            }
+          ]
+        },
+        {
+          "t": "Lasso alpha",
+          "card": "<p>Lasso = L1 penalty; sparse solutions.</p>",
+          "mission": "Build <code class='mono'>Lasso(alpha=0.1)</code>.",
+          "ph": "lasso = Lasso(alpha=0.1)",
+          "sol": "lasso = Lasso(alpha=0.1)",
+          "re": "^lasso\\s*=\\s*Lasso\\(\\s*alpha\\s*=\\s*0\\.1\\s*\\)$",
+          "ok": [
+            "L1 model"
+          ],
+          "checks": [
+            {
+              "re": "Lasso\\(",
+              "msg": "Use Lasso."
+            }
+          ]
+        },
+        {
+          "t": "MSE",
+          "card": "<p>Mean-squared error — penalizes big misses.</p>",
+          "mission": "Compute into <b class='text-white'>mse</b>.",
+          "ph": "mse = mean_squared_error(y_true, y_pred)",
+          "sol": "mse = mean_squared_error(y_true, y_pred)",
+          "re": "^mse\\s*=\\s*mean_squared_error\\(\\s*y_true\\s*,\\s*y_pred\\s*\\)$",
+          "ok": [
+            "error scored"
+          ],
+          "checks": [
+            {
+              "re": "mean_squared_error\\(",
+              "msg": "Use mean_squared_error."
+            }
+          ]
+        },
+        {
+          "t": "RMSE",
+          "card": "<p>RMSE = √MSE — same units as y.</p>",
+          "mission": "Compute into <b class='text-white'>rmse</b>.",
+          "ph": "rmse = mean_squared_error(y_true, y_pred, squared=False)",
+          "sol": "rmse = mean_squared_error(y_true, y_pred, squared=False)",
+          "re": "^rmse\\s*=\\s*mean_squared_error\\(\\s*y_true\\s*,\\s*y_pred\\s*,\\s*squared\\s*=\\s*False\\s*\\)$",
+          "ok": [
+            "root error"
+          ],
+          "checks": [
+            {
+              "re": "squared\\s*=\\s*False",
+              "msg": "Pass squared=False."
+            }
+          ]
+        },
+        {
+          "t": "MAE",
+          "card": "<p>MAE — median-friendly, robust to outliers.</p>",
+          "mission": "Compute into <b class='text-white'>mae</b>.",
+          "ph": "mae = mean_absolute_error(y_true, y_pred)",
+          "sol": "mae = mean_absolute_error(y_true, y_pred)",
+          "re": "^mae\\s*=\\s*mean_absolute_error\\(\\s*y_true\\s*,\\s*y_pred\\s*\\)$",
+          "ok": [
+            "abs error"
+          ],
+          "checks": [
+            {
+              "re": "mean_absolute_error\\(",
+              "msg": "Use mean_absolute_error."
+            }
+          ]
+        },
+        {
+          "t": "R² score",
+          "card": "<p><code class='mono text-cyan-300'>r2_score</code> — variance explained.</p>",
+          "mission": "Compute into <b class='text-white'>r2</b>.",
+          "ph": "r2 = r2_score(y_true, y_pred)",
+          "sol": "r2 = r2_score(y_true, y_pred)",
+          "re": "^r2\\s*=\\s*r2_score\\(\\s*y_true\\s*,\\s*y_pred\\s*\\)$",
+          "ok": [
+            "R²"
+          ],
+          "checks": [
+            {
+              "re": "r2_score\\(",
+              "msg": "Use r2_score."
+            }
+          ]
+        },
+        {
+          "t": "polynomial features",
+          "card": "<p><code class='mono text-cyan-300'>PolynomialFeatures</code> adds x², x·z, ... to catch nonlinearity.</p>",
+          "mission": "Build degree=2 as <b class='text-white'>poly</b>.",
+          "ph": "poly = PolynomialFeatures(degree=2)",
+          "sol": "poly = PolynomialFeatures(degree=2)",
+          "re": "^poly\\s*=\\s*PolynomialFeatures\\(\\s*degree\\s*=\\s*2\\s*\\)$",
+          "ok": [
+            "features expanded"
+          ],
+          "checks": [
+            {
+              "re": "PolynomialFeatures\\(",
+              "msg": "Use PolynomialFeatures."
+            }
+          ]
+        },
+        {
+          "t": "ElasticNet",
+          "card": "<p>ElasticNet mixes L1 + L2; <code class='mono'>l1_ratio</code> blends them.</p>",
+          "mission": "Build with <code class='mono'>l1_ratio=0.5</code>.",
+          "ph": "en = ElasticNet(l1_ratio=0.5)",
+          "sol": "en = ElasticNet(l1_ratio=0.5)",
+          "re": "^en\\s*=\\s*ElasticNet\\(\\s*l1_ratio\\s*=\\s*0\\.5\\s*\\)$",
+          "ok": [
+            "blended reg"
+          ],
+          "checks": [
+            {
+              "re": "ElasticNet\\(",
+              "msg": "Use ElasticNet."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gradient-boosting",
+      "name": "Gradient Boosting",
+      "questions": [
+        {
+          "t": "XGBoost classifier",
+          "card": "<p><code class='mono text-cyan-300'>XGBClassifier</code> — industry-standard boosted trees.</p>",
+          "mission": "Build <b class='text-white'>xgb</b> with 200 trees.",
+          "ph": "xgb = XGBClassifier(n_estimators=200)",
+          "sol": "xgb = XGBClassifier(n_estimators=200)",
+          "re": "^xgb\\s*=\\s*XGBClassifier\\(\\s*n_estimators\\s*=\\s*200\\s*\\)$",
+          "ok": [
+            "xgboost ready"
+          ],
+          "checks": [
+            {
+              "re": "XGBClassifier\\(",
+              "msg": "Use XGBClassifier."
+            }
+          ]
+        },
+        {
+          "t": "LightGBM",
+          "card": "<p><code class='mono text-cyan-300'>LGBMClassifier</code> — faster, similar accuracy.</p>",
+          "mission": "Build <b class='text-white'>lgb</b>.",
+          "ph": "lgb = LGBMClassifier()",
+          "sol": "lgb = LGBMClassifier()",
+          "re": "^lgb\\s*=\\s*LGBMClassifier\\(\\s*\\)$",
+          "ok": [
+            "lightgbm ready"
+          ],
+          "checks": [
+            {
+              "re": "LGBMClassifier\\(",
+              "msg": "Use LGBMClassifier."
+            }
+          ]
+        },
+        {
+          "t": "CatBoost",
+          "card": "<p><code class='mono text-cyan-300'>CatBoostClassifier</code> handles categoricals natively.</p>",
+          "mission": "Build <b class='text-white'>cb</b> silent.",
+          "ph": "cb = CatBoostClassifier(verbose=0)",
+          "sol": "cb = CatBoostClassifier(verbose=0)",
+          "re": "^cb\\s*=\\s*CatBoostClassifier\\(\\s*verbose\\s*=\\s*0\\s*\\)$",
+          "ok": [
+            "catboost ready"
+          ],
+          "checks": [
+            {
+              "re": "CatBoostClassifier\\(",
+              "msg": "Use CatBoostClassifier."
+            }
+          ]
+        },
+        {
+          "t": "early stopping",
+          "card": "<p>Stop boosting once val loss stops improving.</p>",
+          "mission": "Fit <code class='mono'>xgb</code> with <code class='mono'>early_stopping_rounds=20</code> on <code class='mono'>(X_v, y_v)</code>.",
+          "ph": "xgb.fit(X, y, eval_set=[(X_v, y_v)], early_stopping_rounds=20)",
+          "sol": "xgb.fit(X, y, eval_set=[(X_v, y_v)], early_stopping_rounds=20)",
+          "re": "^xgb\\.fit\\(\\s*X\\s*,\\s*y\\s*,\\s*eval_set\\s*=\\s*\\[\\s*\\(\\s*X_v\\s*,\\s*y_v\\s*\\)\\s*\\]\\s*,\\s*early_stopping_rounds\\s*=\\s*20\\s*\\)$",
+          "ok": [
+            "early stop armed"
+          ],
+          "checks": [
+            {
+              "re": "early_stopping_rounds\\s*=",
+              "msg": "Set early_stopping_rounds."
+            }
+          ]
+        },
+        {
+          "t": "learning_rate",
+          "card": "<p>Smaller <code class='mono text-cyan-300'>learning_rate</code> = slower, better generalization.</p>",
+          "mission": "Build <code class='mono'>XGBRegressor</code> with <code class='mono'>learning_rate=0.05</code>.",
+          "ph": "xgb = XGBRegressor(learning_rate=0.05)",
+          "sol": "xgb = XGBRegressor(learning_rate=0.05)",
+          "re": "^xgb\\s*=\\s*XGBRegressor\\(\\s*learning_rate\\s*=\\s*0\\.05\\s*\\)$",
+          "ok": [
+            "lr set"
+          ],
+          "checks": [
+            {
+              "re": "learning_rate\\s*=\\s*0\\.05",
+              "msg": "Set learning_rate=0.05."
+            }
+          ]
+        },
+        {
+          "t": "max_depth",
+          "card": "<p><code class='mono text-cyan-300'>max_depth</code> caps tree size.</p>",
+          "mission": "Build with <code class='mono'>max_depth=6</code>.",
+          "ph": "xgb = XGBClassifier(max_depth=6)",
+          "sol": "xgb = XGBClassifier(max_depth=6)",
+          "re": "^xgb\\s*=\\s*XGBClassifier\\(\\s*max_depth\\s*=\\s*6\\s*\\)$",
+          "ok": [
+            "depth capped"
+          ],
+          "checks": [
+            {
+              "re": "max_depth\\s*=",
+              "msg": "Set max_depth."
+            }
+          ]
+        },
+        {
+          "t": "feature importance",
+          "card": "<p><code class='mono text-cyan-300'>.feature_importances_</code> — gain per feature.</p>",
+          "mission": "Read into <b class='text-white'>imp</b>.",
+          "ph": "imp = xgb.feature_importances_",
+          "sol": "imp = xgb.feature_importances_",
+          "re": "^imp\\s*=\\s*xgb\\.feature_importances_$",
+          "ok": [
+            "gains"
+          ],
+          "checks": [
+            {
+              "re": "feature_importances_",
+              "msg": "Access feature_importances_."
+            }
+          ]
+        },
+        {
+          "t": "save with joblib",
+          "card": "<p><code class='mono text-cyan-300'>joblib.dump</code> serializes fitted models.</p>",
+          "mission": "Save <code class='mono'>xgb</code> to <code class='mono'>model.pkl</code>.",
+          "ph": "joblib.dump(xgb, 'model.pkl')",
+          "sol": "joblib.dump(xgb, 'model.pkl')",
+          "re": "^joblib\\.dump\\(\\s*xgb\\s*,\\s*['\"]model\\.pkl['\"]\\s*\\)$",
+          "ok": [
+            "saved"
+          ],
+          "checks": [
+            {
+              "re": "joblib\\.dump\\(",
+              "msg": "Use joblib.dump."
+            }
+          ]
+        },
+        {
+          "t": "SHAP explainer",
+          "card": "<p><code class='mono text-cyan-300'>shap.TreeExplainer</code> — game-theoretic feature attributions.</p>",
+          "mission": "Build <b class='text-white'>expl</b> for <code class='mono'>xgb</code>.",
+          "ph": "expl = shap.TreeExplainer(xgb)",
+          "sol": "expl = shap.TreeExplainer(xgb)",
+          "re": "^expl\\s*=\\s*shap\\.TreeExplainer\\(\\s*xgb\\s*\\)$",
+          "ok": [
+            "explainer ready"
+          ],
+          "checks": [
+            {
+              "re": "shap\\.TreeExplainer\\(",
+              "msg": "Use shap.TreeExplainer."
+            }
+          ]
+        },
+        {
+          "t": "Optuna trial",
+          "card": "<p><code class='mono text-cyan-300'>optuna.create_study</code> for Bayesian hyperparam search.</p>",
+          "mission": "Create a study minimizing loss.",
+          "ph": "study = optuna.create_study(direction='minimize')",
+          "sol": "study = optuna.create_study(direction='minimize')",
+          "re": "^study\\s*=\\s*optuna\\.create_study\\(\\s*direction\\s*=\\s*['\"]minimize['\"]\\s*\\)$",
+          "ok": [
+            "study up"
+          ],
+          "checks": [
+            {
+              "re": "optuna\\.create_study\\(",
+              "msg": "Use optuna.create_study."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unsupervised",
+      "name": "Unsupervised",
+      "questions": [
+        {
+          "t": "KMeans",
+          "card": "<p><code class='mono text-cyan-300'>KMeans</code> — hard clustering into k centroids.</p>",
+          "mission": "Build <b class='text-white'>km</b> with 3 clusters.",
+          "ph": "km = KMeans(n_clusters=3)",
+          "sol": "km = KMeans(n_clusters=3)",
+          "re": "^km\\s*=\\s*KMeans\\(\\s*n_clusters\\s*=\\s*3\\s*\\)$",
+          "ok": [
+            "3 clusters"
+          ],
+          "checks": [
+            {
+              "re": "KMeans\\(",
+              "msg": "Use KMeans."
+            },
+            {
+              "re": "n_clusters\\s*=\\s*3",
+              "msg": "n_clusters=3."
+            }
+          ]
+        },
+        {
+          "t": "fit_predict",
+          "card": "<p><code class='mono text-cyan-300'>fit_predict</code> — clusters in one call.</p>",
+          "mission": "Cluster <code class='mono'>X</code> into <b class='text-white'>labels</b>.",
+          "ph": "labels = km.fit_predict(X)",
+          "sol": "labels = km.fit_predict(X)",
+          "re": "^labels\\s*=\\s*km\\.fit_predict\\(\\s*X\\s*\\)$",
+          "ok": [
+            "assigned"
+          ],
+          "checks": [
+            {
+              "re": "fit_predict\\(",
+              "msg": "Use fit_predict."
+            }
+          ]
+        },
+        {
+          "t": "DBSCAN density",
+          "card": "<p><code class='mono text-cyan-300'>DBSCAN</code> — density-based, no k needed.</p>",
+          "mission": "Build with <code class='mono'>eps=0.5</code>.",
+          "ph": "db = DBSCAN(eps=0.5)",
+          "sol": "db = DBSCAN(eps=0.5)",
+          "re": "^db\\s*=\\s*DBSCAN\\(\\s*eps\\s*=\\s*0\\.5\\s*\\)$",
+          "ok": [
+            "density ready"
+          ],
+          "checks": [
+            {
+              "re": "DBSCAN\\(",
+              "msg": "Use DBSCAN."
+            }
+          ]
+        },
+        {
+          "t": "PCA reduce",
+          "card": "<p><code class='mono text-cyan-300'>PCA(n_components=k)</code> — linear projection.</p>",
+          "mission": "Reduce to 2 dims as <b class='text-white'>pca</b>.",
+          "ph": "pca = PCA(n_components=2)",
+          "sol": "pca = PCA(n_components=2)",
+          "re": "^pca\\s*=\\s*PCA\\(\\s*n_components\\s*=\\s*2\\s*\\)$",
+          "ok": [
+            "2D projection"
+          ],
+          "checks": [
+            {
+              "re": "PCA\\(",
+              "msg": "Use PCA."
+            }
+          ]
+        },
+        {
+          "t": "explained variance",
+          "card": "<p><code class='mono text-cyan-300'>explained_variance_ratio_</code> — variance kept per component.</p>",
+          "mission": "Read into <b class='text-white'>evr</b>.",
+          "ph": "evr = pca.explained_variance_ratio_",
+          "sol": "evr = pca.explained_variance_ratio_",
+          "re": "^evr\\s*=\\s*pca\\.explained_variance_ratio_$",
+          "ok": [
+            "ratios"
+          ],
+          "checks": [
+            {
+              "re": "explained_variance_ratio_",
+              "msg": "Access explained_variance_ratio_."
+            }
+          ]
+        },
+        {
+          "t": "t-SNE",
+          "card": "<p><code class='mono text-cyan-300'>TSNE</code> — nonlinear embedding for visualization.</p>",
+          "mission": "2D t-SNE as <b class='text-white'>ts</b>.",
+          "ph": "ts = TSNE(n_components=2)",
+          "sol": "ts = TSNE(n_components=2)",
+          "re": "^ts\\s*=\\s*TSNE\\(\\s*n_components\\s*=\\s*2\\s*\\)$",
+          "ok": [
+            "tsne ready"
+          ],
+          "checks": [
+            {
+              "re": "TSNE\\(",
+              "msg": "Use TSNE."
+            }
+          ]
+        },
+        {
+          "t": "silhouette",
+          "card": "<p><code class='mono text-cyan-300'>silhouette_score</code> — cluster quality on [-1, 1].</p>",
+          "mission": "Score into <b class='text-white'>sil</b>.",
+          "ph": "sil = silhouette_score(X, labels)",
+          "sol": "sil = silhouette_score(X, labels)",
+          "re": "^sil\\s*=\\s*silhouette_score\\(\\s*X\\s*,\\s*labels\\s*\\)$",
+          "ok": [
+            "0.6"
+          ],
+          "checks": [
+            {
+              "re": "silhouette_score\\(",
+              "msg": "Use silhouette_score."
+            }
+          ]
+        },
+        {
+          "t": "AgglomerativeClustering",
+          "card": "<p>Hierarchical — merge nearest clusters iteratively.</p>",
+          "mission": "Build with 4 clusters.",
+          "ph": "ac = AgglomerativeClustering(n_clusters=4)",
+          "sol": "ac = AgglomerativeClustering(n_clusters=4)",
+          "re": "^ac\\s*=\\s*AgglomerativeClustering\\(\\s*n_clusters\\s*=\\s*4\\s*\\)$",
+          "ok": [
+            "hierarchy"
+          ],
+          "checks": [
+            {
+              "re": "AgglomerativeClustering\\(",
+              "msg": "Use AgglomerativeClustering."
+            }
+          ]
+        },
+        {
+          "t": "UMAP",
+          "card": "<p><code class='mono text-cyan-300'>UMAP</code> — nonlinear projection, preserves topology.</p>",
+          "mission": "2D UMAP as <b class='text-white'>u</b>.",
+          "ph": "u = UMAP(n_components=2)",
+          "sol": "u = UMAP(n_components=2)",
+          "re": "^u\\s*=\\s*UMAP\\(\\s*n_components\\s*=\\s*2\\s*\\)$",
+          "ok": [
+            "UMAP set"
+          ],
+          "checks": [
+            {
+              "re": "UMAP\\(",
+              "msg": "Use UMAP."
+            }
+          ]
+        },
+        {
+          "t": "IsolationForest",
+          "card": "<p>Anomaly detection via random tree isolation.</p>",
+          "mission": "Build <b class='text-white'>iso</b> with <code class='mono'>contamination=0.05</code>.",
+          "ph": "iso = IsolationForest(contamination=0.05)",
+          "sol": "iso = IsolationForest(contamination=0.05)",
+          "re": "^iso\\s*=\\s*IsolationForest\\(\\s*contamination\\s*=\\s*0\\.05\\s*\\)$",
+          "ok": [
+            "outlier hunter"
+          ],
+          "checks": [
+            {
+              "re": "IsolationForest\\(",
+              "msg": "Use IsolationForest."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "metrics-interpret",
+      "name": "Real Metrics & Interpretability",
+      "questions": [
+        {
+          "t": "precision_score",
+          "card": "<p>Precision = TP / (TP + FP) — how clean the positives are.</p>",
+          "mission": "Compute into <b class='text-white'>p</b>.",
+          "ph": "p = precision_score(y_true, y_pred)",
+          "sol": "p = precision_score(y_true, y_pred)",
+          "re": "^p\\s*=\\s*precision_score\\(\\s*y_true\\s*,\\s*y_pred\\s*\\)$",
+          "ok": [
+            "precision"
+          ],
+          "checks": [
+            {
+              "re": "precision_score\\(",
+              "msg": "Use precision_score."
+            }
+          ]
+        },
+        {
+          "t": "recall_score",
+          "card": "<p>Recall = TP / (TP + FN) — how many positives you found.</p>",
+          "mission": "Compute into <b class='text-white'>r</b>.",
+          "ph": "r = recall_score(y_true, y_pred)",
+          "sol": "r = recall_score(y_true, y_pred)",
+          "re": "^r\\s*=\\s*recall_score\\(\\s*y_true\\s*,\\s*y_pred\\s*\\)$",
+          "ok": [
+            "recall"
+          ],
+          "checks": [
+            {
+              "re": "recall_score\\(",
+              "msg": "Use recall_score."
+            }
+          ]
+        },
+        {
+          "t": "F1",
+          "card": "<p>Harmonic mean of precision & recall.</p>",
+          "mission": "Compute into <b class='text-white'>f1</b>.",
+          "ph": "f1 = f1_score(y_true, y_pred)",
+          "sol": "f1 = f1_score(y_true, y_pred)",
+          "re": "^f1\\s*=\\s*f1_score\\(\\s*y_true\\s*,\\s*y_pred\\s*\\)$",
+          "ok": [
+            "F1"
+          ],
+          "checks": [
+            {
+              "re": "f1_score\\(",
+              "msg": "Use f1_score."
+            }
+          ]
+        },
+        {
+          "t": "ROC AUC",
+          "card": "<p>Area under ROC curve — threshold-free ranking metric.</p>",
+          "mission": "Compute into <b class='text-white'>auc</b>.",
+          "ph": "auc = roc_auc_score(y_true, y_proba)",
+          "sol": "auc = roc_auc_score(y_true, y_proba)",
+          "re": "^auc\\s*=\\s*roc_auc_score\\(\\s*y_true\\s*,\\s*y_proba\\s*\\)$",
+          "ok": [
+            "AUC"
+          ],
+          "checks": [
+            {
+              "re": "roc_auc_score\\(",
+              "msg": "Use roc_auc_score."
+            }
+          ]
+        },
+        {
+          "t": "confusion matrix",
+          "card": "<p>Rows = true, cols = predicted.</p>",
+          "mission": "Compute into <b class='text-white'>cm</b>.",
+          "ph": "cm = confusion_matrix(y_true, y_pred)",
+          "sol": "cm = confusion_matrix(y_true, y_pred)",
+          "re": "^cm\\s*=\\s*confusion_matrix\\(\\s*y_true\\s*,\\s*y_pred\\s*\\)$",
+          "ok": [
+            "2x2 (or NxN)"
+          ],
+          "checks": [
+            {
+              "re": "confusion_matrix\\(",
+              "msg": "Use confusion_matrix."
+            }
+          ]
+        },
+        {
+          "t": "classification_report",
+          "card": "<p>One-shot precision/recall/F1 table per class.</p>",
+          "mission": "Print into <b class='text-white'>rep</b>.",
+          "ph": "rep = classification_report(y_true, y_pred)",
+          "sol": "rep = classification_report(y_true, y_pred)",
+          "re": "^rep\\s*=\\s*classification_report\\(\\s*y_true\\s*,\\s*y_pred\\s*\\)$",
+          "ok": [
+            "tabular scores"
+          ],
+          "checks": [
+            {
+              "re": "classification_report\\(",
+              "msg": "Use classification_report."
+            }
+          ]
+        },
+        {
+          "t": "class_weight balanced",
+          "card": "<p>Rebalance during training — cheap fix for skew.</p>",
+          "mission": "Build LR with <code class='mono'>class_weight='balanced'</code>.",
+          "ph": "lr = LogisticRegression(class_weight='balanced')",
+          "sol": "lr = LogisticRegression(class_weight='balanced')",
+          "re": "^lr\\s*=\\s*LogisticRegression\\(\\s*class_weight\\s*=\\s*['\"]balanced['\"]\\s*\\)$",
+          "ok": [
+            "weighted"
+          ],
+          "checks": [
+            {
+              "re": "class_weight\\s*=",
+              "msg": "Set class_weight."
+            }
+          ]
+        },
+        {
+          "t": "SMOTE resample",
+          "card": "<p><code class='mono text-cyan-300'>SMOTE</code> synthesizes minority-class points.</p>",
+          "mission": "Fit-resample into <code class='mono'>Xr, yr</code>.",
+          "ph": "Xr, yr = SMOTE().fit_resample(X, y)",
+          "sol": "Xr, yr = SMOTE().fit_resample(X, y)",
+          "re": "^Xr\\s*,\\s*yr\\s*=\\s*SMOTE\\(\\s*\\)\\.fit_resample\\(\\s*X\\s*,\\s*y\\s*\\)$",
+          "ok": [
+            "balanced set"
+          ],
+          "checks": [
+            {
+              "re": "SMOTE\\(",
+              "msg": "Use SMOTE."
+            },
+            {
+              "re": "fit_resample\\(",
+              "msg": "Call fit_resample."
+            }
+          ]
+        },
+        {
+          "t": "permutation_importance",
+          "card": "<p>Shuffle a feature, watch metric drop.</p>",
+          "mission": "Compute into <b class='text-white'>pi</b>.",
+          "ph": "pi = permutation_importance(model, X, y)",
+          "sol": "pi = permutation_importance(model, X, y)",
+          "re": "^pi\\s*=\\s*permutation_importance\\(\\s*model\\s*,\\s*X\\s*,\\s*y\\s*\\)$",
+          "ok": [
+            "drops per feature"
+          ],
+          "checks": [
+            {
+              "re": "permutation_importance\\(",
+              "msg": "Use permutation_importance."
+            }
+          ]
+        },
+        {
+          "t": "StratifiedKFold",
+          "card": "<p>Preserves class ratios across folds.</p>",
+          "mission": "5-fold stratified as <b class='text-white'>skf</b>.",
+          "ph": "skf = StratifiedKFold(n_splits=5)",
+          "sol": "skf = StratifiedKFold(n_splits=5)",
+          "re": "^skf\\s*=\\s*StratifiedKFold\\(\\s*n_splits\\s*=\\s*5\\s*\\)$",
+          "ok": [
+            "stratified"
+          ],
+          "checks": [
+            {
+              "re": "StratifiedKFold\\(",
+              "msg": "Use StratifiedKFold."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

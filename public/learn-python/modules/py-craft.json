@@ -1,0 +1,1703 @@
+{
+  "id": "PY-CRAFT",
+  "name": "Software Craft",
+  "tier": "Apprentice",
+  "planet": "Forge Station",
+  "desc": "Comprehensions, exception handling, classes, generators and type hints — writing code others can run.",
+  "xp": 20,
+  "color": "0x35e0ff",
+  "viz": null,
+  "badge": "craft",
+  "checkpoints": [
+    {
+      "id": "comprehensions",
+      "name": "Comprehensions & Iterators",
+      "questions": [
+        {
+          "t": "Map and filter",
+          "card": "<p>output · for · if — all in one expression.</p>",
+          "mission": "Uppercase words longer than 2 chars in <code class='mono'>words</code> into <b class='text-white'>big</b>.",
+          "ctx": "words = [\"hi\", \"ok\", \"alpha\"]",
+          "ph": "big = [w.upper() for w in words if ...]",
+          "sol": "big = [w.upper() for w in words if len(w) > 2]",
+          "re": "^big\\s*=\\s*\\[\\s*w\\.upper\\(\\s*\\)\\s+for\\s+w\\s+in\\s+words\\s+if\\s+len\\(\\s*w\\s*\\)\\s*>\\s*2\\s*\\]$",
+          "ok": [
+            "['ALPHA']"
+          ],
+          "checks": [
+            {
+              "re": "\\.upper\\(",
+              "msg": "Uppercase each word."
+            },
+            {
+              "re": "if\\s+len\\(\\s*w\\s*\\)\\s*>\\s*2",
+              "msg": "Filter: if len(w) > 2."
+            }
+          ]
+        },
+        {
+          "t": "Set comprehension",
+          "card": "<p>Braces build a <b>set</b> of unique results.</p>",
+          "mission": "Collect the distinct word lengths of <code class='mono'>words</code> into <b class='text-white'>sizes</b>.",
+          "ctx": "words = [\"a\", \"bb\", \"cc\"]",
+          "ph": "sizes = {len(w) for w in words}",
+          "sol": "sizes = {len(w) for w in words}",
+          "re": "^sizes\\s*=\\s*\\{\\s*len\\(\\s*w\\s*\\)\\s+for\\s+w\\s+in\\s+words\\s*\\}$",
+          "ok": [
+            "{1, 2}"
+          ],
+          "checks": [
+            {
+              "re": "\\{\\s*len\\(\\s*w\\s*\\)",
+              "msg": "Braces make a set of len(w)."
+            },
+            {
+              "re": "for\\s+w\\s+in\\s+words",
+              "msg": "Iterate words."
+            }
+          ]
+        },
+        {
+          "t": "Invert a dict",
+          "card": "<p>Swap keys and values via <code class='mono'>.items()</code>.</p>",
+          "mission": "Invert <code class='mono'>d</code> into <b class='text-white'>inv</b>.",
+          "ctx": "d = {\"a\": 1}",
+          "ph": "inv = {v: k for k, v in d.items()}",
+          "sol": "inv = {v: k for k, v in d.items()}",
+          "re": "^inv\\s*=\\s*\\{\\s*v\\s*:\\s*k\\s+for\\s+k\\s*,\\s*v\\s+in\\s+d\\.items\\(\\s*\\)\\s*\\}$",
+          "ok": [
+            "{1: 'a'}"
+          ],
+          "checks": [
+            {
+              "re": "\\{\\s*v\\s*:\\s*k",
+              "msg": "Build {v: k ...}."
+            },
+            {
+              "re": "d\\.items\\(",
+              "msg": "Iterate d.items()."
+            }
+          ]
+        },
+        {
+          "t": "Flatten nested",
+          "card": "<p>Two <code class='mono'>for</code> clauses read outer-to-inner.</p>",
+          "mission": "Flatten <code class='mono'>grid</code> into a flat list <b class='text-white'>flat</b>.",
+          "ctx": "grid = [[1, 2], [3, 4]]",
+          "ph": "flat = [x for row in grid for x in row]",
+          "sol": "flat = [x for row in grid for x in row]",
+          "re": "^flat\\s*=\\s*\\[\\s*x\\s+for\\s+row\\s+in\\s+grid\\s+for\\s+x\\s+in\\s+row\\s*\\]$",
+          "ok": [
+            "[1, 2, 3, 4]"
+          ],
+          "checks": [
+            {
+              "re": "for\\s+row\\s+in\\s+grid",
+              "msg": "Outer loop over rows."
+            },
+            {
+              "re": "for\\s+x\\s+in\\s+row",
+              "msg": "Inner loop over row."
+            }
+          ]
+        },
+        {
+          "t": "Generator sum",
+          "card": "<p>No brackets ⇒ a lazy generator, constant memory.</p>",
+          "mission": "Sum squares of 1..5 with a generator into <b class='text-white'>total</b>.",
+          "ph": "total = sum(x * x for x in range(1, 6))",
+          "sol": "total = sum(x * x for x in range(1, 6))",
+          "re": "^total\\s*=\\s*sum\\(\\s*(x\\s*\\*\\s*x|x\\s*\\*\\*\\s*2)\\s+for\\s+x\\s+in\\s+range\\(\\s*1\\s*,\\s*6\\s*\\)\\s*\\)$",
+          "ok": [
+            "55"
+          ],
+          "checks": [
+            {
+              "re": "\\[",
+              "bad": true,
+              "msg": "Drop the brackets — stream it, no list."
+            },
+            {
+              "re": "sum\\(",
+              "msg": "Feed the generator to sum()."
+            }
+          ]
+        },
+        {
+          "t": "any()",
+          "card": "<p><code class='mono text-cyan-300'>any()</code> short-circuits at the first True.</p>",
+          "mission": "Is any number in <code class='mono'>nums</code> negative? → <b class='text-white'>has_neg</b>.",
+          "ctx": "nums = [1, -2, 3]",
+          "ph": "has_neg = any(x < 0 for x in nums)",
+          "sol": "has_neg = any(x < 0 for x in nums)",
+          "re": "^has_neg\\s*=\\s*any\\(\\s*x\\s*<\\s*0\\s+for\\s+x\\s+in\\s+nums\\s*\\)$",
+          "ok": [
+            "True"
+          ],
+          "checks": [
+            {
+              "re": "any\\(",
+              "msg": "Use any(...)."
+            },
+            {
+              "re": "x\\s*<\\s*0",
+              "msg": "Test for negatives."
+            }
+          ]
+        },
+        {
+          "t": "all()",
+          "card": "<p><code class='mono text-cyan-300'>all()</code> is True only if every item is.</p>",
+          "mission": "Are all numbers in <code class='mono'>nums</code> positive? → <b class='text-white'>all_pos</b>.",
+          "ctx": "nums = [1, -2, 3]",
+          "ph": "all_pos = all(x > 0 for x in nums)",
+          "sol": "all_pos = all(x > 0 for x in nums)",
+          "re": "^all_pos\\s*=\\s*all\\(\\s*x\\s*>\\s*0\\s+for\\s+x\\s+in\\s+nums\\s*\\)$",
+          "ok": [
+            "False"
+          ],
+          "checks": [
+            {
+              "re": "all\\(",
+              "msg": "Use all(...)."
+            },
+            {
+              "re": "x\\s*>\\s*0",
+              "msg": "Test each is positive."
+            }
+          ]
+        },
+        {
+          "t": "Sort descending",
+          "card": "<p><code class='mono text-cyan-300'>reverse=True</code> flips the order.</p>",
+          "mission": "Sort <code class='mono'>nums</code> high-to-low into <b class='text-white'>desc</b>.",
+          "ctx": "nums = [1, 3, 2]",
+          "ph": "desc = sorted(nums, reverse=True)",
+          "sol": "desc = sorted(nums, reverse=True)",
+          "re": "^desc\\s*=\\s*sorted\\(\\s*nums\\s*,\\s*reverse\\s*=\\s*True\\s*\\)$",
+          "ok": [
+            "[3, 2, 1]"
+          ],
+          "checks": [
+            {
+              "re": "sorted\\(",
+              "msg": "Use sorted()."
+            },
+            {
+              "re": "reverse\\s*=\\s*True",
+              "msg": "Pass reverse=True."
+            }
+          ]
+        },
+        {
+          "t": "Pair into a dict",
+          "card": "<p><code class='mono'>dict(zip(...))</code> builds a lookup.</p>",
+          "mission": "Zip <code class='mono'>keys</code> with <code class='mono'>vals</code> into <b class='text-white'>table</b>.",
+          "ctx": "keys = [\"a\", \"b\"]\nvals = [1, 2]",
+          "ph": "table = dict(zip(keys, vals))",
+          "sol": "table = dict(zip(keys, vals))",
+          "re": "^table\\s*=\\s*dict\\(\\s*zip\\(\\s*keys\\s*,\\s*vals\\s*\\)\\s*\\)$",
+          "ok": [
+            "{'a': 1, 'b': 2}"
+          ],
+          "checks": [
+            {
+              "re": "zip\\(\\s*keys\\s*,\\s*vals",
+              "msg": "zip(keys, vals)."
+            },
+            {
+              "re": "dict\\(",
+              "msg": "Wrap in dict()."
+            }
+          ]
+        },
+        {
+          "t": "Conditional in a comp",
+          "card": "<p>Put <code class='mono'>a if cond else b</code> before the <code class='mono'>for</code>.</p>",
+          "mission": "Clamp negatives to 0 in <code class='mono'>nums</code> into <b class='text-white'>clipped</b>.",
+          "ctx": "nums = [1, -2, 3]",
+          "ph": "clipped = [x if x > 0 else 0 for x in nums]",
+          "sol": "clipped = [x if x > 0 else 0 for x in nums]",
+          "re": "^clipped\\s*=\\s*\\[\\s*x\\s+if\\s+x\\s*>\\s*0\\s+else\\s+0\\s+for\\s+x\\s+in\\s+nums\\s*\\]$",
+          "ok": [
+            "[1, 0, 3]"
+          ],
+          "checks": [
+            {
+              "re": "x\\s+if\\s+x\\s*>\\s*0\\s+else\\s+0",
+              "msg": "Value-level ternary before the for."
+            },
+            {
+              "re": "for\\s+x\\s+in\\s+nums",
+              "msg": "Iterate nums."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "errors-exceptions",
+      "name": "Errors & Exceptions",
+      "questions": [
+        {
+          "t": "Catch a ValueError",
+          "card": "<p>Recover from a specific error, never a bare <code class='mono'>except</code>.</p>",
+          "mission": "Parse <code class='mono'>raw</code> to int; on ValueError set <b class='text-white'>n</b> to 0.",
+          "ctx": "raw = \"x\"",
+          "ph": "try: ... except ValueError: ...",
+          "sol": "try:\n    n = int(raw)\nexcept ValueError:\n    n = 0",
+          "re": "^try\\s*:\\s*\\n\\s*n\\s*=\\s*int\\(\\s*raw\\s*\\)\\s*\\n\\s*except\\s+ValueError\\s*:\\s*\\n\\s*n\\s*=\\s*0$",
+          "ok": [
+            "n = 0"
+          ],
+          "checks": [
+            {
+              "re": "except\\s*:",
+              "bad": true,
+              "msg": "No bare except — name ValueError."
+            },
+            {
+              "re": "int\\(\\s*raw",
+              "msg": "Attempt int(raw)."
+            },
+            {
+              "re": "except\\s+ValueError",
+              "msg": "Catch ValueError."
+            }
+          ]
+        },
+        {
+          "t": "try / except / else",
+          "card": "<p><code class='mono text-cyan-300'>else</code> runs only when no exception fired.</p>",
+          "mission": "Set <b class='text-white'>ok</b> False on ValueError, True in the else.",
+          "ctx": "raw = \"42\"",
+          "ph": "try: ... except ValueError: ok = False ... else: ok = True",
+          "sol": "try:\n    n = int(raw)\nexcept ValueError:\n    ok = False\nelse:\n    ok = True",
+          "re": "^try\\s*:\\s*\\n\\s*n\\s*=\\s*int\\(\\s*raw\\s*\\)\\s*\\n\\s*except\\s+ValueError\\s*:\\s*\\n\\s*ok\\s*=\\s*False\\s*\\n\\s*else\\s*:\\s*\\n\\s*ok\\s*=\\s*True$",
+          "ok": [
+            "ok = True"
+          ],
+          "checks": [
+            {
+              "re": "except\\s+ValueError",
+              "msg": "Catch ValueError."
+            },
+            {
+              "re": "else\\s*:",
+              "msg": "Add the else branch."
+            },
+            {
+              "re": "ok\\s*=\\s*True",
+              "msg": "Success sets ok = True."
+            }
+          ]
+        },
+        {
+          "t": "Guaranteed cleanup",
+          "card": "<p><code class='mono text-cyan-300'>finally</code> always runs — success or not.</p>",
+          "mission": "Read into <code class='mono'>data</code>, then always <code class='mono'>close()</code> in a finally.",
+          "ph": "try: data = read() finally: close()",
+          "sol": "try:\n    data = read()\nfinally:\n    close()",
+          "re": "^try\\s*:\\s*\\n\\s*data\\s*=\\s*read\\(\\s*\\)\\s*\\n\\s*finally\\s*:\\s*\\n\\s*close\\(\\s*\\)$",
+          "ok": [
+            "cleanup always runs"
+          ],
+          "checks": [
+            {
+              "re": "try\\s*:",
+              "msg": "Open a try block."
+            },
+            {
+              "re": "finally\\s*:",
+              "msg": "Add finally."
+            },
+            {
+              "re": "close\\(",
+              "msg": "Always close()."
+            }
+          ]
+        },
+        {
+          "t": "Raise an error",
+          "card": "<p><code class='mono text-cyan-300'>raise</code> signals a failure.</p>",
+          "mission": "Raise a <code class='mono'>ValueError</code> with message <code class='mono'>\"bad\"</code>.",
+          "ph": "raise ValueError(\"bad\")",
+          "sol": "raise ValueError(\"bad\")",
+          "re": "^raise\\s+ValueError\\(\\s*([\"'])bad\\1\\s*\\)$",
+          "ok": [
+            "ValueError: bad"
+          ],
+          "checks": [
+            {
+              "re": "raise\\s+ValueError",
+              "msg": "raise ValueError(...)."
+            },
+            {
+              "re": "bad",
+              "msg": "Include the message \"bad\"."
+            }
+          ]
+        },
+        {
+          "t": "Custom exception",
+          "card": "<p>Subclass <code class='mono'>Exception</code> for domain-specific errors.</p>",
+          "mission": "Define <b class='text-white'>AuthError</b> subclassing <code class='mono'>Exception</code> with a <code class='mono'>pass</code> body.",
+          "ph": "class AuthError(Exception):",
+          "sol": "class AuthError(Exception):\n    pass",
+          "re": "^class\\s+AuthError\\(\\s*Exception\\s*\\)\\s*:\\s*\\n\\s*pass$",
+          "ok": [
+            "AuthError defined"
+          ],
+          "checks": [
+            {
+              "re": "class\\s+AuthError\\(\\s*Exception\\s*\\)",
+              "msg": "Subclass Exception."
+            },
+            {
+              "re": "pass",
+              "msg": "Empty body: pass."
+            }
+          ]
+        },
+        {
+          "t": "Read a file",
+          "card": "<p><code class='mono text-cyan-300'>with open(...)</code> auto-closes the handle.</p>",
+          "mission": "Read all of <code class='mono'>\"data.txt\"</code> into <b class='text-white'>text</b>.",
+          "ph": "with open(\"data.txt\") as f: text = f.read()",
+          "sol": "with open(\"data.txt\") as f:\n    text = f.read()",
+          "re": "^with\\s+open\\(\\s*([\"'])data\\.txt\\1\\s*\\)\\s+as\\s+f\\s*:\\s*\\n\\s*text\\s*=\\s*f\\.read\\(\\s*\\)$",
+          "ok": [
+            "file contents in text"
+          ],
+          "checks": [
+            {
+              "re": "with\\s+open\\(",
+              "msg": "Use with open(...)."
+            },
+            {
+              "re": "as\\s+f",
+              "msg": "Bind the handle as f."
+            },
+            {
+              "re": "f\\.read\\(",
+              "msg": "Read it with f.read()."
+            }
+          ]
+        },
+        {
+          "t": "Write a file",
+          "card": "<p>Mode <code class='mono'>\"w\"</code> opens for writing.</p>",
+          "mission": "Write <code class='mono'>\"hi\"</code> to <code class='mono'>\"out.txt\"</code>.",
+          "ph": "with open(\"out.txt\", \"w\") as f: f.write(\"hi\")",
+          "sol": "with open(\"out.txt\", \"w\") as f:\n    f.write(\"hi\")",
+          "re": "^with\\s+open\\(\\s*([\"'])out\\.txt\\1\\s*,\\s*([\"'])w\\2\\s*\\)\\s+as\\s+f\\s*:\\s*\\n\\s*f\\.write\\(\\s*([\"'])hi\\3\\s*\\)$",
+          "ok": [
+            "wrote to out.txt"
+          ],
+          "checks": [
+            {
+              "re": "([\"'])w\\1",
+              "msg": "Open in write mode \"w\"."
+            },
+            {
+              "re": "f\\.write\\(",
+              "msg": "Write with f.write()."
+            }
+          ]
+        },
+        {
+          "t": "Parse JSON",
+          "card": "<p><code class='mono text-cyan-300'>json.loads</code> string → Python object.</p>",
+          "mission": "Parse <code class='mono'>raw</code> into <b class='text-white'>data</b>.",
+          "ctx": "raw = '{\"a\": 1}'",
+          "ph": "data = json.loads(raw)",
+          "sol": "data = json.loads(raw)",
+          "re": "^data\\s*=\\s*json\\.loads\\(\\s*raw\\s*\\)$",
+          "ok": [
+            "{'a': 1}"
+          ],
+          "checks": [
+            {
+              "re": "json\\.loads\\(",
+              "msg": "Use json.loads(raw)."
+            }
+          ]
+        },
+        {
+          "t": "Serialize JSON",
+          "card": "<p><code class='mono text-cyan-300'>json.dumps</code> object → string.</p>",
+          "mission": "Serialize <code class='mono'>obj</code> into <b class='text-white'>s</b>.",
+          "ctx": "obj = {\"a\": 1}",
+          "ph": "s = json.dumps(obj)",
+          "sol": "s = json.dumps(obj)",
+          "re": "^s\\s*=\\s*json\\.dumps\\(\\s*obj\\s*\\)$",
+          "ok": [
+            "'{\"a\": 1}'"
+          ],
+          "checks": [
+            {
+              "re": "json\\.dumps\\(",
+              "msg": "Use json.dumps(obj)."
+            }
+          ]
+        },
+        {
+          "t": "Capture the message",
+          "card": "<p><code class='mono text-cyan-300'>except E as e</code> binds the error object.</p>",
+          "mission": "Catch any Exception from <code class='mono'>risky()</code> and store <code class='mono'>str(e)</code> in <b class='text-white'>err</b>.",
+          "ph": "try: risky() except Exception as e: err = str(e)",
+          "sol": "try:\n    risky()\nexcept Exception as e:\n    err = str(e)",
+          "re": "^try\\s*:\\s*\\n\\s*risky\\(\\s*\\)\\s*\\n\\s*except\\s+Exception\\s+as\\s+e\\s*:\\s*\\n\\s*err\\s*=\\s*str\\(\\s*e\\s*\\)$",
+          "ok": [
+            "err holds the message"
+          ],
+          "checks": [
+            {
+              "re": "except\\s+Exception\\s+as\\s+e",
+              "msg": "Bind the error: as e."
+            },
+            {
+              "re": "str\\(\\s*e",
+              "msg": "Stringify it: str(e)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "classes-oop",
+      "name": "Classes & OOP",
+      "questions": [
+        {
+          "t": "Constructor",
+          "card": "<p><code class='mono text-cyan-300'>__init__</code> seeds instance state.</p>",
+          "mission": "Write <b class='text-white'>Point</b> storing <code class='mono'>x</code> and <code class='mono'>y</code>.",
+          "ph": "class Point: def __init__(self, x, y): ...",
+          "sol": "class Point:\n    def __init__(self, x, y):\n        self.x = x\n        self.y = y",
+          "re": "^class\\s+Point\\s*:\\s*\\n\\s*def\\s+__init__\\(\\s*self\\s*,\\s*x\\s*,\\s*y\\s*\\)\\s*:\\s*\\n\\s*self\\.x\\s*=\\s*x\\s*\\n\\s*self\\.y\\s*=\\s*y$",
+          "ok": [
+            "Point(1, 2)"
+          ],
+          "checks": [
+            {
+              "re": "class\\s+Point",
+              "msg": "Declare class Point."
+            },
+            {
+              "re": "def\\s+__init__\\(\\s*self\\s*,\\s*x\\s*,\\s*y",
+              "msg": "__init__(self, x, y)."
+            },
+            {
+              "re": "self\\.x\\s*=\\s*x",
+              "msg": "Store self.x = x."
+            }
+          ]
+        },
+        {
+          "t": "A method that mutates",
+          "card": "<p>Methods take <code class='mono'>self</code> and act on its state.</p>",
+          "mission": "Write <b class='text-white'>Counter</b> with <code class='mono'>n=0</code> and an <code class='mono'>inc()</code> that adds 1.",
+          "ph": "class Counter: __init__ + inc",
+          "sol": "class Counter:\n    def __init__(self):\n        self.n = 0\n    def inc(self):\n        self.n += 1",
+          "re": "^class\\s+Counter\\s*:\\s*\\n\\s*def\\s+__init__\\(\\s*self\\s*\\)\\s*:\\s*\\n\\s*self\\.n\\s*=\\s*0\\s*\\n\\s*def\\s+inc\\(\\s*self\\s*\\)\\s*:\\s*\\n\\s*self\\.n\\s*\\+=\\s*1$",
+          "ok": [
+            "c.inc() -> n = 1"
+          ],
+          "checks": [
+            {
+              "re": "self\\.n\\s*=\\s*0",
+              "msg": "Init self.n = 0."
+            },
+            {
+              "re": "def\\s+inc\\(\\s*self\\s*\\)",
+              "msg": "Define inc(self)."
+            },
+            {
+              "re": "self\\.n\\s*\\+=\\s*1",
+              "msg": "Increment self.n."
+            }
+          ]
+        },
+        {
+          "t": "Readable repr",
+          "card": "<p><code class='mono text-cyan-300'>__repr__</code> controls how the object prints.</p>",
+          "mission": "Give <b class='text-white'>User</b> a repr of <code class='mono'>User(name)</code>.",
+          "ph": "class User: __init__ + __repr__",
+          "sol": "class User:\n    def __init__(self, name):\n        self.name = name\n    def __repr__(self):\n        return f\"User({self.name})\"",
+          "re": "^class\\s+User\\s*:\\s*\\n\\s*def\\s+__init__\\(\\s*self\\s*,\\s*name\\s*\\)\\s*:\\s*\\n\\s*self\\.name\\s*=\\s*name\\s*\\n\\s*def\\s+__repr__\\(\\s*self\\s*\\)\\s*:\\s*\\n\\s*return\\s+f([\"'])User\\(\\{self\\.name\\}\\)\\1$",
+          "ok": [
+            "repr(u) -> User(ada)"
+          ],
+          "checks": [
+            {
+              "re": "def\\s+__repr__\\(\\s*self\\s*\\)",
+              "msg": "Define __repr__(self)."
+            },
+            {
+              "re": "f[\"']User\\(\\{self\\.name\\}\\)",
+              "msg": "Return f\"User({self.name})\"."
+            }
+          ]
+        },
+        {
+          "t": "Inherit with super()",
+          "card": "<p><code class='mono text-cyan-300'>super().__init__</code> runs the parent constructor.</p>",
+          "mission": "Write <b class='text-white'>Admin(User)</b> adding a <code class='mono'>level</code>, chaining to the parent.",
+          "ph": "class Admin(User): __init__ w/ super()",
+          "sol": "class Admin(User):\n    def __init__(self, name, level):\n        super().__init__(name)\n        self.level = level",
+          "re": "^class\\s+Admin\\(\\s*User\\s*\\)\\s*:\\s*\\n\\s*def\\s+__init__\\(\\s*self\\s*,\\s*name\\s*,\\s*level\\s*\\)\\s*:\\s*\\n\\s*super\\(\\s*\\)\\.__init__\\(\\s*name\\s*\\)\\s*\\n\\s*self\\.level\\s*=\\s*level$",
+          "ok": [
+            "Admin extends User"
+          ],
+          "checks": [
+            {
+              "re": "class\\s+Admin\\(\\s*User\\s*\\)",
+              "msg": "Subclass User."
+            },
+            {
+              "re": "super\\(\\s*\\)\\.__init__\\(\\s*name",
+              "msg": "Chain super().__init__(name)."
+            },
+            {
+              "re": "self\\.level\\s*=\\s*level",
+              "msg": "Add self.level."
+            }
+          ]
+        },
+        {
+          "t": "Alternate constructor",
+          "card": "<p><code class='mono text-cyan-300'>@classmethod</code> receives the class as <code class='mono'>cls</code>.</p>",
+          "mission": "Add a <b class='text-white'>guest()</b> classmethod to <code class='mono'>User</code> returning <code class='mono'>cls(\"guest\")</code>.",
+          "ph": "class User: @classmethod def guest(cls): ...",
+          "sol": "class User:\n    @classmethod\n    def guest(cls):\n        return cls(\"guest\")",
+          "re": "^class\\s+User\\s*:\\s*\\n\\s*@classmethod\\s*\\n\\s*def\\s+guest\\(\\s*cls\\s*\\)\\s*:\\s*\\n\\s*return\\s+cls\\(\\s*([\"'])guest\\1\\s*\\)$",
+          "ok": [
+            "User.guest()"
+          ],
+          "checks": [
+            {
+              "re": "@classmethod",
+              "msg": "Decorate with @classmethod."
+            },
+            {
+              "re": "def\\s+guest\\(\\s*cls\\s*\\)",
+              "msg": "Take cls."
+            },
+            {
+              "re": "cls\\(",
+              "msg": "Build via cls(...)."
+            }
+          ]
+        },
+        {
+          "t": "Computed property",
+          "card": "<p><code class='mono text-cyan-300'>@property</code> exposes a method as an attribute.</p>",
+          "mission": "Give <b class='text-white'>Circle</b> an <code class='mono'>area</code> property = <code class='mono'>3.14 * r ** 2</code>.",
+          "ph": "class Circle: __init__(self, r) + @property area",
+          "sol": "class Circle:\n    def __init__(self, r):\n        self.r = r\n    @property\n    def area(self):\n        return 3.14 * self.r ** 2",
+          "re": "^class\\s+Circle\\s*:\\s*\\n\\s*def\\s+__init__\\(\\s*self\\s*,\\s*r\\s*\\)\\s*:\\s*\\n\\s*self\\.r\\s*=\\s*r\\s*\\n\\s*@property\\s*\\n\\s*def\\s+area\\(\\s*self\\s*\\)\\s*:\\s*\\n\\s*return\\s+3\\.14\\s*\\*\\s*self\\.r\\s*\\*\\*\\s*2$",
+          "ok": [
+            "c.area — no parens"
+          ],
+          "checks": [
+            {
+              "re": "@property",
+              "msg": "Decorate with @property."
+            },
+            {
+              "re": "def\\s+area\\(\\s*self\\s*\\)",
+              "msg": "Define area(self)."
+            },
+            {
+              "re": "self\\.r\\s*\\*\\*\\s*2",
+              "msg": "Use r ** 2."
+            }
+          ]
+        },
+        {
+          "t": "Value equality",
+          "card": "<p><code class='mono text-cyan-300'>__eq__</code> defines what == means.</p>",
+          "mission": "Make <b class='text-white'>Money</b> compare by <code class='mono'>cents</code>.",
+          "ph": "class Money: __init__(self, cents) + __eq__",
+          "sol": "class Money:\n    def __init__(self, cents):\n        self.cents = cents\n    def __eq__(self, other):\n        return self.cents == other.cents",
+          "re": "^class\\s+Money\\s*:\\s*\\n\\s*def\\s+__init__\\(\\s*self\\s*,\\s*cents\\s*\\)\\s*:\\s*\\n\\s*self\\.cents\\s*=\\s*cents\\s*\\n\\s*def\\s+__eq__\\(\\s*self\\s*,\\s*other\\s*\\)\\s*:\\s*\\n\\s*return\\s+self\\.cents\\s*==\\s*other\\.cents$",
+          "ok": [
+            "Money(5) == Money(5)"
+          ],
+          "checks": [
+            {
+              "re": "def\\s+__eq__\\(\\s*self\\s*,\\s*other\\s*\\)",
+              "msg": "Define __eq__(self, other)."
+            },
+            {
+              "re": "self\\.cents\\s*==\\s*other\\.cents",
+              "msg": "Compare .cents."
+            }
+          ]
+        },
+        {
+          "t": "Dataclass",
+          "card": "<p><code class='mono text-cyan-300'>@dataclass</code> auto-writes __init__ and __repr__.</p>",
+          "mission": "Declare a dataclass <b class='text-white'>Point</b> with <code class='mono'>x: int</code>, <code class='mono'>y: int</code>.",
+          "ph": "@dataclass class Point: x: int / y: int",
+          "sol": "@dataclass\nclass Point:\n    x: int\n    y: int",
+          "re": "^@dataclass\\s*\\n\\s*class\\s+Point\\s*:\\s*\\n\\s*x\\s*:\\s*int\\s*\\n\\s*y\\s*:\\s*int$",
+          "ok": [
+            "auto __init__ + __repr__"
+          ],
+          "checks": [
+            {
+              "re": "@dataclass",
+              "msg": "Decorate with @dataclass."
+            },
+            {
+              "re": "x\\s*:\\s*int",
+              "msg": "Annotate x: int."
+            },
+            {
+              "re": "y\\s*:\\s*int",
+              "msg": "Annotate y: int."
+            }
+          ]
+        },
+        {
+          "t": "Length protocol",
+          "card": "<p><code class='mono text-cyan-300'>__len__</code> makes <code class='mono'>len(obj)</code> work.</p>",
+          "mission": "Give <b class='text-white'>Bag</b> a length equal to its <code class='mono'>items</code>.",
+          "ph": "class Bag: __init__(self, items) + __len__",
+          "sol": "class Bag:\n    def __init__(self, items):\n        self.items = items\n    def __len__(self):\n        return len(self.items)",
+          "re": "^class\\s+Bag\\s*:\\s*\\n\\s*def\\s+__init__\\(\\s*self\\s*,\\s*items\\s*\\)\\s*:\\s*\\n\\s*self\\.items\\s*=\\s*items\\s*\\n\\s*def\\s+__len__\\(\\s*self\\s*\\)\\s*:\\s*\\n\\s*return\\s+len\\(\\s*self\\.items\\s*\\)$",
+          "ok": [
+            "len(bag) works"
+          ],
+          "checks": [
+            {
+              "re": "def\\s+__len__\\(\\s*self\\s*\\)",
+              "msg": "Define __len__(self)."
+            },
+            {
+              "re": "len\\(\\s*self\\.items",
+              "msg": "Return len(self.items)."
+            }
+          ]
+        },
+        {
+          "t": "Static method",
+          "card": "<p><code class='mono text-cyan-300'>@staticmethod</code> needs neither self nor cls.</p>",
+          "mission": "Give <b class='text-white'>Math</b> a static <code class='mono'>add(a, b)</code>.",
+          "ph": "class Math: @staticmethod def add(a, b): ...",
+          "sol": "class Math:\n    @staticmethod\n    def add(a, b):\n        return a + b",
+          "re": "^class\\s+Math\\s*:\\s*\\n\\s*@staticmethod\\s*\\n\\s*def\\s+add\\(\\s*a\\s*,\\s*b\\s*\\)\\s*:\\s*\\n\\s*return\\s+a\\s*\\+\\s*b$",
+          "ok": [
+            "Math.add(2, 3) -> 5"
+          ],
+          "checks": [
+            {
+              "re": "@staticmethod",
+              "msg": "Decorate with @staticmethod."
+            },
+            {
+              "re": "def\\s+add\\(\\s*a\\s*,\\s*b",
+              "msg": "No self — add(a, b)."
+            },
+            {
+              "re": "return\\s+a\\s*\\+\\s*b",
+              "msg": "Return a + b."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "generators-decorators",
+      "name": "Generators & Decorators",
+      "questions": [
+        {
+          "t": "A yielding generator",
+          "card": "<p><code class='mono text-cyan-300'>yield</code> pauses and streams one value.</p>",
+          "mission": "Write <b class='text-white'>count_up(n)</b> yielding 0..n-1.",
+          "ph": "def count_up(n): for i in range(n): yield i",
+          "sol": "def count_up(n):\n    for i in range(n):\n        yield i",
+          "re": "^def\\s+count_up\\(\\s*n\\s*\\)\\s*:\\s*\\n\\s*for\\s+i\\s+in\\s+range\\(\\s*n\\s*\\)\\s*:\\s*\\n\\s*yield\\s+i$",
+          "ok": [
+            "lazy stream 0..n-1"
+          ],
+          "checks": [
+            {
+              "re": "def\\s+count_up\\(\\s*n",
+              "msg": "Define count_up(n)."
+            },
+            {
+              "re": "yield\\s+i",
+              "msg": "Stream with yield i."
+            }
+          ]
+        },
+        {
+          "t": "Generator expression",
+          "card": "<p>Parentheses make a one-shot lazy iterator.</p>",
+          "mission": "Bind a generator of squares 0..4 to <b class='text-white'>g</b>.",
+          "ph": "g = (x * x for x in range(5))",
+          "sol": "g = (x * x for x in range(5))",
+          "re": "^g\\s*=\\s*\\(\\s*(x\\s*\\*\\s*x|x\\s*\\*\\*\\s*2)\\s+for\\s+x\\s+in\\s+range\\(\\s*5\\s*\\)\\s*\\)$",
+          "ok": [
+            "<generator object>"
+          ],
+          "checks": [
+            {
+              "re": "\\(\\s*x",
+              "msg": "Wrap in parentheses, not brackets."
+            },
+            {
+              "re": "for\\s+x\\s+in\\s+range\\(\\s*5",
+              "msg": "Iterate range(5)."
+            }
+          ]
+        },
+        {
+          "t": "Delegate with yield from",
+          "card": "<p><code class='mono text-cyan-300'>yield from</code> streams a sub-iterable.</p>",
+          "mission": "Write <b class='text-white'>flatten(rows)</b> yielding every item of every row.",
+          "ph": "def flatten(rows): for row in rows: yield from row",
+          "sol": "def flatten(rows):\n    for row in rows:\n        yield from row",
+          "re": "^def\\s+flatten\\(\\s*rows\\s*\\)\\s*:\\s*\\n\\s*for\\s+row\\s+in\\s+rows\\s*:\\s*\\n\\s*yield\\s+from\\s+row$",
+          "ok": [
+            "flattens lazily"
+          ],
+          "checks": [
+            {
+              "re": "for\\s+row\\s+in\\s+rows",
+              "msg": "Loop the rows."
+            },
+            {
+              "re": "yield\\s+from\\s+row",
+              "msg": "Delegate: yield from row."
+            }
+          ]
+        },
+        {
+          "t": "A decorator",
+          "card": "<p>A decorator wraps a function and returns the wrapper.</p>",
+          "mission": "Write <b class='text-white'>loud(fn)</b> returning a <code class='mono'>wrapper(*args)</code> that calls fn.",
+          "ph": "def loud(fn): def wrapper(*args): return fn(*args) / return wrapper",
+          "sol": "def loud(fn):\n    def wrapper(*args):\n        return fn(*args)\n    return wrapper",
+          "re": "^def\\s+loud\\(\\s*fn\\s*\\)\\s*:\\s*\\n\\s*def\\s+wrapper\\(\\s*\\*args\\s*\\)\\s*:\\s*\\n\\s*return\\s+fn\\(\\s*\\*args\\s*\\)\\s*\\n\\s*return\\s+wrapper$",
+          "ok": [
+            "wraps a function"
+          ],
+          "checks": [
+            {
+              "re": "def\\s+loud\\(\\s*fn\\s*\\)",
+              "msg": "Take the function fn."
+            },
+            {
+              "re": "def\\s+wrapper\\(",
+              "msg": "Define the inner wrapper."
+            },
+            {
+              "re": "return\\s+wrapper",
+              "msg": "Return the wrapper."
+            }
+          ]
+        },
+        {
+          "t": "Memoize with lru_cache",
+          "card": "<p><code class='mono text-cyan-300'>@lru_cache</code> caches results by args.</p>",
+          "mission": "Memoize <b class='text-white'>fib(n)</b> (n<2 → n, else fib(n-1)+fib(n-2)).",
+          "ph": "@lru_cache def fib(n): ...",
+          "sol": "@lru_cache\ndef fib(n):\n    return n if n < 2 else fib(n - 1) + fib(n - 2)",
+          "re": "^@lru_cache\\s*\\n\\s*def\\s+fib\\(\\s*n\\s*\\)\\s*:\\s*\\n\\s*return\\s+n\\s+if\\s+n\\s*<\\s*2\\s+else\\s+fib\\(\\s*n\\s*-\\s*1\\s*\\)\\s*\\+\\s*fib\\(\\s*n\\s*-\\s*2\\s*\\)$",
+          "ok": [
+            "memoized — O(n)"
+          ],
+          "checks": [
+            {
+              "re": "@lru_cache",
+              "msg": "Decorate with @lru_cache."
+            },
+            {
+              "re": "def\\s+fib\\(\\s*n",
+              "msg": "Define fib(n)."
+            },
+            {
+              "re": "fib\\(\\s*n\\s*-\\s*1",
+              "msg": "Recurse fib(n-1)+fib(n-2)."
+            }
+          ]
+        },
+        {
+          "t": "Preserve metadata",
+          "card": "<p><code class='mono text-cyan-300'>@wraps(fn)</code> keeps the wrapped name/doc.</p>",
+          "mission": "Write <b class='text-white'>timed(fn)</b>: an inner <code class='mono'>(*args, **kwargs)</code> wrapper decorated with <code class='mono'>@wraps(fn)</code>.",
+          "ph": "def timed(fn): @wraps(fn) def inner(*args, **kwargs): ...",
+          "sol": "def timed(fn):\n    @wraps(fn)\n    def inner(*args, **kwargs):\n        return fn(*args, **kwargs)\n    return inner",
+          "re": "^def\\s+timed\\(\\s*fn\\s*\\)\\s*:\\s*\\n\\s*@wraps\\(\\s*fn\\s*\\)\\s*\\n\\s*def\\s+inner\\(\\s*\\*args\\s*,\\s*\\*\\*kwargs\\s*\\)\\s*:\\s*\\n\\s*return\\s+fn\\(\\s*\\*args\\s*,\\s*\\*\\*kwargs\\s*\\)\\s*\\n\\s*return\\s+inner$",
+          "ok": [
+            "metadata preserved"
+          ],
+          "checks": [
+            {
+              "re": "@wraps\\(\\s*fn",
+              "msg": "Apply @wraps(fn)."
+            },
+            {
+              "re": "\\*args\\s*,\\s*\\*\\*kwargs",
+              "msg": "Forward *args, **kwargs."
+            },
+            {
+              "re": "return\\s+inner",
+              "msg": "Return the inner wrapper."
+            }
+          ]
+        },
+        {
+          "t": "Chain iterables",
+          "card": "<p><code class='mono text-cyan-300'>chain</code> concatenates lazily.</p>",
+          "mission": "Chain <code class='mono'>a</code> and <code class='mono'>b</code> into a list <b class='text-white'>joined</b>.",
+          "ctx": "a = [1]\nb = [2, 3]",
+          "ph": "joined = list(chain(a, b))",
+          "sol": "joined = list(chain(a, b))",
+          "re": "^joined\\s*=\\s*list\\(\\s*chain\\(\\s*a\\s*,\\s*b\\s*\\)\\s*\\)$",
+          "ok": [
+            "[1, 2, 3]"
+          ],
+          "checks": [
+            {
+              "re": "chain\\(\\s*a\\s*,\\s*b",
+              "msg": "Use chain(a, b)."
+            }
+          ]
+        },
+        {
+          "t": "Pull one value",
+          "card": "<p><code class='mono text-cyan-300'>next()</code> advances a generator once.</p>",
+          "mission": "Pull the first value of <code class='mono'>g</code> into <b class='text-white'>first</b>.",
+          "ctx": "g = (x for x in range(3))",
+          "ph": "first = next(g)",
+          "sol": "first = next(g)",
+          "re": "^first\\s*=\\s*next\\(\\s*g\\s*\\)$",
+          "ok": [
+            "0"
+          ],
+          "checks": [
+            {
+              "re": "next\\(\\s*g",
+              "msg": "Advance with next(g)."
+            }
+          ]
+        },
+        {
+          "t": "Stream a huge range",
+          "card": "<p>A generator keeps memory flat over any size.</p>",
+          "mission": "Sum 0..999999 without building a list into <b class='text-white'>total</b>.",
+          "ph": "total = sum(i for i in range(1000000))",
+          "sol": "total = sum(i for i in range(1000000))",
+          "re": "^total\\s*=\\s*sum\\(\\s*i\\s+for\\s+i\\s+in\\s+range\\(\\s*1000000\\s*\\)\\s*\\)$",
+          "ok": [
+            "499999500000",
+            "O(1) memory"
+          ],
+          "checks": [
+            {
+              "re": "\\[",
+              "bad": true,
+              "msg": "No list — stream it with a generator."
+            },
+            {
+              "re": "sum\\(",
+              "msg": "Feed sum() a generator."
+            }
+          ]
+        },
+        {
+          "t": "A timing decorator",
+          "card": "<p>Wrap, time, return — the classic profiler.</p>",
+          "mission": "Write <b class='text-white'>timer(fn)</b>: time <code class='mono'>fn(*args)</code>, print the elapsed, return the result.",
+          "ph": "def timer(fn): def inner(*args): start=... result=fn(*args) print(...) return result / return inner",
+          "sol": "def timer(fn):\n    def inner(*args):\n        start = time.time()\n        result = fn(*args)\n        print(time.time() - start)\n        return result\n    return inner",
+          "re": "^def\\s+timer\\(\\s*fn\\s*\\)\\s*:\\s*\\n\\s*def\\s+inner\\(\\s*\\*args\\s*\\)\\s*:\\s*\\n\\s*start\\s*=\\s*time\\.time\\(\\s*\\)\\s*\\n\\s*result\\s*=\\s*fn\\(\\s*\\*args\\s*\\)\\s*\\n\\s*print\\(\\s*time\\.time\\(\\s*\\)\\s*-\\s*start\\s*\\)\\s*\\n\\s*return\\s+result\\s*\\n\\s*return\\s+inner$",
+          "ok": [
+            "logs elapsed time"
+          ],
+          "checks": [
+            {
+              "re": "start\\s*=\\s*time\\.time\\(",
+              "msg": "Record the start time."
+            },
+            {
+              "re": "result\\s*=\\s*fn\\(\\s*\\*args",
+              "msg": "Call and capture the result."
+            },
+            {
+              "re": "return\\s+inner",
+              "msg": "Return the wrapper."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "typing-modern",
+      "name": "Typing & Modern Python",
+      "questions": [
+        {
+          "t": "Type a signature",
+          "card": "<p>Annotate params with <code class='mono'>name: type</code> and returns with <code class='mono text-cyan-300'>-&gt;</code>.</p>",
+          "mission": "Write the header for <b class='text-white'>mean</b> taking <code class='mono'>list[float]</code>, returning <code class='mono'>float</code>.",
+          "ph": "def mean(nums: list[float]) -> float:",
+          "sol": "def mean(nums: list[float]) -> float:",
+          "re": "^def\\s+mean\\(\\s*nums\\s*:\\s*list\\[\\s*float\\s*\\]\\s*\\)\\s*->\\s*float\\s*:$",
+          "ok": [
+            "typed signature"
+          ],
+          "checks": [
+            {
+              "re": "nums\\s*:\\s*list\\[\\s*float\\s*\\]",
+              "msg": "Annotate nums: list[float]."
+            },
+            {
+              "re": "->\\s*float",
+              "msg": "Return type -> float."
+            }
+          ]
+        },
+        {
+          "t": "Optional return",
+          "card": "<p><code class='mono text-cyan-300'>str | None</code> means \"maybe a str\".</p>",
+          "mission": "Header for <b class='text-white'>find(key: str)</b> returning <code class='mono'>str | None</code>.",
+          "ph": "def find(key: str) -> str | None:",
+          "sol": "def find(key: str) -> str | None:",
+          "re": "^def\\s+find\\(\\s*key\\s*:\\s*str\\s*\\)\\s*->\\s*str\\s*\\|\\s*None\\s*:$",
+          "ok": [
+            "may return None"
+          ],
+          "checks": [
+            {
+              "re": "key\\s*:\\s*str",
+              "msg": "Annotate key: str."
+            },
+            {
+              "re": "->\\s*str\\s*\\|\\s*None",
+              "msg": "Return str | None."
+            }
+          ]
+        },
+        {
+          "t": "Typed list return",
+          "card": "<p>Generics spell out the element type.</p>",
+          "mission": "Header for <b class='text-white'>evens()</b> returning <code class='mono'>list[int]</code>.",
+          "ph": "def evens() -> list[int]:",
+          "sol": "def evens() -> list[int]:",
+          "re": "^def\\s+evens\\(\\s*\\)\\s*->\\s*list\\[\\s*int\\s*\\]\\s*:$",
+          "ok": [
+            "returns list[int]"
+          ],
+          "checks": [
+            {
+              "re": "->\\s*list\\[\\s*int\\s*\\]",
+              "msg": "Return list[int]."
+            }
+          ]
+        },
+        {
+          "t": "Typed dict param",
+          "card": "<p><code class='mono'>dict[str, int]</code> types keys and values.</p>",
+          "mission": "Header for <b class='text-white'>load(cfg: dict[str, int])</b> returning <code class='mono'>None</code>.",
+          "ph": "def load(cfg: dict[str, int]) -> None:",
+          "sol": "def load(cfg: dict[str, int]) -> None:",
+          "re": "^def\\s+load\\(\\s*cfg\\s*:\\s*dict\\[\\s*str\\s*,\\s*int\\s*\\]\\s*\\)\\s*->\\s*None\\s*:$",
+          "ok": [
+            "typed dict param"
+          ],
+          "checks": [
+            {
+              "re": "cfg\\s*:\\s*dict\\[\\s*str\\s*,\\s*int\\s*\\]",
+              "msg": "Annotate cfg: dict[str, int]."
+            },
+            {
+              "re": "->\\s*None",
+              "msg": "Returns None."
+            }
+          ]
+        },
+        {
+          "t": "Typed dataclass",
+          "card": "<p>Fields carry types and optional defaults.</p>",
+          "mission": "Dataclass <b class='text-white'>Config</b>: <code class='mono'>host: str</code>, <code class='mono'>port: int = 8080</code>.",
+          "ph": "@dataclass class Config: host: str / port: int = 8080",
+          "sol": "@dataclass\nclass Config:\n    host: str\n    port: int = 8080",
+          "re": "^@dataclass\\s*\\n\\s*class\\s+Config\\s*:\\s*\\n\\s*host\\s*:\\s*str\\s*\\n\\s*port\\s*:\\s*int\\s*=\\s*8080$",
+          "ok": [
+            "typed config"
+          ],
+          "checks": [
+            {
+              "re": "@dataclass",
+              "msg": "Decorate with @dataclass."
+            },
+            {
+              "re": "host\\s*:\\s*str",
+              "msg": "host: str."
+            },
+            {
+              "re": "port\\s*:\\s*int\\s*=\\s*8080",
+              "msg": "port: int = 8080."
+            }
+          ]
+        },
+        {
+          "t": "Callable parameter",
+          "card": "<p><code class='mono text-cyan-300'>Callable</code> types a function argument.</p>",
+          "mission": "Header for <b class='text-white'>apply(op: Callable, x: int)</b> returning <code class='mono'>int</code>.",
+          "ph": "def apply(op: Callable, x: int) -> int:",
+          "sol": "def apply(op: Callable, x: int) -> int:",
+          "re": "^def\\s+apply\\(\\s*op\\s*:\\s*Callable\\s*,\\s*x\\s*:\\s*int\\s*\\)\\s*->\\s*int\\s*:$",
+          "ok": [
+            "typed higher-order fn"
+          ],
+          "checks": [
+            {
+              "re": "op\\s*:\\s*Callable",
+              "msg": "Annotate op: Callable."
+            },
+            {
+              "re": "->\\s*int",
+              "msg": "Return int."
+            }
+          ]
+        },
+        {
+          "t": "Walrus operator",
+          "card": "<p><code class='mono text-cyan-300'>:=</code> assigns inside an expression.</p>",
+          "mission": "In one condition, bind <code class='mono'>n = len(data)</code> and test <code class='mono'>&gt; 0</code>; print n in the body.",
+          "ctx": "data = [1, 2]",
+          "ph": "if (n := len(data)) > 0: print(n)",
+          "sol": "if (n := len(data)) > 0:\n    print(n)",
+          "re": "^if\\s+\\(\\s*n\\s*:=\\s*len\\(\\s*data\\s*\\)\\s*\\)\\s*>\\s*0\\s*:\\s*\\n\\s*print\\(\\s*n\\s*\\)$",
+          "ok": [
+            "assign + test in one step"
+          ],
+          "checks": [
+            {
+              "re": "n\\s*:=\\s*len\\(\\s*data",
+              "msg": "Bind with n := len(data)."
+            },
+            {
+              "re": ">\\s*0",
+              "msg": "Test > 0."
+            }
+          ]
+        },
+        {
+          "t": "f-string debug",
+          "card": "<p><code class='mono'>{x=}</code> prints both the name and its value.</p>",
+          "mission": "Debug-print <code class='mono'>x</code> with the <code class='mono'>=</code> shortcut.",
+          "ctx": "x = 5",
+          "ph": "print(f\"{x=}\")",
+          "sol": "print(f\"{x=}\")",
+          "re": "^print\\(\\s*f([\"'])\\{x=\\}\\1\\s*\\)$",
+          "ok": [
+            "x=5"
+          ],
+          "checks": [
+            {
+              "re": "f[\"']\\{x=\\}",
+              "msg": "Use the {x=} debug form."
+            }
+          ]
+        },
+        {
+          "t": "match statement",
+          "card": "<p><code class='mono text-cyan-300'>match / case</code> is structural dispatch.</p>",
+          "mission": "Match <code class='mono'>cmd</code>: <code class='mono'>\"start\"</code> → <code class='mono'>run()</code>, else → <code class='mono'>stop()</code>.",
+          "ctx": "cmd = \"start\"",
+          "ph": "match cmd: case \"start\": run() / case _: stop()",
+          "sol": "match cmd:\n    case \"start\":\n        run()\n    case _:\n        stop()",
+          "re": "^match\\s+cmd\\s*:\\s*\\n\\s*case\\s+([\"'])start\\1\\s*:\\s*\\n\\s*run\\(\\s*\\)\\s*\\n\\s*case\\s+_\\s*:\\s*\\n\\s*stop\\(\\s*\\)$",
+          "ok": [
+            "dispatched to run()"
+          ],
+          "checks": [
+            {
+              "re": "match\\s+cmd",
+              "msg": "match cmd:."
+            },
+            {
+              "re": "case\\s+([\"'])start",
+              "msg": "case \"start\":."
+            },
+            {
+              "re": "case\\s+_",
+              "msg": "Default: case _."
+            }
+          ]
+        },
+        {
+          "t": "Typed average",
+          "card": "<p>Put it together: a fully typed function body.</p>",
+          "mission": "Write <b class='text-white'>average(nums: list[float]) -> float</b> returning the mean.",
+          "ph": "def average(nums: list[float]) -> float:",
+          "sol": "def average(nums: list[float]) -> float:\n    return sum(nums) / len(nums)",
+          "re": "^def\\s+average\\(\\s*nums\\s*:\\s*list\\[\\s*float\\s*\\]\\s*\\)\\s*->\\s*float\\s*:\\s*\\n\\s*return\\s+sum\\(\\s*nums\\s*\\)\\s*\\/\\s*len\\(\\s*nums\\s*\\)$",
+          "ok": [
+            "average([2, 4]) -> 3.0"
+          ],
+          "checks": [
+            {
+              "re": "nums\\s*:\\s*list\\[\\s*float\\s*\\]",
+              "msg": "Type the parameter."
+            },
+            {
+              "re": "->\\s*float",
+              "msg": "Return float."
+            },
+            {
+              "re": "sum\\(\\s*nums\\s*\\)\\s*\\/\\s*len\\(\\s*nums",
+              "msg": "mean = sum / len."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "testing",
+      "name": "Testing",
+      "questions": [
+        {
+          "t": "assert equality",
+          "card": "<p><code class='mono text-cyan-300'>assert</code> — first line of defense; fails loud in tests.</p>",
+          "mission": "Assert that <code class='mono'>add(2, 3)</code> equals 5.",
+          "ph": "assert add(2, 3) == 5",
+          "sol": "assert add(2, 3) == 5",
+          "re": "^assert\\s+add\\(\\s*2\\s*,\\s*3\\s*\\)\\s*==\\s*5$",
+          "ok": [
+            "assertion passed"
+          ],
+          "checks": [
+            {
+              "re": "\\bassert\\b",
+              "msg": "Use assert."
+            },
+            {
+              "re": "add\\(\\s*2\\s*,\\s*3\\s*\\)\\s*==\\s*5",
+              "msg": "Check add(2,3) == 5."
+            }
+          ]
+        },
+        {
+          "t": "pytest test fn",
+          "card": "<p>Pytest discovers functions named <code class='mono text-cyan-300'>test_*</code>.</p>",
+          "mission": "Define <code class='mono'>test_add</code> asserting <code class='mono'>add(1, 1) == 2</code>.",
+          "ph": "def test_add():\n    assert add(1, 1) == 2",
+          "sol": "def test_add():\n    assert add(1, 1) == 2",
+          "re": "^def\\s+test_add\\(\\s*\\)\\s*:\\s*\\n\\s+assert\\s+add\\(\\s*1\\s*,\\s*1\\s*\\)\\s*==\\s*2$",
+          "ok": [
+            "1 passed"
+          ],
+          "checks": [
+            {
+              "re": "def\\s+test_",
+              "msg": "Name it test_..."
+            },
+            {
+              "re": "assert\\s+add",
+              "msg": "Body asserts something."
+            }
+          ]
+        },
+        {
+          "t": "pytest.raises",
+          "card": "<p><code class='mono text-cyan-300'>with pytest.raises(E):</code> asserts E was raised.</p>",
+          "mission": "Assert calling <code class='mono'>bad()</code> raises <code class='mono'>ValueError</code>.",
+          "ph": "with pytest.raises(ValueError):\n    bad()",
+          "sol": "with pytest.raises(ValueError):\n    bad()",
+          "re": "^with\\s+pytest\\.raises\\(\\s*ValueError\\s*\\)\\s*:\\s*\\n\\s+bad\\(\\s*\\)$",
+          "ok": [
+            "exception captured"
+          ],
+          "checks": [
+            {
+              "re": "pytest\\.raises\\(",
+              "msg": "Use pytest.raises."
+            }
+          ]
+        },
+        {
+          "t": "parametrize",
+          "card": "<p><code class='mono text-cyan-300'>@pytest.mark.parametrize</code> runs one test many times with different inputs.</p>",
+          "mission": "Decorate <code class='mono'>test_sq</code> with two cases: <code class='mono'>(2, 4)</code>, <code class='mono'>(3, 9)</code>.",
+          "ph": "@pytest.mark.parametrize('x,y', [(2, 4), (3, 9)])",
+          "sol": "@pytest.mark.parametrize('x,y', [(2, 4), (3, 9)])",
+          "re": "^@pytest\\.mark\\.parametrize\\(\\s*['\"]x,y['\"]\\s*,\\s*\\[\\s*\\(\\s*2\\s*,\\s*4\\s*\\)\\s*,\\s*\\(\\s*3\\s*,\\s*9\\s*\\)\\s*\\]\\s*\\)$",
+          "ok": [
+            "2 test cases"
+          ],
+          "checks": [
+            {
+              "re": "parametrize\\(",
+              "msg": "Use parametrize."
+            }
+          ]
+        },
+        {
+          "t": "fixture",
+          "card": "<p><code class='mono text-cyan-300'>@pytest.fixture</code> — a reusable setup for tests.</p>",
+          "mission": "Define fixture <code class='mono'>sample</code> that returns <code class='mono'>[1, 2, 3]</code>.",
+          "ph": "@pytest.fixture\ndef sample():\n    return [1, 2, 3]",
+          "sol": "@pytest.fixture\ndef sample():\n    return [1, 2, 3]",
+          "re": "^@pytest\\.fixture\\s*\\n\\s*def\\s+sample\\(\\s*\\)\\s*:\\s*\\n\\s+return\\s+\\[\\s*1\\s*,\\s*2\\s*,\\s*3\\s*\\]$",
+          "ok": [
+            "fixture registered"
+          ],
+          "checks": [
+            {
+              "re": "@pytest\\.fixture",
+              "msg": "Add @pytest.fixture."
+            }
+          ]
+        },
+        {
+          "t": "approx floats",
+          "card": "<p><code class='mono text-cyan-300'>pytest.approx</code> compares floats with tolerance.</p>",
+          "mission": "Assert <code class='mono'>result</code> approximates <code class='mono'>0.1</code>.",
+          "ph": "assert result == pytest.approx(0.1)",
+          "sol": "assert result == pytest.approx(0.1)",
+          "re": "^assert\\s+result\\s*==\\s*pytest\\.approx\\(\\s*0\\.1\\s*\\)$",
+          "ok": [
+            "float ok"
+          ],
+          "checks": [
+            {
+              "re": "pytest\\.approx\\(",
+              "msg": "Use pytest.approx."
+            }
+          ]
+        },
+        {
+          "t": "mock a call",
+          "card": "<p><code class='mono text-cyan-300'>MagicMock()</code> stands in for a callable in tests.</p>",
+          "mission": "Create a mock <b class='text-white'>api</b> using <code class='mono'>MagicMock()</code>.",
+          "ph": "api = MagicMock()",
+          "sol": "api = MagicMock()",
+          "re": "^api\\s*=\\s*MagicMock\\(\\s*\\)$",
+          "ok": [
+            "mock built"
+          ],
+          "checks": [
+            {
+              "re": "MagicMock\\(",
+              "msg": "Instantiate MagicMock()."
+            }
+          ]
+        },
+        {
+          "t": "monkeypatch env",
+          "card": "<p><code class='mono text-cyan-300'>monkeypatch</code> — pytest builtin to patch env/attrs.</p>",
+          "mission": "Set env var <code class='mono'>KEY</code> to <code class='mono'>abc</code>.",
+          "ph": "monkeypatch.setenv('KEY', 'abc')",
+          "sol": "monkeypatch.setenv('KEY', 'abc')",
+          "re": "^monkeypatch\\.setenv\\(\\s*['\"]KEY['\"]\\s*,\\s*['\"]abc['\"]\\s*\\)$",
+          "ok": [
+            "env patched"
+          ],
+          "checks": [
+            {
+              "re": "setenv\\(",
+              "msg": "Call monkeypatch.setenv."
+            }
+          ]
+        },
+        {
+          "t": "coverage cli",
+          "card": "<p><code class='mono text-cyan-300'>pytest --cov</code> reports line coverage.</p>",
+          "mission": "Run pytest with coverage for pkg <code class='mono'>app</code>.",
+          "ph": "pytest --cov=app",
+          "sol": "pytest --cov=app",
+          "re": "^pytest\\s+--cov=app$",
+          "ok": [
+            "coverage on"
+          ],
+          "checks": [
+            {
+              "re": "--cov=",
+              "msg": "Pass --cov=."
+            }
+          ]
+        },
+        {
+          "t": "skip marker",
+          "card": "<p><code class='mono text-cyan-300'>@pytest.mark.skip</code> skips a broken test with a reason.</p>",
+          "mission": "Skip with reason <code class='mono'>wip</code>.",
+          "ph": "@pytest.mark.skip(reason='wip')",
+          "sol": "@pytest.mark.skip(reason='wip')",
+          "re": "^@pytest\\.mark\\.skip\\(\\s*reason\\s*=\\s*['\"]wip['\"]\\s*\\)$",
+          "ok": [
+            "skipped"
+          ],
+          "checks": [
+            {
+              "re": "mark\\.skip\\(",
+              "msg": "Use @pytest.mark.skip."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "async-concurrent",
+      "name": "Async & Concurrency",
+      "questions": [
+        {
+          "t": "async def",
+          "card": "<p><code class='mono text-cyan-300'>async def</code> defines a coroutine — call it, get an awaitable.</p>",
+          "mission": "Define coroutine <code class='mono'>ping</code> returning <code class='mono'>'pong'</code>.",
+          "ph": "async def ping():\n    return 'pong'",
+          "sol": "async def ping():\n    return 'pong'",
+          "re": "^async\\s+def\\s+ping\\(\\s*\\)\\s*:\\s*\\n\\s+return\\s+['\"]pong['\"]$",
+          "ok": [
+            "coroutine ready"
+          ],
+          "checks": [
+            {
+              "re": "async\\s+def",
+              "msg": "Prefix with async."
+            }
+          ]
+        },
+        {
+          "t": "await sleep",
+          "card": "<p><code class='mono text-cyan-300'>await</code> pauses the coroutine until the awaitable finishes.</p>",
+          "mission": "In <code class='mono'>tick</code>, await <code class='mono'>asyncio.sleep(1)</code>.",
+          "ph": "async def tick():\n    await asyncio.sleep(1)",
+          "sol": "async def tick():\n    await asyncio.sleep(1)",
+          "re": "^async\\s+def\\s+tick\\(\\s*\\)\\s*:\\s*\\n\\s+await\\s+asyncio\\.sleep\\(\\s*1\\s*\\)$",
+          "ok": [
+            "1s later"
+          ],
+          "checks": [
+            {
+              "re": "await\\s+asyncio\\.sleep",
+              "msg": "await asyncio.sleep."
+            }
+          ]
+        },
+        {
+          "t": "asyncio.run",
+          "card": "<p><code class='mono text-cyan-300'>asyncio.run(coro)</code> is the entry from sync land.</p>",
+          "mission": "Kick off <code class='mono'>main()</code> via <code class='mono'>asyncio.run</code>.",
+          "ph": "asyncio.run(main())",
+          "sol": "asyncio.run(main())",
+          "re": "^asyncio\\.run\\(\\s*main\\(\\s*\\)\\s*\\)$",
+          "ok": [
+            "event loop up"
+          ],
+          "checks": [
+            {
+              "re": "asyncio\\.run\\(",
+              "msg": "Call asyncio.run."
+            }
+          ]
+        },
+        {
+          "t": "gather concurrent",
+          "card": "<p><code class='mono text-cyan-300'>asyncio.gather</code> awaits many coroutines in parallel.</p>",
+          "mission": "Gather two tasks — <code class='mono'>a()</code>, <code class='mono'>b()</code> — into <b class='text-white'>results</b>.",
+          "ph": "results = await asyncio.gather(a(), b())",
+          "sol": "results = await asyncio.gather(a(), b())",
+          "re": "^results\\s*=\\s*await\\s+asyncio\\.gather\\(\\s*a\\(\\s*\\)\\s*,\\s*b\\(\\s*\\)\\s*\\)$",
+          "ok": [
+            "both done"
+          ],
+          "checks": [
+            {
+              "re": "asyncio\\.gather\\(",
+              "msg": "Use asyncio.gather."
+            }
+          ]
+        },
+        {
+          "t": "create_task",
+          "card": "<p><code class='mono text-cyan-300'>asyncio.create_task</code> schedules a coroutine without waiting.</p>",
+          "mission": "Schedule <code class='mono'>worker()</code> as <b class='text-white'>t</b>.",
+          "ph": "t = asyncio.create_task(worker())",
+          "sol": "t = asyncio.create_task(worker())",
+          "re": "^t\\s*=\\s*asyncio\\.create_task\\(\\s*worker\\(\\s*\\)\\s*\\)$",
+          "ok": [
+            "task scheduled"
+          ],
+          "checks": [
+            {
+              "re": "create_task\\(",
+              "msg": "Use create_task."
+            }
+          ]
+        },
+        {
+          "t": "timeout guard",
+          "card": "<p><code class='mono text-cyan-300'>asyncio.wait_for</code> raises TimeoutError past a deadline.</p>",
+          "mission": "Bound <code class='mono'>fetch()</code> to 2s into <b class='text-white'>data</b>.",
+          "ph": "data = await asyncio.wait_for(fetch(), 2)",
+          "sol": "data = await asyncio.wait_for(fetch(), 2)",
+          "re": "^data\\s*=\\s*await\\s+asyncio\\.wait_for\\(\\s*fetch\\(\\s*\\)\\s*,\\s*2\\s*\\)$",
+          "ok": [
+            "bounded"
+          ],
+          "checks": [
+            {
+              "re": "wait_for\\(",
+              "msg": "Use wait_for."
+            }
+          ]
+        },
+        {
+          "t": "ThreadPoolExecutor",
+          "card": "<p><code class='mono text-cyan-300'>ThreadPoolExecutor</code> — CPU-light I/O parallelism.</p>",
+          "mission": "Build a pool with 4 workers as <b class='text-white'>pool</b>.",
+          "ph": "pool = ThreadPoolExecutor(max_workers=4)",
+          "sol": "pool = ThreadPoolExecutor(max_workers=4)",
+          "re": "^pool\\s*=\\s*ThreadPoolExecutor\\(\\s*max_workers\\s*=\\s*4\\s*\\)$",
+          "ok": [
+            "4-worker pool"
+          ],
+          "checks": [
+            {
+              "re": "ThreadPoolExecutor\\(",
+              "msg": "Use ThreadPoolExecutor."
+            }
+          ]
+        },
+        {
+          "t": "ProcessPool",
+          "card": "<p>Use <code class='mono text-cyan-300'>ProcessPoolExecutor</code> for CPU-bound parallelism (skirts the GIL).</p>",
+          "mission": "Map <code class='mono'>work</code> over <code class='mono'>xs</code> via <code class='mono'>pool.map</code>.",
+          "ph": "out = list(pool.map(work, xs))",
+          "sol": "out = list(pool.map(work, xs))",
+          "re": "^out\\s*=\\s*list\\(\\s*pool\\.map\\(\\s*work\\s*,\\s*xs\\s*\\)\\s*\\)$",
+          "ok": [
+            "parallel out"
+          ],
+          "checks": [
+            {
+              "re": "pool\\.map\\(",
+              "msg": "Call pool.map."
+            }
+          ]
+        },
+        {
+          "t": "lock a critical section",
+          "card": "<p><code class='mono text-cyan-300'>asyncio.Lock</code> serializes access to a resource.</p>",
+          "mission": "Use <code class='mono'>lock</code> in a <code class='mono'>with</code>-style block: <code class='mono'>async with lock:</code>.",
+          "ph": "async with lock:\n    total += 1",
+          "sol": "async with lock:\n    total += 1",
+          "re": "^async\\s+with\\s+lock\\s*:\\s*\\n\\s+total\\s*\\+=\\s*1$",
+          "ok": [
+            "guarded"
+          ],
+          "checks": [
+            {
+              "re": "async\\s+with\\s+lock",
+              "msg": "async with lock."
+            }
+          ]
+        },
+        {
+          "t": "Queue backpressure",
+          "card": "<p>An <code class='mono text-cyan-300'>asyncio.Queue</code> gives producers/consumers backpressure.</p>",
+          "mission": "Create bounded queue size 100 into <b class='text-white'>q</b>.",
+          "ph": "q = asyncio.Queue(maxsize=100)",
+          "sol": "q = asyncio.Queue(maxsize=100)",
+          "re": "^q\\s*=\\s*asyncio\\.Queue\\(\\s*maxsize\\s*=\\s*100\\s*\\)$",
+          "ok": [
+            "queue ready"
+          ],
+          "checks": [
+            {
+              "re": "asyncio\\.Queue\\(",
+              "msg": "Use asyncio.Queue."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stdlib-tooling",
+      "name": "Std-Lib & Tooling",
+      "questions": [
+        {
+          "t": "pathlib join",
+          "card": "<p><code class='mono text-cyan-300'>Path</code> composes OS-safe file paths.</p>",
+          "mission": "Build <code class='mono'>data/raw.csv</code> as <b class='text-white'>p</b>.",
+          "ph": "p = Path('data') / 'raw.csv'",
+          "sol": "p = Path('data') / 'raw.csv'",
+          "re": "^p\\s*=\\s*Path\\(\\s*['\"]data['\"]\\s*\\)\\s*/\\s*['\"]raw\\.csv['\"]$",
+          "ok": [
+            "data/raw.csv"
+          ],
+          "checks": [
+            {
+              "re": "Path\\(",
+              "msg": "Start with Path()."
+            },
+            {
+              "re": "/",
+              "msg": "Join with /"
+            }
+          ]
+        },
+        {
+          "t": "json.dumps",
+          "card": "<p><code class='mono text-cyan-300'>json.dumps</code> serializes a dict to a string.</p>",
+          "mission": "Dump <code class='mono'>d</code> into <b class='text-white'>raw</b>.",
+          "ph": "raw = json.dumps(d)",
+          "sol": "raw = json.dumps(d)",
+          "re": "^raw\\s*=\\s*json\\.dumps\\(\\s*d\\s*\\)$",
+          "ok": [
+            "'{\"k\": 1}'"
+          ],
+          "checks": [
+            {
+              "re": "json\\.dumps\\(",
+              "msg": "Call json.dumps."
+            }
+          ]
+        },
+        {
+          "t": "re.findall",
+          "card": "<p><code class='mono text-cyan-300'>re.findall</code> — extract every match.</p>",
+          "mission": "Pull digits from <code class='mono'>text</code> into <b class='text-white'>nums</b>.",
+          "ph": "nums = re.findall(r'\\d+', text)",
+          "sol": "nums = re.findall(r'\\d+', text)",
+          "re": "^nums\\s*=\\s*re\\.findall\\(\\s*r?['\"]\\\\d\\+['\"]\\s*,\\s*text\\s*\\)$",
+          "ok": [
+            "['3', '42']"
+          ],
+          "checks": [
+            {
+              "re": "re\\.findall\\(",
+              "msg": "Use re.findall."
+            }
+          ]
+        },
+        {
+          "t": "datetime now",
+          "card": "<p><code class='mono text-cyan-300'>datetime.now()</code> gives current local time.</p>",
+          "mission": "Capture into <b class='text-white'>ts</b>.",
+          "ph": "ts = datetime.now()",
+          "sol": "ts = datetime.now()",
+          "re": "^ts\\s*=\\s*datetime\\.now\\(\\s*\\)$",
+          "ok": [
+            "stamped"
+          ],
+          "checks": [
+            {
+              "re": "datetime\\.now\\(",
+              "msg": "Call datetime.now."
+            }
+          ]
+        },
+        {
+          "t": "Counter tally",
+          "card": "<p><code class='mono text-cyan-300'>Counter</code> — bag-of-things counter with <code class='mono'>.most_common</code>.</p>",
+          "mission": "Count <code class='mono'>chars</code> into <b class='text-white'>tally</b>.",
+          "ph": "tally = Counter(chars)",
+          "sol": "tally = Counter(chars)",
+          "re": "^tally\\s*=\\s*Counter\\(\\s*chars\\s*\\)$",
+          "ok": [
+            "Counter({'a': 3})"
+          ],
+          "checks": [
+            {
+              "re": "Counter\\(",
+              "msg": "Use Counter."
+            }
+          ]
+        },
+        {
+          "t": "defaultdict",
+          "card": "<p><code class='mono text-cyan-300'>defaultdict(list)</code> auto-creates missing values.</p>",
+          "mission": "Create <b class='text-white'>groups</b> defaulting to <code class='mono'>list</code>.",
+          "ph": "groups = defaultdict(list)",
+          "sol": "groups = defaultdict(list)",
+          "re": "^groups\\s*=\\s*defaultdict\\(\\s*list\\s*\\)$",
+          "ok": [
+            "default ready"
+          ],
+          "checks": [
+            {
+              "re": "defaultdict\\(\\s*list\\s*\\)",
+              "msg": "Use defaultdict(list)."
+            }
+          ]
+        },
+        {
+          "t": "itertools chain",
+          "card": "<p><code class='mono text-cyan-300'>itertools.chain</code> flattens iterables end-to-end.</p>",
+          "mission": "Chain <code class='mono'>a, b</code> into <b class='text-white'>flat</b>.",
+          "ph": "flat = list(itertools.chain(a, b))",
+          "sol": "flat = list(itertools.chain(a, b))",
+          "re": "^flat\\s*=\\s*list\\(\\s*itertools\\.chain\\(\\s*a\\s*,\\s*b\\s*\\)\\s*\\)$",
+          "ok": [
+            "[1, 2, 3, 4]"
+          ],
+          "checks": [
+            {
+              "re": "itertools\\.chain\\(",
+              "msg": "Use itertools.chain."
+            }
+          ]
+        },
+        {
+          "t": "logging setup",
+          "card": "<p><code class='mono text-cyan-300'>logging.basicConfig(level=...)</code> — one-line logger setup.</p>",
+          "mission": "Set root level to INFO.",
+          "ph": "logging.basicConfig(level=logging.INFO)",
+          "sol": "logging.basicConfig(level=logging.INFO)",
+          "re": "^logging\\.basicConfig\\(\\s*level\\s*=\\s*logging\\.INFO\\s*\\)$",
+          "ok": [
+            "logging up"
+          ],
+          "checks": [
+            {
+              "re": "basicConfig\\(",
+              "msg": "Call basicConfig."
+            }
+          ]
+        },
+        {
+          "t": "argparse arg",
+          "card": "<p><code class='mono text-cyan-300'>parser.add_argument</code> declares a CLI flag.</p>",
+          "mission": "Add <code class='mono'>--epochs</code> as int.",
+          "ph": "parser.add_argument('--epochs', type=int)",
+          "sol": "parser.add_argument('--epochs', type=int)",
+          "re": "^parser\\.add_argument\\(\\s*['\"]--epochs['\"]\\s*,\\s*type\\s*=\\s*int\\s*\\)$",
+          "ok": [
+            "flag declared"
+          ],
+          "checks": [
+            {
+              "re": "add_argument\\(",
+              "msg": "Call add_argument."
+            }
+          ]
+        },
+        {
+          "t": "contextmanager",
+          "card": "<p><code class='mono text-cyan-300'>@contextmanager</code> — build a with-block from a generator.</p>",
+          "mission": "Decorate <code class='mono'>timer</code> with <code class='mono'>@contextmanager</code>.",
+          "ph": "@contextmanager",
+          "sol": "@contextmanager",
+          "re": "^@contextmanager$",
+          "ok": [
+            "decorator on"
+          ],
+          "checks": [
+            {
+              "re": "@contextmanager",
+              "msg": "Add @contextmanager."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

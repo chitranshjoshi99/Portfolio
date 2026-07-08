@@ -1,0 +1,1690 @@
+{
+  "id": "DL-NEURAL",
+  "name": "Deep Learning",
+  "tier": "Architect",
+  "planet": "Neuronis",
+  "desc": "The PyTorch training loop from the inside — optimizer, backprop, nonlinearity, stable loss.",
+  "xp": 35,
+  "color": "0xa78bfa",
+  "viz": "ml",
+  "badge": "deep",
+  "checkpoints": [
+    {
+      "id": "tensors",
+      "name": "Tensors",
+      "questions": [
+        {
+          "t": "Make a tensor",
+          "card": "<p>The core n-dim array of PyTorch.</p>",
+          "mission": "Tensor from <code class='mono'>[1, 2, 3]</code> into <b class='text-white'>t</b>.",
+          "ph": "t = torch.tensor([1, 2, 3])",
+          "sol": "t = torch.tensor([1, 2, 3])",
+          "re": "^t\\s*=\\s*torch\\.tensor\\(\\s*\\[\\s*1\\s*,\\s*2\\s*,\\s*3\\s*\\]\\s*\\)$",
+          "ok": [
+            "tensor([1, 2, 3])"
+          ],
+          "checks": [
+            {
+              "re": "torch\\.tensor\\(",
+              "msg": "torch.tensor([...])."
+            }
+          ]
+        },
+        {
+          "t": "Zeros tensor",
+          "card": "<p>Pre-allocate a buffer.</p>",
+          "mission": "Three zeros into <b class='text-white'>z</b>.",
+          "ph": "z = torch.zeros(3)",
+          "sol": "z = torch.zeros(3)",
+          "re": "^z\\s*=\\s*torch\\.zeros\\(\\s*3\\s*\\)$",
+          "ok": [
+            "tensor([0., 0., 0.])"
+          ],
+          "checks": [
+            {
+              "re": "torch\\.zeros\\(\\s*3",
+              "msg": "torch.zeros(3)."
+            }
+          ]
+        },
+        {
+          "t": "Random tensor",
+          "card": "<p><code class='mono text-cyan-300'>randn</code> draws from a normal distribution.</p>",
+          "mission": "A 2×3 random tensor into <b class='text-white'>r</b>.",
+          "ph": "r = torch.randn(2, 3)",
+          "sol": "r = torch.randn(2, 3)",
+          "re": "^r\\s*=\\s*torch\\.randn\\(\\s*2\\s*,\\s*3\\s*\\)$",
+          "ok": [
+            "random 2×3"
+          ],
+          "checks": [
+            {
+              "re": "torch\\.randn\\(\\s*2\\s*,\\s*3",
+              "msg": "torch.randn(2, 3)."
+            }
+          ]
+        },
+        {
+          "t": "Reshape a view",
+          "card": "<p><code class='mono text-cyan-300'>.view(r, c)</code> reshapes without copying.</p>",
+          "mission": "Reshape <code class='mono'>x</code> to 2×3 into <b class='text-white'>g</b>.",
+          "ctx": "x = torch.arange(6)",
+          "ph": "g = x.view(2, 3)",
+          "sol": "g = x.view(2, 3)",
+          "re": "^g\\s*=\\s*x\\.view\\(\\s*2\\s*,\\s*3\\s*\\)$",
+          "ok": [
+            "2×3 view"
+          ],
+          "checks": [
+            {
+              "re": "x\\.view\\(\\s*2\\s*,\\s*3",
+              "msg": "x.view(2, 3)."
+            }
+          ]
+        },
+        {
+          "t": "Move to device",
+          "card": "<p><code class='mono text-cyan-300'>.to(device)</code> ships tensors to GPU/CPU.</p>",
+          "mission": "Move <code class='mono'>x</code> to <code class='mono'>device</code> into <b class='text-white'>xd</b>.",
+          "ph": "xd = x.to(device)",
+          "sol": "xd = x.to(device)",
+          "re": "^xd\\s*=\\s*x\\.to\\(\\s*device\\s*\\)$",
+          "ok": [
+            "on the accelerator"
+          ],
+          "checks": [
+            {
+              "re": "x\\.to\\(\\s*device",
+              "msg": "x.to(device)."
+            }
+          ]
+        },
+        {
+          "t": "Cast to float",
+          "card": "<p>Nets need floats — cast integer tensors.</p>",
+          "mission": "Cast <code class='mono'>x</code> to float into <b class='text-white'>xf</b>.",
+          "ph": "xf = x.float()",
+          "sol": "xf = x.float()",
+          "re": "^xf\\s*=\\s*x\\.float\\(\\s*\\)$",
+          "ok": [
+            "float tensor"
+          ],
+          "checks": [
+            {
+              "re": "x\\.float\\(",
+              "msg": "x.float()."
+            }
+          ]
+        },
+        {
+          "t": "Track gradients",
+          "card": "<p><code class='mono'>requires_grad=True</code> puts a tensor on the graph.</p>",
+          "mission": "A length-3 random tensor that tracks grads into <b class='text-white'>w</b>.",
+          "ph": "w = torch.randn(3, requires_grad=True)",
+          "sol": "w = torch.randn(3, requires_grad=True)",
+          "re": "^w\\s*=\\s*torch\\.randn\\(\\s*3\\s*,\\s*requires_grad\\s*=\\s*True\\s*\\)$",
+          "ok": [
+            "autograd-tracked"
+          ],
+          "checks": [
+            {
+              "re": "requires_grad\\s*=\\s*True",
+              "msg": "requires_grad=True."
+            }
+          ]
+        },
+        {
+          "t": "Matrix multiply",
+          "card": "<p><code class='mono'>@</code> is matmul.</p>",
+          "mission": "Multiply <code class='mono'>a</code> by <code class='mono'>b</code> into <b class='text-white'>c</b>.",
+          "ctx": "a = torch.randn(2, 3)\nb = torch.randn(3, 4)",
+          "ph": "c = a @ b",
+          "sol": "c = a @ b",
+          "re": "^c\\s*=\\s*(a\\s*@\\s*b|torch\\.matmul\\(\\s*a\\s*,\\s*b\\s*\\))$",
+          "ok": [
+            "2×4 tensor"
+          ],
+          "checks": [
+            {
+              "re": "a\\s*@\\s*b|torch\\.matmul",
+              "msg": "a @ b (or torch.matmul)."
+            }
+          ]
+        },
+        {
+          "t": "Reduce a tensor",
+          "card": "<p>Reductions collapse to a scalar tensor.</p>",
+          "mission": "Sum <code class='mono'>x</code> into <b class='text-white'>s</b>.",
+          "ph": "s = x.sum()",
+          "sol": "s = x.sum()",
+          "re": "^s\\s*=\\s*x\\.sum\\(\\s*\\)$",
+          "ok": [
+            "scalar"
+          ],
+          "checks": [
+            {
+              "re": "x\\.sum\\(",
+              "msg": "x.sum()."
+            }
+          ]
+        },
+        {
+          "t": "Back to NumPy",
+          "card": "<p><code class='mono text-cyan-300'>.numpy()</code> bridges to NumPy (CPU tensors).</p>",
+          "mission": "Convert <code class='mono'>t</code> to a NumPy array into <b class='text-white'>arr</b>.",
+          "ph": "arr = t.numpy()",
+          "sol": "arr = t.numpy()",
+          "re": "^arr\\s*=\\s*t\\.numpy\\(\\s*\\)$",
+          "ok": [
+            "ndarray"
+          ],
+          "checks": [
+            {
+              "re": "t\\.numpy\\(",
+              "msg": "t.numpy()."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "autograd-modules",
+      "name": "Autograd & Modules",
+      "questions": [
+        {
+          "t": "A leaf that needs grad",
+          "card": "<p>Set <code class='mono'>requires_grad</code> to differentiate through it.</p>",
+          "mission": "Scalar tensor 2.0 tracking grads into <b class='text-white'>x</b>.",
+          "ph": "x = torch.tensor(2.0, requires_grad=True)",
+          "sol": "x = torch.tensor(2.0, requires_grad=True)",
+          "re": "^x\\s*=\\s*torch\\.tensor\\(\\s*2\\.0\\s*,\\s*requires_grad\\s*=\\s*True\\s*\\)$",
+          "ok": [
+            "differentiable"
+          ],
+          "checks": [
+            {
+              "re": "requires_grad\\s*=\\s*True",
+              "msg": "requires_grad=True."
+            }
+          ]
+        },
+        {
+          "t": "Backpropagate",
+          "card": "<p><code class='mono text-cyan-300'>.backward()</code> fills every <code class='mono'>.grad</code>.</p>",
+          "mission": "Backprop the <code class='mono'>loss</code>.",
+          "ph": "loss.backward()",
+          "sol": "loss.backward()",
+          "re": "^loss\\.backward\\(\\s*\\)$",
+          "ok": [
+            "grads computed"
+          ],
+          "checks": [
+            {
+              "re": "loss\\.backward\\(",
+              "msg": "loss.backward()."
+            }
+          ]
+        },
+        {
+          "t": "Read a gradient",
+          "card": "<p>Grads land in <code class='mono text-cyan-300'>.grad</code> after backward.</p>",
+          "mission": "Read <code class='mono'>x</code>'s gradient into <b class='text-white'>g</b>.",
+          "ph": "g = x.grad",
+          "sol": "g = x.grad",
+          "re": "^g\\s*=\\s*x\\.grad$",
+          "ok": [
+            "dL/dx"
+          ],
+          "checks": [
+            {
+              "re": "x\\.grad",
+              "msg": "x.grad."
+            }
+          ]
+        },
+        {
+          "t": "A linear layer",
+          "card": "<p><code class='mono text-cyan-300'>nn.Linear(in, out)</code> is a learnable affine map.</p>",
+          "mission": "A 10→4 linear layer into <b class='text-white'>layer</b>.",
+          "ph": "layer = nn.Linear(10, 4)",
+          "sol": "layer = nn.Linear(10, 4)",
+          "re": "^layer\\s*=\\s*nn\\.Linear\\(\\s*10\\s*,\\s*4\\s*\\)$",
+          "ok": [
+            "W: 4×10, b: 4"
+          ],
+          "checks": [
+            {
+              "re": "nn\\.Linear\\(\\s*10\\s*,\\s*4",
+              "msg": "nn.Linear(10, 4)."
+            }
+          ]
+        },
+        {
+          "t": "Subclass nn.Module",
+          "card": "<p>Register sublayers in <code class='mono'>__init__</code> after <code class='mono'>super().__init__()</code>.</p>",
+          "mission": "Write <b class='text-white'>Net(nn.Module)</b> with <code class='mono'>self.fc = nn.Linear(4, 1)</code>.",
+          "ph": "class Net(nn.Module): __init__ with super() + self.fc",
+          "sol": "class Net(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.fc = nn.Linear(4, 1)",
+          "re": "^class\\s+Net\\(\\s*nn\\.Module\\s*\\)\\s*:\\s*\\n\\s*def\\s+__init__\\(\\s*self\\s*\\)\\s*:\\s*\\n\\s*super\\(\\s*\\)\\.__init__\\(\\s*\\)\\s*\\n\\s*self\\.fc\\s*=\\s*nn\\.Linear\\(\\s*4\\s*,\\s*1\\s*\\)$",
+          "ok": [
+            "custom module"
+          ],
+          "checks": [
+            {
+              "re": "class\\s+Net\\(\\s*nn\\.Module\\s*\\)",
+              "msg": "Subclass nn.Module."
+            },
+            {
+              "re": "super\\(\\s*\\)\\.__init__\\(",
+              "msg": "Call super().__init__()."
+            },
+            {
+              "re": "self\\.fc\\s*=\\s*nn\\.Linear\\(\\s*4\\s*,\\s*1",
+              "msg": "Register self.fc."
+            }
+          ]
+        },
+        {
+          "t": "Inference without grad",
+          "card": "<p><code class='mono text-cyan-300'>torch.no_grad()</code> skips the graph — faster inference.</p>",
+          "mission": "Predict <code class='mono'>x</code> under no_grad into <b class='text-white'>preds</b>.",
+          "ph": "with torch.no_grad(): preds = model(x)",
+          "sol": "with torch.no_grad():\n    preds = model(x)",
+          "re": "^with\\s+torch\\.no_grad\\(\\s*\\)\\s*:\\s*\\n\\s*preds\\s*=\\s*model\\(\\s*x\\s*\\)$",
+          "ok": [
+            "no graph built"
+          ],
+          "checks": [
+            {
+              "re": "with\\s+torch\\.no_grad\\(",
+              "msg": "Enter with torch.no_grad():."
+            },
+            {
+              "re": "preds\\s*=\\s*model\\(\\s*x",
+              "msg": "Run model(x) inside."
+            }
+          ]
+        },
+        {
+          "t": "Detach from the graph",
+          "card": "<p><code class='mono text-cyan-300'>.detach()</code> stops gradient flow.</p>",
+          "mission": "Detach <code class='mono'>t</code> into <b class='text-white'>d</b>.",
+          "ph": "d = t.detach()",
+          "sol": "d = t.detach()",
+          "re": "^d\\s*=\\s*t\\.detach\\(\\s*\\)$",
+          "ok": [
+            "grad-free copy"
+          ],
+          "checks": [
+            {
+              "re": "t\\.detach\\(",
+              "msg": "t.detach()."
+            }
+          ]
+        },
+        {
+          "t": "List parameters",
+          "card": "<p><code class='mono text-cyan-300'>.parameters()</code> yields the learnables.</p>",
+          "mission": "Collect <code class='mono'>model</code>'s params into <b class='text-white'>params</b>.",
+          "ph": "params = list(model.parameters())",
+          "sol": "params = list(model.parameters())",
+          "re": "^params\\s*=\\s*list\\(\\s*model\\.parameters\\(\\s*\\)\\s*\\)$",
+          "ok": [
+            "all weights + biases"
+          ],
+          "checks": [
+            {
+              "re": "model\\.parameters\\(",
+              "msg": "model.parameters()."
+            }
+          ]
+        },
+        {
+          "t": "State dict",
+          "card": "<p><code class='mono text-cyan-300'>state_dict()</code> is the serializable weights.</p>",
+          "mission": "Grab <code class='mono'>model</code>'s state dict into <b class='text-white'>sd</b>.",
+          "ph": "sd = model.state_dict()",
+          "sol": "sd = model.state_dict()",
+          "re": "^sd\\s*=\\s*model\\.state_dict\\(\\s*\\)$",
+          "ok": [
+            "weights dict"
+          ],
+          "checks": [
+            {
+              "re": "model\\.state_dict\\(",
+              "msg": "model.state_dict()."
+            }
+          ]
+        },
+        {
+          "t": "Zero the grads",
+          "card": "<p>Grads accumulate — clear them each step.</p>",
+          "mission": "Zero the optimizer's gradients.",
+          "ph": "optimizer.zero_grad()",
+          "sol": "optimizer.zero_grad()",
+          "re": "^optimizer\\.zero_grad\\(\\s*\\)$",
+          "ok": [
+            "grads reset"
+          ],
+          "checks": [
+            {
+              "re": "optimizer\\.zero_grad\\(",
+              "msg": "optimizer.zero_grad()."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "layers-activations",
+      "name": "Layers & Activations",
+      "questions": [
+        {
+          "t": "Dense layer",
+          "card": "<p>Fully-connected map.</p>",
+          "mission": "128→64 linear into <b class='text-white'>fc</b>.",
+          "ph": "fc = nn.Linear(128, 64)",
+          "sol": "fc = nn.Linear(128, 64)",
+          "re": "^fc\\s*=\\s*nn\\.Linear\\(\\s*128\\s*,\\s*64\\s*\\)$",
+          "ok": [
+            "dense layer"
+          ],
+          "checks": [
+            {
+              "re": "nn\\.Linear\\(\\s*128\\s*,\\s*64",
+              "msg": "nn.Linear(128, 64)."
+            }
+          ]
+        },
+        {
+          "t": "ReLU",
+          "card": "<p>max(0, x) — the default activation.</p>",
+          "mission": "A ReLU into <b class='text-white'>act</b>.",
+          "ph": "act = nn.ReLU()",
+          "sol": "act = nn.ReLU()",
+          "re": "^act\\s*=\\s*nn\\.ReLU\\(\\s*\\)$",
+          "ok": [
+            "nonlinearity"
+          ],
+          "checks": [
+            {
+              "re": "nn\\.ReLU\\(",
+              "msg": "nn.ReLU()."
+            }
+          ]
+        },
+        {
+          "t": "Sigmoid",
+          "card": "<p>Squashes to (0, 1).</p>",
+          "mission": "A Sigmoid into <b class='text-white'>sig</b>.",
+          "ph": "sig = nn.Sigmoid()",
+          "sol": "sig = nn.Sigmoid()",
+          "re": "^sig\\s*=\\s*nn\\.Sigmoid\\(\\s*\\)$",
+          "ok": [
+            "probability gate"
+          ],
+          "checks": [
+            {
+              "re": "nn\\.Sigmoid\\(",
+              "msg": "nn.Sigmoid()."
+            }
+          ]
+        },
+        {
+          "t": "Convolution",
+          "card": "<p><code class='mono text-cyan-300'>Conv2d</code> extracts spatial features.</p>",
+          "mission": "3→16 channels, 3×3 kernel, into <b class='text-white'>conv</b>.",
+          "ph": "conv = nn.Conv2d(3, 16, kernel_size=3)",
+          "sol": "conv = nn.Conv2d(3, 16, kernel_size=3)",
+          "re": "^conv\\s*=\\s*nn\\.Conv2d\\(\\s*3\\s*,\\s*16\\s*,\\s*kernel_size\\s*=\\s*3\\s*\\)$",
+          "ok": [
+            "conv layer"
+          ],
+          "checks": [
+            {
+              "re": "nn\\.Conv2d\\(\\s*3\\s*,\\s*16",
+              "msg": "nn.Conv2d(3, 16, ...)."
+            },
+            {
+              "re": "kernel_size\\s*=\\s*3",
+              "msg": "kernel_size=3."
+            }
+          ]
+        },
+        {
+          "t": "Max pool",
+          "card": "<p>Downsample by taking the max in each window.</p>",
+          "mission": "A 2×2 max-pool into <b class='text-white'>pool</b>.",
+          "ph": "pool = nn.MaxPool2d(2)",
+          "sol": "pool = nn.MaxPool2d(2)",
+          "re": "^pool\\s*=\\s*nn\\.MaxPool2d\\(\\s*2\\s*\\)$",
+          "ok": [
+            "halves H,W"
+          ],
+          "checks": [
+            {
+              "re": "nn\\.MaxPool2d\\(\\s*2",
+              "msg": "nn.MaxPool2d(2)."
+            }
+          ]
+        },
+        {
+          "t": "Dropout",
+          "card": "<p>Randomly zero units to fight overfitting.</p>",
+          "mission": "50% dropout into <b class='text-white'>drop</b>.",
+          "ph": "drop = nn.Dropout(0.5)",
+          "sol": "drop = nn.Dropout(0.5)",
+          "re": "^drop\\s*=\\s*nn\\.Dropout\\(\\s*0\\.5\\s*\\)$",
+          "ok": [
+            "regularizer"
+          ],
+          "checks": [
+            {
+              "re": "nn\\.Dropout\\(\\s*0\\.5",
+              "msg": "nn.Dropout(0.5)."
+            }
+          ]
+        },
+        {
+          "t": "Batch norm",
+          "card": "<p>Normalize activations to stabilize training.</p>",
+          "mission": "BatchNorm over 64 features into <b class='text-white'>bn</b>.",
+          "ph": "bn = nn.BatchNorm1d(64)",
+          "sol": "bn = nn.BatchNorm1d(64)",
+          "re": "^bn\\s*=\\s*nn\\.BatchNorm1d\\(\\s*64\\s*\\)$",
+          "ok": [
+            "stabilized"
+          ],
+          "checks": [
+            {
+              "re": "nn\\.BatchNorm1d\\(\\s*64",
+              "msg": "nn.BatchNorm1d(64)."
+            }
+          ]
+        },
+        {
+          "t": "Softmax",
+          "card": "<p>Turns logits into a probability distribution.</p>",
+          "mission": "Softmax over <code class='mono'>dim=1</code> into <b class='text-white'>sm</b>.",
+          "ph": "sm = nn.Softmax(dim=1)",
+          "sol": "sm = nn.Softmax(dim=1)",
+          "re": "^sm\\s*=\\s*nn\\.Softmax\\(\\s*dim\\s*=\\s*1\\s*\\)$",
+          "ok": [
+            "class probs"
+          ],
+          "checks": [
+            {
+              "re": "nn\\.Softmax\\(",
+              "msg": "nn.Softmax(...)."
+            },
+            {
+              "re": "dim\\s*=\\s*1",
+              "msg": "dim=1."
+            }
+          ]
+        },
+        {
+          "t": "Embedding",
+          "card": "<p>A lookup table mapping tokens → vectors.</p>",
+          "mission": "1000 tokens → 64-dim into <b class='text-white'>emb</b>.",
+          "ph": "emb = nn.Embedding(1000, 64)",
+          "sol": "emb = nn.Embedding(1000, 64)",
+          "re": "^emb\\s*=\\s*nn\\.Embedding\\(\\s*1000\\s*,\\s*64\\s*\\)$",
+          "ok": [
+            "token embeddings"
+          ],
+          "checks": [
+            {
+              "re": "nn\\.Embedding\\(\\s*1000\\s*,\\s*64",
+              "msg": "nn.Embedding(1000, 64)."
+            }
+          ]
+        },
+        {
+          "t": "LSTM",
+          "card": "<p>A recurrent layer for sequences.</p>",
+          "mission": "64→128 LSTM, <code class='mono'>batch_first=True</code>, into <b class='text-white'>lstm</b>.",
+          "ph": "lstm = nn.LSTM(64, 128, batch_first=True)",
+          "sol": "lstm = nn.LSTM(64, 128, batch_first=True)",
+          "re": "^lstm\\s*=\\s*nn\\.LSTM\\(\\s*64\\s*,\\s*128\\s*,\\s*batch_first\\s*=\\s*True\\s*\\)$",
+          "ok": [
+            "sequence model"
+          ],
+          "checks": [
+            {
+              "re": "nn\\.LSTM\\(\\s*64\\s*,\\s*128",
+              "msg": "nn.LSTM(64, 128, ...)."
+            },
+            {
+              "re": "batch_first\\s*=\\s*True",
+              "msg": "batch_first=True."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "optimizers-training",
+      "name": "Optimizers & Training",
+      "questions": [
+        {
+          "t": "SGD",
+          "card": "<p>Plain gradient descent with momentum options.</p>",
+          "mission": "SGD over params at <code class='mono'>lr=0.01</code> into <b class='text-white'>opt</b>.",
+          "ph": "opt = torch.optim.SGD(model.parameters(), lr=0.01)",
+          "sol": "opt = torch.optim.SGD(model.parameters(), lr=0.01)",
+          "re": "^opt\\s*=\\s*torch\\.optim\\.SGD\\(\\s*model\\.parameters\\(\\s*\\)\\s*,\\s*lr\\s*=\\s*0\\.01\\s*\\)$",
+          "ok": [
+            "SGD ready"
+          ],
+          "checks": [
+            {
+              "re": "torch\\.optim\\.SGD\\(",
+              "msg": "torch.optim.SGD(...)."
+            },
+            {
+              "re": "lr\\s*=\\s*0\\.01",
+              "msg": "lr=0.01."
+            }
+          ]
+        },
+        {
+          "t": "Adam",
+          "card": "<p>Adaptive rates — the default optimizer.</p>",
+          "mission": "Adam over params at <code class='mono'>lr=3e-4</code> into <b class='text-white'>opt</b>.",
+          "ph": "opt = torch.optim.Adam(model.parameters(), lr=3e-4)",
+          "sol": "opt = torch.optim.Adam(model.parameters(), lr=3e-4)",
+          "re": "^opt\\s*=\\s*torch\\.optim\\.Adam\\(\\s*model\\.parameters\\(\\s*\\)\\s*,\\s*lr\\s*=\\s*(3e-4|0\\.0003)\\s*\\)$",
+          "ok": [
+            "Adam ready"
+          ],
+          "checks": [
+            {
+              "re": "torch\\.optim\\.Adam\\(",
+              "msg": "torch.optim.Adam(...)."
+            },
+            {
+              "re": "lr\\s*=\\s*(3e-4|0\\.0003)",
+              "msg": "lr=3e-4."
+            }
+          ]
+        },
+        {
+          "t": "LR scheduler",
+          "card": "<p>Decay the rate as training progresses.</p>",
+          "mission": "StepLR on <code class='mono'>opt</code>, <code class='mono'>step_size=10</code>, into <b class='text-white'>scheduler</b>.",
+          "ph": "scheduler = torch.optim.lr_scheduler.StepLR(opt, step_size=10)",
+          "sol": "scheduler = torch.optim.lr_scheduler.StepLR(opt, step_size=10)",
+          "re": "^scheduler\\s*=\\s*torch\\.optim\\.lr_scheduler\\.StepLR\\(\\s*opt\\s*,\\s*step_size\\s*=\\s*10\\s*\\)$",
+          "ok": [
+            "decays lr"
+          ],
+          "checks": [
+            {
+              "re": "lr_scheduler\\.StepLR\\(\\s*opt",
+              "msg": "StepLR(opt, ...)."
+            },
+            {
+              "re": "step_size\\s*=\\s*10",
+              "msg": "step_size=10."
+            }
+          ]
+        },
+        {
+          "t": "DataLoader",
+          "card": "<p>Batches + shuffles a dataset.</p>",
+          "mission": "Batch <code class='mono'>dataset</code> by 32, shuffled, into <b class='text-white'>loader</b>.",
+          "ph": "loader = DataLoader(dataset, batch_size=32, shuffle=True)",
+          "sol": "loader = DataLoader(dataset, batch_size=32, shuffle=True)",
+          "re": "^loader\\s*=\\s*DataLoader\\(\\s*dataset\\s*,\\s*batch_size\\s*=\\s*32\\s*,\\s*shuffle\\s*=\\s*True\\s*\\)$",
+          "ok": [
+            "batched stream"
+          ],
+          "checks": [
+            {
+              "re": "DataLoader\\(\\s*dataset",
+              "msg": "DataLoader(dataset, ...)."
+            },
+            {
+              "re": "batch_size\\s*=\\s*32",
+              "msg": "batch_size=32."
+            },
+            {
+              "re": "shuffle\\s*=\\s*True",
+              "msg": "shuffle=True."
+            }
+          ]
+        },
+        {
+          "t": "Backprop",
+          "card": "<p>Fill the gradients.</p>",
+          "mission": "Backprop the <code class='mono'>loss</code>.",
+          "ph": "loss.backward()",
+          "sol": "loss.backward()",
+          "re": "^loss\\.backward\\(\\s*\\)$",
+          "ok": [
+            "grads set"
+          ],
+          "checks": [
+            {
+              "re": "loss\\.backward\\(",
+              "msg": "loss.backward()."
+            }
+          ]
+        },
+        {
+          "t": "Optimizer step",
+          "card": "<p>Apply the update using current grads.</p>",
+          "mission": "Step the optimizer.",
+          "ph": "optimizer.step()",
+          "sol": "optimizer.step()",
+          "re": "^optimizer\\.step\\(\\s*\\)$",
+          "ok": [
+            "weights updated"
+          ],
+          "checks": [
+            {
+              "re": "optimizer\\.step\\(",
+              "msg": "optimizer.step()."
+            }
+          ]
+        },
+        {
+          "t": "Scheduler step",
+          "card": "<p>Advance the LR schedule once per epoch.</p>",
+          "mission": "Step the scheduler.",
+          "ph": "scheduler.step()",
+          "sol": "scheduler.step()",
+          "re": "^scheduler\\.step\\(\\s*\\)$",
+          "ok": [
+            "lr decayed"
+          ],
+          "checks": [
+            {
+              "re": "scheduler\\.step\\(",
+              "msg": "scheduler.step()."
+            }
+          ]
+        },
+        {
+          "t": "Save weights",
+          "card": "<p>Persist <code class='mono text-cyan-300'>state_dict()</code>, not the whole model.</p>",
+          "mission": "Save <code class='mono'>model</code>'s weights to <code class='mono'>\"model.pt\"</code>.",
+          "ph": "torch.save(model.state_dict(), \"model.pt\")",
+          "sol": "torch.save(model.state_dict(), \"model.pt\")",
+          "re": "^torch\\.save\\(\\s*model\\.state_dict\\(\\s*\\)\\s*,\\s*([\"'])model\\.pt\\1\\s*\\)$",
+          "ok": [
+            "checkpoint saved"
+          ],
+          "checks": [
+            {
+              "re": "torch\\.save\\(\\s*model\\.state_dict\\(",
+              "msg": "torch.save(model.state_dict(), ...)."
+            }
+          ]
+        },
+        {
+          "t": "Load weights",
+          "card": "<p>Load into an existing architecture.</p>",
+          "mission": "Load <code class='mono'>\"model.pt\"</code> into <code class='mono'>model</code>.",
+          "ph": "model.load_state_dict(torch.load(\"model.pt\"))",
+          "sol": "model.load_state_dict(torch.load(\"model.pt\"))",
+          "re": "^model\\.load_state_dict\\(\\s*torch\\.load\\(\\s*([\"'])model\\.pt\\1\\s*\\)\\s*\\)$",
+          "ok": [
+            "weights restored"
+          ],
+          "checks": [
+            {
+              "re": "load_state_dict\\(\\s*torch\\.load\\(",
+              "msg": "model.load_state_dict(torch.load(...))."
+            }
+          ]
+        },
+        {
+          "t": "Pick the device",
+          "card": "<p>Use CUDA when present, else CPU.</p>",
+          "mission": "Set <b class='text-white'>device</b> to cuda-if-available, else cpu.",
+          "ph": "device = torch.device(\"cuda\" if torch.cuda.is_available() else \"cpu\")",
+          "sol": "device = torch.device(\"cuda\" if torch.cuda.is_available() else \"cpu\")",
+          "re": "^device\\s*=\\s*torch\\.device\\(\\s*([\"'])cuda\\1\\s+if\\s+torch\\.cuda\\.is_available\\(\\s*\\)\\s+else\\s+([\"'])cpu\\2\\s*\\)$",
+          "ok": [
+            "device selected"
+          ],
+          "checks": [
+            {
+              "re": "torch\\.device\\(",
+              "msg": "torch.device(...)."
+            },
+            {
+              "re": "torch\\.cuda\\.is_available\\(",
+              "msg": "Guard on torch.cuda.is_available()."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "training-loop",
+      "name": "The Training Loop",
+      "questions": [
+        {
+          "t": "Carve a validation set",
+          "card": "<p>Reserve a split you watch during training — the early-stopping signal.</p>",
+          "mission": "Split <code class='mono'>X, y</code> into train/val — 20% held out, fixed seed.",
+          "ctx": "# X: (2000, 64)  y: (2000,)",
+          "ph": "X_train, X_val, y_train, y_val = train_test_split(...)",
+          "sol": "X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)",
+          "re": "^X_train\\s*,\\s*X_val\\s*,\\s*y_train\\s*,\\s*y_val\\s*=\\s*train_test_split\\(\\s*X\\s*,\\s*y\\s*,\\s*test_size\\s*=\\s*0\\.2\\s*,\\s*random_state\\s*=\\s*\\d+\\s*\\)$",
+          "ok": [
+            "20% never trained on"
+          ],
+          "checks": [
+            {
+              "re": "X_val\\b",
+              "msg": "Second output is X_val."
+            },
+            {
+              "re": "test_size\\s*=\\s*0\\.2",
+              "msg": "test_size=0.2."
+            },
+            {
+              "re": "random_state\\s*=",
+              "msg": "Fix the seed."
+            }
+          ]
+        },
+        {
+          "t": "Tune the learning rate",
+          "card": "<p>The optimizer steps by <code class='mono'>lr</code>. Jammed at <b class='text-red-400'>5.0</b> it diverges — ease to <b class='text-white'>1e-3</b>.</p>",
+          "mission": "Adam over <code class='mono'>model.parameters()</code> at <b class='text-white'>lr=1e-3</b>.",
+          "ph": "optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)",
+          "sol": "optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)",
+          "re": "^optimizer\\s*=\\s*torch\\.optim\\.Adam\\(\\s*model\\.parameters\\(\\s*\\)\\s*,\\s*lr\\s*=\\s*(1e-3|0\\.001)\\s*\\)$",
+          "ok": [
+            "loss: 4821 -> 0.89"
+          ],
+          "checks": [
+            {
+              "re": "lr\\s*=\\s*5",
+              "bad": true,
+              "msg": "lr=5.0 overshoots — diverges. Use 1e-3."
+            },
+            {
+              "re": "model\\.parameters\\(",
+              "msg": "Pass model.parameters()."
+            },
+            {
+              "re": "lr\\s*=\\s*(1e-3|0\\.001)",
+              "msg": "lr=1e-3."
+            }
+          ]
+        },
+        {
+          "t": "The training step",
+          "card": "<p>Three lines, every batch, in order: clear · backprop · apply.</p>",
+          "mission": "Write the three-line inner step.",
+          "ph": "optimizer.zero_grad() / loss.backward() / optimizer.step()",
+          "sol": "optimizer.zero_grad()\nloss.backward()\noptimizer.step()",
+          "re": "^optimizer\\.zero_grad\\(\\s*\\)\\s*\\n\\s*loss\\.backward\\(\\s*\\)\\s*\\n\\s*optimizer\\.step\\(\\s*\\)$",
+          "ok": [
+            "one optimization iteration"
+          ],
+          "checks": [
+            {
+              "re": "zero_grad\\(",
+              "msg": "Clear grads first."
+            },
+            {
+              "re": "loss\\.backward\\(",
+              "msg": "Backprop the loss."
+            },
+            {
+              "re": "optimizer\\.step\\(",
+              "msg": "Apply the update."
+            }
+          ]
+        },
+        {
+          "t": "Add the nonlinearity",
+          "card": "<p><code class='mono text-cyan-300'>ReLU</code> bends the space between linear layers.</p>",
+          "mission": "<b class='text-white'>net</b>: Linear 64→32, ReLU, Linear 32→1.",
+          "ph": "net = nn.Sequential(nn.Linear(64, 32), nn.ReLU(), nn.Linear(32, 1))",
+          "sol": "net = nn.Sequential(nn.Linear(64, 32), nn.ReLU(), nn.Linear(32, 1))",
+          "re": "^net\\s*=\\s*nn\\.Sequential\\(\\s*nn\\.Linear\\(\\s*64\\s*,\\s*32\\s*\\)\\s*,\\s*nn\\.ReLU\\(\\s*\\)\\s*,\\s*nn\\.Linear\\(\\s*32\\s*,\\s*1\\s*\\)\\s*\\)$",
+          "ok": [
+            "val_acc 0.97"
+          ],
+          "checks": [
+            {
+              "re": "nn\\.ReLU\\(",
+              "msg": "Insert nn.ReLU() between the Linears."
+            },
+            {
+              "re": "nn\\.Linear\\(\\s*64\\s*,\\s*32",
+              "msg": "Dims 64 → 32 → 1."
+            }
+          ]
+        },
+        {
+          "t": "Stable binary loss",
+          "card": "<p>Feed raw logits to <code class='mono text-cyan-300'>BCEWithLogitsLoss</code> — fused sigmoid, no overflow.</p>",
+          "mission": "Set <b class='text-white'>criterion</b> to the stable binary loss.",
+          "ph": "criterion = nn.BCEWithLogitsLoss()",
+          "sol": "criterion = nn.BCEWithLogitsLoss()",
+          "re": "^criterion\\s*=\\s*nn\\.BCEWithLogitsLoss\\(\\s*\\)$",
+          "ok": [
+            "logit-space loss"
+          ],
+          "checks": [
+            {
+              "re": "nn\\.BCELoss\\b",
+              "bad": true,
+              "msg": "Plain BCELoss can overflow — use BCEWithLogitsLoss."
+            },
+            {
+              "re": "BCEWithLogitsLoss",
+              "msg": "nn.BCEWithLogitsLoss()."
+            }
+          ]
+        },
+        {
+          "t": "Forward pass",
+          "card": "<p>Calling a module runs its <code class='mono'>forward</code>.</p>",
+          "mission": "Run <code class='mono'>x</code> through <code class='mono'>model</code> into <b class='text-white'>out</b>.",
+          "ph": "out = model(x)",
+          "sol": "out = model(x)",
+          "re": "^out\\s*=\\s*model\\(\\s*x\\s*\\)$",
+          "ok": [
+            "logits"
+          ],
+          "checks": [
+            {
+              "re": "model\\(\\s*x\\s*\\)",
+              "msg": "Call model(x)."
+            }
+          ]
+        },
+        {
+          "t": "Compute the loss",
+          "card": "<p>Compare predictions to targets.</p>",
+          "mission": "Loss of <code class='mono'>out</code> vs <code class='mono'>y</code> into <b class='text-white'>loss</b>.",
+          "ph": "loss = criterion(out, y)",
+          "sol": "loss = criterion(out, y)",
+          "re": "^loss\\s*=\\s*criterion\\(\\s*out\\s*,\\s*y\\s*\\)$",
+          "ok": [
+            "scalar loss"
+          ],
+          "checks": [
+            {
+              "re": "criterion\\(\\s*out\\s*,\\s*y",
+              "msg": "criterion(out, y)."
+            }
+          ]
+        },
+        {
+          "t": "Train mode",
+          "card": "<p><code class='mono text-cyan-300'>.train()</code> enables dropout / batchnorm updates.</p>",
+          "mission": "Put <code class='mono'>model</code> in training mode.",
+          "ph": "model.train()",
+          "sol": "model.train()",
+          "re": "^model\\.train\\(\\s*\\)$",
+          "ok": [
+            "training mode"
+          ],
+          "checks": [
+            {
+              "re": "model\\.train\\(",
+              "msg": "model.train()."
+            }
+          ]
+        },
+        {
+          "t": "Eval mode",
+          "card": "<p><code class='mono text-cyan-300'>.eval()</code> freezes dropout / batchnorm for inference.</p>",
+          "mission": "Put <code class='mono'>model</code> in evaluation mode.",
+          "ph": "model.eval()",
+          "sol": "model.eval()",
+          "re": "^model\\.eval\\(\\s*\\)$",
+          "ok": [
+            "eval mode"
+          ],
+          "checks": [
+            {
+              "re": "model\\.eval\\(",
+              "msg": "model.eval()."
+            }
+          ]
+        },
+        {
+          "t": "Detach the scalar",
+          "card": "<p><code class='mono text-cyan-300'>.item()</code> pulls a Python number out of a 0-d tensor.</p>",
+          "mission": "Read the loss value into <b class='text-white'>val</b>.",
+          "ph": "val = loss.item()",
+          "sol": "val = loss.item()",
+          "re": "^val\\s*=\\s*loss\\.item\\(\\s*\\)$",
+          "ok": [
+            "0.11"
+          ],
+          "checks": [
+            {
+              "re": "loss\\.item\\(",
+              "msg": "loss.item()."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "data-loading",
+      "name": "Dataset & DataLoader",
+      "questions": [
+        {
+          "t": "TensorDataset",
+          "card": "<p><code class='mono text-cyan-300'>TensorDataset</code> pairs feature/label tensors.</p>",
+          "mission": "Wrap <code class='mono'>X, y</code> into <b class='text-white'>ds</b>.",
+          "ph": "ds = TensorDataset(X, y)",
+          "sol": "ds = TensorDataset(X, y)",
+          "re": "^ds\\s*=\\s*TensorDataset\\(\\s*X\\s*,\\s*y\\s*\\)$",
+          "ok": [
+            "pairs bundled"
+          ],
+          "checks": [
+            {
+              "re": "TensorDataset\\(",
+              "msg": "Use TensorDataset."
+            }
+          ]
+        },
+        {
+          "t": "DataLoader",
+          "card": "<p><code class='mono text-cyan-300'>DataLoader</code> yields shuffled batches.</p>",
+          "mission": "Batch 32, shuffle.",
+          "ph": "dl = DataLoader(ds, batch_size=32, shuffle=True)",
+          "sol": "dl = DataLoader(ds, batch_size=32, shuffle=True)",
+          "re": "^dl\\s*=\\s*DataLoader\\(\\s*ds\\s*,\\s*batch_size\\s*=\\s*32\\s*,\\s*shuffle\\s*=\\s*True\\s*\\)$",
+          "ok": [
+            "batches ready"
+          ],
+          "checks": [
+            {
+              "re": "DataLoader\\(",
+              "msg": "Use DataLoader."
+            },
+            {
+              "re": "batch_size\\s*=\\s*32",
+              "msg": "Set batch_size=32."
+            }
+          ]
+        },
+        {
+          "t": "custom Dataset",
+          "card": "<p>Subclass <code class='mono text-cyan-300'>Dataset</code>; implement <code class='mono'>__len__</code>+<code class='mono'>__getitem__</code>.</p>",
+          "mission": "Declare class header.",
+          "ph": "class MyDataset(Dataset):",
+          "sol": "class MyDataset(Dataset):",
+          "re": "^class\\s+MyDataset\\(\\s*Dataset\\s*\\)\\s*:$",
+          "ok": [
+            "subclass ready"
+          ],
+          "checks": [
+            {
+              "re": "class\\s+MyDataset\\(\\s*Dataset",
+              "msg": "Subclass Dataset."
+            }
+          ]
+        },
+        {
+          "t": "transforms Compose",
+          "card": "<p><code class='mono text-cyan-300'>transforms.Compose</code> chains preprocessing steps.</p>",
+          "mission": "Combine <code class='mono'>ToTensor()</code>, <code class='mono'>Normalize((0.5,), (0.5,))</code>.",
+          "ph": "tfm = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,))])",
+          "sol": "tfm = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,))])",
+          "re": "^tfm\\s*=\\s*transforms\\.Compose\\(\\s*\\[\\s*transforms\\.ToTensor\\(\\s*\\)\\s*,\\s*transforms\\.Normalize\\(\\s*\\(\\s*0\\.5\\s*,\\s*\\)\\s*,\\s*\\(\\s*0\\.5\\s*,\\s*\\)\\s*\\)\\s*\\]\\s*\\)$",
+          "ok": [
+            "pipeline"
+          ],
+          "checks": [
+            {
+              "re": "transforms\\.Compose\\(",
+              "msg": "Use transforms.Compose."
+            }
+          ]
+        },
+        {
+          "t": "train/val split",
+          "card": "<p><code class='mono text-cyan-300'>random_split</code> carves a fixed-size val set.</p>",
+          "mission": "Split <code class='mono'>ds</code> 900/100 into <b class='text-white'>tr, va</b>.",
+          "ph": "tr, va = random_split(ds, [900, 100])",
+          "sol": "tr, va = random_split(ds, [900, 100])",
+          "re": "^tr\\s*,\\s*va\\s*=\\s*random_split\\(\\s*ds\\s*,\\s*\\[\\s*900\\s*,\\s*100\\s*\\]\\s*\\)$",
+          "ok": [
+            "split"
+          ],
+          "checks": [
+            {
+              "re": "random_split\\(",
+              "msg": "Use random_split."
+            }
+          ]
+        },
+        {
+          "t": "num_workers",
+          "card": "<p>Parallel data loading with <code class='mono text-cyan-300'>num_workers</code>.</p>",
+          "mission": "Use 4 workers.",
+          "ph": "dl = DataLoader(ds, num_workers=4)",
+          "sol": "dl = DataLoader(ds, num_workers=4)",
+          "re": "^dl\\s*=\\s*DataLoader\\(\\s*ds\\s*,\\s*num_workers\\s*=\\s*4\\s*\\)$",
+          "ok": [
+            "4 workers"
+          ],
+          "checks": [
+            {
+              "re": "num_workers\\s*=\\s*4",
+              "msg": "Set num_workers=4."
+            }
+          ]
+        },
+        {
+          "t": "pin_memory",
+          "card": "<p><code class='mono text-cyan-300'>pin_memory=True</code> speeds CPU→GPU copy.</p>",
+          "mission": "Add flag.",
+          "ph": "dl = DataLoader(ds, pin_memory=True)",
+          "sol": "dl = DataLoader(ds, pin_memory=True)",
+          "re": "^dl\\s*=\\s*DataLoader\\(\\s*ds\\s*,\\s*pin_memory\\s*=\\s*True\\s*\\)$",
+          "ok": [
+            "pinned"
+          ],
+          "checks": [
+            {
+              "re": "pin_memory\\s*=\\s*True",
+              "msg": "Set pin_memory=True."
+            }
+          ]
+        },
+        {
+          "t": "ImageFolder",
+          "card": "<p><code class='mono text-cyan-300'>ImageFolder</code> reads a folder-per-class directory.</p>",
+          "mission": "Load <code class='mono'>data/</code> as <b class='text-white'>ds</b>.",
+          "ph": "ds = ImageFolder('data/')",
+          "sol": "ds = ImageFolder('data/')",
+          "re": "^ds\\s*=\\s*ImageFolder\\(\\s*['\"]data/['\"]\\s*\\)$",
+          "ok": [
+            "folder scanned"
+          ],
+          "checks": [
+            {
+              "re": "ImageFolder\\(",
+              "msg": "Use ImageFolder."
+            }
+          ]
+        },
+        {
+          "t": "iterate loader",
+          "card": "<p>DataLoaders are iterables — <code class='mono text-cyan-300'>for x, y in dl:</code>.</p>",
+          "mission": "Write the header line.",
+          "ph": "for x, y in dl:",
+          "sol": "for x, y in dl:",
+          "re": "^for\\s+x\\s*,\\s*y\\s+in\\s+dl\\s*:$",
+          "ok": [
+            "batch loop"
+          ],
+          "checks": [
+            {
+              "re": "for\\s+x\\s*,\\s*y",
+              "msg": "Unpack batches."
+            }
+          ]
+        },
+        {
+          "t": "move to device",
+          "card": "<p><code class='mono text-cyan-300'>.to(device)</code> shifts a batch to GPU/CPU.</p>",
+          "mission": "Send <code class='mono'>x</code> to <code class='mono'>device</code>.",
+          "ph": "x = x.to(device)",
+          "sol": "x = x.to(device)",
+          "re": "^x\\s*=\\s*x\\.to\\(\\s*device\\s*\\)$",
+          "ok": [
+            "on device"
+          ],
+          "checks": [
+            {
+              "re": "\\.to\\(\\s*device",
+              "msg": "Call .to(device)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cnn",
+      "name": "CNN",
+      "questions": [
+        {
+          "t": "Conv2d layer",
+          "card": "<p><code class='mono text-cyan-300'>Conv2d</code> — spatial feature detectors.</p>",
+          "mission": "3→16 channels, 3x3 kernel.",
+          "ph": "conv = nn.Conv2d(3, 16, 3)",
+          "sol": "conv = nn.Conv2d(3, 16, 3)",
+          "re": "^conv\\s*=\\s*nn\\.Conv2d\\(\\s*3\\s*,\\s*16\\s*,\\s*3\\s*\\)$",
+          "ok": [
+            "conv built"
+          ],
+          "checks": [
+            {
+              "re": "nn\\.Conv2d\\(",
+              "msg": "Use nn.Conv2d."
+            }
+          ]
+        },
+        {
+          "t": "MaxPool2d",
+          "card": "<p><code class='mono text-cyan-300'>MaxPool2d</code> downsamples by max in each window.</p>",
+          "mission": "2x2 window.",
+          "ph": "pool = nn.MaxPool2d(2)",
+          "sol": "pool = nn.MaxPool2d(2)",
+          "re": "^pool\\s*=\\s*nn\\.MaxPool2d\\(\\s*2\\s*\\)$",
+          "ok": [
+            "pooled"
+          ],
+          "checks": [
+            {
+              "re": "nn\\.MaxPool2d\\(",
+              "msg": "Use nn.MaxPool2d."
+            }
+          ]
+        },
+        {
+          "t": "BatchNorm2d",
+          "card": "<p><code class='mono text-cyan-300'>BatchNorm2d</code> normalizes activations per channel.</p>",
+          "mission": "16-channel.",
+          "ph": "bn = nn.BatchNorm2d(16)",
+          "sol": "bn = nn.BatchNorm2d(16)",
+          "re": "^bn\\s*=\\s*nn\\.BatchNorm2d\\(\\s*16\\s*\\)$",
+          "ok": [
+            "bn ready"
+          ],
+          "checks": [
+            {
+              "re": "nn\\.BatchNorm2d\\(",
+              "msg": "Use nn.BatchNorm2d."
+            }
+          ]
+        },
+        {
+          "t": "Dropout",
+          "card": "<p><code class='mono text-cyan-300'>Dropout(p)</code> — regularize by random zeroing.</p>",
+          "mission": "50% drop.",
+          "ph": "drop = nn.Dropout(0.5)",
+          "sol": "drop = nn.Dropout(0.5)",
+          "re": "^drop\\s*=\\s*nn\\.Dropout\\(\\s*0\\.5\\s*\\)$",
+          "ok": [
+            "dropout on"
+          ],
+          "checks": [
+            {
+              "re": "nn\\.Dropout\\(",
+              "msg": "Use nn.Dropout."
+            }
+          ]
+        },
+        {
+          "t": "Flatten",
+          "card": "<p><code class='mono text-cyan-300'>Flatten</code> — turn feature maps into a vector before <code class='mono'>Linear</code>.</p>",
+          "mission": "Add layer.",
+          "ph": "flat = nn.Flatten()",
+          "sol": "flat = nn.Flatten()",
+          "re": "^flat\\s*=\\s*nn\\.Flatten\\(\\s*\\)$",
+          "ok": [
+            "flattened"
+          ],
+          "checks": [
+            {
+              "re": "nn\\.Flatten\\(",
+              "msg": "Use nn.Flatten."
+            }
+          ]
+        },
+        {
+          "t": "AdaptiveAvgPool2d",
+          "card": "<p>Global avg pool for variable input sizes.</p>",
+          "mission": "Output <code class='mono'>(1, 1)</code>.",
+          "ph": "gap = nn.AdaptiveAvgPool2d((1, 1))",
+          "sol": "gap = nn.AdaptiveAvgPool2d((1, 1))",
+          "re": "^gap\\s*=\\s*nn\\.AdaptiveAvgPool2d\\(\\s*\\(\\s*1\\s*,\\s*1\\s*\\)\\s*\\)$",
+          "ok": [
+            "global pool"
+          ],
+          "checks": [
+            {
+              "re": "AdaptiveAvgPool2d\\(",
+              "msg": "Use AdaptiveAvgPool2d."
+            }
+          ]
+        },
+        {
+          "t": "resnet18",
+          "card": "<p>Torchvision pretrained CNN — <code class='mono text-cyan-300'>resnet18</code>.</p>",
+          "mission": "Load pretrained.",
+          "ph": "model = resnet18(pretrained=True)",
+          "sol": "model = resnet18(pretrained=True)",
+          "re": "^model\\s*=\\s*resnet18\\(\\s*pretrained\\s*=\\s*True\\s*\\)$",
+          "ok": [
+            "weights loaded"
+          ],
+          "checks": [
+            {
+              "re": "resnet18\\(",
+              "msg": "Use resnet18."
+            }
+          ]
+        },
+        {
+          "t": "freeze params",
+          "card": "<p>Freeze feature extractor — only classifier trains.</p>",
+          "mission": "Zero <code class='mono'>requires_grad</code> for <code class='mono'>p</code>.",
+          "ph": "p.requires_grad = False",
+          "sol": "p.requires_grad = False",
+          "re": "^p\\.requires_grad\\s*=\\s*False$",
+          "ok": [
+            "frozen"
+          ],
+          "checks": [
+            {
+              "re": "requires_grad\\s*=\\s*False",
+              "msg": "Set requires_grad = False."
+            }
+          ]
+        },
+        {
+          "t": "replace fc head",
+          "card": "<p>Swap <code class='mono text-cyan-300'>model.fc</code> for your task.</p>",
+          "mission": "10-class classifier from 512-dim features.",
+          "ph": "model.fc = nn.Linear(512, 10)",
+          "sol": "model.fc = nn.Linear(512, 10)",
+          "re": "^model\\.fc\\s*=\\s*nn\\.Linear\\(\\s*512\\s*,\\s*10\\s*\\)$",
+          "ok": [
+            "head swapped"
+          ],
+          "checks": [
+            {
+              "re": "model\\.fc\\s*=",
+              "msg": "Reassign model.fc."
+            }
+          ]
+        },
+        {
+          "t": "CrossEntropy",
+          "card": "<p><code class='mono text-cyan-300'>CrossEntropyLoss</code> = logits + softmax + NLL.</p>",
+          "mission": "Build <b class='text-white'>crit</b>.",
+          "ph": "crit = nn.CrossEntropyLoss()",
+          "sol": "crit = nn.CrossEntropyLoss()",
+          "re": "^crit\\s*=\\s*nn\\.CrossEntropyLoss\\(\\s*\\)$",
+          "ok": [
+            "loss ready"
+          ],
+          "checks": [
+            {
+              "re": "CrossEntropyLoss\\(",
+              "msg": "Use CrossEntropyLoss."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "transformer",
+      "name": "Transformer",
+      "questions": [
+        {
+          "t": "Embedding",
+          "card": "<p><code class='mono text-cyan-300'>nn.Embedding(vocab, dim)</code> — token → vector table.</p>",
+          "mission": "5000 tokens, 128-dim.",
+          "ph": "emb = nn.Embedding(5000, 128)",
+          "sol": "emb = nn.Embedding(5000, 128)",
+          "re": "^emb\\s*=\\s*nn\\.Embedding\\(\\s*5000\\s*,\\s*128\\s*\\)$",
+          "ok": [
+            "embedding table"
+          ],
+          "checks": [
+            {
+              "re": "nn\\.Embedding\\(",
+              "msg": "Use nn.Embedding."
+            }
+          ]
+        },
+        {
+          "t": "MultiheadAttention",
+          "card": "<p><code class='mono text-cyan-300'>MultiheadAttention(embed_dim, num_heads)</code>.</p>",
+          "mission": "128-dim, 8 heads.",
+          "ph": "mha = nn.MultiheadAttention(128, 8)",
+          "sol": "mha = nn.MultiheadAttention(128, 8)",
+          "re": "^mha\\s*=\\s*nn\\.MultiheadAttention\\(\\s*128\\s*,\\s*8\\s*\\)$",
+          "ok": [
+            "attn ready"
+          ],
+          "checks": [
+            {
+              "re": "MultiheadAttention\\(",
+              "msg": "Use MultiheadAttention."
+            }
+          ]
+        },
+        {
+          "t": "scaled dot-product formula",
+          "card": "<p><code class='mono text-cyan-300'>softmax(QKᵀ/√d)V</code>.</p>",
+          "mission": "Divisor: <code class='mono'>d ** 0.5</code>. Store in <b class='text-white'>scale</b>.",
+          "ph": "scale = d ** 0.5",
+          "sol": "scale = d ** 0.5",
+          "re": "^scale\\s*=\\s*d\\s*\\*\\*\\s*0\\.5$",
+          "ok": [
+            "√d"
+          ],
+          "checks": [
+            {
+              "re": "d\\s*\\*\\*\\s*0\\.5",
+              "msg": "Compute d ** 0.5."
+            }
+          ]
+        },
+        {
+          "t": "TransformerEncoderLayer",
+          "card": "<p>One block: self-attn + FFN + LayerNorm.</p>",
+          "mission": "512-dim, 8 heads.",
+          "ph": "enc = nn.TransformerEncoderLayer(d_model=512, nhead=8)",
+          "sol": "enc = nn.TransformerEncoderLayer(d_model=512, nhead=8)",
+          "re": "^enc\\s*=\\s*nn\\.TransformerEncoderLayer\\(\\s*d_model\\s*=\\s*512\\s*,\\s*nhead\\s*=\\s*8\\s*\\)$",
+          "ok": [
+            "encoder block"
+          ],
+          "checks": [
+            {
+              "re": "TransformerEncoderLayer\\(",
+              "msg": "Use TransformerEncoderLayer."
+            }
+          ]
+        },
+        {
+          "t": "LayerNorm",
+          "card": "<p><code class='mono text-cyan-300'>LayerNorm(dim)</code> — normalize along the feature dim.</p>",
+          "mission": "128-dim.",
+          "ph": "ln = nn.LayerNorm(128)",
+          "sol": "ln = nn.LayerNorm(128)",
+          "re": "^ln\\s*=\\s*nn\\.LayerNorm\\(\\s*128\\s*\\)$",
+          "ok": [
+            "normed"
+          ],
+          "checks": [
+            {
+              "re": "nn\\.LayerNorm\\(",
+              "msg": "Use nn.LayerNorm."
+            }
+          ]
+        },
+        {
+          "t": "positional encoding",
+          "card": "<p>Add a positional signal so attention knows order.</p>",
+          "mission": "Add position vec: <code class='mono'>x = x + pe</code>.",
+          "ph": "x = x + pe",
+          "sol": "x = x + pe",
+          "re": "^x\\s*=\\s*x\\s*\\+\\s*pe$",
+          "ok": [
+            "positioned"
+          ],
+          "checks": [
+            {
+              "re": "\\+\\s*pe",
+              "msg": "Add pe."
+            }
+          ]
+        },
+        {
+          "t": "causal mask",
+          "card": "<p>Upper triangular mask blocks attending to the future.</p>",
+          "mission": "Build <b class='text-white'>mask</b> for length 10.",
+          "ph": "mask = torch.triu(torch.ones(10, 10), diagonal=1).bool()",
+          "sol": "mask = torch.triu(torch.ones(10, 10), diagonal=1).bool()",
+          "re": "^mask\\s*=\\s*torch\\.triu\\(\\s*torch\\.ones\\(\\s*10\\s*,\\s*10\\s*\\)\\s*,\\s*diagonal\\s*=\\s*1\\s*\\)\\.bool\\(\\s*\\)$",
+          "ok": [
+            "upper triangle"
+          ],
+          "checks": [
+            {
+              "re": "torch\\.triu\\(",
+              "msg": "Use torch.triu."
+            }
+          ]
+        },
+        {
+          "t": "GELU activation",
+          "card": "<p><code class='mono text-cyan-300'>GELU</code> — smooth ReLU used in Transformers.</p>",
+          "mission": "Instantiate.",
+          "ph": "act = nn.GELU()",
+          "sol": "act = nn.GELU()",
+          "re": "^act\\s*=\\s*nn\\.GELU\\(\\s*\\)$",
+          "ok": [
+            "GELU"
+          ],
+          "checks": [
+            {
+              "re": "nn\\.GELU\\(",
+              "msg": "Use nn.GELU."
+            }
+          ]
+        },
+        {
+          "t": "AdamW",
+          "card": "<p><code class='mono text-cyan-300'>AdamW</code> — Adam with decoupled weight decay (Transformer default).</p>",
+          "mission": "lr=3e-4, wd=0.01.",
+          "ph": "opt = torch.optim.AdamW(model.parameters(), lr=3e-4, weight_decay=0.01)",
+          "sol": "opt = torch.optim.AdamW(model.parameters(), lr=3e-4, weight_decay=0.01)",
+          "re": "^opt\\s*=\\s*torch\\.optim\\.AdamW\\(\\s*model\\.parameters\\(\\s*\\)\\s*,\\s*lr\\s*=\\s*3e-4\\s*,\\s*weight_decay\\s*=\\s*0\\.01\\s*\\)$",
+          "ok": [
+            "AdamW ready"
+          ],
+          "checks": [
+            {
+              "re": "AdamW\\(",
+              "msg": "Use AdamW."
+            },
+            {
+              "re": "weight_decay\\s*=",
+              "msg": "Set weight_decay."
+            }
+          ]
+        },
+        {
+          "t": "grad clip",
+          "card": "<p><code class='mono text-cyan-300'>clip_grad_norm_</code> — cap gradient magnitude.</p>",
+          "mission": "Clip at 1.0.",
+          "ph": "torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)",
+          "sol": "torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)",
+          "re": "^torch\\.nn\\.utils\\.clip_grad_norm_\\(\\s*model\\.parameters\\(\\s*\\)\\s*,\\s*1\\.0\\s*\\)$",
+          "ok": [
+            "clipped"
+          ],
+          "checks": [
+            {
+              "re": "clip_grad_norm_",
+              "msg": "Use clip_grad_norm_."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fine-tuning",
+      "name": "Losses & Fine-Tuning",
+      "questions": [
+        {
+          "t": "BCEWithLogitsLoss",
+          "card": "<p>Binary classification: <code class='mono text-cyan-300'>BCEWithLogitsLoss</code> is numerically stable.</p>",
+          "mission": "Build <b class='text-white'>bce</b>.",
+          "ph": "bce = nn.BCEWithLogitsLoss()",
+          "sol": "bce = nn.BCEWithLogitsLoss()",
+          "re": "^bce\\s*=\\s*nn\\.BCEWithLogitsLoss\\(\\s*\\)$",
+          "ok": [
+            "stable BCE"
+          ],
+          "checks": [
+            {
+              "re": "BCEWithLogitsLoss\\(",
+              "msg": "Use BCEWithLogitsLoss."
+            }
+          ]
+        },
+        {
+          "t": "MSELoss",
+          "card": "<p>Regression baseline loss.</p>",
+          "mission": "Build <b class='text-white'>mse</b>.",
+          "ph": "mse = nn.MSELoss()",
+          "sol": "mse = nn.MSELoss()",
+          "re": "^mse\\s*=\\s*nn\\.MSELoss\\(\\s*\\)$",
+          "ok": [
+            "MSE"
+          ],
+          "checks": [
+            {
+              "re": "nn\\.MSELoss\\(",
+              "msg": "Use nn.MSELoss."
+            }
+          ]
+        },
+        {
+          "t": "load pretrained BERT",
+          "card": "<p><code class='mono text-cyan-300'>AutoModel.from_pretrained</code>.</p>",
+          "mission": "Load <code class='mono'>bert-base-uncased</code>.",
+          "ph": "model = AutoModel.from_pretrained('bert-base-uncased')",
+          "sol": "model = AutoModel.from_pretrained('bert-base-uncased')",
+          "re": "^model\\s*=\\s*AutoModel\\.from_pretrained\\(\\s*['\"]bert-base-uncased['\"]\\s*\\)$",
+          "ok": [
+            "BERT ready"
+          ],
+          "checks": [
+            {
+              "re": "AutoModel\\.from_pretrained\\(",
+              "msg": "Call from_pretrained."
+            }
+          ]
+        },
+        {
+          "t": "CosineAnnealing",
+          "card": "<p><code class='mono text-cyan-300'>CosineAnnealingLR</code> smoothly decays lr to zero.</p>",
+          "mission": "T_max = 50.",
+          "ph": "sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=50)",
+          "sol": "sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=50)",
+          "re": "^sched\\s*=\\s*torch\\.optim\\.lr_scheduler\\.CosineAnnealingLR\\(\\s*opt\\s*,\\s*T_max\\s*=\\s*50\\s*\\)$",
+          "ok": [
+            "scheduler"
+          ],
+          "checks": [
+            {
+              "re": "CosineAnnealingLR\\(",
+              "msg": "Use CosineAnnealingLR."
+            }
+          ]
+        },
+        {
+          "t": "Xavier init",
+          "card": "<p><code class='mono text-cyan-300'>nn.init.xavier_uniform_</code> for tanh/linear layers.</p>",
+          "mission": "Init <code class='mono'>layer.weight</code>.",
+          "ph": "nn.init.xavier_uniform_(layer.weight)",
+          "sol": "nn.init.xavier_uniform_(layer.weight)",
+          "re": "^nn\\.init\\.xavier_uniform_\\(\\s*layer\\.weight\\s*\\)$",
+          "ok": [
+            "weights inited"
+          ],
+          "checks": [
+            {
+              "re": "xavier_uniform_\\(",
+              "msg": "Use xavier_uniform_."
+            }
+          ]
+        },
+        {
+          "t": "Kaiming init",
+          "card": "<p><code class='mono text-cyan-300'>kaiming_normal_</code> — best for ReLU.</p>",
+          "mission": "Init <code class='mono'>layer.weight</code>.",
+          "ph": "nn.init.kaiming_normal_(layer.weight)",
+          "sol": "nn.init.kaiming_normal_(layer.weight)",
+          "re": "^nn\\.init\\.kaiming_normal_\\(\\s*layer\\.weight\\s*\\)$",
+          "ok": [
+            "He init"
+          ],
+          "checks": [
+            {
+              "re": "kaiming_normal_\\(",
+              "msg": "Use kaiming_normal_."
+            }
+          ]
+        },
+        {
+          "t": "amp autocast",
+          "card": "<p><code class='mono text-cyan-300'>torch.autocast</code> — mixed precision.</p>",
+          "mission": "Wrap forward in autocast (cuda).",
+          "ph": "with torch.autocast('cuda'):\n    out = model(x)",
+          "sol": "with torch.autocast('cuda'):\n    out = model(x)",
+          "re": "^with\\s+torch\\.autocast\\(\\s*['\"]cuda['\"]\\s*\\)\\s*:\\s*\\n\\s+out\\s*=\\s*model\\(\\s*x\\s*\\)$",
+          "ok": [
+            "mixed precision"
+          ],
+          "checks": [
+            {
+              "re": "torch\\.autocast\\(",
+              "msg": "Use torch.autocast."
+            }
+          ]
+        },
+        {
+          "t": "GradScaler",
+          "card": "<p>Scales loss to avoid FP16 underflow.</p>",
+          "mission": "Build <b class='text-white'>scaler</b>.",
+          "ph": "scaler = torch.cuda.amp.GradScaler()",
+          "sol": "scaler = torch.cuda.amp.GradScaler()",
+          "re": "^scaler\\s*=\\s*torch\\.cuda\\.amp\\.GradScaler\\(\\s*\\)$",
+          "ok": [
+            "scaler on"
+          ],
+          "checks": [
+            {
+              "re": "GradScaler\\(",
+              "msg": "Use GradScaler."
+            }
+          ]
+        },
+        {
+          "t": "save checkpoint",
+          "card": "<p><code class='mono text-cyan-300'>torch.save(state, path)</code>.</p>",
+          "mission": "Save <code class='mono'>model.state_dict()</code> to <code class='mono'>ckpt.pt</code>.",
+          "ph": "torch.save(model.state_dict(), 'ckpt.pt')",
+          "sol": "torch.save(model.state_dict(), 'ckpt.pt')",
+          "re": "^torch\\.save\\(\\s*model\\.state_dict\\(\\s*\\)\\s*,\\s*['\"]ckpt\\.pt['\"]\\s*\\)$",
+          "ok": [
+            "checkpointed"
+          ],
+          "checks": [
+            {
+              "re": "torch\\.save\\(",
+              "msg": "Use torch.save."
+            }
+          ]
+        },
+        {
+          "t": "load checkpoint",
+          "card": "<p><code class='mono text-cyan-300'>load_state_dict</code> restores weights.</p>",
+          "mission": "Load <code class='mono'>ckpt.pt</code> into <code class='mono'>model</code>.",
+          "ph": "model.load_state_dict(torch.load('ckpt.pt'))",
+          "sol": "model.load_state_dict(torch.load('ckpt.pt'))",
+          "re": "^model\\.load_state_dict\\(\\s*torch\\.load\\(\\s*['\"]ckpt\\.pt['\"]\\s*\\)\\s*\\)$",
+          "ok": [
+            "restored"
+          ],
+          "checks": [
+            {
+              "re": "load_state_dict\\(",
+              "msg": "Call load_state_dict."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
