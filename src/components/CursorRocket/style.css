@@ -1,0 +1,17 @@
+.cursor-rocket {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 24px;
+  height: 24px;
+  margin-left: -12px;
+  margin-top: -12px;
+  pointer-events: none;
+  z-index: var(--z-cursor);
+  will-change: transform;
+}
+
+.cursor-rocket__svg {
+  image-rendering: pixelated;
+  display: block;
+}

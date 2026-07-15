@@ -1,0 +1,541 @@
+{
+  "id": "ML-OPS",
+  "name": "MLOps & Deployment",
+  "tier": "Ops",
+  "planet": "Orbital Foundry",
+  "desc": "Experiment tracking, model registry, serving, monitoring — the production stack.",
+  "xp": 25,
+  "color": "0x66d9a1",
+  "viz": null,
+  "badge": "mlops",
+  "checkpoints": [
+    {
+      "id": "experiment-tracking",
+      "name": "Experiment Tracking",
+      "questions": [
+        {
+          "t": "mlflow set uri",
+          "card": "<p><code class='mono text-cyan-300'>mlflow.set_tracking_uri</code>.</p>",
+          "mission": "Point at local <code class='mono'>./mlruns</code>.",
+          "ph": "mlflow.set_tracking_uri('./mlruns')",
+          "sol": "mlflow.set_tracking_uri('./mlruns')",
+          "re": "^mlflow\\.set_tracking_uri\\(\\s*['\"]\\./mlruns['\"]\\s*\\)$",
+          "ok": [
+            "tracking set"
+          ],
+          "checks": [
+            {
+              "re": "set_tracking_uri\\(",
+              "msg": "Call set_tracking_uri."
+            }
+          ]
+        },
+        {
+          "t": "start run",
+          "card": "<p><code class='mono text-cyan-300'>with mlflow.start_run():</code>.</p>",
+          "mission": "Open the context.",
+          "ph": "with mlflow.start_run():",
+          "sol": "with mlflow.start_run():",
+          "re": "^with\\s+mlflow\\.start_run\\(\\s*\\)\\s*:$",
+          "ok": [
+            "run open"
+          ],
+          "checks": [
+            {
+              "re": "start_run\\(",
+              "msg": "Use mlflow.start_run."
+            }
+          ]
+        },
+        {
+          "t": "log_param",
+          "card": "<p>Track a hyperparameter.</p>",
+          "mission": "Log <code class='mono'>lr=0.01</code>.",
+          "ph": "mlflow.log_param('lr', 0.01)",
+          "sol": "mlflow.log_param('lr', 0.01)",
+          "re": "^mlflow\\.log_param\\(\\s*['\"]lr['\"]\\s*,\\s*0\\.01\\s*\\)$",
+          "ok": [
+            "param logged"
+          ],
+          "checks": [
+            {
+              "re": "log_param\\(",
+              "msg": "Use log_param."
+            }
+          ]
+        },
+        {
+          "t": "log_metric",
+          "card": "<p>Track a scalar metric.</p>",
+          "mission": "Log <code class='mono'>val_acc=0.94</code>.",
+          "ph": "mlflow.log_metric('val_acc', 0.94)",
+          "sol": "mlflow.log_metric('val_acc', 0.94)",
+          "re": "^mlflow\\.log_metric\\(\\s*['\"]val_acc['\"]\\s*,\\s*0\\.94\\s*\\)$",
+          "ok": [
+            "metric logged"
+          ],
+          "checks": [
+            {
+              "re": "log_metric\\(",
+              "msg": "Use log_metric."
+            }
+          ]
+        },
+        {
+          "t": "log artifact",
+          "card": "<p>Attach a file (plot, model, config).</p>",
+          "mission": "Log <code class='mono'>confusion.png</code>.",
+          "ph": "mlflow.log_artifact('confusion.png')",
+          "sol": "mlflow.log_artifact('confusion.png')",
+          "re": "^mlflow\\.log_artifact\\(\\s*['\"]confusion\\.png['\"]\\s*\\)$",
+          "ok": [
+            "file attached"
+          ],
+          "checks": [
+            {
+              "re": "log_artifact\\(",
+              "msg": "Use log_artifact."
+            }
+          ]
+        },
+        {
+          "t": "wandb init",
+          "card": "<p><code class='mono text-cyan-300'>wandb.init</code>.</p>",
+          "mission": "Init project <code class='mono'>demo</code>.",
+          "ph": "wandb.init(project='demo')",
+          "sol": "wandb.init(project='demo')",
+          "re": "^wandb\\.init\\(\\s*project\\s*=\\s*['\"]demo['\"]\\s*\\)$",
+          "ok": [
+            "wandb up"
+          ],
+          "checks": [
+            {
+              "re": "wandb\\.init\\(",
+              "msg": "Call wandb.init."
+            }
+          ]
+        },
+        {
+          "t": "wandb log",
+          "card": "<p>Send metrics.</p>",
+          "mission": "Log <code class='mono'>{'loss': 0.3}</code>.",
+          "ph": "wandb.log({'loss': 0.3})",
+          "sol": "wandb.log({'loss': 0.3})",
+          "re": "^wandb\\.log\\(\\s*\\{\\s*['\"]loss['\"]\\s*:\\s*0\\.3\\s*\\}\\s*\\)$",
+          "ok": [
+            "logged"
+          ],
+          "checks": [
+            {
+              "re": "wandb\\.log\\(",
+              "msg": "Call wandb.log."
+            }
+          ]
+        },
+        {
+          "t": "log_model",
+          "card": "<p>Register a sklearn model.</p>",
+          "mission": "Log <code class='mono'>clf</code> under <code class='mono'>model</code>.",
+          "ph": "mlflow.sklearn.log_model(clf, 'model')",
+          "sol": "mlflow.sklearn.log_model(clf, 'model')",
+          "re": "^mlflow\\.sklearn\\.log_model\\(\\s*clf\\s*,\\s*['\"]model['\"]\\s*\\)$",
+          "ok": [
+            "model versioned"
+          ],
+          "checks": [
+            {
+              "re": "sklearn\\.log_model\\(",
+              "msg": "Use mlflow.sklearn.log_model."
+            }
+          ]
+        },
+        {
+          "t": "search_runs",
+          "card": "<p>Query past runs.</p>",
+          "mission": "List by experiment id 1 into <b class='text-white'>runs</b>.",
+          "ph": "runs = mlflow.search_runs(experiment_ids=['1'])",
+          "sol": "runs = mlflow.search_runs(experiment_ids=['1'])",
+          "re": "^runs\\s*=\\s*mlflow\\.search_runs\\(\\s*experiment_ids\\s*=\\s*\\[\\s*['\"]1['\"]\\s*\\]\\s*\\)$",
+          "ok": [
+            "queried"
+          ],
+          "checks": [
+            {
+              "re": "search_runs\\(",
+              "msg": "Use search_runs."
+            }
+          ]
+        },
+        {
+          "t": "DVC add",
+          "card": "<p><code class='mono text-cyan-300'>dvc add data/</code> versions data.</p>",
+          "mission": "Track <code class='mono'>data/train.csv</code>.",
+          "ph": "dvc add data/train.csv",
+          "sol": "dvc add data/train.csv",
+          "re": "^dvc\\s+add\\s+data\\/train\\.csv$",
+          "ok": [
+            "versioned"
+          ],
+          "checks": [
+            {
+              "re": "dvc\\s+add",
+              "msg": "Use dvc add."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "registry-serving",
+      "name": "Registry & Serving",
+      "questions": [
+        {
+          "t": "register model",
+          "card": "<p><code class='mono text-cyan-300'>mlflow.register_model</code>.</p>",
+          "mission": "Register a URI + name <code class='mono'>fraud</code>.",
+          "ph": "mlflow.register_model('runs:/abc/model', 'fraud')",
+          "sol": "mlflow.register_model('runs:/abc/model', 'fraud')",
+          "re": "^mlflow\\.register_model\\(\\s*['\"]runs:/abc/model['\"]\\s*,\\s*['\"]fraud['\"]\\s*\\)$",
+          "ok": [
+            "registered"
+          ],
+          "checks": [
+            {
+              "re": "register_model\\(",
+              "msg": "Use register_model."
+            }
+          ]
+        },
+        {
+          "t": "transition stage",
+          "card": "<p>Promote a version to Production.</p>",
+          "mission": "Transition v1 → Production.",
+          "ph": "client.transition_model_version_stage(name='fraud', version=1, stage='Production')",
+          "sol": "client.transition_model_version_stage(name='fraud', version=1, stage='Production')",
+          "re": "^client\\.transition_model_version_stage\\(\\s*name\\s*=\\s*['\"]fraud['\"]\\s*,\\s*version\\s*=\\s*1\\s*,\\s*stage\\s*=\\s*['\"]Production['\"]\\s*\\)$",
+          "ok": [
+            "promoted"
+          ],
+          "checks": [
+            {
+              "re": "transition_model_version_stage\\(",
+              "msg": "Call transition_model_version_stage."
+            }
+          ]
+        },
+        {
+          "t": "load prod model",
+          "card": "<p><code class='mono text-cyan-300'>models:/name/Production</code>.</p>",
+          "mission": "Load into <b class='text-white'>m</b>.",
+          "ph": "m = mlflow.pyfunc.load_model('models:/fraud/Production')",
+          "sol": "m = mlflow.pyfunc.load_model('models:/fraud/Production')",
+          "re": "^m\\s*=\\s*mlflow\\.pyfunc\\.load_model\\(\\s*['\"]models:/fraud/Production['\"]\\s*\\)$",
+          "ok": [
+            "prod loaded"
+          ],
+          "checks": [
+            {
+              "re": "load_model\\(",
+              "msg": "Use pyfunc.load_model."
+            }
+          ]
+        },
+        {
+          "t": "FastAPI predict route",
+          "card": "<p>Serve inference.</p>",
+          "mission": "Add route: <code class='mono'>@app.post('/predict')</code>.",
+          "ph": "@app.post('/predict')",
+          "sol": "@app.post('/predict')",
+          "re": "^@app\\.post\\(\\s*['\"]/predict['\"]\\s*\\)$",
+          "ok": [
+            "route ready"
+          ],
+          "checks": [
+            {
+              "re": "/predict",
+              "msg": "Bind /predict."
+            }
+          ]
+        },
+        {
+          "t": "pydantic request",
+          "card": "<p>Typed request bodies.</p>",
+          "mission": "Header for class <code class='mono'>Item(BaseModel)</code>.",
+          "ph": "class Item(BaseModel):",
+          "sol": "class Item(BaseModel):",
+          "re": "^class\\s+Item\\(\\s*BaseModel\\s*\\)\\s*:$",
+          "ok": [
+            "schema decl"
+          ],
+          "checks": [
+            {
+              "re": "BaseModel",
+              "msg": "Subclass BaseModel."
+            }
+          ]
+        },
+        {
+          "t": "Dockerfile expose",
+          "card": "<p><code class='mono text-cyan-300'>EXPOSE 8000</code>.</p>",
+          "mission": "One line.",
+          "ph": "line = 'EXPOSE 8000'",
+          "sol": "line = 'EXPOSE 8000'",
+          "re": "^line\\s*=\\s*['\"]EXPOSE 8000['\"]$",
+          "ok": [
+            "port declared"
+          ],
+          "checks": [
+            {
+              "re": "EXPOSE\\s+8000",
+              "msg": "Emit EXPOSE 8000."
+            }
+          ]
+        },
+        {
+          "t": "docker build",
+          "card": "<p>Build the image.</p>",
+          "mission": "Tag as <code class='mono'>svc:latest</code>.",
+          "ph": "docker build -t svc:latest .",
+          "sol": "docker build -t svc:latest .",
+          "re": "^docker\\s+build\\s+-t\\s+svc:latest\\s+\\.$",
+          "ok": [
+            "image built"
+          ],
+          "checks": [
+            {
+              "re": "docker\\s+build",
+              "msg": "Use docker build."
+            }
+          ]
+        },
+        {
+          "t": "S3 upload",
+          "card": "<p><code class='mono text-cyan-300'>boto3</code> puts artifacts.</p>",
+          "mission": "Upload <code class='mono'>model.pkl</code> to bucket <code class='mono'>ml</code>.",
+          "ph": "s3.upload_file('model.pkl', 'ml', 'model.pkl')",
+          "sol": "s3.upload_file('model.pkl', 'ml', 'model.pkl')",
+          "re": "^s3\\.upload_file\\(\\s*['\"]model\\.pkl['\"]\\s*,\\s*['\"]ml['\"]\\s*,\\s*['\"]model\\.pkl['\"]\\s*\\)$",
+          "ok": [
+            "uploaded"
+          ],
+          "checks": [
+            {
+              "re": "upload_file\\(",
+              "msg": "Use upload_file."
+            }
+          ]
+        },
+        {
+          "t": "cloud run deploy",
+          "card": "<p>Serverless container.</p>",
+          "mission": "Deploy service <code class='mono'>svc</code>, image <code class='mono'>gcr.io/p/svc</code>.",
+          "ph": "gcloud run deploy svc --image gcr.io/p/svc",
+          "sol": "gcloud run deploy svc --image gcr.io/p/svc",
+          "re": "^gcloud\\s+run\\s+deploy\\s+svc\\s+--image\\s+gcr\\.io\\/p\\/svc$",
+          "ok": [
+            "deploying"
+          ],
+          "checks": [
+            {
+              "re": "gcloud\\s+run\\s+deploy",
+              "msg": "Use gcloud run deploy."
+            }
+          ]
+        },
+        {
+          "t": "gunicorn workers",
+          "card": "<p>Prod ASGI needs a worker pool.</p>",
+          "mission": "4 workers, uvicorn worker class.",
+          "ph": "gunicorn app:app -w 4 -k uvicorn.workers.UvicornWorker",
+          "sol": "gunicorn app:app -w 4 -k uvicorn.workers.UvicornWorker",
+          "re": "^gunicorn\\s+app:app\\s+-w\\s+4\\s+-k\\s+uvicorn\\.workers\\.UvicornWorker$",
+          "ok": [
+            "4 workers"
+          ],
+          "checks": [
+            {
+              "re": "UvicornWorker",
+              "msg": "Use UvicornWorker."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "monitoring-drift",
+      "name": "Monitoring & Drift",
+      "questions": [
+        {
+          "t": "KS test drift",
+          "card": "<p><code class='mono text-cyan-300'>scipy.stats.ks_2samp</code> — distribution drift.</p>",
+          "mission": "Compare into <b class='text-white'>s, p</b>.",
+          "ph": "s, p = stats.ks_2samp(train, live)",
+          "sol": "s, p = stats.ks_2samp(train, live)",
+          "re": "^s\\s*,\\s*p\\s*=\\s*stats\\.ks_2samp\\(\\s*train\\s*,\\s*live\\s*\\)$",
+          "ok": [
+            "drift stat"
+          ],
+          "checks": [
+            {
+              "re": "ks_2samp\\(",
+              "msg": "Use ks_2samp."
+            }
+          ]
+        },
+        {
+          "t": "PSI",
+          "card": "<p>Population Stability Index — drift heuristic.</p>",
+          "mission": "Compute into <b class='text-white'>psi</b>.",
+          "ph": "psi = ((a - b) * np.log(a / b)).sum()",
+          "sol": "psi = ((a - b) * np.log(a / b)).sum()",
+          "re": "^psi\\s*=\\s*\\(\\s*\\(\\s*a\\s*-\\s*b\\s*\\)\\s*\\*\\s*np\\.log\\(\\s*a\\s*/\\s*b\\s*\\)\\s*\\)\\.sum\\(\\s*\\)$",
+          "ok": [
+            "PSI"
+          ],
+          "checks": [
+            {
+              "re": "np\\.log\\(",
+              "msg": "Use np.log."
+            }
+          ]
+        },
+        {
+          "t": "prometheus counter",
+          "card": "<p><code class='mono text-cyan-300'>Counter</code> tracks a monotonic count.</p>",
+          "mission": "Requests total.",
+          "ph": "REQS = Counter('reqs', 'total')",
+          "sol": "REQS = Counter('reqs', 'total')",
+          "re": "^REQS\\s*=\\s*Counter\\(\\s*['\"]reqs['\"]\\s*,\\s*['\"]total['\"]\\s*\\)$",
+          "ok": [
+            "metric"
+          ],
+          "checks": [
+            {
+              "re": "Counter\\(",
+              "msg": "Use Counter."
+            }
+          ]
+        },
+        {
+          "t": "log latency",
+          "card": "<p>Histogram for latency buckets.</p>",
+          "mission": "Name <code class='mono'>lat</code>.",
+          "ph": "LAT = Histogram('lat', 'seconds')",
+          "sol": "LAT = Histogram('lat', 'seconds')",
+          "re": "^LAT\\s*=\\s*Histogram\\(\\s*['\"]lat['\"]\\s*,\\s*['\"]seconds['\"]\\s*\\)$",
+          "ok": [
+            "histogram"
+          ],
+          "checks": [
+            {
+              "re": "Histogram\\(",
+              "msg": "Use Histogram."
+            }
+          ]
+        },
+        {
+          "t": "log exception",
+          "card": "<p>Structured error logging.</p>",
+          "mission": "Log with <code class='mono'>logger.exception('predict failed')</code>.",
+          "ph": "logger.exception('predict failed')",
+          "sol": "logger.exception('predict failed')",
+          "re": "^logger\\.exception\\(\\s*['\"]predict failed['\"]\\s*\\)$",
+          "ok": [
+            "exception logged"
+          ],
+          "checks": [
+            {
+              "re": "logger\\.exception\\(",
+              "msg": "Use logger.exception."
+            }
+          ]
+        },
+        {
+          "t": "data quality assert",
+          "card": "<p>Fail fast on schema mismatch.</p>",
+          "mission": "Assert <code class='mono'>df</code> has 10 cols.",
+          "ph": "assert df.shape[1] == 10",
+          "sol": "assert df.shape[1] == 10",
+          "re": "^assert\\s+df\\.shape\\[\\s*1\\s*\\]\\s*==\\s*10$",
+          "ok": [
+            "schema ok"
+          ],
+          "checks": [
+            {
+              "re": "df\\.shape\\[",
+              "msg": "Check df.shape."
+            }
+          ]
+        },
+        {
+          "t": "canary weight",
+          "card": "<p>Route 10% to new model.</p>",
+          "mission": "Set weight <code class='mono'>new = 0.1</code>.",
+          "ph": "new = 0.1",
+          "sol": "new = 0.1",
+          "re": "^new\\s*=\\s*0\\.1$",
+          "ok": [
+            "canary"
+          ],
+          "checks": [
+            {
+              "re": "0\\.1",
+              "msg": "Use 0.1 weight."
+            }
+          ]
+        },
+        {
+          "t": "rollback",
+          "card": "<p>Flip stage back to Staging.</p>",
+          "mission": "Transition v2 → Staging.",
+          "ph": "client.transition_model_version_stage(name='fraud', version=2, stage='Staging')",
+          "sol": "client.transition_model_version_stage(name='fraud', version=2, stage='Staging')",
+          "re": "^client\\.transition_model_version_stage\\(\\s*name\\s*=\\s*['\"]fraud['\"]\\s*,\\s*version\\s*=\\s*2\\s*,\\s*stage\\s*=\\s*['\"]Staging['\"]\\s*\\)$",
+          "ok": [
+            "rolled back"
+          ],
+          "checks": [
+            {
+              "re": "stage\\s*=\\s*[\"\\']Staging",
+              "msg": "Move to Staging."
+            }
+          ]
+        },
+        {
+          "t": "shadow deploy",
+          "card": "<p>Send prod traffic to new model, discard output.</p>",
+          "mission": "Compute prediction without emitting: <code class='mono'>shadow = new_model.predict(x)</code>.",
+          "ph": "shadow = new_model.predict(x)",
+          "sol": "shadow = new_model.predict(x)",
+          "re": "^shadow\\s*=\\s*new_model\\.predict\\(\\s*x\\s*\\)$",
+          "ok": [
+            "shadow ok"
+          ],
+          "checks": [
+            {
+              "re": "new_model\\.predict",
+              "msg": "Call new_model.predict."
+            }
+          ]
+        },
+        {
+          "t": "seed reproducibility",
+          "card": "<p>Freeze randomness across libs.</p>",
+          "mission": "Set numpy seed 42.",
+          "ph": "np.random.seed(42)",
+          "sol": "np.random.seed(42)",
+          "re": "^np\\.random\\.seed\\(\\s*42\\s*\\)$",
+          "ok": [
+            "seeded"
+          ],
+          "checks": [
+            {
+              "re": "np\\.random\\.seed\\(",
+              "msg": "Seed numpy."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

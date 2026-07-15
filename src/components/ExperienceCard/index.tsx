@@ -24,7 +24,7 @@ const ExperienceCard = forwardRef<HTMLElement, ExpCardProps>(
           {
             "--exp-accent": exp.accentHex,
             "--exp-accent-dim": exp.accentHex + "22",
-            "--exp-bg": exp.bgHex,
+            // "--exp-bg": exp.bgHex,
           } as React.CSSProperties
         }
         aria-label={`${exp.companyFull} experience`}

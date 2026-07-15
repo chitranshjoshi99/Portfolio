@@ -1,0 +1,2401 @@
+{
+  "id": "PY-CORE",
+  "name": "Python Core Foundations",
+  "tier": "Beginner",
+  "planet": "Terra Prime",
+  "desc": "Types, slicing, control flow, collections and functions — the way working Python is actually written.",
+  "xp": 15,
+  "color": "0x3ecf8e",
+  "viz": null,
+  "badge": "core",
+  "checkpoints": [
+    {
+      "id": "values-strings",
+      "name": "Values & Strings",
+      "questions": [
+        {
+          "t": "Interpolate a name",
+          "card": "<p><b class='text-white'>What:</b> An f-string (<code class='mono'>f\"...\"</code>) lets you drop a variable straight into text using <code class='mono'>{ }</code>, instead of gluing pieces together with <code class='mono'>+</code>.</p><p><b class='text-white'>Why:</b> String concatenation with <code class='mono'>+</code> breaks the moment a value isn't already a string (an int, for example) and gets unreadable past two or three pieces. f-strings read like the sentence you're building and convert values automatically.</p><p><b class='text-white'>How:</b> Prefix the string literal with <code class='mono'>f</code>, then put any expression inside <code class='mono'>{ }</code> — Python evaluates it and inserts the result.</p><div class='codeblock'>name = &quot;ada&quot;\ngreeting = f&quot;hi, {name}&quot;\nprint(greeting)  <span class='cm'># hi, ada</span></div>",
+          "mission": "Build the string <b class='text-white'>hi, ada</b> from <code class='mono'>name</code> and store in <b class='text-white'>line</b>.",
+          "ctx": "name = \"ada\"",
+          "ph": "line = f\"...\"",
+          "sol": "line = f\"hi, {name}\"",
+          "checks": [
+            {
+              "re": "f[\"']",
+              "msg": "Prefix the string with f."
+            },
+            {
+              "re": "\\{name\\}",
+              "msg": "Interpolate {name} inside the string."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "name = \"ada\"",
+              "read": "line",
+              "expected": "hi, ada"
+            },
+            {
+              "ctx": "name = \"grace\"",
+              "read": "line",
+              "expected": "hi, grace"
+            },
+            {
+              "ctx": "name = \"zephyr\"",
+              "read": "line",
+              "expected": "hi, zephyr"
+            }
+          ]
+        },
+        {
+          "t": "Slice the year",
+          "card": "<p><b class='text-white'>What:</b> Slicing (<code class='mono'>s[start:stop]</code>) pulls a substring out by position without a loop or a library.</p><p><b class='text-white'>Why:</b> Fixed-width fields (dates, IDs, codes) show up constantly in real data — the first 4 characters of an ISO date are always the year, so slicing is the direct tool, no parsing needed.</p><p><b class='text-white'>How:</b> <code class='mono'>raw[:4]</code> means \"from the start up to (not including) index 4\" — indices 0,1,2,3, four characters.</p><div class='codeblock'>raw = &quot;2026-07-08&quot;\nyear = raw[:4]\nprint(year)  <span class='cm'># 2026</span></div>",
+          "mission": "Pull the 4-digit year out of <code class='mono'>raw</code> into <b class='text-white'>year</b>.",
+          "ctx": "raw = \"2026-07-08\"",
+          "ph": "year = raw[...]",
+          "sol": "year = raw[:4]",
+          "checks": [
+            {
+              "re": "raw\\[",
+              "msg": "Index into raw with brackets."
+            },
+            {
+              "re": ":\\s*4",
+              "msg": "Slice up to index 4."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "raw = \"2026-07-08\"",
+              "read": "year",
+              "expected": "2026"
+            },
+            {
+              "ctx": "raw = \"1999-12-31\"",
+              "read": "year",
+              "expected": "1999"
+            },
+            {
+              "ctx": "raw = \"0042-01-01\"",
+              "read": "year",
+              "expected": "0042"
+            }
+          ]
+        },
+        {
+          "t": "Uppercase it",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>str.upper()</code> returns a new string with every letter capitalized.</p><p><b class='text-white'>Why:</b> Case-insensitive comparisons and shouty UI labels both start by normalizing case — Python never mutates the original string (strings are immutable), so you always get a new one back.</p><p><b class='text-white'>How:</b> Call <code class='mono'>.upper()</code> on the string and store the result — the original variable is untouched.</p><div class='codeblock'>code = &quot;ab12&quot;\nup = code.upper()\nprint(up)  <span class='cm'># AB12</span></div>",
+          "mission": "Uppercase <code class='mono'>code</code> into <b class='text-white'>up</b>.",
+          "ctx": "code = \"ab12\"",
+          "ph": "up = code...",
+          "sol": "up = code.upper()",
+          "checks": [
+            {
+              "re": "\\.upper\\(",
+              "msg": "Call .upper() on code."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "code = \"ab12\"",
+              "read": "up",
+              "expected": "AB12"
+            },
+            {
+              "ctx": "code = \"hello\"",
+              "read": "up",
+              "expected": "HELLO"
+            },
+            {
+              "ctx": "code = \"Zx9\"",
+              "read": "up",
+              "expected": "ZX9"
+            }
+          ]
+        },
+        {
+          "t": "Split a CSV line",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>str.split(sep)</code> breaks a string into a list wherever <code class='mono'>sep</code> occurs.</p><p><b class='text-white'>Why:</b> Raw text (a CSV row, a log line, user input) arrives as one long string — splitting on a delimiter is the first step before you can work with the individual fields.</p><p><b class='text-white'>How:</b> <code class='mono'>row.split(\",\")</code> cuts on every comma and returns a list of the pieces in order.</p><div class='codeblock'>row = &quot;a,b,c&quot;\nparts = row.split(&quot;,&quot;)\nprint(parts)  <span class='cm'># [&#x27;a&#x27;, &#x27;b&#x27;, &#x27;c&#x27;]</span></div>",
+          "mission": "Split <code class='mono'>row</code> on the comma into <b class='text-white'>parts</b>.",
+          "ctx": "row = \"a,b,c\"",
+          "ph": "parts = row.split(...)",
+          "sol": "parts = row.split(\",\")",
+          "checks": [
+            {
+              "re": "\\.split\\(",
+              "msg": "Use row.split(...)."
+            },
+            {
+              "re": "\",\"|','",
+              "msg": "Split on the comma \",\" ."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "row = \"a,b,c\"",
+              "read": "parts",
+              "expected": [
+                "a",
+                "b",
+                "c"
+              ]
+            },
+            {
+              "ctx": "row = \"x,y\"",
+              "read": "parts",
+              "expected": [
+                "x",
+                "y"
+              ]
+            },
+            {
+              "ctx": "row = \"1,2,3,4\"",
+              "read": "parts",
+              "expected": [
+                "1",
+                "2",
+                "3",
+                "4"
+              ]
+            }
+          ]
+        },
+        {
+          "t": "Clean whitespace",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>.strip()</code> removes leading/trailing whitespace; <code class='mono'>.lower()</code> lowercases. Chaining both normalizes messy input in one line.</p><p><b class='text-white'>Why:</b> User-typed text almost always carries stray spaces and inconsistent case — normalizing before comparing or storing avoids bugs like <code class='mono'>\"Ada\" != \"ada \"</code>.</p><p><b class='text-white'>How:</b> Methods chain left to right: <code class='mono'>s.strip()</code> runs first, then <code class='mono'>.lower()</code> runs on its result.</p><div class='codeblock'>s = &quot;  HELLO  &quot;\nclean = s.strip().lower()\nprint(clean)  <span class='cm'># &#x27;hello&#x27;</span></div>",
+          "mission": "Trim and lowercase <code class='mono'>s</code> into <b class='text-white'>clean</b>.",
+          "ctx": "s = \"  HELLO  \"",
+          "ph": "clean = s.strip()...",
+          "sol": "clean = s.strip().lower()",
+          "checks": [
+            {
+              "re": "\\.strip\\(",
+              "msg": "Trim the ends with .strip()."
+            },
+            {
+              "re": "\\.lower\\(",
+              "msg": "Lowercase with .lower()."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "s = \"  HELLO  \"",
+              "read": "clean",
+              "expected": "hello"
+            },
+            {
+              "ctx": "s = \"PYTHON  \"",
+              "read": "clean",
+              "expected": "python"
+            },
+            {
+              "ctx": "s = \"  Ada Lovelace  \"",
+              "read": "clean",
+              "expected": "ada lovelace"
+            }
+          ]
+        },
+        {
+          "t": "Swap a separator",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>str.replace(old, new)</code> swaps every occurrence of one substring for another.</p><p><b class='text-white'>Why:</b> Reformatting between conventions — a filesystem path into a Python import path, a US date into ISO — is almost always a targeted find-and-replace, not a full rewrite.</p><p><b class='text-white'>How:</b> <code class='mono'>path.replace(\"/\", \".\")</code> scans <code class='mono'>path</code> and replaces every <code class='mono'>/</code> with <code class='mono'>.</code>.</p><div class='codeblock'>path = &quot;a/b/c&quot;\ndotted = path.replace(&quot;/&quot;, &quot;.&quot;)\nprint(dotted)  <span class='cm'># a.b.c</span></div>",
+          "mission": "Turn the slashes in <code class='mono'>path</code> into dots, into <b class='text-white'>dotted</b>.",
+          "ctx": "path = \"a/b/c\"",
+          "ph": "dotted = path.replace(...)",
+          "sol": "dotted = path.replace(\"/\", \".\")",
+          "checks": [
+            {
+              "re": "\\.replace\\(",
+              "msg": "Use path.replace(old, new)."
+            },
+            {
+              "re": "\"\\/\"|'\\/'",
+              "msg": "Replace the slash \"/\"."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "path = \"a/b/c\"",
+              "read": "dotted",
+              "expected": "a.b.c"
+            },
+            {
+              "ctx": "path = \"usr/local/bin\"",
+              "read": "dotted",
+              "expected": "usr.local.bin"
+            },
+            {
+              "ctx": "path = \"x/y\"",
+              "read": "dotted",
+              "expected": "x.y"
+            }
+          ]
+        },
+        {
+          "t": "Format a float",
+          "card": "<p><b class='text-white'>What:</b> An f-string format spec (<code class='mono'>{value:.2f}</code>) controls how a number renders — <code class='mono'>.2f</code> means \"fixed-point, 2 digits after the decimal\".</p><p><b class='text-white'>Why:</b> Raw floats print with unpredictable trailing digits (<code class='mono'>3.140000000001</code>-style noise never happens here, but arbitrary precision does) — money, percentages and scores all need a fixed, predictable display width.</p><p><b class='text-white'>How:</b> Put the format spec after a colon inside the braces: <code class='mono'>f\"{pi:.2f}\"</code>.</p><div class='codeblock'>pi = 3.14159\ntxt = f&quot;{pi:.2f}&quot;\nprint(txt)  <span class='cm'># 3.14</span></div>",
+          "mission": "Format <code class='mono'>pi</code> to 2 decimals as an f-string into <b class='text-white'>txt</b>.",
+          "ctx": "pi = 3.14159",
+          "ph": "txt = f\"{pi:...}\"",
+          "sol": "txt = f\"{pi:.2f}\"",
+          "checks": [
+            {
+              "re": "f[\"']",
+              "msg": "Use an f-string."
+            },
+            {
+              "re": ":\\.2f",
+              "msg": "Add the format spec :.2f"
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "pi = 3.14159",
+              "read": "txt",
+              "expected": "3.14"
+            },
+            {
+              "ctx": "pi = 2.5",
+              "read": "txt",
+              "expected": "2.50"
+            },
+            {
+              "ctx": "pi = 10.0",
+              "read": "txt",
+              "expected": "10.00"
+            }
+          ]
+        },
+        {
+          "t": "Join a list",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>sep.join(list)</code> is the inverse of <code class='mono'>split</code> — it glues a list of strings back together with <code class='mono'>sep</code> between each pair.</p><p><b class='text-white'>Why:</b> It lives on the separator, not the list (<code class='mono'>\"-\".join(words)</code>, not <code class='mono'>words.join(\"-\")</code>) — that trips up almost everyone the first time, so it's worth drilling until it's automatic.</p><p><b class='text-white'>How:</b> Call <code class='mono'>.join()</code> on the separator string, passing the list as the argument.</p><div class='codeblock'>words = [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]\nline = &quot;-&quot;.join(words)\nprint(line)  <span class='cm'># a-b-c</span></div>",
+          "mission": "Join <code class='mono'>words</code> with <code class='mono'>\"-\"</code> into <b class='text-white'>line</b>.",
+          "ctx": "words = [\"a\", \"b\", \"c\"]",
+          "ph": "line = \"-\".join(...)",
+          "sol": "line = \"-\".join(words)",
+          "checks": [
+            {
+              "re": "\\.join\\(\\s*words",
+              "msg": "Call \"-\".join(words)."
+            },
+            {
+              "re": "([\"'])-\\1",
+              "msg": "Separator is \"-\"."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "words = [\"a\", \"b\", \"c\"]",
+              "read": "line",
+              "expected": "a-b-c"
+            },
+            {
+              "ctx": "words = [\"x\", \"y\"]",
+              "read": "line",
+              "expected": "x-y"
+            },
+            {
+              "ctx": "words = [\"solo\"]",
+              "read": "line",
+              "expected": "solo"
+            }
+          ]
+        },
+        {
+          "t": "Prefix check",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>str.startswith(prefix)</code> returns a bool — <code class='mono'>True</code> if the string begins with <code class='mono'>prefix</code>.</p><p><b class='text-white'>Why:</b> It's the safe way to check a prefix — slicing and comparing (<code class='mono'>url[:5] == \"https\"</code>) breaks silently on short strings; <code class='mono'>startswith</code> never throws.</p><p><b class='text-white'>How:</b> Call <code class='mono'>.startswith()</code> with the prefix you're checking for; store the resulting bool.</p><div class='codeblock'>url = &quot;https://x.io&quot;\nsecure = url.startswith(&quot;https&quot;)\nprint(secure)  <span class='cm'># True</span></div>",
+          "mission": "Is <code class='mono'>url</code> HTTPS? Store the bool in <b class='text-white'>secure</b>.",
+          "ctx": "url = \"https://x.io\"",
+          "ph": "secure = url.startswith(...)",
+          "sol": "secure = url.startswith(\"https\")",
+          "checks": [
+            {
+              "re": "\\.startswith\\(",
+              "msg": "Use url.startswith(...)."
+            },
+            {
+              "re": "https",
+              "msg": "Check the \"https\" prefix."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "url = \"https://x.io\"",
+              "read": "secure",
+              "expected": true
+            },
+            {
+              "ctx": "url = \"http://x.io\"",
+              "read": "secure",
+              "expected": false
+            },
+            {
+              "ctx": "url = \"https://a.b/c\"",
+              "read": "secure",
+              "expected": true
+            }
+          ]
+        },
+        {
+          "t": "Write a slugifier",
+          "card": "<p><b class='text-white'>What:</b> A <b>slug</b> is the URL-safe form of a title — lowercase, spaces swapped for dashes (<code class='mono'>\"My Post\" → \"my-post\"</code>). Here you write it as a reusable function.</p><p><b class='text-white'>Why:</b> Every blog, wiki and e-commerce site needs this exact transform to build clean URLs — it's small enough to hand-write and common enough that you'll rewrite it from memory many times.</p><p><b class='text-white'>How:</b> Combine what you've already used: <code class='mono'>.lower()</code> to normalize case, then <code class='mono'>.replace(\" \", \"-\")</code> to swap spaces for dashes. One expression, returned directly.</p><div class='codeblock'>def slugify(s):\n    return s.lower().replace(&quot; &quot;, &quot;-&quot;)\n\nprint(slugify(&quot;Hello World&quot;))  <span class='cm'># hello-world</span></div>",
+          "mission": "Write <b class='text-white'>slugify(s)</b>: lowercase, then replace spaces with <code class='mono'>\"-\"</code>. One return line.",
+          "ph": "def slugify(s):",
+          "sol": "def slugify(s):\n    return s.lower().replace(\" \", \"-\")",
+          "checks": [
+            {
+              "re": "def\\s+slugify\\(\\s*s\\s*\\)",
+              "msg": "Define slugify(s)."
+            },
+            {
+              "re": "\\.lower\\(",
+              "msg": "Lowercase first."
+            },
+            {
+              "re": "\\.replace\\(",
+              "msg": "Replace spaces with \"-\"."
+            }
+          ],
+          "tests": [
+            {
+              "call": "slugify(\"Hello World\")",
+              "expected": "hello-world"
+            },
+            {
+              "call": "slugify(\"Data Science\")",
+              "expected": "data-science"
+            },
+            {
+              "call": "slugify(\"A B C\")",
+              "expected": "a-b-c"
+            },
+            {
+              "call": "slugify(\"nospaces\")",
+              "expected": "nospaces"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "numbers-logic",
+      "name": "Numbers & Logic",
+      "questions": [
+        {
+          "t": "Operator precedence",
+          "card": "<p><b class='text-white'>What:</b> Python evaluates <code class='mono'>*</code>, <code class='mono'>/</code> before <code class='mono'>+</code>, <code class='mono'>-</code> — the same order-of-operations rule as arithmetic on paper.</p><p><b class='text-white'>Why:</b> Precedence bugs are silent — the code runs, it just computes the wrong thing. Knowing the order by heart (rather than guessing and adding parens defensively) is what lets you read math-heavy code at a glance.</p><p><b class='text-white'>How:</b> <code class='mono'>2 + 3 * 4</code> multiplies <code class='mono'>3 * 4</code> first (12), then adds 2 — not <code class='mono'>(2 + 3) * 4</code>.</p><div class='codeblock'>r = 2 + 3 * 4\nprint(r)  <span class='cm'># 14, not 20</span></div>",
+          "mission": "Compute <code class='mono'>2 + 3 * 4</code> into <b class='text-white'>r</b> (write the expression).",
+          "ph": "r = 2 + 3 * 4",
+          "sol": "r = 2 + 3 * 4",
+          "checks": [
+            {
+              "re": "3\\s*\\*\\s*4",
+              "msg": "3 * 4 evaluates first."
+            }
+          ],
+          "tests": [
+            {
+              "call": "2 + 3 * 4",
+              "expected": 14
+            }
+          ]
+        },
+        {
+          "t": "Floor division",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>//</code> divides and rounds down to the nearest whole number — \"how many whole times does this fit\".</p><p><b class='text-white'>Why:</b> Regular division (<code class='mono'>/</code>) always returns a float, even for exact divisions — floor division is what you reach for whenever the answer has to be a count of whole units (weeks, pages, batches).</p><p><b class='text-white'>How:</b> <code class='mono'>100 // 7</code> is <code class='mono'>14</code> (7 fits into 100 fourteen whole times, with 2 left over — that remainder is what <code class='mono'>%</code> gives you).</p><div class='codeblock'>weeks = 100 // 7\nprint(weeks)  <span class='cm'># 14</span></div>",
+          "mission": "Whole weeks in 100 days into <b class='text-white'>weeks</b>.",
+          "ph": "weeks = 100 // 7",
+          "sol": "weeks = 100 // 7",
+          "checks": [
+            {
+              "re": "\\/\\/",
+              "msg": "Floor-divide with //."
+            }
+          ],
+          "tests": [
+            {
+              "call": "100 // 7",
+              "expected": 14
+            }
+          ]
+        },
+        {
+          "t": "Even test",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>%</code> is the modulo operator — it returns the remainder of a division. A number is even exactly when <code class='mono'>n % 2 == 0</code>.</p><p><b class='text-white'>Why:</b> This is the standard idiom for even/odd, and modulo more generally is how you detect cycles: every Nth item, wraparound indices, clock arithmetic.</p><p><b class='text-white'>How:</b> <code class='mono'>42 % 2</code> is 0 (42 divides evenly by 2), and comparing that to 0 gives a bool directly — no <code class='mono'>if</code> needed.</p><div class='codeblock'>even = 42 % 2 == 0\nprint(even)  <span class='cm'># True</span></div>",
+          "mission": "Store the bool \"42 is even\" in <b class='text-white'>even</b>.",
+          "ph": "even = 42 % 2 == 0",
+          "sol": "even = 42 % 2 == 0",
+          "checks": [
+            {
+              "re": "%\\s*2",
+              "msg": "Take 42 % 2."
+            },
+            {
+              "re": "==\\s*0",
+              "msg": "Compare the remainder to 0."
+            }
+          ],
+          "tests": [
+            {
+              "call": "42 % 2 == 0",
+              "expected": true
+            }
+          ]
+        },
+        {
+          "t": "Powers",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>**</code> is exponentiation — <code class='mono'>base ** exponent</code>.</p><p><b class='text-white'>Why:</b> It shows up everywhere quantitative: compounding, byte sizes (<code class='mono'>2**10 == 1024</code>), polynomial terms, ML loss functions squaring an error.</p><p><b class='text-white'>How:</b> <code class='mono'>2 ** 10</code> multiplies 2 by itself 10 times: 1024.</p><div class='codeblock'>p = 2 ** 10\nprint(p)  <span class='cm'># 1024</span></div>",
+          "mission": "2 to the 10th into <b class='text-white'>p</b>.",
+          "ph": "p = 2 ** 10",
+          "sol": "p = 2 ** 10",
+          "checks": [
+            {
+              "re": "\\*\\*",
+              "msg": "Use ** for power."
+            }
+          ],
+          "tests": [
+            {
+              "call": "2 ** 10",
+              "expected": 1024
+            }
+          ]
+        },
+        {
+          "t": "Rounding",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>round(value, ndigits)</code> rounds to a given number of decimal places and returns a float.</p><p><b class='text-white'>Why:</b> Display and storage often need fewer digits than a computation naturally produces — rounding for a UI is a different concern from formatting for display (<code class='mono'>round()</code> gives you back a real number you can still do math with; an f-string spec only changes how it prints).</p><p><b class='text-white'>How:</b> <code class='mono'>round(x, 2)</code> keeps 2 digits after the decimal point, rounding the third digit normally.</p><div class='codeblock'>x = 3.14159\nr = round(x, 2)\nprint(r)  <span class='cm'># 3.14</span></div>",
+          "mission": "Round <code class='mono'>x</code> to 2 decimals into <b class='text-white'>r</b>.",
+          "ctx": "x = 3.14159",
+          "ph": "r = round(...)",
+          "sol": "r = round(x, 2)",
+          "checks": [
+            {
+              "re": "round\\(",
+              "msg": "Use round(x, 2)."
+            },
+            {
+              "re": ",\\s*2",
+              "msg": "Two decimal places."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "x = 3.14159",
+              "read": "r",
+              "expected": 3.14
+            },
+            {
+              "ctx": "x = 7.126",
+              "read": "r",
+              "expected": 7.13
+            },
+            {
+              "ctx": "x = 12.344",
+              "read": "r",
+              "expected": 12.34
+            }
+          ]
+        },
+        {
+          "t": "Absolute value",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>abs(n)</code> strips the sign — it returns the distance from zero, always non-negative.</p><p><b class='text-white'>Why:</b> Differences and distances (error magnitude, offsets, deltas between two frames of data) care about \"how far\", not direction — <code class='mono'>abs()</code> is the direct way to say that instead of an <code class='mono'>if n &lt; 0</code> branch.</p><p><b class='text-white'>How:</b> <code class='mono'>abs(-7)</code> returns <code class='mono'>7</code>; <code class='mono'>abs(7)</code> also returns <code class='mono'>7</code>.</p><div class='codeblock'>a = -7\nd = abs(a)\nprint(d)  <span class='cm'># 7</span></div>",
+          "mission": "Absolute value of <code class='mono'>a</code> into <b class='text-white'>d</b>.",
+          "ctx": "a = -7",
+          "ph": "d = abs(...)",
+          "sol": "d = abs(a)",
+          "checks": [
+            {
+              "re": "abs\\(",
+              "msg": "Use abs(a)."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "a = -7",
+              "read": "d",
+              "expected": 7
+            },
+            {
+              "ctx": "a = 15",
+              "read": "d",
+              "expected": 15
+            },
+            {
+              "ctx": "a = -100",
+              "read": "d",
+              "expected": 100
+            }
+          ]
+        },
+        {
+          "t": "Chained comparison",
+          "card": "<p><b class='text-white'>What:</b> Python lets you chain comparisons: <code class='mono'>a &lt;= x &lt; b</code> means \"x is at least a AND strictly less than b\" — one readable expression instead of two joined by <code class='mono'>and</code>.</p><p><b class='text-white'>Why:</b> Range checks (valid index, percentage bounds, a value inside a threshold window) are extremely common, and the chained form matches how you'd say it out loud: \"between 0 and 100\".</p><p><b class='text-white'>How:</b> <code class='mono'>0 &lt;= x &lt; 100</code> is equivalent to <code class='mono'>0 &lt;= x and x &lt; 100</code>, evaluated left to right.</p><div class='codeblock'>x = 57\nvalid = 0 &lt;= x &lt; 100\nprint(valid)  <span class='cm'># True</span></div>",
+          "mission": "Bool \"x is in [0, 100)\" into <b class='text-white'>valid</b>.",
+          "ctx": "x = 57",
+          "ph": "valid = 0 <= x < 100",
+          "sol": "valid = 0 <= x < 100",
+          "checks": [
+            {
+              "re": "0\\s*<=\\s*x",
+              "msg": "Lower bound: 0 <= x."
+            },
+            {
+              "re": "x\\s*<\\s*100",
+              "msg": "Upper bound: x < 100."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "x = 57",
+              "read": "valid",
+              "expected": true
+            },
+            {
+              "ctx": "x = 150",
+              "read": "valid",
+              "expected": false
+            },
+            {
+              "ctx": "x = 100",
+              "read": "valid",
+              "expected": false
+            },
+            {
+              "ctx": "x = 0",
+              "read": "valid",
+              "expected": true
+            }
+          ]
+        },
+        {
+          "t": "Ternary expression",
+          "card": "<p><b class='text-white'>What:</b> Python's conditional expression — <code class='mono'>a if condition else b</code> — picks one of two values inline, without a multi-line <code class='mono'>if/else</code>.</p><p><b class='text-white'>Why:</b> When you're assigning one of two values based on a condition, a full <code class='mono'>if/else</code> block is 4 lines of ceremony for what is really one decision — the ternary form keeps the assignment on one line.</p><p><b class='text-white'>How:</b> Read it right-to-left-ish: \"<code class='mono'>\\\"even\\\"</code> if <code class='mono'>n % 2 == 0</code>, otherwise <code class='mono'>\\\"odd\\\"</code>\".</p><div class='codeblock'>n = 4\nlabel = &quot;even&quot; if n % 2 == 0 else &quot;odd&quot;\nprint(label)  <span class='cm'># even</span></div>",
+          "mission": "Set <b class='text-white'>label</b> to <code class='mono'>\"even\"</code> when <code class='mono'>n</code> is even, else <code class='mono'>\"odd\"</code>.",
+          "ctx": "n = 4",
+          "ph": "label = \"even\" if ... else \"odd\"",
+          "sol": "label = \"even\" if n % 2 == 0 else \"odd\"",
+          "checks": [
+            {
+              "re": "if\\s+n\\s*%\\s*2",
+              "msg": "Condition: if n % 2 == 0."
+            },
+            {
+              "re": "else",
+              "msg": "Provide the else branch."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "n = 4",
+              "read": "label",
+              "expected": "even"
+            },
+            {
+              "ctx": "n = 7",
+              "read": "label",
+              "expected": "odd"
+            },
+            {
+              "ctx": "n = 0",
+              "read": "label",
+              "expected": "even"
+            }
+          ]
+        },
+        {
+          "t": "Boolean logic",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>and</code> requires both sides to be true; <code class='mono'>or</code> requires at least one. They combine bools the same way as everyday logic.</p><p><b class='text-white'>Why:</b> Access rules, feature gates and validation almost always combine more than one condition — \"adult AND a member\" is a single rule made of two checks.</p><p><b class='text-white'>How:</b> <code class='mono'>age &gt;= 18</code> evaluates to a bool, <code class='mono'>member</code> already is one, and <code class='mono'>and</code> combines them.</p><div class='codeblock'>age = 20\nmember = True\nallowed = age &gt;= 18 and member\nprint(allowed)  <span class='cm'># True</span></div>",
+          "mission": "Bool \"adult and member\" into <b class='text-white'>allowed</b>.",
+          "ctx": "age = 20\nmember = True",
+          "ph": "allowed = age >= 18 and member",
+          "sol": "allowed = age >= 18 and member",
+          "checks": [
+            {
+              "re": ">=\\s*18",
+              "msg": "age >= 18."
+            },
+            {
+              "re": "\\band\\b",
+              "msg": "Combine with and."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "age = 20\nmember = True",
+              "read": "allowed",
+              "expected": true
+            },
+            {
+              "ctx": "age = 15\nmember = True",
+              "read": "allowed",
+              "expected": false
+            },
+            {
+              "ctx": "age = 20\nmember = False",
+              "read": "allowed",
+              "expected": false
+            }
+          ]
+        },
+        {
+          "t": "Leap-year rule",
+          "card": "<p><b class='text-white'>What:</b> The Gregorian leap-year rule: divisible by 4, UNLESS divisible by 100, UNLESS ALSO divisible by 400. Here you encode that as a function that returns a bool.</p><p><b class='text-white'>Why:</b> It's the canonical example of a rule that looks like one condition but is actually three nested exceptions — a good forcing function for combining <code class='mono'>and</code>/<code class='mono'>or</code> correctly instead of getting a plausible-looking wrong answer (e.g. missing the 1900-is-NOT-a-leap-year case).</p><p><b class='text-white'>How:</b> <code class='mono'>y % 4 == 0</code> catches the common case; <code class='mono'>(y % 100 != 0 or y % 400 == 0)</code> excludes century years except the ones divisible by 400.</p><div class='codeblock'>def is_leap(y):\n    return y % 4 == 0 and (y % 100 != 0 or y % 400 == 0)\n\nprint(is_leap(2000))  <span class='cm'># True</span>\nprint(is_leap(1900))  <span class='cm'># False</span></div>",
+          "mission": "Write <b class='text-white'>is_leap(y)</b> returning the bool. One return line.",
+          "ph": "def is_leap(y):",
+          "sol": "def is_leap(y):\n    return y % 4 == 0 and (y % 100 != 0 or y % 400 == 0)",
+          "checks": [
+            {
+              "re": "def\\s+is_leap\\(\\s*y\\s*\\)",
+              "msg": "Define is_leap(y)."
+            },
+            {
+              "re": "%\\s*4\\s*==\\s*0",
+              "msg": "Divisible by 4."
+            },
+            {
+              "re": "%\\s*400\\s*==\\s*0",
+              "msg": "…or by 400 for centuries."
+            }
+          ],
+          "tests": [
+            {
+              "call": "is_leap(2024)",
+              "expected": true
+            },
+            {
+              "call": "is_leap(1900)",
+              "expected": false
+            },
+            {
+              "call": "is_leap(2000)",
+              "expected": true
+            },
+            {
+              "call": "is_leap(2023)",
+              "expected": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "control-flow",
+      "name": "Control Flow",
+      "questions": [
+        {
+          "t": "Branching grades",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>if / elif / else</code> runs the FIRST branch whose condition is true, then skips the rest — order matters.</p><p><b class='text-white'>Why:</b> Grading, tiered pricing, HTTP status handling — anywhere thresholds decide behavior, and the thresholds overlap conceptually (a 95 is also &gt;= 80), so ordering from most to least specific is what makes the logic correct.</p><p><b class='text-white'>How:</b> Check the highest bar first (<code class='mono'>&gt;= 90</code>). If it fails, <code class='mono'>elif</code> checks the next bar. <code class='mono'>else</code> is whatever's left.</p><div class='codeblock'>def grade(score):\n    if score &gt;= 90:\n        return &quot;A&quot;\n    elif score &gt;= 80:\n        return &quot;B&quot;\n    else:\n        return &quot;C&quot;\n\nprint(grade(95))  <span class='cm'># A</span></div>",
+          "mission": "Write <b class='text-white'>grade(score)</b>: \"A\" ≥90, \"B\" ≥80, else \"C\".",
+          "ph": "def grade(score):",
+          "sol": "def grade(score):\n    if score >= 90:\n        return \"A\"\n    elif score >= 80:\n        return \"B\"\n    else:\n        return \"C\"",
+          "checks": [
+            {
+              "re": "if\\s+score\\s*>=\\s*90",
+              "msg": "First: if score >= 90."
+            },
+            {
+              "re": "elif\\s+score\\s*>=\\s*80",
+              "msg": "Then: elif score >= 80."
+            },
+            {
+              "re": "else\\s*:",
+              "msg": "Fallback: else."
+            }
+          ],
+          "tests": [
+            {
+              "call": "grade(95)",
+              "expected": "A"
+            },
+            {
+              "call": "grade(83)",
+              "expected": "B"
+            },
+            {
+              "call": "grade(70)",
+              "expected": "C"
+            },
+            {
+              "call": "grade(90)",
+              "expected": "A"
+            }
+          ]
+        },
+        {
+          "t": "While accumulate",
+          "card": "<p><b class='text-white'>What:</b> A <code class='mono'>while</code> loop repeats its body as long as its condition stays true — you control both the exit condition and the step manually.</p><p><b class='text-white'>Why:</b> It's the general-purpose loop: use it when the number of iterations isn't known up front, or when the step logic is more than \"go from a to b\" (which is what <code class='mono'>for</code>/<code class='mono'>range</code> is for instead).</p><p><b class='text-white'>How:</b> Start <code class='mono'>total</code> and <code class='mono'>i</code> at their initial values, then on every pass add <code class='mono'>i</code> to <code class='mono'>total</code> and increment <code class='mono'>i</code> — stop once <code class='mono'>i</code> passes <code class='mono'>n</code>.</p><div class='codeblock'>n = 5\ntotal = 0\ni = 1\nwhile i &lt;= n:\n    total += i\n    i += 1\nprint(total)  <span class='cm'># 15</span></div>",
+          "mission": "Sum 1..n with a while loop into <b class='text-white'>total</b> (init total=0, i=1).",
+          "ctx": "n = 5",
+          "ph": "total = 0 / i = 1 / while ...",
+          "sol": "total = 0\ni = 1\nwhile i <= n:\n    total += i\n    i += 1",
+          "checks": [
+            {
+              "re": "while\\s+i\\s*<=\\s*n",
+              "msg": "Loop while i <= n."
+            },
+            {
+              "re": "total\\s*\\+=\\s*i",
+              "msg": "Accumulate total += i."
+            },
+            {
+              "re": "i\\s*\\+=\\s*1",
+              "msg": "Advance i += 1 (or you loop forever)."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "n = 5",
+              "read": "total",
+              "expected": 15
+            },
+            {
+              "ctx": "n = 1",
+              "read": "total",
+              "expected": 1
+            },
+            {
+              "ctx": "n = 10",
+              "read": "total",
+              "expected": 55
+            }
+          ]
+        },
+        {
+          "t": "Range sum",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>range(1, n + 1)</code> generates the integers 1..n; <code class='mono'>sum(...)</code> adds them all up. Same result as the while-loop version, one line.</p><p><b class='text-white'>Why:</b> Once a loop is just \"accumulate over a known range\", Python's built-ins (<code class='mono'>sum</code>, <code class='mono'>range</code>) do it faster and more clearly than a hand-rolled loop — knowing when to reach for a built-in instead of writing the loop yourself is a core skill.</p><p><b class='text-white'>How:</b> <code class='mono'>range(1, n + 1)</code> stops BEFORE its second argument, so <code class='mono'>+ 1</code> is what includes <code class='mono'>n</code> itself.</p><div class='codeblock'>n = 5\ntotal = sum(range(1, n + 1))\nprint(total)  <span class='cm'># 15</span></div>",
+          "mission": "Sum 1..n in one line into <b class='text-white'>total</b>.",
+          "ctx": "n = 5",
+          "ph": "total = sum(range(1, n + 1))",
+          "sol": "total = sum(range(1, n + 1))",
+          "checks": [
+            {
+              "re": "sum\\(",
+              "msg": "Collapse with sum()."
+            },
+            {
+              "re": "range\\(\\s*1\\s*,\\s*n\\s*\\+\\s*1",
+              "msg": "range(1, n + 1) for 1..n."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "n = 5",
+              "read": "total",
+              "expected": 15
+            },
+            {
+              "ctx": "n = 1",
+              "read": "total",
+              "expected": 1
+            },
+            {
+              "ctx": "n = 10",
+              "read": "total",
+              "expected": 55
+            }
+          ]
+        },
+        {
+          "t": "Count positives",
+          "card": "<p><b class='text-white'>What:</b> A <code class='mono'>for</code> loop over a list visits each element in order; an <code class='mono'>if</code> inside it filters which ones count.</p><p><b class='text-white'>Why:</b> \"Count how many satisfy X\" is one of the most common loop shapes there is — the same pattern (init a counter, loop, conditionally increment) reappears constantly, just with the condition swapped out.</p><p><b class='text-white'>How:</b> Start <code class='mono'>count</code> at 0. For each <code class='mono'>x</code> in <code class='mono'>nums</code>, if <code class='mono'>x &gt; 0</code>, add 1 to <code class='mono'>count</code>.</p><div class='codeblock'>nums = [3, -1, 4, -2]\ncount = 0\nfor x in nums:\n    if x &gt; 0:\n        count += 1\nprint(count)  <span class='cm'># 2</span></div>",
+          "mission": "Count positive numbers in <code class='mono'>nums</code> into <b class='text-white'>count</b> (loop).",
+          "ctx": "nums = [3, -1, 4, -2]",
+          "ph": "count = 0 / for x in nums: ...",
+          "sol": "count = 0\nfor x in nums:\n    if x > 0:\n        count += 1",
+          "checks": [
+            {
+              "re": "for\\s+x\\s+in\\s+nums",
+              "msg": "Loop over nums."
+            },
+            {
+              "re": "if\\s+x\\s*>\\s*0",
+              "msg": "Keep the positives."
+            },
+            {
+              "re": "count\\s*\\+=\\s*1",
+              "msg": "Increment count."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "nums = [3, -1, 4, -2]",
+              "read": "count",
+              "expected": 2
+            },
+            {
+              "ctx": "nums = [-1, -2, -3]",
+              "read": "count",
+              "expected": 0
+            },
+            {
+              "ctx": "nums = [1, 2, 3]",
+              "read": "count",
+              "expected": 3
+            }
+          ]
+        },
+        {
+          "t": "Index with enumerate",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>enumerate(list)</code> yields <code class='mono'>(index, value)</code> pairs — it pairs each item with its position without you tracking a counter by hand.</p><p><b class='text-white'>Why:</b> Manually maintaining an index (<code class='mono'>i = 0</code>, then <code class='mono'>i += 1</code> at the end of the loop body) is a classic off-by-one source — <code class='mono'>enumerate</code> removes the whole failure mode.</p><p><b class='text-white'>How:</b> <code class='mono'>list(enumerate(nums))</code> turns the lazy enumerate object into a concrete list of tuples you can inspect.</p><div class='codeblock'>nums = [3, -1, 4]\npairs = list(enumerate(nums))\nprint(pairs)  <span class='cm'># [(0, 3), (1, -1), (2, 4)]</span></div>",
+          "mission": "Pair each num with its index into <b class='text-white'>pairs</b>.",
+          "ctx": "nums = [3, -1, 4]",
+          "ph": "pairs = list(enumerate(...))",
+          "sol": "pairs = list(enumerate(nums))",
+          "checks": [
+            {
+              "re": "enumerate\\(\\s*nums",
+              "msg": "Wrap nums in enumerate()."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "nums = [3, -1, 4]",
+              "read": "pairs",
+              "expected": [
+                [
+                  0,
+                  3
+                ],
+                [
+                  1,
+                  -1
+                ],
+                [
+                  2,
+                  4
+                ]
+              ]
+            },
+            {
+              "ctx": "nums = [9]",
+              "read": "pairs",
+              "expected": [
+                [
+                  0,
+                  9
+                ]
+              ]
+            },
+            {
+              "ctx": "nums = [1, 1, 1]",
+              "read": "pairs",
+              "expected": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  1,
+                  1
+                ],
+                [
+                  2,
+                  1
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "t": "Zip two lists",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>zip(a, b)</code> pairs up elements from two sequences position-by-position — first with first, second with second.</p><p><b class='text-white'>Why:</b> Whenever two parallel lists represent the same underlying rows (names and scores, keys and values, x's and y's for a plot) zip is how you walk them together instead of indexing both by hand.</p><p><b class='text-white'>How:</b> <code class='mono'>list(zip(a, b))</code> stops at the shorter of the two inputs, producing one tuple per position.</p><div class='codeblock'>a = [1, 2]\nb = [&quot;x&quot;, &quot;y&quot;]\npairs = list(zip(a, b))\nprint(pairs)  <span class='cm'># [(1, &#x27;x&#x27;), (2, &#x27;y&#x27;)]</span></div>",
+          "mission": "Pair <code class='mono'>a</code> with <code class='mono'>b</code> into <b class='text-white'>pairs</b>.",
+          "ctx": "a = [1, 2]\nb = [\"x\", \"y\"]",
+          "ph": "pairs = list(zip(...))",
+          "sol": "pairs = list(zip(a, b))",
+          "checks": [
+            {
+              "re": "zip\\(\\s*a\\s*,\\s*b",
+              "msg": "zip(a, b)."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "a = [1, 2]\nb = [\"x\", \"y\"]",
+              "read": "pairs",
+              "expected": [
+                [
+                  1,
+                  "x"
+                ],
+                [
+                  2,
+                  "y"
+                ]
+              ]
+            },
+            {
+              "ctx": "a = [5]\nb = [\"z\"]",
+              "read": "pairs",
+              "expected": [
+                [
+                  5,
+                  "z"
+                ]
+              ]
+            },
+            {
+              "ctx": "a = [1, 2, 3]\nb = [\"a\", \"b\"]",
+              "read": "pairs",
+              "expected": [
+                [
+                  1,
+                  "a"
+                ],
+                [
+                  2,
+                  "b"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "t": "Break on first hit",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>break</code> exits a loop immediately — execution jumps straight past it, skipping any remaining iterations.</p><p><b class='text-white'>Why:</b> Searching for \"the first thing that matches\" shouldn't keep scanning after it's found — on a large list that's wasted work, and semantically the loop's job is already done.</p><p><b class='text-white'>How:</b> Initialize <code class='mono'>found</code> to <code class='mono'>None</code>. Loop through <code class='mono'>nums</code>; the moment one is even, store it in <code class='mono'>found</code> and <code class='mono'>break</code>.</p><div class='codeblock'>nums = [1, 3, 4, 7]\nfound = None\nfor x in nums:\n    if x % 2 == 0:\n        found = x\n        break\nprint(found)  <span class='cm'># 4</span></div>",
+          "mission": "Find the first even in <code class='mono'>nums</code> into <b class='text-white'>found</b> (init None, break).",
+          "ctx": "nums = [1, 3, 4, 7]",
+          "ph": "found = None / for x in nums: ...",
+          "sol": "found = None\nfor x in nums:\n    if x % 2 == 0:\n        found = x\n        break",
+          "checks": [
+            {
+              "re": "if\\s+x\\s*%\\s*2\\s*==\\s*0",
+              "msg": "Test for even."
+            },
+            {
+              "re": "found\\s*=\\s*x",
+              "msg": "Capture the value."
+            },
+            {
+              "re": "break",
+              "msg": "Stop with break."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "nums = [1, 3, 4, 7]",
+              "read": "found",
+              "expected": 4
+            },
+            {
+              "ctx": "nums = [1, 3, 5]",
+              "read": "found",
+              "expected": null
+            },
+            {
+              "ctx": "nums = [2, 4, 6]",
+              "read": "found",
+              "expected": 2
+            }
+          ]
+        },
+        {
+          "t": "Skip with continue",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>continue</code> skips the rest of the current iteration's body and moves straight to the next one — it doesn't exit the loop like <code class='mono'>break</code>.</p><p><b class='text-white'>Why:</b> It reads better than wrapping the whole loop body in an <code class='mono'>if</code> — \"skip this one and move on\" is a guard clause, and guard clauses keep loop bodies flat instead of nested.</p><p><b class='text-white'>How:</b> For each <code class='mono'>x</code>, if it's odd, <code class='mono'>continue</code> (skip straight to the next <code class='mono'>x</code>). Only even values reach the <code class='mono'>total += x</code> line.</p><div class='codeblock'>nums = [1, 2, 3, 4]\ntotal = 0\nfor x in nums:\n    if x % 2 != 0:\n        continue\n    total += x\nprint(total)  <span class='cm'># 6</span></div>",
+          "mission": "Sum only the evens of <code class='mono'>nums</code> into <b class='text-white'>total</b>, skipping odds with continue.",
+          "ctx": "nums = [1, 2, 3, 4]",
+          "ph": "total = 0 / for x in nums: ...",
+          "sol": "total = 0\nfor x in nums:\n    if x % 2 != 0:\n        continue\n    total += x",
+          "checks": [
+            {
+              "re": "%\\s*2\\s*!=\\s*0",
+              "msg": "Detect odd numbers."
+            },
+            {
+              "re": "continue",
+              "msg": "Skip them with continue."
+            },
+            {
+              "re": "total\\s*\\+=\\s*x",
+              "msg": "Add the rest."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "nums = [1, 2, 3, 4]",
+              "read": "total",
+              "expected": 6
+            },
+            {
+              "ctx": "nums = [1, 3, 5]",
+              "read": "total",
+              "expected": 0
+            },
+            {
+              "ctx": "nums = [2, 4, 6]",
+              "read": "total",
+              "expected": 12
+            }
+          ]
+        },
+        {
+          "t": "List comprehension",
+          "card": "<p><b class='text-white'>What:</b> A list comprehension — <code class='mono'>[expr for item in iterable]</code> — builds a new list from an existing one in a single expression.</p><p><b class='text-white'>Why:</b> It replaces the extremely common 3-line pattern (make an empty list, loop, append) with one line that's just as readable once it's familiar — it's the idiomatic Python way to transform a sequence.</p><p><b class='text-white'>How:</b> <code class='mono'>x * x for x in range(5)</code> reads as \"the square of x, for every x in 0..4\".</p><div class='codeblock'>squares = [x * x for x in range(5)]\nprint(squares)  <span class='cm'># [0, 1, 4, 9, 16]</span></div>",
+          "mission": "Squares of 0..4 into <b class='text-white'>squares</b>.",
+          "ph": "squares = [x * x for x in range(5)]",
+          "sol": "squares = [x * x for x in range(5)]",
+          "checks": [
+            {
+              "re": "for\\s+x\\s+in\\s+range\\(\\s*5",
+              "msg": "Iterate range(5)."
+            }
+          ],
+          "tests": [
+            {
+              "read": "squares",
+              "expected": [
+                0,
+                1,
+                4,
+                9,
+                16
+              ]
+            }
+          ]
+        },
+        {
+          "t": "Dict comprehension",
+          "card": "<p><b class='text-white'>What:</b> A dict comprehension — <code class='mono'>{key_expr: value_expr for item in iterable}</code> — builds a dict in one expression, the same idea as a list comprehension but producing key/value pairs.</p><p><b class='text-white'>Why:</b> Any time you're mapping each item in a collection to a derived value and need to look it up later by the original item (word → its length, id → its record), a dict comprehension builds that lookup table directly.</p><p><b class='text-white'>How:</b> <code class='mono'>w: len(w) for w in words</code> reads as \"for every word w, map w to its length\".</p><div class='codeblock'>words = [&quot;hi&quot;, &quot;abc&quot;]\nlengths = {w: len(w) for w in words}\nprint(lengths)  <span class='cm'># {&#x27;hi&#x27;: 2, &#x27;abc&#x27;: 3}</span></div>",
+          "mission": "Map each word to its length into <b class='text-white'>lengths</b>.",
+          "ctx": "words = [\"hi\", \"abc\"]",
+          "ph": "lengths = {w: len(w) for w in words}",
+          "sol": "lengths = {w: len(w) for w in words}",
+          "checks": [
+            {
+              "re": "\\{\\s*w\\s*:\\s*len\\(\\s*w\\s*\\)",
+              "msg": "Build {w: len(w) ...}."
+            },
+            {
+              "re": "for\\s+w\\s+in\\s+words",
+              "msg": "Iterate words."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "words = [\"hi\", \"abc\"]",
+              "read": "lengths",
+              "expected": {
+                "hi": 2,
+                "abc": 3
+              }
+            },
+            {
+              "ctx": "words = [\"a\", \"bb\", \"ccc\"]",
+              "read": "lengths",
+              "expected": {
+                "a": 1,
+                "bb": 2,
+                "ccc": 3
+              }
+            },
+            {
+              "ctx": "words = [\"x\"]",
+              "read": "lengths",
+              "expected": {
+                "x": 1
+              }
+            }
+          ]
+        },
+        {
+          "t": "while loop until zero",
+          "card": "<p><b class='text-white'>What:</b> The same <code class='mono'>while</code> pattern as before, applied to counting down instead of up — the loop runs until the condition (<code class='mono'>fuel &gt; 0</code>) goes false.</p><p><b class='text-white'>Why:</b> Countdown-to-zero is the shape behind timers, retry budgets and resource draining — get the exit condition or the step direction wrong and you get an infinite loop instead of a bug that just gives a wrong number.</p><p><b class='text-white'>How:</b> Loop while <code class='mono'>fuel &gt; 0</code>, decrementing by 1 each pass, until it reaches exactly 0.</p><div class='codeblock'>fuel = 5\nwhile fuel &gt; 0:\n    fuel -= 1\nprint(fuel)  <span class='cm'># 0</span></div>",
+          "mission": "Decrement <code class='mono'>fuel</code> to 0 using <code class='mono'>while</code>. Body: <code class='mono'>fuel -= 1</code>.",
+          "ctx": "fuel = 5",
+          "ph": "while ...:\n    fuel -= 1",
+          "sol": "while fuel > 0:\n    fuel -= 1",
+          "checks": [
+            {
+              "re": "while\\s+fuel",
+              "msg": "Use while fuel > 0:."
+            },
+            {
+              "re": "fuel\\s*-=\\s*1",
+              "msg": "Body must decrement fuel."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "fuel = 5",
+              "read": "fuel",
+              "expected": 0
+            },
+            {
+              "ctx": "fuel = 1",
+              "read": "fuel",
+              "expected": 0
+            },
+            {
+              "ctx": "fuel = 10",
+              "read": "fuel",
+              "expected": 0
+            }
+          ]
+        },
+        {
+          "t": "break on match",
+          "card": "<p><b class='text-white'>What:</b> Combining <code class='mono'>if</code> and <code class='mono'>break</code>: scan a list, and the moment a specific value is seen, stop looping.</p><p><b class='text-white'>Why:</b> This is <code class='mono'>break</code> in its rawest form — no accumulator, just \"stop as soon as you see it\" — the building block behind search loops before you learn library functions like <code class='mono'>in</code> or <code class='mono'>.index()</code> that do the same thing internally.</p><p><b class='text-white'>How:</b> Loop through <code class='mono'>nums</code>; when <code class='mono'>x == 7</code>, <code class='mono'>break</code> immediately — the loop variable <code class='mono'>x</code> is left holding the matched value.</p><div class='codeblock'>nums = [1, 3, 7, 9]\nfor x in nums:\n    if x == 7:\n        break\nprint(x)  <span class='cm'># 7 (loop stopped here, never reached 9)</span></div>",
+          "mission": "Find the first <code class='mono'>x</code> in <code class='mono'>nums</code> equal to 7 and <code class='mono'>break</code>.",
+          "ctx": "nums = [1, 3, 7, 9]",
+          "ph": "for x in nums:\n    if x == 7:\n        ...",
+          "sol": "for x in nums:\n    if x == 7:\n        break",
+          "checks": [
+            {
+              "re": "\\bbreak\\b",
+              "msg": "break out of the loop."
+            },
+            {
+              "re": "if\\s+x\\s*==\\s*7",
+              "msg": "Compare x to 7."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "nums = [1, 3, 7, 9]",
+              "read": "x",
+              "expected": 7
+            },
+            {
+              "ctx": "nums = [7, 1, 2]",
+              "read": "x",
+              "expected": 7
+            },
+            {
+              "ctx": "nums = [5, 6, 7, 8, 2]",
+              "read": "x",
+              "expected": 7
+            }
+          ]
+        },
+        {
+          "t": "continue skips evens",
+          "card": "<p><b class='text-white'>What:</b> Another <code class='mono'>continue</code> drill, this time printing instead of accumulating — the skip happens before the <code class='mono'>print</code> line, so evens never reach it.</p><p><b class='text-white'>Why:</b> Filtering what gets printed/logged/sent is a direct real-world use of continue — e.g. skipping already-processed records in a batch job.</p><p><b class='text-white'>How:</b> For each <code class='mono'>x</code>, if it's even, <code class='mono'>continue</code> (skip the print). Odd values fall through to <code class='mono'>print(x)</code>.</p><div class='codeblock'>nums = [1, 2, 3, 4]\nfor x in nums:\n    if x % 2 == 0:\n        continue\n    print(x)\n<span class='cm'># 1</span>\n<span class='cm'># 3</span></div>",
+          "mission": "Skip even <code class='mono'>x</code>, print odd ones.",
+          "ctx": "nums = [1, 2, 3, 4]",
+          "ph": "for x in nums:\n    if x % 2 == 0:\n        ...\n    print(x)",
+          "sol": "for x in nums:\n    if x % 2 == 0:\n        continue\n    print(x)",
+          "checks": [
+            {
+              "re": "\\bcontinue\\b",
+              "msg": "Use continue to skip."
+            },
+            {
+              "re": "x\\s*%\\s*2",
+              "msg": "Test x % 2."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "nums = [1, 2, 3, 4]",
+              "stdout": "1\n3"
+            },
+            {
+              "ctx": "nums = [2, 4, 6]",
+              "stdout": ""
+            },
+            {
+              "ctx": "nums = [5, 7, 9, 10]",
+              "stdout": "5\n7\n9"
+            }
+          ]
+        },
+        {
+          "t": "enumerate index+value",
+          "card": "<p><b class='text-white'>What:</b> Unpacking <code class='mono'>enumerate</code> directly in the <code class='mono'>for</code> header — <code class='mono'>for i, n in enumerate(names)</code> — gives you both the index and the value as separate loop variables, no <code class='mono'>list()</code> or manual indexing needed.</p><p><b class='text-white'>Why:</b> This is the form you'll actually type in real code far more often than <code class='mono'>list(enumerate(...))</code> — printing/logging with a position label is a constant need (numbered output, progress lines, ranked results).</p><p><b class='text-white'>How:</b> Each iteration unpacks the <code class='mono'>(index, value)</code> tuple straight into <code class='mono'>i</code> and <code class='mono'>n</code>.</p><div class='codeblock'>names = [&#x27;ada&#x27;, &#x27;linus&#x27;]\nfor i, n in enumerate(names):\n    print(f&#x27;{i}:{n}&#x27;)\n<span class='cm'># 0:ada</span>\n<span class='cm'># 1:linus</span></div>",
+          "mission": "Loop indices+values of <code class='mono'>names</code>, print <code class='mono'>f'{i}:{n}'</code>.",
+          "ctx": "names = ['ada', 'linus']",
+          "ph": "for i, n in enumerate(names):\n    print(f'{i}:{n}')",
+          "sol": "for i, n in enumerate(names):\n    print(f'{i}:{n}')",
+          "checks": [
+            {
+              "re": "enumerate\\(",
+              "msg": "Call enumerate(names)."
+            },
+            {
+              "re": "i\\s*,\\s*n",
+              "msg": "Unpack (i, n)."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "names = ['ada', 'linus']",
+              "stdout": "0:ada\n1:linus"
+            },
+            {
+              "ctx": "names = ['x']",
+              "stdout": "0:x"
+            },
+            {
+              "ctx": "names = ['a', 'b', 'c']",
+              "stdout": "0:a\n1:b\n2:c"
+            }
+          ]
+        },
+        {
+          "t": "zip parallel lists",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>dict(zip(keys, vals))</code> builds a dict in one line by pairing two parallel lists and feeding the pairs straight to <code class='mono'>dict()</code>.</p><p><b class='text-white'>Why:</b> It's the standard idiom for turning \"two columns\" data (headers + a row, keys + values from two separate API fields) into a lookup structure, without a manual loop.</p><p><b class='text-white'>How:</b> <code class='mono'>zip(keys, vals)</code> produces <code class='mono'>(key, value)</code> tuples; <code class='mono'>dict()</code> consumes exactly that shape to build the mapping.</p><div class='codeblock'>keys = [&#x27;a&#x27;, &#x27;b&#x27;]\nvals = [1, 2]\nd = dict(zip(keys, vals))\nprint(d)  <span class='cm'># {&#x27;a&#x27;: 1, &#x27;b&#x27;: 2}</span></div>",
+          "mission": "Pair <code class='mono'>keys</code>+<code class='mono'>vals</code> into <b class='text-white'>d</b> via <code class='mono'>dict(...)</code>.",
+          "ctx": "keys = ['a', 'b']\nvals = [1, 2]",
+          "ph": "d = dict(zip(keys, vals))",
+          "sol": "d = dict(zip(keys, vals))",
+          "checks": [
+            {
+              "re": "zip\\(",
+              "msg": "Use zip."
+            },
+            {
+              "re": "dict\\(",
+              "msg": "Wrap zip in dict()."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "keys = ['a', 'b']\nvals = [1, 2]",
+              "read": "d",
+              "expected": {
+                "a": 1,
+                "b": 2
+              }
+            },
+            {
+              "ctx": "keys = ['x']\nvals = [9]",
+              "read": "d",
+              "expected": {
+                "x": 9
+              }
+            },
+            {
+              "ctx": "keys = ['p', 'q', 'r']\nvals = [1, 2, 3]",
+              "read": "d",
+              "expected": {
+                "p": 1,
+                "q": 2,
+                "r": 3
+              }
+            }
+          ]
+        },
+        {
+          "t": "sorted with key",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>sorted(list, key=fn)</code> sorts by whatever <code class='mono'>fn</code> returns for each element, instead of the elements themselves — <code class='mono'>key=len</code> sorts strings by their length.</p><p><b class='text-white'>Why:</b> Sorting by a derived property (length, a dict field, negative value for descending) is the norm, not the exception — <code class='mono'>key</code> is what makes <code class='mono'>sorted</code> flexible enough for that without writing a custom comparator.</p><p><b class='text-white'>How:</b> <code class='mono'>sorted</code> calls <code class='mono'>len(word)</code> for each word to get its sort key, then orders the original words by those keys — ties keep their original relative order (a stable sort).</p><div class='codeblock'>words = [&#x27;nova&#x27;, &#x27;ada&#x27;, &#x27;hi&#x27;]\nbylen = sorted(words, key=len)\nprint(bylen)  <span class='cm'># [&#x27;hi&#x27;, &#x27;ada&#x27;, &#x27;nova&#x27;]</span></div>",
+          "mission": "Sort <code class='mono'>words</code> by length into <b class='text-white'>bylen</b>.",
+          "ctx": "words = ['nova', 'ada', 'hi']",
+          "ph": "bylen = sorted(words, key=len)",
+          "sol": "bylen = sorted(words, key=len)",
+          "checks": [
+            {
+              "re": "sorted\\(",
+              "msg": "Call sorted()."
+            },
+            {
+              "re": "key\\s*=\\s*len",
+              "msg": "Pass key=len."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "words = ['nova', 'ada', 'hi']",
+              "read": "bylen",
+              "expected": [
+                "hi",
+                "ada",
+                "nova"
+              ]
+            },
+            {
+              "ctx": "words = ['a', 'bb', 'ccc']",
+              "read": "bylen",
+              "expected": [
+                "a",
+                "bb",
+                "ccc"
+              ]
+            },
+            {
+              "ctx": "words = ['same', 'size']",
+              "read": "bylen",
+              "expected": [
+                "same",
+                "size"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "collections",
+      "name": "Collections",
+      "questions": [
+        {
+          "t": "Build with append",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>list.append(x)</code> grows a list in place by adding <code class='mono'>x</code> to the end — the classic \"build a result list inside a loop\" pattern.</p><p><b class='text-white'>Why:</b> Before comprehensions feel natural, this 3-step shape (empty list → loop → append) is how you build up any result incrementally, and it's still the right tool once the loop body has more than one line.</p><p><b class='text-white'>How:</b> Start with <code class='mono'>out = []</code>. Each pass through <code class='mono'>range(5)</code>, compute <code class='mono'>x * x</code> and append it.</p><div class='codeblock'>out = []\nfor x in range(5):\n    out.append(x * x)\nprint(out)  <span class='cm'># [0, 1, 4, 9, 16]</span></div>",
+          "mission": "Build squares 0..4 by appending in a loop into <b class='text-white'>out</b>.",
+          "ph": "out = [] / for x in range(5): out.append(...)",
+          "sol": "out = []\nfor x in range(5):\n    out.append(x * x)",
+          "checks": [
+            {
+              "re": "out\\s*=\\s*\\[\\s*\\]",
+              "msg": "Start with an empty list."
+            },
+            {
+              "re": "\\.append\\(",
+              "msg": "Grow it with .append()."
+            }
+          ],
+          "tests": [
+            {
+              "read": "out",
+              "expected": [
+                0,
+                1,
+                4,
+                9,
+                16
+              ]
+            }
+          ]
+        },
+        {
+          "t": "Reverse a list",
+          "card": "<p><b class='text-white'>What:</b> Slicing with a step of <code class='mono'>-1</code> (<code class='mono'>list[::-1]</code>) walks the list backwards, producing a reversed copy.</p><p><b class='text-white'>Why:</b> It's the fastest way to reverse a sequence, and the same <code class='mono'>[::-1]</code> trick works identically on strings and tuples — one pattern, three types.</p><p><b class='text-white'>How:</b> <code class='mono'>[::-1]</code> means \"every element, step -1\" — start at the end, walk to the beginning.</p><div class='codeblock'>items = [1, 2, 3]\nrev = items[::-1]\nprint(rev)  <span class='cm'># [3, 2, 1]</span></div>",
+          "mission": "Reverse <code class='mono'>items</code> into <b class='text-white'>rev</b>.",
+          "ctx": "items = [1, 2, 3]",
+          "ph": "rev = items[::-1]",
+          "sol": "rev = items[::-1]",
+          "checks": [
+            {
+              "re": "\\[\\s*::\\s*-\\s*1\\s*\\]",
+              "msg": "Use the [::-1] slice."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "items = [1, 2, 3]",
+              "read": "rev",
+              "expected": [
+                3,
+                2,
+                1
+              ]
+            },
+            {
+              "ctx": "items = ['a', 'b']",
+              "read": "rev",
+              "expected": [
+                "b",
+                "a"
+              ]
+            },
+            {
+              "ctx": "items = [5]",
+              "read": "rev",
+              "expected": [
+                5
+              ]
+            }
+          ]
+        },
+        {
+          "t": "Sort by a key",
+          "card": "<p><b class='text-white'>What:</b> Same <code class='mono'>key=</code> idea as before, this time on a fresh example to lock it in: sort a list of words by their length rather than alphabetically.</p><p><b class='text-white'>Why:</b> Sorting by a derived value instead of the raw value is a pattern you'll reuse constantly (sort users by signup date, products by price) — it's worth seeing it a second time with different data.</p><p><b class='text-white'>How:</b> <code class='mono'>sorted(words, key=len)</code> orders <code class='mono'>words</code> by the result of calling <code class='mono'>len()</code> on each one.</p><div class='codeblock'>words = [&#x27;ccc&#x27;, &#x27;a&#x27;, &#x27;bb&#x27;]\nordered = sorted(words, key=len)\nprint(ordered)  <span class='cm'># [&#x27;a&#x27;, &#x27;bb&#x27;, &#x27;ccc&#x27;]</span></div>",
+          "mission": "Sort <code class='mono'>words</code> by length into <b class='text-white'>ordered</b>.",
+          "ctx": "words = [\"ccc\", \"a\", \"bb\"]",
+          "ph": "ordered = sorted(words, key=len)",
+          "sol": "ordered = sorted(words, key=len)",
+          "checks": [
+            {
+              "re": "sorted\\(",
+              "msg": "Use sorted()."
+            },
+            {
+              "re": "key\\s*=\\s*len",
+              "msg": "Order by length: key=len."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "words = ['ccc', 'a', 'bb']",
+              "read": "ordered",
+              "expected": [
+                "a",
+                "bb",
+                "ccc"
+              ]
+            },
+            {
+              "ctx": "words = ['xx', 'y', 'zzz']",
+              "read": "ordered",
+              "expected": [
+                "y",
+                "xx",
+                "zzz"
+              ]
+            },
+            {
+              "ctx": "words = ['same', 'word']",
+              "read": "ordered",
+              "expected": [
+                "same",
+                "word"
+              ]
+            }
+          ]
+        },
+        {
+          "t": "Dict with fallback",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>dict.get(key, default)</code> looks up <code class='mono'>key</code> and returns <code class='mono'>default</code> instead of raising <code class='mono'>KeyError</code> when it's missing.</p><p><b class='text-white'>Why:</b> Config objects, JSON payloads and optional fields are never guaranteed to have every key — <code class='mono'>.get()</code> with a default is the standard way to read \"this or a sensible fallback\" in one line, instead of a try/except.</p><p><b class='text-white'>How:</b> <code class='mono'>cfg.get(\"color\", \"blue\")</code> returns <code class='mono'>cfg[\"color\"]</code> if present, otherwise <code class='mono'>\"blue\"</code>.</p><div class='codeblock'>cfg = {}\ncolor = cfg.get(&quot;color&quot;, &quot;blue&quot;)\nprint(color)  <span class='cm'># blue</span></div>",
+          "mission": "Read <code class='mono'>\"color\"</code> from <code class='mono'>cfg</code>, default <code class='mono'>\"blue\"</code>, into <b class='text-white'>color</b>.",
+          "ctx": "cfg = {}",
+          "ph": "color = cfg.get(...)",
+          "sol": "color = cfg.get(\"color\", \"blue\")",
+          "checks": [
+            {
+              "re": "\\.get\\(",
+              "msg": "Use cfg.get(key, default)."
+            },
+            {
+              "re": "blue",
+              "msg": "Default to \"blue\"."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "cfg = {}",
+              "read": "color",
+              "expected": "blue"
+            },
+            {
+              "ctx": "cfg = {\"color\": \"red\"}",
+              "read": "color",
+              "expected": "red"
+            },
+            {
+              "ctx": "cfg = {\"size\": \"L\"}",
+              "read": "color",
+              "expected": "blue"
+            }
+          ]
+        },
+        {
+          "t": "Sum dict values",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>dict.items()</code> yields <code class='mono'>(key, value)</code> pairs so you can loop over both at once.</p><p><b class='text-white'>Why:</b> Aggregating a dict's values (totals, counts, averages) is one of the most common dict operations — <code class='mono'>.items()</code> is how you get at both halves without a separate <code class='mono'>.keys()</code>/lookup dance.</p><p><b class='text-white'>How:</b> For each <code class='mono'>k, v</code> pair, add <code class='mono'>v</code> to the running <code class='mono'>total</code> — the keys aren't needed here, just the values.</p><div class='codeblock'>scores = {&quot;a&quot;: 3, &quot;b&quot;: 5}\ntotal = 0\nfor k, v in scores.items():\n    total += v\nprint(total)  <span class='cm'># 8</span></div>",
+          "mission": "Sum all values in <code class='mono'>scores</code> into <b class='text-white'>total</b> (loop).",
+          "ctx": "scores = {\"a\": 3, \"b\": 5}",
+          "ph": "total = 0 / for k, v in scores.items(): ...",
+          "sol": "total = 0\nfor k, v in scores.items():\n    total += v",
+          "checks": [
+            {
+              "re": "\\.items\\(",
+              "msg": "Iterate scores.items()."
+            },
+            {
+              "re": "for\\s+k\\s*,\\s*v",
+              "msg": "Unpack k, v."
+            },
+            {
+              "re": "total\\s*\\+=\\s*v",
+              "msg": "Add each value."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "scores = {\"a\": 3, \"b\": 5}",
+              "read": "total",
+              "expected": 8
+            },
+            {
+              "ctx": "scores = {\"x\": 10}",
+              "read": "total",
+              "expected": 10
+            },
+            {
+              "ctx": "scores = {}",
+              "read": "total",
+              "expected": 0
+            }
+          ]
+        },
+        {
+          "t": "Set intersection",
+          "card": "<p><b class='text-white'>What:</b> A <code class='mono'>set</code> holds unique, unordered values. <code class='mono'>&amp;</code> between two sets returns their intersection — elements present in both.</p><p><b class='text-white'>Why:</b> Sets are the right tool the moment order and duplicates stop mattering and the question becomes \"which elements do these two collections share\" — computing that with lists directly means nested loops; sets do it natively.</p><p><b class='text-white'>How:</b> <code class='mono'>set(a) &amp; set(b)</code> converts both lists to sets first, then <code class='mono'>&amp;</code> keeps only the shared elements.</p><div class='codeblock'>a = [1, 2, 3]\nb = [2, 3, 4]\nboth = set(a) &amp; set(b)\nprint(both)  <span class='cm'># {2, 3}</span></div>",
+          "mission": "Elements in both <code class='mono'>a</code> and <code class='mono'>b</code> into <b class='text-white'>both</b>.",
+          "ctx": "a = [1, 2, 3]\nb = [2, 3, 4]",
+          "ph": "both = set(a) & set(b)",
+          "sol": "both = set(a) & set(b)",
+          "checks": [
+            {
+              "re": "set\\(\\s*a",
+              "msg": "Convert to sets."
+            },
+            {
+              "re": "&",
+              "msg": "Intersect with &."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "a = [1, 2, 3]\nb = [2, 3, 4]",
+              "read": "sorted(both)",
+              "expected": [
+                2,
+                3
+              ]
+            },
+            {
+              "ctx": "a = [5]\nb = [5, 6]",
+              "read": "sorted(both)",
+              "expected": [
+                5
+              ]
+            },
+            {
+              "ctx": "a = [1, 2]\nb = [3, 4]",
+              "read": "sorted(both)",
+              "expected": []
+            }
+          ]
+        },
+        {
+          "t": "Swap two variables",
+          "card": "<p><b class='text-white'>What:</b> Python can swap two variables in a single line with tuple assignment: <code class='mono'>a, b = b, a</code>. The right side builds a tuple <code class='mono'>(b, a)</code> before anything is reassigned, so no temporary variable is needed.</p><p><b class='text-white'>Why:</b> In most languages a swap needs a third temp variable — Python's tuple unpacking makes the classic 3-line swap unnecessary, and the same unpacking mechanism is what powers multiple return values from functions.</p><p><b class='text-white'>How:</b> The whole right-hand side is evaluated first (as a tuple), then unpacked into <code class='mono'>a</code> and <code class='mono'>b</code> — so both swap simultaneously, not one at a time.</p><div class='codeblock'>a = 1\nb = 2\na, b = b, a\nprint(a, b)  <span class='cm'># 2 1</span></div>",
+          "mission": "Swap <code class='mono'>a</code> and <code class='mono'>b</code> in one line.",
+          "ctx": "a = 1\nb = 2",
+          "ph": "a, b = b, a",
+          "sol": "a, b = b, a",
+          "checks": [
+            {
+              "re": "a\\s*,\\s*b\\s*=\\s*b\\s*,\\s*a",
+              "msg": "Write a, b = b, a."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "a = 1\nb = 2",
+              "read": "(a, b)",
+              "expected": [
+                2,
+                1
+              ]
+            },
+            {
+              "ctx": "a = 5\nb = 9",
+              "read": "(a, b)",
+              "expected": [
+                9,
+                5
+              ]
+            },
+            {
+              "ctx": "a = -1\nb = 0",
+              "read": "(a, b)",
+              "expected": [
+                0,
+                -1
+              ]
+            }
+          ]
+        },
+        {
+          "t": "Nested indexing",
+          "card": "<p><b class='text-white'>What:</b> A list of lists (a \"grid\") is indexed twice: <code class='mono'>grid[row][col]</code> — first pick the row, then pick the column within it.</p><p><b class='text-white'>Why:</b> Anything two-dimensional (a game board, a small matrix, pixel rows) is naturally represented as nested lists before you reach for a real array library — nested indexing is how you read a specific cell.</p><p><b class='text-white'>How:</b> <code class='mono'>grid[1]</code> gets the second row (<code class='mono'>[3, 4]</code>); <code class='mono'>[1]</code> again gets the second element of THAT row.</p><div class='codeblock'>grid = [[1, 2], [3, 4]]\nv = grid[1][1]\nprint(v)  <span class='cm'># 4</span></div>",
+          "mission": "Grab the bottom-right of <code class='mono'>grid</code> into <b class='text-white'>v</b>.",
+          "ctx": "grid = [[1, 2], [3, 4]]",
+          "ph": "v = grid[1][1]",
+          "sol": "v = grid[1][1]",
+          "checks": [
+            {
+              "re": "grid\\[\\s*1\\s*\\]\\[\\s*1\\s*\\]",
+              "msg": "Index row 1 then col 1."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "grid = [[1, 2], [3, 4]]",
+              "read": "v",
+              "expected": 4
+            },
+            {
+              "ctx": "grid = [[9, 8], [7, 6]]",
+              "read": "v",
+              "expected": 6
+            },
+            {
+              "ctx": "grid = [[0, 1], [2, 3]]",
+              "read": "v",
+              "expected": 3
+            }
+          ]
+        },
+        {
+          "t": "Filtered comprehension",
+          "card": "<p><b class='text-white'>What:</b> A comprehension can add a trailing <code class='mono'>if</code> to keep only elements that pass a test: <code class='mono'>[expr for item in iterable if condition]</code>.</p><p><b class='text-white'>Why:</b> Filtering-and-transforming in one pass is such a common combo that Python builds it into the comprehension syntax directly, rather than needing a separate <code class='mono'>filter()</code> call chained with <code class='mono'>map()</code>.</p><p><b class='text-white'>How:</b> <code class='mono'>for x in nums if x % 2 == 0</code> only lets even <code class='mono'>x</code> values through to be collected.</p><div class='codeblock'>nums = [1, 2, 3, 4]\nevens = [x for x in nums if x % 2 == 0]\nprint(evens)  <span class='cm'># [2, 4]</span></div>",
+          "mission": "Keep the evens of <code class='mono'>nums</code> into <b class='text-white'>evens</b>.",
+          "ctx": "nums = [1, 2, 3, 4]",
+          "ph": "evens = [x for x in nums if ...]",
+          "sol": "evens = [x for x in nums if x % 2 == 0]",
+          "checks": [
+            {
+              "re": "for\\s+x\\s+in\\s+nums",
+              "msg": "Iterate nums."
+            },
+            {
+              "re": "if\\s+x\\s*%\\s*2\\s*==\\s*0",
+              "msg": "Filter: if x % 2 == 0."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "nums = [1, 2, 3, 4]",
+              "read": "evens",
+              "expected": [
+                2,
+                4
+              ]
+            },
+            {
+              "ctx": "nums = [5, 7, 9]",
+              "read": "evens",
+              "expected": []
+            },
+            {
+              "ctx": "nums = [2, 4, 5, 6, 7]",
+              "read": "evens",
+              "expected": [
+                2,
+                4,
+                6
+              ]
+            }
+          ]
+        },
+        {
+          "t": "Word frequency",
+          "card": "<p><b class='text-white'>What:</b> Counting occurrences by building a dict as you loop — <code class='mono'>counts.get(w, 0) + 1</code> reads \"how many so far, defaulting to 0 if it's new\" and adds one.</p><p><b class='text-white'>Why:</b> This exact pattern (a running dict of counts) is the basis of frequency analysis, histograms and the first step of most text-processing pipelines, before you ever reach for <code class='mono'>collections.Counter</code>.</p><p><b class='text-white'>How:</b> For each word, look up its current count (0 if not seen), add 1, and store it back under the same key.</p><div class='codeblock'>words = [&quot;a&quot;, &quot;b&quot;, &quot;a&quot;]\ncounts = {}\nfor w in words:\n    counts[w] = counts.get(w, 0) + 1\nprint(counts)  <span class='cm'># {&#x27;a&#x27;: 2, &#x27;b&#x27;: 1}</span></div>",
+          "mission": "Count occurrences of each word in <code class='mono'>words</code> into <b class='text-white'>counts</b>.",
+          "ctx": "words = [\"a\", \"b\", \"a\"]",
+          "ph": "counts = {} / for w in words: ...",
+          "sol": "counts = {}\nfor w in words:\n    counts[w] = counts.get(w, 0) + 1",
+          "checks": [
+            {
+              "re": "counts\\s*=\\s*\\{\\s*\\}",
+              "msg": "Start with an empty dict."
+            },
+            {
+              "re": "counts\\.get\\(\\s*w\\s*,\\s*0\\s*\\)",
+              "msg": "Default missing keys to 0."
+            },
+            {
+              "re": "\\+\\s*1",
+              "msg": "Increment."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "words = [\"a\", \"b\", \"a\"]",
+              "read": "counts",
+              "expected": {
+                "a": 2,
+                "b": 1
+              }
+            },
+            {
+              "ctx": "words = [\"x\", \"x\", \"x\"]",
+              "read": "counts",
+              "expected": {
+                "x": 3
+              }
+            },
+            {
+              "ctx": "words = [\"p\", \"q\", \"r\", \"p\"]",
+              "read": "counts",
+              "expected": {
+                "p": 2,
+                "q": 1,
+                "r": 1
+              }
+            }
+          ]
+        },
+        {
+          "t": "None sentinel",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>None</code> is Python's explicit \"no value\" — a distinct object, not zero, not an empty string, not false.</p><p><b class='text-white'>Why:</b> Functions that might not have an answer (a search that found nothing, an optional field never set) return <code class='mono'>None</code> rather than a fake placeholder value — code that checks for it can tell \"absent\" apart from \"legitimately zero/empty\".</p><p><b class='text-white'>How:</b> Assign <code class='mono'>None</code> directly — no quotes, no parentheses, it's a keyword-like singleton.</p><div class='codeblock'>result = None\nprint(result)  <span class='cm'># None</span></div>",
+          "mission": "Assign <b class='text-white'>result</b> to <code class='mono'>None</code>.",
+          "ph": "result = ...",
+          "sol": "result = None",
+          "checks": [
+            {
+              "re": "=\\s*None\\b",
+              "msg": "Assign None."
+            }
+          ],
+          "tests": [
+            {
+              "read": "result",
+              "expected": null
+            }
+          ]
+        },
+        {
+          "t": "is vs ==",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>==</code> checks value equality; <code class='mono'>is</code> checks identity (same object). For <code class='mono'>None</code> specifically, <code class='mono'>is None</code> is the correct and idiomatic check.</p><p><b class='text-white'>Why:</b> Because <code class='mono'>None</code> is a true singleton (there's only ever one), <code class='mono'>is</code> is both faster and more correct than <code class='mono'>==</code> here — and it's a real style rule enforced by linters, not just a preference.</p><p><b class='text-white'>How:</b> <code class='mono'>x is None</code> returns <code class='mono'>True</code> only when <code class='mono'>x</code> is literally the <code class='mono'>None</code> object — <code class='mono'>0</code> and <code class='mono'>\"\"</code> are NOT <code class='mono'>None</code>, even though both are falsy.</p><div class='codeblock'>x = None\nempty = x is None\nprint(empty)  <span class='cm'># True</span></div>",
+          "mission": "Test whether <code class='mono'>x</code> is None into <b class='text-white'>empty</b>.",
+          "ctx": "x = None",
+          "ph": "empty = x is None",
+          "sol": "empty = x is None",
+          "checks": [
+            {
+              "re": "\\bis\\s+None\\b",
+              "msg": "Use is None."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "x = None",
+              "read": "empty",
+              "expected": true
+            },
+            {
+              "ctx": "x = 0",
+              "read": "empty",
+              "expected": false
+            },
+            {
+              "ctx": "x = \"\"",
+              "read": "empty",
+              "expected": false
+            }
+          ]
+        },
+        {
+          "t": "split words",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>str.split()</code> with no arguments splits on ANY whitespace (spaces, tabs, newlines) and collapses runs of it — different from <code class='mono'>split(\",\")</code>, which splits on that exact character only.</p><p><b class='text-white'>Why:</b> Free-form text (a sentence, a command line, a search query) is separated by whitespace of unpredictable width — the argument-less form is what handles that without you first having to normalize the spacing.</p><p><b class='text-white'>How:</b> <code class='mono'>line.split()</code> breaks on whitespace and discards it, returning just the words.</p><div class='codeblock'>line = &#x27;hi ada&#x27;\nparts = line.split()\nprint(parts)  <span class='cm'># [&#x27;hi&#x27;, &#x27;ada&#x27;]</span></div>",
+          "mission": "Split <code class='mono'>line</code> into <b class='text-white'>parts</b>.",
+          "ctx": "line = 'hi ada'",
+          "ph": "parts = line.split()",
+          "sol": "parts = line.split()",
+          "checks": [
+            {
+              "re": "\\.split\\(",
+              "msg": "Call .split()."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "line = 'hi ada'",
+              "read": "parts",
+              "expected": [
+                "hi",
+                "ada"
+              ]
+            },
+            {
+              "ctx": "line = 'a b c'",
+              "read": "parts",
+              "expected": [
+                "a",
+                "b",
+                "c"
+              ]
+            },
+            {
+              "ctx": "line = '  multi   space here '",
+              "read": "parts",
+              "expected": [
+                "multi",
+                "space",
+                "here"
+              ]
+            }
+          ]
+        },
+        {
+          "t": "join into csv",
+          "card": "<p><b class='text-white'>What:</b> A second look at <code class='mono'>\",\".join(list)</code> — the inverse of <code class='mono'>split</code> — this time framed as building CSV output rather than just gluing words.</p><p><b class='text-white'>Why:</b> Writing data back out (to a file, an API body, a log line) is exactly as common as parsing it in — join is the half of the round-trip that's easy to forget lives on the separator, not the list.</p><p><b class='text-white'>How:</b> <code class='mono'>\",\".join(items)</code> places a comma between every pair of adjacent items, with none before the first or after the last.</p><div class='codeblock'>items = [&#x27;a&#x27;, &#x27;b&#x27;, &#x27;c&#x27;]\ncsv = &#x27;,&#x27;.join(items)\nprint(csv)  <span class='cm'># a,b,c</span></div>",
+          "mission": "Join <code class='mono'>items</code> with <code class='mono'>\",\"</code> into <b class='text-white'>csv</b>.",
+          "ctx": "items = ['a', 'b', 'c']",
+          "ph": "csv = \",\".join(items)",
+          "sol": "csv = \",\".join(items)",
+          "checks": [
+            {
+              "re": "\\.join\\(",
+              "msg": "Call .join."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "items = ['a', 'b', 'c']",
+              "read": "csv",
+              "expected": "a,b,c"
+            },
+            {
+              "ctx": "items = ['x']",
+              "read": "csv",
+              "expected": "x"
+            },
+            {
+              "ctx": "items = ['1', '2']",
+              "read": "csv",
+              "expected": "1,2"
+            }
+          ]
+        },
+        {
+          "t": "strip whitespace",
+          "card": "<p><b class='text-white'>What:</b> One more pass at <code class='mono'>.strip()</code> alone (no <code class='mono'>.lower()</code> this time) — trimming only the leading/trailing whitespace, leaving internal spacing and case untouched.</p><p><b class='text-white'>Why:</b> It's worth isolating from the earlier \"clean + lowercase\" example: <code class='mono'>.strip()</code> alone is what you reach for when case matters but stray edge-whitespace from user input or file reads doesn't.</p><p><b class='text-white'>How:</b> <code class='mono'>raw.strip()</code> removes whitespace from both ends only — anything in the middle stays exactly as typed.</p><div class='codeblock'>raw = &#x27;  ada  &#x27;\nclean = raw.strip()\nprint(clean)  <span class='cm'># &#x27;ada&#x27;</span></div>",
+          "mission": "Clean <code class='mono'>raw</code> into <b class='text-white'>clean</b>.",
+          "ctx": "raw = '  ada  '",
+          "ph": "clean = raw.strip()",
+          "sol": "clean = raw.strip()",
+          "checks": [
+            {
+              "re": "\\.strip\\(",
+              "msg": "Call .strip."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "raw = '  ada  '",
+              "read": "clean",
+              "expected": "ada"
+            },
+            {
+              "ctx": "raw = 'x'",
+              "read": "clean",
+              "expected": "x"
+            },
+            {
+              "ctx": "raw = '   spaced out   '",
+              "read": "clean",
+              "expected": "spaced out"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "functions",
+      "name": "Functions",
+      "questions": [
+        {
+          "t": "Define and return",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>def</code> defines a reusable block of code with a name and parameters; <code class='mono'>return</code> sends a value back to whoever called it.</p><p><b class='text-white'>Why:</b> Functions are how you stop repeating yourself — write the logic once, name it, and call it wherever you need that computation instead of copy-pasting the body.</p><p><b class='text-white'>How:</b> <code class='mono'>square(n)</code> takes one parameter <code class='mono'>n</code> and returns <code class='mono'>n * n</code> — calling <code class='mono'>square(6)</code> runs the body with <code class='mono'>n</code> bound to 6.</p><div class='codeblock'>def square(n):\n    return n * n\n\nprint(square(6))  <span class='cm'># 36</span></div>",
+          "mission": "Write <b class='text-white'>square(n)</b> returning n².",
+          "ph": "def square(n):",
+          "sol": "def square(n):\n    return n * n",
+          "checks": [
+            {
+              "re": "def\\s+square\\(\\s*n\\s*\\)",
+              "msg": "Define square(n)."
+            },
+            {
+              "re": "return",
+              "msg": "Return the square."
+            }
+          ],
+          "tests": [
+            {
+              "call": "square(6)",
+              "expected": 36
+            },
+            {
+              "call": "square(0)",
+              "expected": 0
+            },
+            {
+              "call": "square(-3)",
+              "expected": 9
+            }
+          ]
+        },
+        {
+          "t": "Default arguments",
+          "card": "<p><b class='text-white'>What:</b> A parameter can have a default value (<code class='mono'>greeting=\"hi\"</code>) — callers can omit it and get the default, or pass their own to override it.</p><p><b class='text-white'>Why:</b> Defaults let a function have a sensible \"usual\" behavior while staying flexible — you don't need two versions of the same function, one with the extra parameter and one without.</p><p><b class='text-white'>How:</b> <code class='mono'>greet(\"ada\")</code> uses the default <code class='mono'>\"hi\"</code>; <code class='mono'>greet(\"ada\", \"hey\")</code> overrides it with the second positional argument.</p><div class='codeblock'>def greet(name, greeting=&quot;hi&quot;):\n    return f&quot;{greeting}, {name}&quot;\n\nprint(greet(&quot;ada&quot;))         <span class='cm'># hi, ada</span>\nprint(greet(&quot;ada&quot;, &quot;hey&quot;))  <span class='cm'># hey, ada</span></div>",
+          "mission": "Write <b class='text-white'>greet(name, greeting=\"hi\")</b> returning <code class='mono'>\"{greeting}, {name}\"</code>.",
+          "ph": "def greet(name, greeting=\"hi\"):",
+          "sol": "def greet(name, greeting=\"hi\"):\n    return f\"{greeting}, {name}\"",
+          "checks": [
+            {
+              "re": "greeting\\s*=\\s*([\"'])hi",
+              "msg": "Default greeting=\"hi\"."
+            },
+            {
+              "re": "f[\"']\\{greeting\\}",
+              "msg": "Return the f-string."
+            }
+          ],
+          "tests": [
+            {
+              "call": "greet(\"ada\")",
+              "expected": "hi, ada"
+            },
+            {
+              "call": "greet(\"lin\", \"hey\")",
+              "expected": "hey, lin"
+            },
+            {
+              "call": "greet(\"nova\", \"sup\")",
+              "expected": "sup, nova"
+            }
+          ]
+        },
+        {
+          "t": "Variadic *args",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>*nums</code> in a parameter list collects any number of positional arguments into a tuple named <code class='mono'>nums</code> inside the function.</p><p><b class='text-white'>Why:</b> It's what lets a function accept a flexible number of inputs — <code class='mono'>print()</code>, <code class='mono'>max()</code> and <code class='mono'>sum()</code>-like helpers all work this way rather than forcing a fixed parameter count.</p><p><b class='text-white'>How:</b> Calling <code class='mono'>total(1, 2, 3)</code> packs <code class='mono'>(1, 2, 3)</code> into <code class='mono'>nums</code>; <code class='mono'>sum(nums)</code> adds them up. Zero arguments gives an empty tuple, and <code class='mono'>sum(())</code> is 0.</p><div class='codeblock'>def total(*nums):\n    return sum(nums)\n\nprint(total(1, 2, 3))  <span class='cm'># 6</span>\nprint(total())         <span class='cm'># 0</span></div>",
+          "mission": "Write <b class='text-white'>total(*nums)</b> returning their sum.",
+          "ph": "def total(*nums):",
+          "sol": "def total(*nums):\n    return sum(nums)",
+          "checks": [
+            {
+              "re": "\\*nums",
+              "msg": "Collect with *nums."
+            },
+            {
+              "re": "return\\s+sum\\(\\s*nums",
+              "msg": "Return sum(nums)."
+            }
+          ],
+          "tests": [
+            {
+              "call": "total(1, 2, 3)",
+              "expected": 6
+            },
+            {
+              "call": "total()",
+              "expected": 0
+            },
+            {
+              "call": "total(10, 20)",
+              "expected": 30
+            }
+          ]
+        },
+        {
+          "t": "Keyword **kwargs",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>**opts</code> in a parameter list collects any number of keyword arguments into a dict named <code class='mono'>opts</code>.</p><p><b class='text-white'>Why:</b> It's how functions accept an open-ended set of named options (think config overrides, or how <code class='mono'>dict(a=1, b=2)</code> itself works) without listing every possible parameter up front.</p><p><b class='text-white'>How:</b> <code class='mono'>build(x=1, y=2)</code> packs <code class='mono'>{\"x\": 1, \"y\": 2}</code> into <code class='mono'>opts</code>; <code class='mono'>len(opts)</code> counts how many were passed.</p><div class='codeblock'>def build(**opts):\n    return len(opts)\n\nprint(build(x=1, y=2))  <span class='cm'># 2</span>\nprint(build())          <span class='cm'># 0</span></div>",
+          "mission": "Write <b class='text-white'>build(**opts)</b> returning how many options were passed.",
+          "ph": "def build(**opts):",
+          "sol": "def build(**opts):\n    return len(opts)",
+          "checks": [
+            {
+              "re": "\\*\\*opts",
+              "msg": "Collect with **opts."
+            },
+            {
+              "re": "len\\(\\s*opts",
+              "msg": "Count with len(opts)."
+            }
+          ],
+          "tests": [
+            {
+              "call": "build()",
+              "expected": 0
+            },
+            {
+              "call": "build(x=1)",
+              "expected": 1
+            },
+            {
+              "call": "build(x=1, y=2, z=3)",
+              "expected": 3
+            }
+          ]
+        },
+        {
+          "t": "Lambda as a key",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>lambda</code> writes a small, unnamed function inline — <code class='mono'>lambda p: p[1]</code> is a function that takes <code class='mono'>p</code> and returns its second item.</p><p><b class='text-white'>Why:</b> For a one-off function that's only ever used as an argument (like a sort key), defining it with <code class='mono'>def</code> elsewhere and naming it is more ceremony than the logic deserves — <code class='mono'>lambda</code> keeps it inline, right where it's used.</p><p><b class='text-white'>How:</b> <code class='mono'>sorted(pairs, key=lambda p: p[1])</code> sorts each tuple <code class='mono'>p</code> by its second element, ascending.</p><div class='codeblock'>pairs = [(&quot;a&quot;, 3), (&quot;b&quot;, 1)]\nordered = sorted(pairs, key=lambda p: p[1])\nprint(ordered)  <span class='cm'># [(&#x27;b&#x27;, 1), (&#x27;a&#x27;, 3)]</span></div>",
+          "mission": "Sort <code class='mono'>pairs</code> by their second item into <b class='text-white'>ordered</b>.",
+          "ctx": "pairs = [(\"a\", 3), (\"b\", 1)]",
+          "ph": "ordered = sorted(pairs, key=lambda p: p[1])",
+          "sol": "ordered = sorted(pairs, key=lambda p: p[1])",
+          "checks": [
+            {
+              "re": "key\\s*=\\s*lambda",
+              "msg": "Pass a lambda as key."
+            },
+            {
+              "re": "p\\[\\s*1\\s*\\]",
+              "msg": "Sort on p[1]."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "pairs = [(\"a\", 3), (\"b\", 1)]",
+              "read": "ordered",
+              "expected": [
+                [
+                  "b",
+                  1
+                ],
+                [
+                  "a",
+                  3
+                ]
+              ]
+            },
+            {
+              "ctx": "pairs = [(\"x\", 9), (\"y\", 2), (\"z\", 5)]",
+              "read": "ordered",
+              "expected": [
+                [
+                  "y",
+                  2
+                ],
+                [
+                  "z",
+                  5
+                ],
+                [
+                  "x",
+                  9
+                ]
+              ]
+            },
+            {
+              "ctx": "pairs = [(\"p\", 1)]",
+              "read": "ordered",
+              "expected": [
+                [
+                  "p",
+                  1
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "t": "Map a function",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>map(fn, iterable)</code> applies <code class='mono'>fn</code> to every element and returns a lazy iterator of the results — wrap it in <code class='mono'>list()</code> to see them.</p><p><b class='text-white'>Why:</b> It's the functional-programming counterpart to a list comprehension — same result as <code class='mono'>[x * 2 for x in nums]</code>, useful when you already have a function (named or lambda) you want to apply directly without writing a comprehension.</p><p><b class='text-white'>How:</b> <code class='mono'>map(lambda x: x * 2, nums)</code> doubles every element; <code class='mono'>list(...)</code> forces it into a concrete list.</p><div class='codeblock'>nums = [1, 2, 3]\ndoubled = list(map(lambda x: x * 2, nums))\nprint(doubled)  <span class='cm'># [2, 4, 6]</span></div>",
+          "mission": "Double every number in <code class='mono'>nums</code> into <b class='text-white'>doubled</b>.",
+          "ctx": "nums = [1, 2, 3]",
+          "ph": "doubled = list(map(lambda x: x * 2, nums))",
+          "sol": "doubled = list(map(lambda x: x * 2, nums))",
+          "checks": [
+            {
+              "re": "map\\(\\s*lambda",
+              "msg": "Use map with a lambda."
+            },
+            {
+              "re": "x\\s*\\*\\s*2",
+              "msg": "Double each x."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "nums = [1, 2, 3]",
+              "read": "doubled",
+              "expected": [
+                2,
+                4,
+                6
+              ]
+            },
+            {
+              "ctx": "nums = [5]",
+              "read": "doubled",
+              "expected": [
+                10
+              ]
+            },
+            {
+              "ctx": "nums = [0, -1, 4]",
+              "read": "doubled",
+              "expected": [
+                0,
+                -2,
+                8
+              ]
+            }
+          ]
+        },
+        {
+          "t": "Recursion",
+          "card": "<p><b class='text-white'>What:</b> A recursive function calls itself with a smaller version of the problem, until it hits a <b>base case</b> simple enough to answer directly without recursing further.</p><p><b class='text-white'>Why:</b> Some problems (factorial, tree/nested-structure traversal, divide-and-conquer algorithms) are naturally defined in terms of themselves — recursion lets the code mirror that definition directly instead of simulating it with an explicit stack.</p><p><b class='text-white'>How:</b> Base case: <code class='mono'>n &lt;= 1</code> returns 1 directly. Otherwise, return <code class='mono'>n * factorial(n - 1)</code> — each call is a strictly smaller problem, so it must eventually hit the base case.</p><div class='codeblock'>def factorial(n):\n    if n &lt;= 1:\n        return 1\n    return n * factorial(n - 1)\n\nprint(factorial(5))  <span class='cm'># 120</span></div>",
+          "mission": "Write recursive <b class='text-white'>factorial(n)</b> (base: n ≤ 1 → 1).",
+          "ph": "def factorial(n):",
+          "sol": "def factorial(n):\n    if n <= 1:\n        return 1\n    return n * factorial(n - 1)",
+          "checks": [
+            {
+              "re": "if\\s+n\\s*<=\\s*1",
+              "msg": "Base case: n <= 1."
+            },
+            {
+              "re": "return\\s+1",
+              "msg": "Return 1 at the base."
+            },
+            {
+              "re": "factorial\\(\\s*n\\s*-\\s*1",
+              "msg": "Recurse on n - 1."
+            }
+          ],
+          "tests": [
+            {
+              "call": "factorial(5)",
+              "expected": 120
+            },
+            {
+              "call": "factorial(0)",
+              "expected": 1
+            },
+            {
+              "call": "factorial(3)",
+              "expected": 6
+            }
+          ]
+        },
+        {
+          "t": "Higher-order function",
+          "card": "<p><b class='text-white'>What:</b> A <b>higher-order function</b> takes another function as an argument (or returns one) — <code class='mono'>apply(fn, x)</code> doesn't know or care what <code class='mono'>fn</code> does, it just calls it.</p><p><b class='text-white'>Why:</b> This is the mechanism behind <code class='mono'>sorted(..., key=...)</code>, <code class='mono'>map()</code>, event handlers and callbacks generally — functions being ordinary values you can pass around is one of Python's most load-bearing features.</p><p><b class='text-white'>How:</b> <code class='mono'>apply(fn, x)</code> simply calls <code class='mono'>fn(x)</code> and returns whatever that produces — <code class='mono'>fn</code> can be a lambda, a named function, or even a builtin like <code class='mono'>str</code>.</p><div class='codeblock'>def apply(fn, x):\n    return fn(x)\n\nprint(apply(lambda x: x + 1, 5))  <span class='cm'># 6</span></div>",
+          "mission": "Write <b class='text-white'>apply(fn, x)</b> returning fn(x).",
+          "ph": "def apply(fn, x):",
+          "sol": "def apply(fn, x):\n    return fn(x)",
+          "checks": [
+            {
+              "re": "def\\s+apply\\(\\s*fn\\s*,\\s*x",
+              "msg": "Define apply(fn, x)."
+            },
+            {
+              "re": "return\\s+fn\\(\\s*x",
+              "msg": "Call the passed-in fn."
+            }
+          ],
+          "tests": [
+            {
+              "call": "apply(lambda x: x + 1, 5)",
+              "expected": 6
+            },
+            {
+              "call": "apply(lambda x: x * x, 4)",
+              "expected": 16
+            },
+            {
+              "call": "apply(str, 7)",
+              "expected": "7"
+            }
+          ]
+        },
+        {
+          "t": "Unpack into a call",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>*nums</code> at a CALL site does the opposite of <code class='mono'>*nums</code> in a definition — it spreads a list back out into separate positional arguments.</p><p><b class='text-white'>Why:</b> It's how you forward a list of values to a function that takes individual arguments (or a <code class='mono'>*args</code> function, as here) without manually indexing into it — <code class='mono'>fn(*my_list)</code> instead of <code class='mono'>fn(my_list[0], my_list[1], ...)</code>.</p><p><b class='text-white'>How:</b> <code class='mono'>total(*nums)</code> with <code class='mono'>nums = [1, 2, 3]</code> calls exactly like <code class='mono'>total(1, 2, 3)</code>.</p><div class='codeblock'>def total(*nums):\n    return sum(nums)\n\nnums = [1, 2, 3]\nr = total(*nums)\nprint(r)  <span class='cm'># 6</span></div>",
+          "mission": "Call <code class='mono'>total</code> with <code class='mono'>nums</code> spread out, into <b class='text-white'>r</b>.",
+          "ctx": "def total(*nums):\n    return sum(nums)\nnums = [1, 2, 3]",
+          "ph": "r = total(*nums)",
+          "sol": "r = total(*nums)",
+          "checks": [
+            {
+              "re": "total\\(\\s*\\*nums",
+              "msg": "Spread with total(*nums)."
+            }
+          ],
+          "tests": [
+            {
+              "ctx": "def total(*nums):\n    return sum(nums)\nnums = [1, 2, 3]",
+              "read": "r",
+              "expected": 6
+            },
+            {
+              "ctx": "def total(*nums):\n    return sum(nums)\nnums = [5, 10]",
+              "read": "r",
+              "expected": 15
+            },
+            {
+              "ctx": "def total(*nums):\n    return sum(nums)\nnums = []",
+              "read": "r",
+              "expected": 0
+            }
+          ]
+        },
+        {
+          "t": "Compose a helper",
+          "card": "<p><b class='text-white'>What:</b> A two-step function: compute an intermediate value (<code class='mono'>m = max(nums)</code>), then use it to build the final result — normalizing a list so its largest value becomes 1.0.</p><p><b class='text-white'>Why:</b> Min-max normalization like this is the first thing you do before feeding numbers into almost any ML model — features on wildly different scales (age vs. income) otherwise dominate the ones with bigger raw numbers for no meaningful reason.</p><p><b class='text-white'>How:</b> Find the max once, store it, then divide every element by that same max inside a comprehension — computing <code class='mono'>max(nums)</code> fresh inside the loop would work but re-scans the list every iteration.</p><div class='codeblock'>def normalize(nums):\n    m = max(nums)\n    return [x / m for x in nums]\n\nprint(normalize([1, 2, 4]))  <span class='cm'># [0.25, 0.5, 1.0]</span></div>",
+          "mission": "Write <b class='text-white'>normalize(nums)</b>: divide each value by <code class='mono'>max(nums)</code>. Two lines.",
+          "ph": "def normalize(nums):",
+          "sol": "def normalize(nums):\n    m = max(nums)\n    return [x / m for x in nums]",
+          "checks": [
+            {
+              "re": "m\\s*=\\s*max\\(\\s*nums",
+              "msg": "Grab the max first."
+            },
+            {
+              "re": "\\[\\s*x\\s*\\/\\s*m\\s+for\\s+x\\s+in\\s+nums",
+              "msg": "Divide each x by m."
+            }
+          ],
+          "tests": [
+            {
+              "call": "normalize([1, 2, 4])",
+              "expected": [
+                0.25,
+                0.5,
+                1.0
+              ]
+            },
+            {
+              "call": "normalize([10, 20])",
+              "expected": [
+                0.5,
+                1.0
+              ]
+            },
+            {
+              "call": "normalize([3, 3, 3])",
+              "expected": [
+                1.0,
+                1.0,
+                1.0
+              ]
+            }
+          ]
+        },
+        {
+          "t": "*args gather",
+          "card": "<p><b class='text-white'>What:</b> The same <code class='mono'>*args</code> pattern as before, drilled again with the conventional parameter name <code class='mono'>args</code> (the name Python's own docs and error messages use).</p><p><b class='text-white'>Why:</b> You'll see <code class='mono'>*args</code> (and <code class='mono'>**kwargs</code>) constantly in library code and decorators, specifically under these exact names — recognizing the convention matters as much as understanding the mechanism.</p><p><b class='text-white'>How:</b> <code class='mono'>*args</code> collects all positional arguments into a tuple called <code class='mono'>args</code>; <code class='mono'>sum(args)</code> adds them.</p><div class='codeblock'>def total(*args):\n    return sum(args)\n\nprint(total(1, 2, 3))  <span class='cm'># 6</span></div>",
+          "mission": "Define <code class='mono'>total(*args)</code> returning <code class='mono'>sum(args)</code>.",
+          "ph": "def total(*args):\n    return sum(args)",
+          "sol": "def total(*args):\n    return sum(args)",
+          "checks": [
+            {
+              "re": "\\*args",
+              "msg": "Accept *args."
+            },
+            {
+              "re": "sum\\(\\s*args",
+              "msg": "Return sum(args)."
+            }
+          ],
+          "tests": [
+            {
+              "call": "total(1, 2, 3)",
+              "expected": 6
+            },
+            {
+              "call": "total()",
+              "expected": 0
+            },
+            {
+              "call": "total(4, 5, 6, 7)",
+              "expected": 22
+            }
+          ]
+        },
+        {
+          "t": "**kwargs gather",
+          "card": "<p><b class='text-white'>What:</b> Same idea as <code class='mono'>build(**opts)</code> earlier, but this time returning the whole collected dict instead of just its length — so you can see exactly what <code class='mono'>**kwargs</code> gives you.</p><p><b class='text-white'>Why:</b> Returning (or forwarding) <code class='mono'>**kwargs</code> unchanged is extremely common in wrapper functions and decorators that pass options through to another function without needing to know each one by name.</p><p><b class='text-white'>How:</b> <code class='mono'>show(a=1, b=2)</code> packs the keyword arguments into <code class='mono'>kw</code> as <code class='mono'>{\"a\": 1, \"b\": 2}</code>, which is returned as-is.</p><div class='codeblock'>def show(**kw):\n    return kw\n\nprint(show(a=1, b=2))  <span class='cm'># {&#x27;a&#x27;: 1, &#x27;b&#x27;: 2}</span></div>",
+          "mission": "Define <code class='mono'>show(**kw)</code> returning <code class='mono'>kw</code>.",
+          "ph": "def show(**kw):\n    return kw",
+          "sol": "def show(**kw):\n    return kw",
+          "checks": [
+            {
+              "re": "\\*\\*kw",
+              "msg": "Accept **kw."
+            },
+            {
+              "re": "return\\s+kw",
+              "msg": "Return kw dict."
+            }
+          ],
+          "tests": [
+            {
+              "call": "show()",
+              "expected": {}
+            },
+            {
+              "call": "show(a=1)",
+              "expected": {
+                "a": 1
+              }
+            },
+            {
+              "call": "show(a=1, b=2)",
+              "expected": {
+                "a": 1,
+                "b": 2
+              }
+            }
+          ]
+        },
+        {
+          "t": "keyword-only arg",
+          "card": "<p><b class='text-white'>What:</b> A bare <code class='mono'>*</code> in a parameter list marks everything after it as <b>keyword-only</b> — <code class='mono'>k</code> can only be passed as <code class='mono'>k=value</code>, never positionally.</p><p><b class='text-white'>Why:</b> It's a readability guardrail library authors use deliberately: for a function with several similar-looking parameters, forcing some to be named at the call site (<code class='mono'>f(1, k=2)</code> instead of the ambiguous <code class='mono'>f(1, 2)</code>) prevents mixing them up by position.</p><p><b class='text-white'>How:</b> <code class='mono'>x</code> can be positional or keyword; <code class='mono'>k</code>, appearing after the bare <code class='mono'>*</code>, must always be passed by name.</p><div class='codeblock'>def f(x, *, k):\n    return x + k\n\nprint(f(1, k=2))  <span class='cm'># 3</span></div>",
+          "mission": "Define <code class='mono'>f(x, *, k)</code> returning <code class='mono'>x + k</code>.",
+          "ph": "def f(x, *, k):\n    return x + k",
+          "sol": "def f(x, *, k):\n    return x + k",
+          "checks": [
+            {
+              "re": "x\\s*,\\s*\\*\\s*,\\s*k",
+              "msg": "Insert bare *."
+            }
+          ],
+          "tests": [
+            {
+              "call": "f(1, k=2)",
+              "expected": 3
+            },
+            {
+              "call": "f(5, k=10)",
+              "expected": 15
+            },
+            {
+              "call": "f(0, k=0)",
+              "expected": 0
+            }
+          ]
+        },
+        {
+          "t": "recursion factorial",
+          "card": "<p><b class='text-white'>What:</b> The same factorial recursion as before, written with a ternary instead of an <code class='mono'>if/else</code> block — one expression: <code class='mono'>1 if n == 0 else n * fact(n - 1)</code>.</p><p><b class='text-white'>Why:</b> Seeing the identical logic in two syntactic shapes (block-style, then ternary) is what makes the ternary form click as \"just another way to write a return value\", not a different concept.</p><p><b class='text-white'>How:</b> When <code class='mono'>n == 0</code>, return 1 directly (the base case). Otherwise return <code class='mono'>n * fact(n - 1)</code> — the recursive step.</p><div class='codeblock'>def fact(n):\n    return 1 if n == 0 else n * fact(n - 1)\n\nprint(fact(5))  <span class='cm'># 120</span></div>",
+          "mission": "Define <code class='mono'>fact(n)</code> returning <code class='mono'>1</code> at 0 else <code class='mono'>n*fact(n-1)</code>.",
+          "ph": "def fact(n):\n    return 1 if n == 0 else n * fact(n - 1)",
+          "sol": "def fact(n):\n    return 1 if n == 0 else n * fact(n - 1)",
+          "checks": [
+            {
+              "re": "fact\\(\\s*n\\s*-\\s*1",
+              "msg": "Recurse on n-1."
+            },
+            {
+              "re": "n\\s*==\\s*0",
+              "msg": "Base case n == 0."
+            }
+          ],
+          "tests": [
+            {
+              "call": "fact(5)",
+              "expected": 120
+            },
+            {
+              "call": "fact(0)",
+              "expected": 1
+            },
+            {
+              "call": "fact(4)",
+              "expected": 24
+            }
+          ]
+        },
+        {
+          "t": "import math",
+          "card": "<p><b class='text-white'>What:</b> <code class='mono'>import math</code> loads Python's built-in math module, giving you access to <code class='mono'>math.sqrt</code>, <code class='mono'>math.floor</code>, <code class='mono'>math.pi</code> and more under the <code class='mono'>math.</code> prefix.</p><p><b class='text-white'>Why:</b> The standard library ships with this instead of every project reimplementing square roots and trig — importing it is the first line of nearly every numeric Python script, and it's the direct predecessor to importing third-party libraries like NumPy the same way.</p><p><b class='text-white'>How:</b> Just the one line — no <code class='mono'>from</code>, no aliasing — then anything in the module is reachable as <code class='mono'>math.&lt;name&gt;</code>.</p><div class='codeblock'>import math\nprint(math.sqrt(16))   <span class='cm'># 4.0</span>\nprint(math.floor(9.7))  <span class='cm'># 9</span></div>",
+          "mission": "Import the standard <code class='mono'>math</code> module.",
+          "ph": "import math",
+          "sol": "import math",
+          "checks": [
+            {
+              "re": "import\\s+math",
+              "msg": "import math."
+            }
+          ],
+          "tests": [
+            {
+              "read": "math.sqrt(16)",
+              "expected": 4.0
+            },
+            {
+              "read": "math.floor(9.7)",
+              "expected": 9
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

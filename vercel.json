@@ -1,10 +1,14 @@
 {
   "rewrites": [
+    { "source": "/apps/stylophone-visualiser", "destination": "/apps/stylophone-visualiser/index.html" },
+    { "source": "/apps/stylophone-visualiser/", "destination": "/apps/stylophone-visualiser/index.html" },
     { "source": "/about", "destination": "/api/page?route=about" },
     { "source": "/labs", "destination": "/api/page?route=labs" },
     { "source": "/blogs", "destination": "/api/page?route=blogs" },
     { "source": "/blogs/:slug", "destination": "/api/page?slug=:slug" },
     { "source": "/contact", "destination": "/api/page?route=contact" },
+    { "source": "/learn-python", "destination": "/learn-python/index.html" },
+    { "source": "/learn-python/", "destination": "/learn-python/index.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

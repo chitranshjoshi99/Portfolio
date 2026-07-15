@@ -1,0 +1,166 @@
+{
+  "ranks": [
+    "Cadet",
+    "Navigator",
+    "Engineer",
+    "Commander",
+    "Architect",
+    "Archon",
+    "Ascendant"
+  ],
+  "badges": [
+    {
+      "id": "signal",
+      "name": "First Signal",
+      "how": "Verify your first line of code",
+      "artifact": "Signal Prism",
+      "color": "0x35e0ff",
+      "pos": [
+        -24,
+        11,
+        -10
+      ],
+      "geo": "ico"
+    },
+    {
+      "id": "core",
+      "name": "Core Online",
+      "how": "Finish Python Core Foundations",
+      "artifact": "Terra Core Relic",
+      "color": "0x3ecf8e",
+      "pos": [
+        -52,
+        9,
+        -16
+      ],
+      "geo": "knot"
+    },
+    {
+      "id": "craft",
+      "name": "Engineer Certified",
+      "how": "Finish Software Craft",
+      "artifact": "Forge Sigil",
+      "color": "0x35e0ff",
+      "pos": [
+        24,
+        -12,
+        -30
+      ],
+      "geo": "oct"
+    },
+    {
+      "id": "data",
+      "name": "Data Wrangler",
+      "how": "Finish Vector Computation",
+      "artifact": "Datara Tablet",
+      "color": "0xffb03a",
+      "pos": [
+        58,
+        8,
+        -78
+      ],
+      "geo": "torus"
+    },
+    {
+      "id": "ml",
+      "name": "Model Builder",
+      "how": "Finish Machine Learning",
+      "artifact": "Modelia Cortex",
+      "color": "0xff9f2e",
+      "pos": [
+        16,
+        18,
+        -132
+      ],
+      "geo": "tetra"
+    },
+    {
+      "id": "deep",
+      "name": "Net Architect",
+      "how": "Finish Deep Learning",
+      "artifact": "Neural Halo",
+      "color": "0xa78bfa",
+      "pos": [
+        -30,
+        -2,
+        -176
+      ],
+      "geo": "dodec"
+    },
+    {
+      "id": "genai",
+      "name": "Prompt Sovereign",
+      "how": "Finish Generative AI",
+      "artifact": "Nexus Shard",
+      "color": "0xff5d9e",
+      "pos": [
+        42,
+        18,
+        -224
+      ],
+      "geo": "cube"
+    },
+    {
+      "id": "streak",
+      "name": "Constellation Streak",
+      "how": "Train 3 days in a row",
+      "artifact": "Ember of Constance",
+      "color": "0xff5d5d",
+      "pos": [
+        26,
+        14,
+        -48
+      ],
+      "geo": "cone"
+    },
+    {
+      "id": "operational",
+      "name": "Fully Operational",
+      "how": "Complete all six modules",
+      "artifact": "The Astrolabe",
+      "color": "0xffe9a8",
+      "pos": [
+        8,
+        22,
+        -100
+      ],
+      "geo": "dodec"
+    },
+    {
+      "id": "prereq",
+      "name": "Ignition",
+      "how": "Finish Ignition Prereqs",
+      "artifact": "Ignition Sigil",
+      "color": "0x9ee6ff",
+      "pos": [
+        -70,
+        -6,
+        -2
+      ],
+      "geo": "ico"
+    },
+    {
+      "id": "mlops",
+      "name": "Ops Certified",
+      "how": "Finish MLOps & Deployment",
+      "artifact": "Ops Prism",
+      "color": "0x66d9a1",
+      "pos": [
+        60,
+        -18,
+        -260
+      ],
+      "geo": "oct"
+    }
+  ],
+  "modules": [
+    "./modules/py-prereq.json",
+    "./modules/py-core.json",
+    "./modules/py-craft.json",
+    "./modules/data-core.json",
+    "./modules/ml-classic.json",
+    "./modules/dl-neural.json",
+    "./modules/genai-forge.json",
+    "./modules/ml-ops.json"
+  ]
+}

@@ -133,7 +133,7 @@ export function Navbar() {
           <a
             href={asset("/resume.pdf")}
             download="ChitranshJoshi-Resume.pdf"
-            className="navbar__resume pixel-text"
+            className="navbar__link navbar__link--active pixel-text"
             aria-label="Download resume"
             onClick={() => haptics.press()}
           >
@@ -188,7 +188,7 @@ export function Navbar() {
               <a
                 href={asset("/resume.pdf")}
                 download="ChitranshJoshi-Resume.pdf"
-                className="navbar__link navbar__link--resume pixel-text"
+                className="navbar__link navbar__link--resume pixel-text "
                 onClick={() => haptics.press()}
               >
                 ↓ RESUME

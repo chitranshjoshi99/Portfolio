@@ -1,0 +1,1495 @@
+{
+  "id": "DATA-CORE",
+  "name": "Vector Computation",
+  "tier": "Analyst",
+  "planet": "Datara",
+  "desc": "NumPy vectorization and Pandas selection — leave Python loops behind for compiled array math.",
+  "xp": 25,
+  "color": "0xffb03a",
+  "viz": "data",
+  "badge": "data",
+  "checkpoints": [
+    {
+      "id": "telemetry-pipeline",
+      "name": "NumPy Warm-up",
+      "questions": [
+        {
+          "t": "Vectorize the readings",
+          "card": "<p>A NumPy array is one block where math hits every element at once.</p>",
+          "mission": "Pack the probe speeds <b class='text-white'>88, 132, 99, 145</b> into <b class='text-white'>speeds</b>.",
+          "ph": "speeds = np.array([...])",
+          "sol": "speeds = np.array([88, 132, 99, 145])",
+          "re": "^speeds\\s*=\\s*np\\.array\\(\\s*\\[\\s*88\\s*,\\s*132\\s*,\\s*99\\s*,\\s*145\\s*\\]\\s*\\)$",
+          "ok": [
+            "array([ 88, 132,  99, 145])"
+          ],
+          "checks": [
+            {
+              "re": "np\\.array",
+              "msg": "Build with np.array([...])."
+            },
+            {
+              "re": "88\\s*,\\s*132\\s*,\\s*99\\s*,\\s*145",
+              "msg": "Exact readings, in order."
+            }
+          ]
+        },
+        {
+          "t": "Fleet average",
+          "card": "<p>Array methods reduce the whole vector in compiled code.</p>",
+          "mission": "Store the mean of <code class='mono'>speeds</code> in <b class='text-white'>avg</b>.",
+          "ph": "avg = speeds.mean()",
+          "sol": "avg = speeds.mean()",
+          "re": "^avg\\s*=\\s*(speeds\\.mean\\(\\s*\\)|np\\.mean\\(\\s*speeds\\s*\\))$",
+          "ok": [
+            "116.0"
+          ],
+          "checks": [
+            {
+              "re": "speeds",
+              "msg": "Aggregate speeds."
+            },
+            {
+              "re": "mean",
+              "msg": "Reduce with .mean()."
+            }
+          ]
+        },
+        {
+          "t": "Label the matrix",
+          "card": "<p>A DataFrame gives records named columns and an index.</p>",
+          "mission": "Turn <code class='mono'>probes</code> into a DataFrame <b class='text-white'>df</b>.",
+          "ctx": "probes = [{\"probe\": \"P-01\", \"speed\": 88, \"signal\": 72}, ...]",
+          "ph": "df = pd.DataFrame(probes)",
+          "sol": "df = pd.DataFrame(probes)",
+          "re": "^df\\s*=\\s*pd\\.DataFrame\\(\\s*probes\\s*\\)$",
+          "ok": [
+            "labelled columns + index"
+          ],
+          "checks": [
+            {
+              "re": "pd\\.DataFrame",
+              "msg": "Use pd.DataFrame(probes)."
+            }
+          ]
+        },
+        {
+          "t": "Boolean mask",
+          "card": "<p>A comparison yields a True/False mask; index the frame with it.</p>",
+          "mission": "Keep probes faster than 100 into <b class='text-white'>fast</b>.",
+          "ph": "fast = df[df[\"speed\"] > 100]",
+          "sol": "fast = df[df[\"speed\"] > 100]",
+          "re": "^fast\\s*=\\s*df\\[\\s*df\\[\\s*([\"'])speed\\1\\s*\\]\\s*>\\s*100\\s*\\]$",
+          "ok": [
+            "2 of 4 rows"
+          ],
+          "checks": [
+            {
+              "re": "df\\[\\s*df\\[",
+              "msg": "Filter with df[df[...] > 100]."
+            },
+            {
+              "re": ">\\s*100",
+              "msg": "Threshold 100."
+            }
+          ]
+        },
+        {
+          "t": "Min-max scale",
+          "card": "<p>Map a vector into [0, 1] — all vectorized.</p>",
+          "mission": "Min-max scale <code class='mono'>speeds</code> into <b class='text-white'>norm</b>.",
+          "ph": "norm = (speeds - speeds.min()) / (...)",
+          "sol": "norm = (speeds - speeds.min()) / (speeds.max() - speeds.min())",
+          "re": "^norm\\s*=\\s*\\(\\s*speeds\\s*-\\s*speeds\\.min\\(\\s*\\)\\s*\\)\\s*\\/\\s*\\(\\s*speeds\\.max\\(\\s*\\)\\s*-\\s*speeds\\.min\\(\\s*\\)\\s*\\)$",
+          "ok": [
+            "[0. , 0.77, 0.19, 1. ]"
+          ],
+          "checks": [
+            {
+              "re": "for\\s",
+              "bad": true,
+              "msg": "No loop — whole-array math."
+            },
+            {
+              "re": "speeds\\.max\\(\\s*\\)\\s*-\\s*speeds\\.min\\(",
+              "msg": "Divide by the range."
+            }
+          ]
+        },
+        {
+          "t": "Spread of readings",
+          "card": "<p><code class='mono text-cyan-300'>.std()</code> is the standard deviation.</p>",
+          "mission": "Store the std of <code class='mono'>speeds</code> in <b class='text-white'>sd</b>.",
+          "ph": "sd = speeds.std()",
+          "sol": "sd = speeds.std()",
+          "re": "^sd\\s*=\\s*(speeds\\.std\\(\\s*\\)|np\\.std\\(\\s*speeds\\s*\\))$",
+          "ok": [
+            "≈ 22.3"
+          ],
+          "checks": [
+            {
+              "re": "std",
+              "msg": "Use .std()."
+            }
+          ]
+        },
+        {
+          "t": "Total distance",
+          "card": "<p><code class='mono text-cyan-300'>.sum()</code> reduces to one number.</p>",
+          "mission": "Sum <code class='mono'>speeds</code> into <b class='text-white'>total</b>.",
+          "ph": "total = speeds.sum()",
+          "sol": "total = speeds.sum()",
+          "re": "^total\\s*=\\s*(speeds\\.sum\\(\\s*\\)|np\\.sum\\(\\s*speeds\\s*\\))$",
+          "ok": [
+            "464"
+          ],
+          "checks": [
+            {
+              "re": "sum",
+              "msg": "Use .sum()."
+            }
+          ]
+        },
+        {
+          "t": "Fastest index",
+          "card": "<p><code class='mono text-cyan-300'>.argmax()</code> returns the index of the max.</p>",
+          "mission": "Index of the fastest probe into <b class='text-white'>peak</b>.",
+          "ph": "peak = speeds.argmax()",
+          "sol": "peak = speeds.argmax()",
+          "re": "^peak\\s*=\\s*(speeds\\.argmax\\(\\s*\\)|np\\.argmax\\(\\s*speeds\\s*\\))$",
+          "ok": [
+            "3"
+          ],
+          "checks": [
+            {
+              "re": "argmax",
+              "msg": "Use .argmax()."
+            }
+          ]
+        },
+        {
+          "t": "Sort the vector",
+          "card": "<p><code class='mono text-cyan-300'>np.sort</code> returns a sorted copy.</p>",
+          "mission": "Sort <code class='mono'>speeds</code> ascending into <b class='text-white'>ranked</b>.",
+          "ph": "ranked = np.sort(speeds)",
+          "sol": "ranked = np.sort(speeds)",
+          "re": "^ranked\\s*=\\s*np\\.sort\\(\\s*speeds\\s*\\)$",
+          "ok": [
+            "[ 88,  99, 132, 145]"
+          ],
+          "checks": [
+            {
+              "re": "np\\.sort\\(\\s*speeds",
+              "msg": "Use np.sort(speeds)."
+            }
+          ]
+        },
+        {
+          "t": "Count over threshold",
+          "card": "<p>A boolean array sums as 1s and 0s.</p>",
+          "mission": "Count probes with speed &gt; 100 into <b class='text-white'>n</b> (vectorized).",
+          "ph": "n = (speeds > 100).sum()",
+          "sol": "n = (speeds > 100).sum()",
+          "re": "^n\\s*=\\s*\\(\\s*speeds\\s*>\\s*100\\s*\\)\\.sum\\(\\s*\\)$",
+          "ok": [
+            "2"
+          ],
+          "checks": [
+            {
+              "re": "\\(\\s*speeds\\s*>\\s*100\\s*\\)",
+              "msg": "Build the boolean mask."
+            },
+            {
+              "re": "\\.sum\\(",
+              "msg": "Sum the mask."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "numpy-arrays",
+      "name": "NumPy Arrays",
+      "questions": [
+        {
+          "t": "Ranged array",
+          "card": "<p><code class='mono text-cyan-300'>np.arange(n)</code> — 0..n-1.</p>",
+          "mission": "Make 0..9 into <b class='text-white'>r</b>.",
+          "ph": "r = np.arange(10)",
+          "sol": "r = np.arange(10)",
+          "re": "^r\\s*=\\s*np\\.arange\\(\\s*10\\s*\\)$",
+          "ok": [
+            "[0 1 2 ... 9]"
+          ],
+          "checks": [
+            {
+              "re": "np\\.arange\\(\\s*10",
+              "msg": "np.arange(10)."
+            }
+          ]
+        },
+        {
+          "t": "Zeros",
+          "card": "<p><code class='mono text-cyan-300'>np.zeros(n)</code> pre-allocates.</p>",
+          "mission": "Five zeros into <b class='text-white'>z</b>.",
+          "ph": "z = np.zeros(5)",
+          "sol": "z = np.zeros(5)",
+          "re": "^z\\s*=\\s*np\\.zeros\\(\\s*5\\s*\\)$",
+          "ok": [
+            "[0. 0. 0. 0. 0.]"
+          ],
+          "checks": [
+            {
+              "re": "np\\.zeros\\(\\s*5",
+              "msg": "np.zeros(5)."
+            }
+          ]
+        },
+        {
+          "t": "Reshape",
+          "card": "<p><code class='mono text-cyan-300'>.reshape(r, c)</code> changes the view, not the data.</p>",
+          "mission": "Reshape 0..5 into a 2×3 grid <b class='text-white'>grid</b>.",
+          "ph": "grid = np.arange(6).reshape(2, 3)",
+          "sol": "grid = np.arange(6).reshape(2, 3)",
+          "re": "^grid\\s*=\\s*np\\.arange\\(\\s*6\\s*\\)\\.reshape\\(\\s*2\\s*,\\s*3\\s*\\)$",
+          "ok": [
+            "[[0 1 2] [3 4 5]]"
+          ],
+          "checks": [
+            {
+              "re": "\\.reshape\\(\\s*2\\s*,\\s*3",
+              "msg": ".reshape(2, 3)."
+            }
+          ]
+        },
+        {
+          "t": "Set the dtype",
+          "card": "<p><code class='mono'>dtype=float</code> forces the element type.</p>",
+          "mission": "Build a float array of 1,2,3 into <b class='text-white'>arr</b>.",
+          "ph": "arr = np.array([1, 2, 3], dtype=float)",
+          "sol": "arr = np.array([1, 2, 3], dtype=float)",
+          "re": "^arr\\s*=\\s*np\\.array\\(\\s*\\[\\s*1\\s*,\\s*2\\s*,\\s*3\\s*\\]\\s*,\\s*dtype\\s*=\\s*float\\s*\\)$",
+          "ok": [
+            "[1. 2. 3.]"
+          ],
+          "checks": [
+            {
+              "re": "dtype\\s*=\\s*float",
+              "msg": "Pass dtype=float."
+            }
+          ]
+        },
+        {
+          "t": "Element-wise op",
+          "card": "<p>Scalars broadcast across the whole array.</p>",
+          "mission": "Double every element of <code class='mono'>arr</code> into <b class='text-white'>scaled</b>.",
+          "ctx": "arr = np.array([1, 2, 3])",
+          "ph": "scaled = arr * 2",
+          "sol": "scaled = arr * 2",
+          "re": "^scaled\\s*=\\s*arr\\s*\\*\\s*2$",
+          "ok": [
+            "[2 4 6]"
+          ],
+          "checks": [
+            {
+              "re": "arr\\s*\\*\\s*2",
+              "msg": "No loop — arr * 2."
+            }
+          ]
+        },
+        {
+          "t": "Broadcast a scalar",
+          "card": "<p>Adding a scalar shifts every element.</p>",
+          "mission": "Add 10 to every element of <code class='mono'>arr</code> into <b class='text-white'>shifted</b>.",
+          "ctx": "arr = np.array([1, 2, 3])",
+          "ph": "shifted = arr + 10",
+          "sol": "shifted = arr + 10",
+          "re": "^shifted\\s*=\\s*arr\\s*\\+\\s*10$",
+          "ok": [
+            "[11 12 13]"
+          ],
+          "checks": [
+            {
+              "re": "arr\\s*\\+\\s*10",
+              "msg": "arr + 10."
+            }
+          ]
+        },
+        {
+          "t": "Column slice",
+          "card": "<p><code class='mono text-cyan-300'>grid[:, 0]</code> = every row, column 0.</p>",
+          "mission": "Take the first column of <code class='mono'>grid</code> into <b class='text-white'>col</b>.",
+          "ctx": "grid = np.arange(6).reshape(2, 3)",
+          "ph": "col = grid[:, 0]",
+          "sol": "col = grid[:, 0]",
+          "re": "^col\\s*=\\s*grid\\[\\s*:\\s*,\\s*0\\s*\\]$",
+          "ok": [
+            "[0 3]"
+          ],
+          "checks": [
+            {
+              "re": "grid\\[\\s*:\\s*,\\s*0",
+              "msg": "grid[:, 0] — all rows, col 0."
+            }
+          ]
+        },
+        {
+          "t": "Boolean indexing",
+          "card": "<p>Index with a mask to pull matching elements.</p>",
+          "mission": "Keep only the positives of <code class='mono'>arr</code> into <b class='text-white'>pos</b>.",
+          "ctx": "arr = np.array([-1, 2, -3, 4])",
+          "ph": "pos = arr[arr > 0]",
+          "sol": "pos = arr[arr > 0]",
+          "re": "^pos\\s*=\\s*arr\\[\\s*arr\\s*>\\s*0\\s*\\]$",
+          "ok": [
+            "[2 4]"
+          ],
+          "checks": [
+            {
+              "re": "arr\\[\\s*arr\\s*>\\s*0",
+              "msg": "Index arr with arr > 0."
+            }
+          ]
+        },
+        {
+          "t": "Vectorized where",
+          "card": "<p><code class='mono text-cyan-300'>np.where(cond, a, b)</code> selects per element.</p>",
+          "mission": "Map <code class='mono'>arr</code> to +1 / −1 by sign into <b class='text-white'>signs</b>.",
+          "ctx": "arr = np.array([-1, 2, -3])",
+          "ph": "signs = np.where(arr > 0, 1, -1)",
+          "sol": "signs = np.where(arr > 0, 1, -1)",
+          "re": "^signs\\s*=\\s*np\\.where\\(\\s*arr\\s*>\\s*0\\s*,\\s*1\\s*,\\s*-\\s*1\\s*\\)$",
+          "ok": [
+            "[-1  1 -1]"
+          ],
+          "checks": [
+            {
+              "re": "np\\.where\\(",
+              "msg": "Use np.where(cond, a, b)."
+            }
+          ]
+        },
+        {
+          "t": "Dot product",
+          "card": "<p>Linear algebra: <code class='mono text-cyan-300'>np.dot</code> or <code class='mono'>@</code>.</p>",
+          "mission": "Dot <code class='mono'>a</code> with <code class='mono'>b</code> into <b class='text-white'>d</b>.",
+          "ctx": "a = np.array([1, 2])\nb = np.array([3, 4])",
+          "ph": "d = np.dot(a, b)",
+          "sol": "d = np.dot(a, b)",
+          "re": "^d\\s*=\\s*(np\\.dot\\(\\s*a\\s*,\\s*b\\s*\\)|a\\s*@\\s*b)$",
+          "ok": [
+            "11"
+          ],
+          "checks": [
+            {
+              "re": "np\\.dot\\(\\s*a\\s*,\\s*b|a\\s*@\\s*b",
+              "msg": "np.dot(a, b) or a @ b."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "numpy-math",
+      "name": "NumPy Math & Axes",
+      "questions": [
+        {
+          "t": "Sum down columns",
+          "card": "<p><code class='mono text-cyan-300'>axis=0</code> collapses rows.</p>",
+          "mission": "Column sums of <code class='mono'>m</code> into <b class='text-white'>col_sums</b>.",
+          "ctx": "m = np.arange(6).reshape(2, 3)",
+          "ph": "col_sums = m.sum(axis=0)",
+          "sol": "col_sums = m.sum(axis=0)",
+          "re": "^col_sums\\s*=\\s*m\\.sum\\(\\s*axis\\s*=\\s*0\\s*\\)$",
+          "ok": [
+            "[3 5 7]"
+          ],
+          "checks": [
+            {
+              "re": "axis\\s*=\\s*0",
+              "msg": "Sum along axis=0."
+            }
+          ]
+        },
+        {
+          "t": "Mean across rows",
+          "card": "<p><code class='mono text-cyan-300'>axis=1</code> collapses columns.</p>",
+          "mission": "Row means of <code class='mono'>m</code> into <b class='text-white'>row_means</b>.",
+          "ctx": "m = np.arange(6).reshape(2, 3)",
+          "ph": "row_means = m.mean(axis=1)",
+          "sol": "row_means = m.mean(axis=1)",
+          "re": "^row_means\\s*=\\s*m\\.mean\\(\\s*axis\\s*=\\s*1\\s*\\)$",
+          "ok": [
+            "[1. 4.]"
+          ],
+          "checks": [
+            {
+              "re": "mean\\(\\s*axis\\s*=\\s*1",
+              "msg": "mean(axis=1)."
+            }
+          ]
+        },
+        {
+          "t": "Square roots",
+          "card": "<p><code class='mono text-cyan-300'>np.sqrt</code> is element-wise.</p>",
+          "mission": "Roots of <code class='mono'>arr</code> into <b class='text-white'>roots</b>.",
+          "ctx": "arr = np.array([1, 4, 9])",
+          "ph": "roots = np.sqrt(arr)",
+          "sol": "roots = np.sqrt(arr)",
+          "re": "^roots\\s*=\\s*np\\.sqrt\\(\\s*arr\\s*\\)$",
+          "ok": [
+            "[1. 2. 3.]"
+          ],
+          "checks": [
+            {
+              "re": "np\\.sqrt\\(\\s*arr",
+              "msg": "np.sqrt(arr)."
+            }
+          ]
+        },
+        {
+          "t": "Exponential",
+          "card": "<p><code class='mono text-cyan-300'>np.exp</code> — e^x, element-wise.</p>",
+          "mission": "Exp of <code class='mono'>arr</code> into <b class='text-white'>e</b>.",
+          "ctx": "arr = np.array([0, 1])",
+          "ph": "e = np.exp(arr)",
+          "sol": "e = np.exp(arr)",
+          "re": "^e\\s*=\\s*np\\.exp\\(\\s*arr\\s*\\)$",
+          "ok": [
+            "[1.    2.718]"
+          ],
+          "checks": [
+            {
+              "re": "np\\.exp\\(\\s*arr",
+              "msg": "np.exp(arr)."
+            }
+          ]
+        },
+        {
+          "t": "Clip to a range",
+          "card": "<p><code class='mono text-cyan-300'>np.clip(arr, lo, hi)</code> bounds values.</p>",
+          "mission": "Clip <code class='mono'>arr</code> to [0, 1] into <b class='text-white'>c</b>.",
+          "ctx": "arr = np.array([-2, 0.5, 3])",
+          "ph": "c = np.clip(arr, 0, 1)",
+          "sol": "c = np.clip(arr, 0, 1)",
+          "re": "^c\\s*=\\s*np\\.clip\\(\\s*arr\\s*,\\s*0\\s*,\\s*1\\s*\\)$",
+          "ok": [
+            "[0.  0.5 1. ]"
+          ],
+          "checks": [
+            {
+              "re": "np\\.clip\\(\\s*arr\\s*,\\s*0\\s*,\\s*1",
+              "msg": "np.clip(arr, 0, 1)."
+            }
+          ]
+        },
+        {
+          "t": "Running total",
+          "card": "<p><code class='mono text-cyan-300'>np.cumsum</code> is the prefix sum.</p>",
+          "mission": "Cumulative sum of <code class='mono'>arr</code> into <b class='text-white'>cs</b>.",
+          "ctx": "arr = np.array([1, 2, 3])",
+          "ph": "cs = np.cumsum(arr)",
+          "sol": "cs = np.cumsum(arr)",
+          "re": "^cs\\s*=\\s*(np\\.cumsum\\(\\s*arr\\s*\\)|arr\\.cumsum\\(\\s*\\))$",
+          "ok": [
+            "[1 3 6]"
+          ],
+          "checks": [
+            {
+              "re": "cumsum",
+              "msg": "Use cumsum."
+            }
+          ]
+        },
+        {
+          "t": "Index of max",
+          "card": "<p><code class='mono text-cyan-300'>argmax</code> locates the peak.</p>",
+          "mission": "Index of the max of <code class='mono'>arr</code> into <b class='text-white'>i</b>.",
+          "ctx": "arr = np.array([3, 9, 4])",
+          "ph": "i = arr.argmax()",
+          "sol": "i = arr.argmax()",
+          "re": "^i\\s*=\\s*(arr\\.argmax\\(\\s*\\)|np\\.argmax\\(\\s*arr\\s*\\))$",
+          "ok": [
+            "1"
+          ],
+          "checks": [
+            {
+              "re": "argmax",
+              "msg": "Use argmax."
+            }
+          ]
+        },
+        {
+          "t": "Distinct values",
+          "card": "<p><code class='mono text-cyan-300'>np.unique</code> sorts + dedupes.</p>",
+          "mission": "Distinct values of <code class='mono'>arr</code> into <b class='text-white'>u</b>.",
+          "ctx": "arr = np.array([2, 1, 2, 3])",
+          "ph": "u = np.unique(arr)",
+          "sol": "u = np.unique(arr)",
+          "re": "^u\\s*=\\s*np\\.unique\\(\\s*arr\\s*\\)$",
+          "ok": [
+            "[1 2 3]"
+          ],
+          "checks": [
+            {
+              "re": "np\\.unique\\(\\s*arr",
+              "msg": "np.unique(arr)."
+            }
+          ]
+        },
+        {
+          "t": "Concatenate",
+          "card": "<p><code class='mono text-cyan-300'>np.concatenate([a, b])</code> joins arrays.</p>",
+          "mission": "Join <code class='mono'>a</code> and <code class='mono'>b</code> into <b class='text-white'>both</b>.",
+          "ctx": "a = np.array([1, 2])\nb = np.array([3, 4])",
+          "ph": "both = np.concatenate([a, b])",
+          "sol": "both = np.concatenate([a, b])",
+          "re": "^both\\s*=\\s*np\\.concatenate\\(\\s*\\[\\s*a\\s*,\\s*b\\s*\\]\\s*\\)$",
+          "ok": [
+            "[1 2 3 4]"
+          ],
+          "checks": [
+            {
+              "re": "np\\.concatenate\\(\\s*\\[\\s*a\\s*,\\s*b",
+              "msg": "np.concatenate([a, b])."
+            }
+          ]
+        },
+        {
+          "t": "Evenly spaced",
+          "card": "<p><code class='mono text-cyan-300'>np.linspace(a, b, n)</code> — n points inclusive.</p>",
+          "mission": "Five points from 0 to 1 into <b class='text-white'>xs</b>.",
+          "ph": "xs = np.linspace(0, 1, 5)",
+          "sol": "xs = np.linspace(0, 1, 5)",
+          "re": "^xs\\s*=\\s*np\\.linspace\\(\\s*0\\s*,\\s*1\\s*,\\s*5\\s*\\)$",
+          "ok": [
+            "[0. 0.25 0.5 0.75 1.]"
+          ],
+          "checks": [
+            {
+              "re": "np\\.linspace\\(\\s*0\\s*,\\s*1\\s*,\\s*5",
+              "msg": "np.linspace(0, 1, 5)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pandas-selection",
+      "name": "Pandas Selection",
+      "questions": [
+        {
+          "t": "Select a column",
+          "card": "<p><code class='mono'>df[\"col\"]</code> returns a Series.</p>",
+          "mission": "Grab the <code class='mono'>speed</code> column into <b class='text-white'>s</b>.",
+          "ph": "s = df[\"speed\"]",
+          "sol": "s = df[\"speed\"]",
+          "re": "^s\\s*=\\s*df\\[\\s*([\"'])speed\\1\\s*\\]$",
+          "ok": [
+            "the speed Series"
+          ],
+          "checks": [
+            {
+              "re": "df\\[\\s*([\"'])speed\\1\\s*\\]",
+              "msg": "df[\"speed\"]."
+            }
+          ]
+        },
+        {
+          "t": "Label lookup",
+          "card": "<p><code class='mono text-cyan-300'>.loc[label]</code> selects by index label.</p>",
+          "mission": "Row at index 0 into <b class='text-white'>row</b>.",
+          "ph": "row = df.loc[0]",
+          "sol": "row = df.loc[0]",
+          "re": "^row\\s*=\\s*df\\.loc\\[\\s*0\\s*\\]$",
+          "ok": [
+            "first row"
+          ],
+          "checks": [
+            {
+              "re": "df\\.loc\\[\\s*0",
+              "msg": "df.loc[0]."
+            }
+          ]
+        },
+        {
+          "t": "Positional lookup",
+          "card": "<p><code class='mono text-cyan-300'>.iloc[r, c]</code> selects by position.</p>",
+          "mission": "Value at row 0, column 1 into <b class='text-white'>cell</b>.",
+          "ph": "cell = df.iloc[0, 1]",
+          "sol": "cell = df.iloc[0, 1]",
+          "re": "^cell\\s*=\\s*df\\.iloc\\[\\s*0\\s*,\\s*1\\s*\\]$",
+          "ok": [
+            "88"
+          ],
+          "checks": [
+            {
+              "re": "df\\.iloc\\[\\s*0\\s*,\\s*1",
+              "msg": "df.iloc[0, 1]."
+            }
+          ]
+        },
+        {
+          "t": "Filter rows",
+          "card": "<p>Mask a Series, index the frame.</p>",
+          "mission": "Rows where <code class='mono'>signal &lt; 80</code> into <b class='text-white'>weak</b>.",
+          "ph": "weak = df[df[\"signal\"] < 80]",
+          "sol": "weak = df[df[\"signal\"] < 80]",
+          "re": "^weak\\s*=\\s*df\\[\\s*df\\[\\s*([\"'])signal\\1\\s*\\]\\s*<\\s*80\\s*\\]$",
+          "ok": [
+            "low-signal probes"
+          ],
+          "checks": [
+            {
+              "re": "df\\[\\s*df\\[",
+              "msg": "df[df[...] < 80]."
+            },
+            {
+              "re": "<\\s*80",
+              "msg": "Threshold 80."
+            }
+          ]
+        },
+        {
+          "t": "Derive a column",
+          "card": "<p>Assign a computed Series to a new column.</p>",
+          "mission": "Add a boolean column <code class='mono'>ok</code> = speed &gt; 100.",
+          "ph": "df[\"ok\"] = df[\"speed\"] > 100",
+          "sol": "df[\"ok\"] = df[\"speed\"] > 100",
+          "re": "^df\\[\\s*([\"'])ok\\1\\s*\\]\\s*=\\s*df\\[\\s*([\"'])speed\\2\\s*\\]\\s*>\\s*100$",
+          "ok": [
+            "new bool column"
+          ],
+          "checks": [
+            {
+              "re": "df\\[\\s*([\"'])ok\\1\\s*\\]\\s*=",
+              "msg": "Assign to df[\"ok\"]."
+            },
+            {
+              "re": ">\\s*100",
+              "msg": "speed > 100."
+            }
+          ]
+        },
+        {
+          "t": "Drop a column",
+          "card": "<p><code class='mono text-cyan-300'>.drop(columns=[...])</code> removes columns.</p>",
+          "mission": "Drop <code class='mono'>signal</code> into <b class='text-white'>df2</b>.",
+          "ph": "df2 = df.drop(columns=[\"signal\"])",
+          "sol": "df2 = df.drop(columns=[\"signal\"])",
+          "re": "^df2\\s*=\\s*df\\.drop\\(\\s*columns\\s*=\\s*\\[\\s*([\"'])signal\\1\\s*\\]\\s*\\)$",
+          "ok": [
+            "signal gone"
+          ],
+          "checks": [
+            {
+              "re": "\\.drop\\(\\s*columns\\s*=",
+              "msg": ".drop(columns=[...])."
+            }
+          ]
+        },
+        {
+          "t": "Rename a column",
+          "card": "<p><code class='mono'>columns={old: new}</code> renames.</p>",
+          "mission": "Rename <code class='mono'>speed</code> → <code class='mono'>v</code> into <b class='text-white'>df3</b>.",
+          "ph": "df3 = df.rename(columns={\"speed\": \"v\"})",
+          "sol": "df3 = df.rename(columns={\"speed\": \"v\"})",
+          "re": "^df3\\s*=\\s*df\\.rename\\(\\s*columns\\s*=\\s*\\{\\s*([\"'])speed\\1\\s*:\\s*([\"'])v\\2\\s*\\}\\s*\\)$",
+          "ok": [
+            "column renamed"
+          ],
+          "checks": [
+            {
+              "re": "\\.rename\\(\\s*columns\\s*=",
+              "msg": ".rename(columns={...})."
+            }
+          ]
+        },
+        {
+          "t": "Count categories",
+          "card": "<p><code class='mono text-cyan-300'>.value_counts()</code> tallies a Series.</p>",
+          "mission": "Tally the <code class='mono'>probe</code> column into <b class='text-white'>counts</b>.",
+          "ph": "counts = df[\"probe\"].value_counts()",
+          "sol": "counts = df[\"probe\"].value_counts()",
+          "re": "^counts\\s*=\\s*df\\[\\s*([\"'])probe\\1\\s*\\]\\.value_counts\\(\\s*\\)$",
+          "ok": [
+            "frequency table"
+          ],
+          "checks": [
+            {
+              "re": "\\.value_counts\\(",
+              "msg": ".value_counts()."
+            }
+          ]
+        },
+        {
+          "t": "Sort by column",
+          "card": "<p><code class='mono text-cyan-300'>.sort_values(\"col\")</code> orders rows.</p>",
+          "mission": "Sort rows by <code class='mono'>speed</code> into <b class='text-white'>ranked</b>.",
+          "ph": "ranked = df.sort_values(\"speed\")",
+          "sol": "ranked = df.sort_values(\"speed\")",
+          "re": "^ranked\\s*=\\s*df\\.sort_values\\(\\s*([\"'])speed\\1\\s*\\)$",
+          "ok": [
+            "ordered by speed"
+          ],
+          "checks": [
+            {
+              "re": "\\.sort_values\\(\\s*([\"'])speed",
+              "msg": ".sort_values(\"speed\")."
+            }
+          ]
+        },
+        {
+          "t": "First rows",
+          "card": "<p><code class='mono text-cyan-300'>.head(n)</code> peeks at the top.</p>",
+          "mission": "First 3 rows into <b class='text-white'>top</b>.",
+          "ph": "top = df.head(3)",
+          "sol": "top = df.head(3)",
+          "re": "^top\\s*=\\s*df\\.head\\(\\s*3\\s*\\)$",
+          "ok": [
+            "3 rows"
+          ],
+          "checks": [
+            {
+              "re": "\\.head\\(\\s*3",
+              "msg": ".head(3)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pandas-aggregation",
+      "name": "Pandas Aggregation",
+      "questions": [
+        {
+          "t": "Group and mean",
+          "card": "<p><code class='mono text-cyan-300'>groupby(k)[col].mean()</code> — split-apply-combine.</p>",
+          "mission": "Mean speed per <code class='mono'>band</code> into <b class='text-white'>g</b>.",
+          "ph": "g = df.groupby(\"band\")[\"speed\"].mean()",
+          "sol": "g = df.groupby(\"band\")[\"speed\"].mean()",
+          "re": "^g\\s*=\\s*df\\.groupby\\(\\s*([\"'])band\\1\\s*\\)\\[\\s*([\"'])speed\\2\\s*\\]\\.mean\\(\\s*\\)$",
+          "ok": [
+            "mean per band"
+          ],
+          "checks": [
+            {
+              "re": "\\.groupby\\(\\s*([\"'])band",
+              "msg": "groupby(\"band\")."
+            },
+            {
+              "re": "\\.mean\\(",
+              "msg": "…[\"speed\"].mean()."
+            }
+          ]
+        },
+        {
+          "t": "Multiple aggregates",
+          "card": "<p><code class='mono text-cyan-300'>.agg([...])</code> runs several reducers.</p>",
+          "mission": "Mean and max of <code class='mono'>speed</code> into <b class='text-white'>stats</b>.",
+          "ph": "stats = df[\"speed\"].agg([\"mean\", \"max\"])",
+          "sol": "stats = df[\"speed\"].agg([\"mean\", \"max\"])",
+          "re": "^stats\\s*=\\s*df\\[\\s*([\"'])speed\\1\\s*\\]\\.agg\\(\\s*\\[\\s*([\"'])mean\\2\\s*,\\s*([\"'])max\\3\\s*\\]\\s*\\)$",
+          "ok": [
+            "mean + max"
+          ],
+          "checks": [
+            {
+              "re": "\\.agg\\(\\s*\\[",
+              "msg": ".agg([...])."
+            },
+            {
+              "re": "mean",
+              "msg": "Include \"mean\"."
+            }
+          ]
+        },
+        {
+          "t": "Fill missing",
+          "card": "<p><code class='mono text-cyan-300'>.fillna(v)</code> replaces NaN.</p>",
+          "mission": "Fill NaNs with 0 into <b class='text-white'>filled</b>.",
+          "ph": "filled = df.fillna(0)",
+          "sol": "filled = df.fillna(0)",
+          "re": "^filled\\s*=\\s*df\\.fillna\\(\\s*0\\s*\\)$",
+          "ok": [
+            "no NaNs"
+          ],
+          "checks": [
+            {
+              "re": "\\.fillna\\(\\s*0",
+              "msg": ".fillna(0)."
+            }
+          ]
+        },
+        {
+          "t": "Drop missing",
+          "card": "<p><code class='mono text-cyan-300'>.dropna()</code> removes NaN rows.</p>",
+          "mission": "Drop rows with NaN into <b class='text-white'>clean</b>.",
+          "ph": "clean = df.dropna()",
+          "sol": "clean = df.dropna()",
+          "re": "^clean\\s*=\\s*df\\.dropna\\(\\s*\\)$",
+          "ok": [
+            "complete rows only"
+          ],
+          "checks": [
+            {
+              "re": "\\.dropna\\(",
+              "msg": ".dropna()."
+            }
+          ]
+        },
+        {
+          "t": "Apply a function",
+          "card": "<p><code class='mono text-cyan-300'>.apply(fn)</code> maps each value.</p>",
+          "mission": "Add a <code class='mono'>km</code> column = speed × 1.6.",
+          "ph": "df[\"km\"] = df[\"speed\"].apply(lambda x: x * 1.6)",
+          "sol": "df[\"km\"] = df[\"speed\"].apply(lambda x: x * 1.6)",
+          "re": "^df\\[\\s*([\"'])km\\1\\s*\\]\\s*=\\s*df\\[\\s*([\"'])speed\\2\\s*\\]\\.apply\\(\\s*lambda\\s+x\\s*:\\s*x\\s*\\*\\s*1\\.6\\s*\\)$",
+          "ok": [
+            "km column added"
+          ],
+          "checks": [
+            {
+              "re": "\\.apply\\(\\s*lambda",
+              "msg": ".apply(lambda x: ...)."
+            },
+            {
+              "re": "x\\s*\\*\\s*1\\.6",
+              "msg": "x * 1.6."
+            }
+          ]
+        },
+        {
+          "t": "Column mean",
+          "card": "<p>Series reductions collapse to a scalar.</p>",
+          "mission": "Mean of the <code class='mono'>speed</code> column into <b class='text-white'>mspeed</b>.",
+          "ph": "mspeed = df[\"speed\"].mean()",
+          "sol": "mspeed = df[\"speed\"].mean()",
+          "re": "^mspeed\\s*=\\s*df\\[\\s*([\"'])speed\\1\\s*\\]\\.mean\\(\\s*\\)$",
+          "ok": [
+            "116.0"
+          ],
+          "checks": [
+            {
+              "re": "df\\[\\s*([\"'])speed\\1\\s*\\]\\.mean\\(",
+              "msg": "df[\"speed\"].mean()."
+            }
+          ]
+        },
+        {
+          "t": "Top-n rows",
+          "card": "<p><code class='mono text-cyan-300'>.nlargest(n, col)</code> — the n biggest.</p>",
+          "mission": "Two fastest rows into <b class='text-white'>top2</b>.",
+          "ph": "top2 = df.nlargest(2, \"speed\")",
+          "sol": "top2 = df.nlargest(2, \"speed\")",
+          "re": "^top2\\s*=\\s*df\\.nlargest\\(\\s*2\\s*,\\s*([\"'])speed\\1\\s*\\)$",
+          "ok": [
+            "2 fastest probes"
+          ],
+          "checks": [
+            {
+              "re": "\\.nlargest\\(\\s*2\\s*,",
+              "msg": ".nlargest(2, \"speed\")."
+            }
+          ]
+        },
+        {
+          "t": "Summary stats",
+          "card": "<p><code class='mono text-cyan-300'>.describe()</code> — count/mean/std/quartiles.</p>",
+          "mission": "Describe the <code class='mono'>speed</code> column into <b class='text-white'>summary</b>.",
+          "ph": "summary = df[\"speed\"].describe()",
+          "sol": "summary = df[\"speed\"].describe()",
+          "re": "^summary\\s*=\\s*df\\[\\s*([\"'])speed\\1\\s*\\]\\.describe\\(\\s*\\)$",
+          "ok": [
+            "8-number summary"
+          ],
+          "checks": [
+            {
+              "re": "\\.describe\\(",
+              "msg": ".describe()."
+            }
+          ]
+        },
+        {
+          "t": "Flatten a groupby",
+          "card": "<p><code class='mono text-cyan-300'>.reset_index()</code> turns the index back into a column.</p>",
+          "mission": "Flatten the grouped result <code class='mono'>g</code> into <b class='text-white'>flat</b>.",
+          "ctx": "g = df.groupby(\"band\")[\"speed\"].mean()",
+          "ph": "flat = g.reset_index()",
+          "sol": "flat = g.reset_index()",
+          "re": "^flat\\s*=\\s*g\\.reset_index\\(\\s*\\)$",
+          "ok": [
+            "tidy DataFrame"
+          ],
+          "checks": [
+            {
+              "re": "\\.reset_index\\(",
+              "msg": ".reset_index()."
+            }
+          ]
+        },
+        {
+          "t": "Join two frames",
+          "card": "<p><code class='mono text-cyan-300'>pd.merge(a, b, on=key)</code> — a SQL join.</p>",
+          "mission": "Join <code class='mono'>df</code> with <code class='mono'>meta</code> on <code class='mono'>probe</code> into <b class='text-white'>joined</b>.",
+          "ph": "joined = pd.merge(df, meta, on=\"probe\")",
+          "sol": "joined = pd.merge(df, meta, on=\"probe\")",
+          "re": "^joined\\s*=\\s*pd\\.merge\\(\\s*df\\s*,\\s*meta\\s*,\\s*on\\s*=\\s*([\"'])probe\\1\\s*\\)$",
+          "ok": [
+            "merged on probe"
+          ],
+          "checks": [
+            {
+              "re": "pd\\.merge\\(\\s*df\\s*,\\s*meta",
+              "msg": "pd.merge(df, meta, ...)."
+            },
+            {
+              "re": "on\\s*=\\s*([\"'])probe",
+              "msg": "Join on=\"probe\"."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "visualization",
+      "name": "Visualization",
+      "questions": [
+        {
+          "t": "import matplotlib",
+          "card": "<p><code class='mono text-cyan-300'>pyplot</code> is the Matlab-style API to matplotlib.</p>",
+          "mission": "Import <code class='mono'>matplotlib.pyplot</code> as <code class='mono'>plt</code>.",
+          "ph": "import matplotlib.pyplot as plt",
+          "sol": "import matplotlib.pyplot as plt",
+          "re": "^import\\s+matplotlib\\.pyplot\\s+as\\s+plt$",
+          "ok": [
+            "plt ready"
+          ],
+          "checks": [
+            {
+              "re": "as\\s+plt",
+              "msg": "Alias to plt."
+            }
+          ]
+        },
+        {
+          "t": "plt.plot",
+          "card": "<p><code class='mono text-cyan-300'>plt.plot(x, y)</code> — the default line chart.</p>",
+          "mission": "Plot <code class='mono'>xs</code>, <code class='mono'>ys</code>.",
+          "ph": "plt.plot(xs, ys)",
+          "sol": "plt.plot(xs, ys)",
+          "re": "^plt\\.plot\\(\\s*xs\\s*,\\s*ys\\s*\\)$",
+          "ok": [
+            "line drawn"
+          ],
+          "checks": [
+            {
+              "re": "plt\\.plot\\(",
+              "msg": "Call plt.plot."
+            }
+          ]
+        },
+        {
+          "t": "scatter",
+          "card": "<p><code class='mono text-cyan-300'>plt.scatter(x, y)</code> — one dot per pair.</p>",
+          "mission": "Scatter <code class='mono'>height</code> vs <code class='mono'>weight</code>.",
+          "ph": "plt.scatter(height, weight)",
+          "sol": "plt.scatter(height, weight)",
+          "re": "^plt\\.scatter\\(\\s*height\\s*,\\s*weight\\s*\\)$",
+          "ok": [
+            "dots plotted"
+          ],
+          "checks": [
+            {
+              "re": "plt\\.scatter\\(",
+              "msg": "Use scatter."
+            }
+          ]
+        },
+        {
+          "t": "histogram",
+          "card": "<p><code class='mono text-cyan-300'>plt.hist(x, bins=n)</code> reveals distribution shape.</p>",
+          "mission": "Draw <code class='mono'>ages</code> with 20 bins.",
+          "ph": "plt.hist(ages, bins=20)",
+          "sol": "plt.hist(ages, bins=20)",
+          "re": "^plt\\.hist\\(\\s*ages\\s*,\\s*bins\\s*=\\s*20\\s*\\)$",
+          "ok": [
+            "distribution shown"
+          ],
+          "checks": [
+            {
+              "re": "plt\\.hist\\(",
+              "msg": "Use plt.hist."
+            }
+          ]
+        },
+        {
+          "t": "labels + title",
+          "card": "<p>Every chart deserves labels + a title.</p>",
+          "mission": "Set title to <code class='mono'>Speed</code>.",
+          "ph": "plt.title('Speed')",
+          "sol": "plt.title('Speed')",
+          "re": "^plt\\.title\\(\\s*['\"]Speed['\"]\\s*\\)$",
+          "ok": [
+            "titled"
+          ],
+          "checks": [
+            {
+              "re": "plt\\.title\\(",
+              "msg": "Call plt.title."
+            }
+          ]
+        },
+        {
+          "t": "seaborn heatmap",
+          "card": "<p><code class='mono text-cyan-300'>sns.heatmap</code> for correlations / confusion matrices.</p>",
+          "mission": "Heatmap <code class='mono'>corr</code>.",
+          "ph": "sns.heatmap(corr)",
+          "sol": "sns.heatmap(corr)",
+          "re": "^sns\\.heatmap\\(\\s*corr\\s*\\)$",
+          "ok": [
+            "heat drawn"
+          ],
+          "checks": [
+            {
+              "re": "sns\\.heatmap\\(",
+              "msg": "Use sns.heatmap."
+            }
+          ]
+        },
+        {
+          "t": "boxplot outliers",
+          "card": "<p><code class='mono text-cyan-300'>sns.boxplot</code> visualizes distribution + outliers.</p>",
+          "mission": "Box <code class='mono'>speed</code>.",
+          "ph": "sns.boxplot(x=speed)",
+          "sol": "sns.boxplot(x=speed)",
+          "re": "^sns\\.boxplot\\(\\s*x\\s*=\\s*speed\\s*\\)$",
+          "ok": [
+            "whiskers shown"
+          ],
+          "checks": [
+            {
+              "re": "boxplot\\(",
+              "msg": "Use sns.boxplot."
+            }
+          ]
+        },
+        {
+          "t": "save figure",
+          "card": "<p><code class='mono text-cyan-300'>plt.savefig(path)</code> writes to disk.</p>",
+          "mission": "Save to <code class='mono'>out.png</code>.",
+          "ph": "plt.savefig('out.png')",
+          "sol": "plt.savefig('out.png')",
+          "re": "^plt\\.savefig\\(\\s*['\"]out\\.png['\"]\\s*\\)$",
+          "ok": [
+            "file written"
+          ],
+          "checks": [
+            {
+              "re": "plt\\.savefig\\(",
+              "msg": "Use plt.savefig."
+            }
+          ]
+        },
+        {
+          "t": "subplots grid",
+          "card": "<p><code class='mono text-cyan-300'>plt.subplots(r, c)</code> makes a grid of axes.</p>",
+          "mission": "Make 1 row, 2 cols into <code class='mono'>fig, axes</code>.",
+          "ph": "fig, axes = plt.subplots(1, 2)",
+          "sol": "fig, axes = plt.subplots(1, 2)",
+          "re": "^fig\\s*,\\s*axes\\s*=\\s*plt\\.subplots\\(\\s*1\\s*,\\s*2\\s*\\)$",
+          "ok": [
+            "2-panel grid"
+          ],
+          "checks": [
+            {
+              "re": "plt\\.subplots\\(",
+              "msg": "Call plt.subplots."
+            }
+          ]
+        },
+        {
+          "t": "plotly express",
+          "card": "<p><code class='mono text-cyan-300'>plotly.express</code> is the fast, interactive path.</p>",
+          "mission": "Import as <code class='mono'>px</code>.",
+          "ph": "import plotly.express as px",
+          "sol": "import plotly.express as px",
+          "re": "^import\\s+plotly\\.express\\s+as\\s+px$",
+          "ok": [
+            "px ready"
+          ],
+          "checks": [
+            {
+              "re": "as\\s+px",
+              "msg": "Alias to px."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "statistics",
+      "name": "Statistics",
+      "questions": [
+        {
+          "t": "median",
+          "card": "<p>Median = robust center; resists outliers.</p>",
+          "mission": "Median of <code class='mono'>x</code> into <b class='text-white'>med</b>.",
+          "ph": "med = np.median(x)",
+          "sol": "med = np.median(x)",
+          "re": "^med\\s*=\\s*np\\.median\\(\\s*x\\s*\\)$",
+          "ok": [
+            "center found"
+          ],
+          "checks": [
+            {
+              "re": "np\\.median\\(",
+              "msg": "Use np.median."
+            }
+          ]
+        },
+        {
+          "t": "variance",
+          "card": "<p>Variance = mean squared deviation.</p>",
+          "mission": "Variance into <b class='text-white'>v</b>.",
+          "ph": "v = np.var(x)",
+          "sol": "v = np.var(x)",
+          "re": "^v\\s*=\\s*np\\.var\\(\\s*x\\s*\\)$",
+          "ok": [
+            "spread"
+          ],
+          "checks": [
+            {
+              "re": "np\\.var\\(",
+              "msg": "Use np.var."
+            }
+          ]
+        },
+        {
+          "t": "std deviation",
+          "card": "<p>Std = √variance; same units as data.</p>",
+          "mission": "Std into <b class='text-white'>s</b>.",
+          "ph": "s = np.std(x)",
+          "sol": "s = np.std(x)",
+          "re": "^s\\s*=\\s*np\\.std\\(\\s*x\\s*\\)$",
+          "ok": [
+            "sigma"
+          ],
+          "checks": [
+            {
+              "re": "np\\.std\\(",
+              "msg": "Use np.std."
+            }
+          ]
+        },
+        {
+          "t": "quantile 0.95",
+          "card": "<p><code class='mono text-cyan-300'>np.quantile</code> — value at the p-th cutoff.</p>",
+          "mission": "Get p95 into <b class='text-white'>q95</b>.",
+          "ph": "q95 = np.quantile(x, 0.95)",
+          "sol": "q95 = np.quantile(x, 0.95)",
+          "re": "^q95\\s*=\\s*np\\.quantile\\(\\s*x\\s*,\\s*0\\.95\\s*\\)$",
+          "ok": [
+            "95th %ile"
+          ],
+          "checks": [
+            {
+              "re": "np\\.quantile\\(",
+              "msg": "Use np.quantile."
+            }
+          ]
+        },
+        {
+          "t": "correlation",
+          "card": "<p><code class='mono text-cyan-300'>np.corrcoef</code> — Pearson linear correlation.</p>",
+          "mission": "Correlate <code class='mono'>a, b</code> into <b class='text-white'>r</b>.",
+          "ph": "r = np.corrcoef(a, b)",
+          "sol": "r = np.corrcoef(a, b)",
+          "re": "^r\\s*=\\s*np\\.corrcoef\\(\\s*a\\s*,\\s*b\\s*\\)$",
+          "ok": [
+            "[-1..1]"
+          ],
+          "checks": [
+            {
+              "re": "corrcoef\\(",
+              "msg": "Use np.corrcoef."
+            }
+          ]
+        },
+        {
+          "t": "z-score",
+          "card": "<p>Z-score = (x − mean) / std — standardize.</p>",
+          "mission": "Compute into <b class='text-white'>z</b>.",
+          "ph": "z = (x - x.mean()) / x.std()",
+          "sol": "z = (x - x.mean()) / x.std()",
+          "re": "^z\\s*=\\s*\\(\\s*x\\s*-\\s*x\\.mean\\(\\s*\\)\\s*\\)\\s*/\\s*x\\.std\\(\\s*\\)$",
+          "ok": [
+            "standardized"
+          ],
+          "checks": [
+            {
+              "re": "x\\.mean\\(",
+              "msg": "Subtract the mean."
+            },
+            {
+              "re": "x\\.std\\(",
+              "msg": "Divide by std."
+            }
+          ]
+        },
+        {
+          "t": "t-test",
+          "card": "<p><code class='mono text-cyan-300'>scipy.stats.ttest_ind</code> compares two groups.</p>",
+          "mission": "Compare <code class='mono'>a, b</code> into <b class='text-white'>t, p</b>.",
+          "ph": "t, p = stats.ttest_ind(a, b)",
+          "sol": "t, p = stats.ttest_ind(a, b)",
+          "re": "^t\\s*,\\s*p\\s*=\\s*stats\\.ttest_ind\\(\\s*a\\s*,\\s*b\\s*\\)$",
+          "ok": [
+            "t, p returned"
+          ],
+          "checks": [
+            {
+              "re": "ttest_ind\\(",
+              "msg": "Use ttest_ind."
+            }
+          ]
+        },
+        {
+          "t": "normal sample",
+          "card": "<p><code class='mono text-cyan-300'>np.random.normal(mu, sigma, n)</code> — draw from Gaussian.</p>",
+          "mission": "Draw 100 with mean 0, std 1 into <b class='text-white'>x</b>.",
+          "ph": "x = np.random.normal(0, 1, 100)",
+          "sol": "x = np.random.normal(0, 1, 100)",
+          "re": "^x\\s*=\\s*np\\.random\\.normal\\(\\s*0\\s*,\\s*1\\s*,\\s*100\\s*\\)$",
+          "ok": [
+            "100 draws"
+          ],
+          "checks": [
+            {
+              "re": "np\\.random\\.normal\\(",
+              "msg": "Use np.random.normal."
+            }
+          ]
+        },
+        {
+          "t": "confidence interval",
+          "card": "<p>68/95/99 rule — mean ± 1.96·SEM ≈ 95% CI.</p>",
+          "mission": "Half-width: <code class='mono'>hw = 1.96 * s / n**0.5</code>.",
+          "ph": "hw = 1.96 * s / n**0.5",
+          "sol": "hw = 1.96 * s / n**0.5",
+          "re": "^hw\\s*=\\s*1\\.96\\s*\\*\\s*s\\s*/\\s*n\\*\\*0\\.5$",
+          "ok": [
+            "±hw"
+          ],
+          "checks": [
+            {
+              "re": "1\\.96",
+              "msg": "Use 1.96."
+            }
+          ]
+        },
+        {
+          "t": "linear regression fit",
+          "card": "<p><code class='mono text-cyan-300'>scipy.stats.linregress</code> — slope + intercept + r.</p>",
+          "mission": "Fit into <b class='text-white'>reg</b>.",
+          "ph": "reg = stats.linregress(x, y)",
+          "sol": "reg = stats.linregress(x, y)",
+          "re": "^reg\\s*=\\s*stats\\.linregress\\(\\s*x\\s*,\\s*y\\s*\\)$",
+          "ok": [
+            "slope, intercept"
+          ],
+          "checks": [
+            {
+              "re": "linregress\\(",
+              "msg": "Use linregress."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sql",
+      "name": "SQL",
+      "questions": [
+        {
+          "t": "SELECT *",
+          "card": "<p><code class='mono text-cyan-300'>SELECT ... FROM t</code> — read every column.</p>",
+          "mission": "Read all rows from <code class='mono'>users</code> into <b class='text-white'>q</b>.",
+          "ph": "q = 'SELECT * FROM users'",
+          "sol": "q = 'SELECT * FROM users'",
+          "re": "^q\\s*=\\s*['\"]SELECT \\* FROM users['\"]$",
+          "ok": [
+            "query built"
+          ],
+          "checks": [
+            {
+              "re": "SELECT\\s+\\*",
+              "msg": "SELECT *."
+            }
+          ]
+        },
+        {
+          "t": "WHERE",
+          "card": "<p><code class='mono text-cyan-300'>WHERE</code> filters rows.</p>",
+          "mission": "Users with age > 18 as <b class='text-white'>q</b>.",
+          "ph": "q = 'SELECT * FROM users WHERE age > 18'",
+          "sol": "q = 'SELECT * FROM users WHERE age > 18'",
+          "re": "^q\\s*=\\s*['\"]SELECT \\* FROM users WHERE age > 18['\"]$",
+          "ok": [
+            "filtered"
+          ],
+          "checks": [
+            {
+              "re": "WHERE\\s+age",
+              "msg": "Add WHERE clause."
+            }
+          ]
+        },
+        {
+          "t": "GROUP BY count",
+          "card": "<p><code class='mono text-cyan-300'>GROUP BY</code> buckets rows for aggregation.</p>",
+          "mission": "Count users per <code class='mono'>country</code> into <b class='text-white'>q</b>.",
+          "ph": "q = 'SELECT country, COUNT(*) FROM users GROUP BY country'",
+          "sol": "q = 'SELECT country, COUNT(*) FROM users GROUP BY country'",
+          "re": "^q\\s*=\\s*['\"]SELECT country, COUNT\\(\\*\\) FROM users GROUP BY country['\"]$",
+          "ok": [
+            "grouped"
+          ],
+          "checks": [
+            {
+              "re": "GROUP\\s+BY",
+              "msg": "Use GROUP BY."
+            }
+          ]
+        },
+        {
+          "t": "ORDER BY",
+          "card": "<p><code class='mono text-cyan-300'>ORDER BY col DESC</code> sorts.</p>",
+          "mission": "Top 5 by <code class='mono'>score</code> descending.",
+          "ph": "q = 'SELECT * FROM users ORDER BY score DESC LIMIT 5'",
+          "sol": "q = 'SELECT * FROM users ORDER BY score DESC LIMIT 5'",
+          "re": "^q\\s*=\\s*['\"]SELECT \\* FROM users ORDER BY score DESC LIMIT 5['\"]$",
+          "ok": [
+            "sorted top-5"
+          ],
+          "checks": [
+            {
+              "re": "ORDER\\s+BY",
+              "msg": "Add ORDER BY."
+            },
+            {
+              "re": "LIMIT\\s+5",
+              "msg": "LIMIT 5."
+            }
+          ]
+        },
+        {
+          "t": "INNER JOIN",
+          "card": "<p><code class='mono text-cyan-300'>INNER JOIN</code> keeps matching rows from both tables.</p>",
+          "mission": "Join <code class='mono'>orders o</code> to <code class='mono'>users u ON o.uid = u.id</code>.",
+          "ph": "q = 'SELECT * FROM orders o INNER JOIN users u ON o.uid = u.id'",
+          "sol": "q = 'SELECT * FROM orders o INNER JOIN users u ON o.uid = u.id'",
+          "re": "^q\\s*=\\s*['\"]SELECT \\* FROM orders o INNER JOIN users u ON o\\.uid = u\\.id['\"]$",
+          "ok": [
+            "joined"
+          ],
+          "checks": [
+            {
+              "re": "INNER\\s+JOIN",
+              "msg": "INNER JOIN."
+            }
+          ]
+        },
+        {
+          "t": "read_sql",
+          "card": "<p><code class='mono text-cyan-300'>pd.read_sql</code> executes a query into a DataFrame.</p>",
+          "mission": "Run <code class='mono'>q</code> over <code class='mono'>conn</code> into <b class='text-white'>df</b>.",
+          "ph": "df = pd.read_sql(q, conn)",
+          "sol": "df = pd.read_sql(q, conn)",
+          "re": "^df\\s*=\\s*pd\\.read_sql\\(\\s*q\\s*,\\s*conn\\s*\\)$",
+          "ok": [
+            "rows loaded"
+          ],
+          "checks": [
+            {
+              "re": "pd\\.read_sql\\(",
+              "msg": "Use pd.read_sql."
+            }
+          ]
+        },
+        {
+          "t": "CREATE TABLE",
+          "card": "<p>DDL — <code class='mono text-cyan-300'>CREATE TABLE</code> declares the schema.</p>",
+          "mission": "Two cols: <code class='mono'>id INT</code>, <code class='mono'>name TEXT</code>.",
+          "ph": "q = 'CREATE TABLE users (id INT, name TEXT)'",
+          "sol": "q = 'CREATE TABLE users (id INT, name TEXT)'",
+          "re": "^q\\s*=\\s*['\"]CREATE TABLE users \\(id INT, name TEXT\\)['\"]$",
+          "ok": [
+            "table created"
+          ],
+          "checks": [
+            {
+              "re": "CREATE\\s+TABLE",
+              "msg": "Add CREATE TABLE."
+            }
+          ]
+        },
+        {
+          "t": "INSERT VALUES",
+          "card": "<p>DML — <code class='mono text-cyan-300'>INSERT INTO ... VALUES</code>.</p>",
+          "mission": "Insert one row (1, 'ada').",
+          "ph": "q = \"INSERT INTO users VALUES (1, 'ada')\"",
+          "sol": "q = \"INSERT INTO users VALUES (1, 'ada')\"",
+          "re": "^q\\s*=\\s*['\"]INSERT INTO users VALUES \\(1, ['\\\"]ada['\\\"]\\)['\"]$",
+          "ok": [
+            "row added"
+          ],
+          "checks": [
+            {
+              "re": "INSERT\\s+INTO",
+              "msg": "INSERT INTO."
+            }
+          ]
+        },
+        {
+          "t": "sqlite connect",
+          "card": "<p><code class='mono text-cyan-300'>sqlite3.connect(path)</code> opens (creates) a DB file.</p>",
+          "mission": "Open <code class='mono'>app.db</code> as <b class='text-white'>conn</b>.",
+          "ph": "conn = sqlite3.connect('app.db')",
+          "sol": "conn = sqlite3.connect('app.db')",
+          "re": "^conn\\s*=\\s*sqlite3\\.connect\\(\\s*['\"]app\\.db['\"]\\s*\\)$",
+          "ok": [
+            "connected"
+          ],
+          "checks": [
+            {
+              "re": "sqlite3\\.connect\\(",
+              "msg": "Use sqlite3.connect."
+            }
+          ]
+        },
+        {
+          "t": "window row_number",
+          "card": "<p>Window: <code class='mono text-cyan-300'>ROW_NUMBER() OVER (PARTITION BY ... ORDER BY ...)</code>.</p>",
+          "mission": "Rank within each <code class='mono'>uid</code> by <code class='mono'>ts</code>.",
+          "ph": "q = 'SELECT *, ROW_NUMBER() OVER (PARTITION BY uid ORDER BY ts) FROM events'",
+          "sol": "q = 'SELECT *, ROW_NUMBER() OVER (PARTITION BY uid ORDER BY ts) FROM events'",
+          "re": "^q\\s*=\\s*['\"]SELECT \\*, ROW_NUMBER\\(\\) OVER \\(PARTITION BY uid ORDER BY ts\\) FROM events['\"]$",
+          "ok": [
+            "ranked"
+          ],
+          "checks": [
+            {
+              "re": "ROW_NUMBER\\(\\)",
+              "msg": "Use ROW_NUMBER()."
+            },
+            {
+              "re": "PARTITION\\s+BY",
+              "msg": "PARTITION BY uid."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

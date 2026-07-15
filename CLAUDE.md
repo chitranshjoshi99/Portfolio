@@ -4,6 +4,8 @@ This file is read by Claude at the start of every session. It captures
 architecture decisions, conventions, and gotchas so you don't have to
 re-derive them from the code.
 
+**Last updated:** 2026-07-02
+
 ---
 
 ## What this project is
@@ -28,6 +30,7 @@ src/
 │   ├── ChannelStatic/    index.tsx + style.css   ← TV static noise canvas (on-demand only)
 │   ├── CodePanel/        index.tsx + style.css   ← expandable code window (titlebar + pre)
 │   ├── CodePopup/        index.tsx + style.css   ← mobile "Show Code" popup; iOS-style zoom open/close (reuses CodePanel)
+│   ├── CursorRocket/     index.tsx + style.css   ← app-wide custom cursor: pixel rocket, rotates toward mouse-travel direction
 │   ├── ExperienceCard/   index.tsx + style.css
 │   ├── Handheld/         index.tsx + style.css   ← mobile "See in Action" brick-game console modal (HH games)
 │   ├── JourneyProgress/  index.tsx + style.css
@@ -38,6 +41,7 @@ src/
 │   ├── SceneText/        index.tsx + style.css   ← title + teaser + SHOW LOGIC toggle
 │   ├── ScrollIndicator/  index.tsx + style.css
 │   ├── ScrollToTop/      index.tsx
+│   ├── SpaceBackground/  index.tsx + style.css   ← app-wide fixed bg layer: dark = pixel space (stars/moon), light = pixel sky (clouds/sun)
 │   ├── StatCard/         index.tsx + style.css
 │   ├── ThemeToggle/      index.tsx
 │   ├── TVScreen/         index.tsx + style.css   ← channel host + static-burst FSM
@@ -74,18 +78,20 @@ src/
 
 ## Critical files
 
-| File                                     | Purpose                                                                                                                                                                                                                                                                                                                         |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/data/resume.ts`                     | **Only place resume content lives.** Edit here; pages pick it up automatically.                                                                                                                                                                                                                                                 |
-| `src/data/labs.ts`                       | **Only place Labs content lives.** All experiments, channels, teasers, code snippets. See §Labs internals.                                                                                                                                                                                                                      |
-| `src/styles/tokens.css`                  | All CSS custom properties — palette, spacing, fonts, shadows. Edit colours here, not inline.                                                                                                                                                                                                                                    |
-| `src/styles/global.css`                  | Reset, utility classes (`.pixel-text`, `.vt-text`, animations), **all `.btn` / `.btn--*` variants** (each sets `--btn-shadow` for the 3D-press mechanic — see §Button system), and two blink keyframes: `blink` (step-end, for cursors/CTAs) and `blink-soft` (ease-in-out fade, for persistent chrome like the navbar cursor). |
-| `src/contexts/ThemeContext.tsx`          | Dark/light theme. Reads `prefers-color-scheme` as default; persists override in `localStorage` under key `cj-portfolio-theme`. Applies `data-theme` attribute to `<html>`.                                                                                                                                                      |
-| `src/contexts/ScrollProgressContext.tsx` | One shared rAF loop writing `--p` (0→1) onto registered scene elements. Used by Labs SceneText for entry animations.                                                                                                                                                                                                            |
-| `src/pages/Contact/index.tsx`            | Has `FORMSPREE_ID` constant at the top — set it to enable direct email.                                                                                                                                                                                                                                                         |
-| `src/utils/haptics.ts`                   | Thin wrapper around `navigator.vibrate` + stub for future haptic patterns. Import `haptics` and call `.tap()`, `.press()`, `.toggle()`, `.reveal()`.                                                                                                                                                                            |
-| `src/components/Magic8Ball/index.tsx`    | Self-contained pixel-art oracle game. Lives in **Labs → magic8ball toy scene**. See §Magic8Ball below.                                                                                                                                                                                                                          |
-| `src/components/TVScreen/index.tsx`      | Channel host FSM (`live` / `static`). `GAME_MAP` here maps `GameKey → Component`. Add new TV games here.                                                                                                                                                                                                                        |
+| File                                       | Purpose                                                                                                                                                                                                                                                                                                                         |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/data/resume.ts`                       | **Only place resume content lives.** Edit here; pages pick it up automatically.                                                                                                                                                                                                                                                 |
+| `src/data/labs.ts`                         | **Only place Labs content lives.** All experiments, channels, teasers, code snippets. See §Labs internals.                                                                                                                                                                                                                      |
+| `src/styles/tokens.css`                    | All CSS custom properties — palette, spacing, fonts, shadows. Edit colours here, not inline.                                                                                                                                                                                                                                    |
+| `src/styles/global.css`                    | Reset, utility classes (`.pixel-text`, `.vt-text`, animations), **all `.btn` / `.btn--*` variants** (each sets `--btn-shadow` for the 3D-press mechanic — see §Button system), and two blink keyframes: `blink` (step-end, for cursors/CTAs) and `blink-soft` (ease-in-out fade, for persistent chrome like the navbar cursor). |
+| `src/contexts/ThemeContext.tsx`            | Dark/light theme. Reads `prefers-color-scheme` as default; persists override in `localStorage` under key `cj-portfolio-theme`. Applies `data-theme` attribute to `<html>`.                                                                                                                                                      |
+| `src/contexts/ScrollProgressContext.tsx`   | One shared rAF loop writing `--p` (0→1) onto registered scene elements. Used by Labs SceneText for entry animations.                                                                                                                                                                                                            |
+| `src/pages/Contact/index.tsx`              | Has `FORMSPREE_ID` constant at the top — set it to enable direct email.                                                                                                                                                                                                                                                         |
+| `src/utils/haptics.ts`                     | Thin wrapper around `navigator.vibrate` + stub for future haptic patterns. Import `haptics` and call `.tap()`, `.press()`, `.toggle()`, `.reveal()`.                                                                                                                                                                            |
+| `src/components/Magic8Ball/index.tsx`      | Self-contained pixel-art oracle game. Lives in **Labs → magic8ball toy scene**. See §Magic8Ball below.                                                                                                                                                                                                                          |
+| `src/components/TVScreen/index.tsx`        | Channel host FSM (`live` / `static`). `GAME_MAP` here maps `GameKey → Component`. Add new TV games here.                                                                                                                                                                                                                        |
+| `src/components/CursorRocket/index.tsx`    | App-wide custom cursor. Mounted once in `App.tsx`. See §Cursor & background layers below.                                                                                                                                                                                                                                       |
+| `src/components/SpaceBackground/index.tsx` | App-wide fixed background layer (space/sky). Mounted once in `App.tsx`. See §Cursor & background layers below.                                                                                                                                                                                                                  |
 
 ---
 
@@ -208,6 +214,34 @@ haptics.reveal(); // triple escalating pulse — Magic8Ball reveal
 ```
 
 All methods are no-ops where `navigator.vibrate` is unsupported (desktop). Every interactive element in Navbar and Home CTAs is wired to haptics.
+
+---
+
+## Cursor & background layers (added 2026-07-01)
+
+Two shared, app-wide fixed-position layers, each mounted **once** in `src/App.tsx` (inside `ThemeProvider`, outside/alongside `<Routes>` so they persist across route changes without remounting):
+
+### `CursorRocket`
+
+`src/components/CursorRocket/` replaces the native OS cursor everywhere with a small pixel-art rocket (inline SVG, `shapeRendering="crispEdges"`) that rotates to point in the direction of mouse travel.
+
+- Global `cursor: none !important` rule lives in `global.css` (one rule, not scattered per-component).
+- Position/rotation are written directly to `style.transform` inside a `requestAnimationFrame` loop, driven by refs — **not** `useState` — mirroring `ScrollProgressContext`'s no-re-render discipline. Rotation = `atan2(dy, dx) + 90deg` (rocket is drawn nose-up/north in its own coordinate space), smoothed with a lerp, snapping to nose-up after ~150ms idle.
+- Respects `prefers-reduced-motion`: skips the lerp and snaps directly to the target angle instead of easing.
+- Rocket body/flame use `var(--accent-primary)` / `var(--accent-secondary)` — no hardcoded colors, so it re-themes automatically with dark/light.
+- The cursor element is `pointer-events: none` and sits at the new `--z-cursor: 400` token (tokens.css), above `--z-modal: 300` so it renders over the Handheld/CodePopup modals.
+
+### `SpaceBackground`
+
+`src/components/SpaceBackground/` renders one fixed, full-viewport decorative layer behind all page content, branching on `useTheme().isDark`:
+
+- **Dark theme**: black pixel space scene — a deterministic star field (fixed positions, not `Math.random()`, so layout never shifts) with a few twinkling stars, plus a small pixel-art moon (blocky SVG rect-cluster).
+- **Light theme**: soft pixel sky — a pixel-art sun (same rect-cluster silhouette technique as the moon, `var(--nivoda-gold)`) plus a few pixel-art clouds.
+- Both variants respect `prefers-reduced-motion` (twinkle/drift animations disabled, decor stays visible) via the same `matchMedia` + `change`-listener pattern used elsewhere in the codebase.
+- Sits at the new `--z-bg: -1` token (tokens.css) — intentionally **negative** so it paints behind all normal in-flow page content without requiring every page to add explicit `position`/`z-index` just to sit above it (CSS paints negative-z-index descendants before non-positioned in-flow boxes).
+- `pointer-events: none` throughout — never blocks clicks or Labs game input.
+
+**Gotcha for future pages:** any page/section that sets its own **opaque** `background: var(--bg-primary)` on a root/full-height container will fully hide `SpaceBackground` on that route, because normal in-flow content paints after negative-z-index layers. This was already fixed for `Labs` (`.labs-section`, `.tv-set-wrapper`), `BlogIndex` (`.blog-index`), and `BlogPost` (`.blog-post`) by removing that declaration — they now rely on the shared layer (or `body`'s `--bg-primary`) showing through instead. **When adding a new page, don't set an opaque background on its root container** — let `SpaceBackground` show through, same as Home/About/Contact already do.
 
 ---
 
@@ -449,7 +483,8 @@ const WA_NUMBER = "918126196827";
 2. Add the route in `src/App.tsx`.
 3. Add `{ to: "/newpage", label: "> LABEL", key: "newpage" }` to `NAV_LINKS` in `src/components/Navbar/index.tsx` — the mobile dropdown renders from the same array automatically.
 4. If the page has content driven by data, add an export to `src/data/resume.ts`.
-5. Update `CLAUDE.md` (required by pre-commit hook if you commit `src/` changes).
+5. Do not set an opaque `background: var(--bg-primary)` on the page's root container — see §Cursor & background layers, it will hide the shared `SpaceBackground` layer on that route.
+6. Update `CLAUDE.md` (required by pre-commit hook if you commit `src/` changes).
 
 ---
 

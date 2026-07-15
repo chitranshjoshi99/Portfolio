@@ -1,7 +1,7 @@
 .blog-post {
   padding-top: 56px;
   min-height: 100vh;
-  background: var(--bg-primary);
+  /* no opaque background — lets shared SpaceBackground show through in dark theme */
 }
 
 .blog-post__inner {

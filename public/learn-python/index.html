@@ -1,0 +1,2445 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/learn-python/favicon.svg" />
+    <link
+      rel="icon"
+      type="image/jpeg"
+      href="/learn-python/profile.jpeg"
+      sizes="any"
+    />
+    <link rel="apple-touch-icon" href="/learn-python/profile.jpeg" />
+    <title>Nebula Academy v2 — Astronaut-Engineer Training</title>
+    <meta
+      name="description"
+      content="Learn Python and Machine Learning in a 3D space game. Build a rocket line-by-line of verified code, fly planet to planet, recover artifacts. Free, in-browser, no signup."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://chitransh.dev/learn-python" />
+    <meta
+      property="og:title"
+      content="Nebula Academy — Learn Python & ML in 3D Space"
+    />
+    <meta
+      property="og:description"
+      content="Build a rocket line-by-line of verified code, fly planet to planet, recover artifacts. Free, in-browser, no signup."
+    />
+    <meta
+      property="og:image"
+      content="https://chitransh.dev/learn-python/og.jpg"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Nebula Academy — Learn Python & ML in 3D Space"
+    />
+    <meta
+      name="twitter:description"
+      content="Build a rocket line-by-line of verified code, fly planet to planet, recover artifacts. Free, in-browser, no signup."
+    />
+    <meta
+      name="twitter:image"
+      content="https://chitransh.dev/learn-python/og.jpg"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink: #05070d;
+        --bg: #070a14;
+        --panel: #0d1326;
+        --line: #22335c;
+        --cyan: #35e0ff;
+        --orange: #ff9f2e;
+        --green: #3ecf8e;
+        --violet: #a78bfa;
+        --red: #ff5d5d;
+        --gutter: 12px;
+        --header-h: 92px;
+        --col-left: calc((100vw - var(--gutter) * 3) / 4);
+        --col-right-start: calc(var(--gutter) * 2 + var(--col-left));
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        font-family: "Space Grotesk", sans-serif;
+        background: var(--bg);
+      }
+      .mono {
+        font-family: "JetBrains Mono", monospace;
+      }
+      /* Cel-shaded UI: flat fills, hard 2px outlines, offset hard shadows — no soft glow */
+      .panel {
+        background: var(--panel);
+        border: 2px solid var(--line);
+        border-radius: 10px;
+        box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.55);
+      }
+      .btn {
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-size: 11px;
+        border: 2px solid var(--line);
+        border-radius: 8px;
+        padding: 7px 12px;
+        background: #111a33;
+        color: #cfe3ff;
+        box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.55);
+        transition:
+          transform 0.08s ease,
+          box-shadow 0.08s ease;
+        cursor: pointer;
+        user-select: none;
+        white-space: nowrap;
+      }
+      .btn:hover {
+        transform: translate(-1px, -1px);
+        box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.55);
+      }
+      .btn:active {
+        transform: translate(2px, 2px);
+        box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.55);
+      }
+      .btn-cyan {
+        background: var(--cyan);
+        color: var(--ink);
+        border-color: #0f6d80;
+      }
+      .btn-orange {
+        background: var(--orange);
+        color: var(--ink);
+        border-color: #8a5210;
+      }
+      .btn-red {
+        background: transparent;
+        color: var(--red);
+        border-color: #5c2233;
+      }
+      .btn[disabled] {
+        opacity: 0.4;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.55);
+      }
+      .chip {
+        display: inline-block;
+        border: 2px solid var(--line);
+        border-radius: 6px;
+        padding: 1px 8px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .formula {
+        display: inline-block;
+        background: #050a18;
+        border: 2px solid var(--line);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+        color: var(--cyan);
+      }
+      .codeblock {
+        background: #050a18;
+        border: 2px solid var(--line);
+        border-radius: 8px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12.5px;
+        line-height: 1.6;
+        padding: 10px 12px;
+        white-space: pre;
+        overflow-x: auto;
+        color: #9fd8ff;
+      }
+      .codeblock .kw {
+        color: var(--orange);
+      }
+      .codeblock .str {
+        color: var(--green);
+      }
+      .codeblock .cm {
+        color: #5b6b93;
+      }
+      #editor {
+        width: 100%;
+        background: #050a18;
+        color: #e6f4ff;
+        border: 2px solid var(--line);
+        border-radius: 8px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 14px;
+        line-height: 1.6;
+        padding: 10px 12px;
+        outline: none;
+        resize: none;
+      }
+      #editor:focus {
+        border-color: var(--cyan);
+      }
+      #terminal {
+        background: #020409;
+        border: 2px solid var(--line);
+        border-radius: 8px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        line-height: 1.7;
+        padding: 10px 12px;
+        overflow-y: auto;
+        min-height: 110px;
+      }
+      .t-in {
+        color: #7f93c4;
+      }
+      .t-out {
+        color: #d7e8ff;
+      }
+      .t-ok {
+        color: var(--green);
+      }
+      .t-err {
+        color: var(--red);
+      }
+      .t-hint {
+        color: var(--orange);
+      }
+      .dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        border: 2px solid var(--line);
+        background: #0a1020;
+        display: inline-block;
+      }
+      .dot.done {
+        background: var(--cyan);
+        border-color: #0f6d80;
+      }
+      .dot.cur {
+        border-color: var(--orange);
+      }
+      .xpbar {
+        height: 10px;
+        border: 2px solid var(--line);
+        border-radius: 6px;
+        background: #0a1020;
+        overflow: hidden;
+      }
+      .xpbar > div {
+        height: 100%;
+        background: var(--cyan);
+      }
+      .prog {
+        height: 8px;
+        border: 2px solid var(--line);
+        border-radius: 5px;
+        background: #0a1020;
+        overflow: hidden;
+      }
+      .prog > div {
+        height: 100%;
+        background: var(--green);
+      }
+      .tag {
+        position: absolute;
+        transform: translate(-50%, -120%);
+        pointer-events: none;
+        background: var(--panel);
+        border: 2px solid var(--line);
+        border-radius: 6px;
+        padding: 2px 8px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.55);
+        white-space: nowrap;
+      }
+      .toast {
+        background: var(--panel);
+        border: 2px solid var(--line);
+        border-left: 6px solid var(--cyan);
+        border-radius: 8px;
+        box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.55);
+        padding: 8px 14px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        animation: toastin 0.18s ease-out;
+      }
+      .toast.badge {
+        border-left-color: var(--orange);
+      }
+      .toast.level {
+        border-left-color: var(--green);
+      }
+      @keyframes toastin {
+        from {
+          transform: translateY(-10px);
+          opacity: 0;
+        }
+        to {
+          transform: none;
+          opacity: 1;
+        }
+      }
+      .scrollslim::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      .scrollslim::-webkit-scrollbar-thumb {
+        background: var(--line);
+        border-radius: 3px;
+      }
+      table.dv {
+        border-collapse: collapse;
+        width: 100%;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11.5px;
+      }
+      table.dv th,
+      table.dv td {
+        border: 1px solid var(--line);
+        padding: 3px 8px;
+        text-align: right;
+        color: #c9dcff;
+      }
+      table.dv th {
+        color: #7f93c4;
+        font-weight: 700;
+        background: #0a1020;
+      }
+      table.dv td.hl {
+        background: #0e3b46;
+        color: var(--cyan);
+        font-weight: 700;
+      }
+      table.dv tr.dim td {
+        opacity: 0.3;
+      }
+      table.dv tr.keep td {
+        background: #123422;
+        color: var(--green);
+      }
+
+      /* ---- planet navigation arrows ---- */
+      #planetNav .navbtn {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        line-height: 1;
+        padding: 0;
+      }
+      #planetNav .navbtn[disabled] {
+        opacity: 0.25;
+      }
+      #hud {
+        flex: 1;
+      }
+      #hudLevel {
+        padding: 4px 8px;
+        border: 3px solid var(--line);
+      }
+
+      /* ---- spacesuit overlay (free float) ---- */
+      .suit-visor {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 1;
+      }
+      .suit-visor::before {
+        content: "";
+        position: absolute;
+        inset: -8%;
+        background: radial-gradient(
+          ellipse 60% 66% at 50% 44%,
+          transparent 38%,
+          rgba(5, 8, 17, 0.35) 60%,
+          rgba(3, 5, 12, 0.9) 80%,
+          rgba(2, 3, 9, 0.99) 100%
+        );
+      }
+      .suit-visor::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        box-shadow:
+          inset 0 0 0 3px rgba(53, 224, 255, 0.1),
+          inset 0 0 120px 10px rgba(53, 224, 255, 0.06);
+      }
+      .suit-arm {
+        position: absolute;
+        bottom: -2%;
+        width: min(34vw, 420px);
+        height: auto;
+        pointer-events: none;
+        z-index: 2;
+        filter: drop-shadow(0 -4px 10px rgba(0, 0, 0, 0.6));
+      }
+      .suit-arm--l {
+        left: -3%;
+        transform: rotate(6deg);
+      }
+      .suit-arm--r {
+        right: -3%;
+        transform: scaleX(-1) rotate(6deg);
+      }
+      .suit-reticle {
+        position: absolute;
+        top: 44%;
+        left: 50%;
+        width: 60px;
+        height: 60px;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 2;
+        opacity: 0.5;
+        background:
+          linear-gradient(var(--cyan), var(--cyan)) 50% 0/2px 14px no-repeat,
+          linear-gradient(var(--cyan), var(--cyan)) 50% 100%/2px 14px no-repeat,
+          linear-gradient(var(--cyan), var(--cyan)) 0 50%/14px 2px no-repeat,
+          linear-gradient(var(--cyan), var(--cyan)) 100% 50%/14px 2px no-repeat;
+      }
+      .suit-readout {
+        position: absolute;
+        z-index: 2;
+        pointer-events: none;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        color: var(--cyan);
+        opacity: 0.65;
+        font-weight: 700;
+      }
+      .suit-readout.tl {
+        top: 12%;
+        left: 6%;
+      }
+      .suit-readout.tr {
+        bottom: 15%;
+        right: 6%;
+        text-align: right;
+      }
+
+      /* ---- real Python console (Pyodide) ---- */
+      #pyCode {
+        width: 100%;
+        background: #050a18;
+        color: #e6f4ff;
+        border: 2px solid var(--line);
+        border-radius: 8px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13.5px;
+        line-height: 1.6;
+        padding: 10px 12px;
+        outline: none;
+        resize: vertical;
+        min-height: 150px;
+      }
+      #pyCode:focus {
+        border-color: var(--cyan);
+      }
+      #pyOut {
+        background: #020409;
+        border: 2px solid var(--line);
+        border-radius: 8px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        line-height: 1.7;
+        padding: 10px 12px;
+        height: 190px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+    </style>
+  </head>
+  <body class="overflow-hidden text-slate-200 select-none">
+    <canvas id="bg" class="fixed inset-0 w-full h-full block"></canvas>
+    <div id="tags" class="fixed inset-0 pointer-events-none z-20"></div>
+
+    <!-- ============ TOP HUD ============ -->
+    <header
+      class="fixed top-0 left-0 right-0 z-40 grid grid-cols-[1fr_3fr] items-start gap-3 p-3 pointer-events-none"
+    >
+      <div class="panel pl-4 pr-12 py-2 pointer-events-auto relative">
+        <a
+          href="/"
+          class="absolute top-2 right-2 flex items-center justify-center w-7 h-7 rounded-full border border-cyan-500/30 bg-slate-900/60 text-cyan-300 text-xs hover:bg-cyan-500/20 hover:text-white transition"
+          title="Back to Portfolio"
+        >
+          &#8617;
+        </a>
+        <div class="text-[18px] tracking-[.25em] text-cyan-300 font-bold">
+          NEBULA ACADEMY
+        </div>
+        <div class="text-[12px] text-slate-400 tracking-widest">
+          ASTRONAUT-ENGINEER PROGRAM // V2
+        </div>
+      </div>
+      <div class="panel px-4 py-2 pointer-events-auto">
+        <div class="flex items-center justify-between gap-4">
+          <div>
+            <span id="hudRank" class="text-[16px] font-bold text-white"
+              >Cadet</span
+            >
+            <span id="hudLevel" class="chip text-cyan-300 ml-1">LVL 1</span>
+          </div>
+          <div class="text-right flex gap-2">
+            <div id="hudXP" class="text-xs font-bold text-cyan-300 mono">
+              0 XP
+            </div>
+            <div
+              id="hudStreak"
+              class="text-[10px] text-orange-300 tracking-widest font-bold"
+            >
+              STREAK 0
+            </div>
+          </div>
+        </div>
+        <div class="xpbar mt-1.5">
+          <div id="hudXPBar" style="width: 0%"></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ============ BOTTOM-RIGHT ACTION DOCK ============ -->
+    <div
+      class="fixed bottom-3 right-3 z-40 flex flex-col gap-2 pointer-events-auto items-end"
+    >
+      <button id="btnReset" class="btn btn-red">Reset</button>
+      <button id="btnPy" class="btn btn-orange">Python</button>
+      <button id="btnFree" class="btn btn-cyan">Free Float</button>
+      <!-- <button id="btnCert" class="btn">Certificate</button> -->
+    </div>
+
+    <!-- ============ LEFT PANEL (rocket persists into lessons; mission control toggles) ============ -->
+    <div
+      id="leftpanel"
+      class="fixed z-40 flex flex-col gap-3 pointer-events-none"
+      style="
+        top: var(--header-h);
+        bottom: var(--gutter);
+        left: var(--gutter);
+        width: var(--col-left);
+      "
+    >
+      <!-- Rocket + badges -->
+      <section
+        id="rocketCard"
+        class="panel p-4 pointer-events-auto flex flex-col min-h-0"
+      >
+        <div class="text-[10px] tracking-[.25em] text-slate-400 font-bold">
+          ROCKET ASSEMBLY
+        </div>
+        <div id="rocketStatus" class="text-sm font-bold text-white mt-1">
+          0 / 5 parts
+        </div>
+        <div class="prog mt-1.5 mb-3">
+          <div id="rocketBar" style="width: 0%"></div>
+        </div>
+        <div
+          class="text-[10px] tracking-[.25em] text-slate-400 font-bold mb-1.5"
+        >
+          ARTIFACTS RECOVERED
+        </div>
+        <div
+          id="badgeList"
+          class="space-y-1 text-xs overflow-y-auto scrollslim pr-1"
+          style="max-height: 26vh"
+        ></div>
+      </section>
+      <!-- Mission control -->
+      <section
+        id="dash"
+        class="panel p-4 pointer-events-auto flex-1 min-h-0 flex flex-col"
+      >
+        <div class="text-[10px] tracking-[.25em] text-slate-400 font-bold mb-2">
+          MISSION CONTROL // PLANETS
+        </div>
+        <div
+          id="moduleList"
+          class="space-y-3 overflow-y-auto scrollslim pr-1 flex-1"
+        ></div>
+      </section>
+    </div>
+
+    <!-- ============ FREE FLOAT HUD ============ -->
+    <div id="freeHud" class="hidden fixed inset-0 z-30 pointer-events-none">
+      <!-- spacesuit view -->
+      <div class="suit-visor"></div>
+      <div class="suit-readout tl">O2 98%<br />PWR ▮▮▮▮▯</div>
+      <div class="suit-readout tr">EVA MODE<br />PRESS 1.0atm</div>
+      <div class="suit-reticle"></div>
+      <svg
+        class="suit-arm suit-arm--l"
+        viewBox="0 0 300 200"
+        shape-rendering="crispEdges"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <g stroke="#05070d" stroke-width="4">
+          <path
+            d="M-10 200 L30 120 L120 92 L210 128 L250 200 Z"
+            fill="#e6ecf7"
+          />
+          <path d="M120 92 L210 128 L192 168 L118 132 Z" fill="#cdd6e6" />
+          <rect x="86" y="86" width="70" height="26" fill="var(--cyan)" />
+          <path
+            d="M198 118 q46 -6 66 20 q10 22 -10 40 q-34 20 -58 -6 z"
+            fill="#f2f5fb"
+          />
+          <circle cx="228" cy="150" r="10" fill="var(--orange)" />
+          <path
+            d="M40 128 L108 110 M52 150 L120 132"
+            stroke="#9fb0cf"
+            stroke-width="3"
+            fill="none"
+          />
+        </g>
+      </svg>
+      <svg
+        class="suit-arm suit-arm--r"
+        viewBox="0 0 300 200"
+        shape-rendering="crispEdges"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <g stroke="#05070d" stroke-width="4">
+          <path
+            d="M-10 200 L30 120 L120 92 L210 128 L250 200 Z"
+            fill="#e6ecf7"
+          />
+          <path d="M120 92 L210 128 L192 168 L118 132 Z" fill="#cdd6e6" />
+          <rect x="86" y="86" width="70" height="26" fill="var(--cyan)" />
+          <path
+            d="M198 118 q46 -6 66 20 q10 22 -10 40 q-34 20 -58 -6 z"
+            fill="#f2f5fb"
+          />
+          <circle cx="228" cy="150" r="10" fill="var(--orange)" />
+          <path
+            d="M40 128 L108 110 M52 150 L120 132"
+            stroke="#9fb0cf"
+            stroke-width="3"
+            fill="none"
+          />
+        </g>
+      </svg>
+      <div
+        class="absolute top-20 right-3 flex flex-col gap-2 pointer-events-auto items-end"
+        style="z-index: 3"
+      >
+        <button id="btnHome" class="btn btn-orange">Home Planet</button>
+        <button id="btnExitFree" class="btn">Exit Free Float</button>
+      </div>
+      <div
+        class="absolute bottom-4 left-1/2 -translate-x-1/2 panel px-5 py-2 text-[11px] tracking-widest font-bold text-slate-300"
+        style="z-index: 3"
+      >
+        MOUSE: LOOK &nbsp;·&nbsp; ARROWS: THRUST + TURN &nbsp;·&nbsp; SHIFT +
+        UP/DOWN: CLIMB / DESCEND
+      </div>
+    </div>
+
+    <!-- ============ PLANET NAV ARROWS ============ -->
+    <div
+      id="planetNav"
+      class="fixed z-30 pointer-events-none flex items-center justify-between"
+      style="top: 34%; left: var(--col-right-start); right: var(--gutter)"
+    >
+      <button
+        id="btnPrevPlanet"
+        class="btn navbtn pointer-events-auto"
+        title="Previous planet"
+      >
+        ‹
+      </button>
+      <button
+        id="btnNextPlanet"
+        class="btn navbtn pointer-events-auto"
+        title="Next planet"
+      >
+        ›
+      </button>
+    </div>
+
+    <!-- ============ LESSON WORKSPACE (right of the persistent rocket panel) ============ -->
+    <div
+      id="lessonBackdrop"
+      class="hidden fixed inset-0 z-[35]"
+      style="background: rgba(7, 10, 20, 0.82); backdrop-filter: blur(4px)"
+    ></div>
+    <div
+      id="lesson"
+      class="hidden fixed z-40 flex flex-col gap-3"
+      style="
+        left: var(--col-right-start);
+        right: var(--gutter);
+        top: var(--header-h);
+        bottom: var(--gutter);
+      "
+    >
+      <div
+        class="panel px-4 py-2.5 flex items-center justify-between gap-3 pointer-events-auto"
+      >
+        <div class="min-w-0">
+          <span id="lsCodename" class="chip text-orange-300">PY-CORE</span>
+          <span id="lsModule" class="text-sm font-bold text-white ml-2"
+            >Python Core Foundations</span
+          >
+        </div>
+        <div
+          id="lsDots"
+          class="flex items-center gap-2 flex-wrap justify-center"
+        ></div>
+        <button id="btnCloseLesson" class="btn shrink-0">
+          Return to Orbit
+        </button>
+      </div>
+      <div class="flex-1 grid lg:grid-cols-2 gap-3 min-h-0">
+        <!-- LEFT: problem statement -->
+        <div
+          class="panel p-5 overflow-y-auto scrollslim pointer-events-auto flex flex-col gap-3"
+        >
+          <div class="text-[10px] tracking-[.25em] text-cyan-300 font-bold">
+            PROBLEM
+          </div>
+          <h2 id="lsTitle" class="text-xl font-bold text-white">Task</h2>
+          <div
+            id="lsCard"
+            class="text-[13.5px] leading-relaxed text-slate-300 space-y-3"
+          ></div>
+          <div class="border-t-2 border-[#22335c] pt-3 mt-1">
+            <div
+              class="text-[10px] tracking-[.25em] text-orange-300 font-bold mb-1"
+            >
+              🎯 YOUR TASK
+            </div>
+            <div id="lsMission" class="text-[13.5px] text-slate-200"></div>
+          </div>
+          <div id="lsCtxWrap" class="hidden">
+            <div
+              class="text-[10px] tracking-[.25em] text-slate-400 font-bold mb-1"
+            >
+              GIVEN
+            </div>
+            <div id="lsCtx" class="codeblock"></div>
+          </div>
+          <div id="lsViz" class="panel p-3 hidden">
+            <div
+              id="lsVizTitle"
+              class="text-[10px] tracking-[.25em] text-slate-400 font-bold mb-2"
+            >
+              LIVE TELEMETRY
+            </div>
+            <div id="lsVizBody"></div>
+          </div>
+        </div>
+        <!-- RIGHT: editor (top) + console (bottom) -->
+        <div class="flex flex-col gap-3 min-h-0 pointer-events-auto">
+          <div class="panel p-4 flex flex-col">
+            <div class="flex items-center justify-between mb-1">
+              <span
+                class="text-[10px] tracking-[.25em] text-orange-300 font-bold"
+                >CODE // solution.py</span
+              >
+              <span id="lsXP" class="chip text-cyan-300">+15 XP</span>
+            </div>
+            <textarea
+              id="editor"
+              rows="6"
+              spellcheck="false"
+              autocomplete="off"
+            ></textarea>
+            <div class="flex items-center gap-2 mt-2">
+              <button id="btnRun" class="btn btn-cyan">Submit ▸</button>
+              <button
+                id="btnRunReal"
+                class="btn btn-orange"
+                title="Execute your code in a real Python interpreter"
+              >
+                ▶ Real Python
+              </button>
+              <span class="text-[10px] text-slate-500 tracking-widest ml-auto"
+                >CTRL + ENTER</span
+              >
+            </div>
+          </div>
+          <div class="panel p-4 flex-1 flex flex-col min-h-0">
+            <div
+              class="text-[10px] tracking-[.25em] text-slate-400 font-bold mb-1"
+            >
+              CONSOLE // OUTPUT
+            </div>
+            <div id="terminal" class="mt-1 flex-1 scrollslim">
+              <div class="t-in">nebula-shell v2.0 — awaiting input</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ INTRO ============ -->
+    <div
+      id="intro"
+      class="hidden fixed inset-0 z-50 flex items-center justify-center p-4"
+      style="background: rgba(7, 10, 20, 0.85)"
+    >
+      <div class="panel p-7 max-w-lg">
+        <div class="text-[10px] tracking-[.25em] text-cyan-300 font-bold">
+          TRANSMISSION // MISSION BRIEF
+        </div>
+        <h1 class="text-2xl font-bold text-white mt-2">
+          You are an astronaut-engineer.
+        </h1>
+        <p class="text-sm text-slate-300 mt-3 leading-relaxed">
+          Six worlds ahead — Python core, software craft, vector computation,
+          machine learning, deep learning and generative AI. Every verified line
+          of code builds one part of your rocket. Complete a planet's training
+          and the rocket flies you to the next world. Moons and satellites mark
+          your checkpoints. Lost artifacts drift between the planets — recover
+          them by earning commendations, then visit them in Free Float.
+        </p>
+        <div class="mt-5 flex gap-3">
+          <button id="btnBegin" class="btn btn-cyan">Begin Training</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ CERTIFICATE MODAL ============ -->
+    <div
+      id="certModal"
+      class="hidden fixed inset-0 z-50 flex items-center justify-center p-4"
+      style="background: rgba(7, 10, 20, 0.85)"
+    >
+      <div class="panel p-6 max-w-md w-full">
+        <div class="text-[10px] tracking-[.25em] text-cyan-300 font-bold">
+          PROGRESS CERTIFICATE
+        </div>
+        <p class="text-xs text-slate-400 mt-2">
+          Exports a signed JSON completion receipt of your current training
+          record.
+        </p>
+        <input
+          id="certName"
+          class="mono mt-3 w-full bg-[#050a18] border-2 border-[#22335c] rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-cyan-400"
+          placeholder="Astronaut-Engineer name"
+          value="Astronaut-Engineer"
+        />
+        <pre
+          id="certPreview"
+          class="codeblock mt-3 max-h-48 overflow-y-auto scrollslim text-[11px]"
+        ></pre>
+        <div class="mt-4 flex gap-2">
+          <button id="btnDownloadCert" class="btn btn-cyan">
+            Download JSON
+          </button>
+          <button id="btnCloseCert" class="btn">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ PYTHON CONSOLE (Pyodide) ============ -->
+    <div
+      id="pyModal"
+      class="hidden fixed inset-0 z-50 flex items-center justify-center p-4"
+      style="background: rgba(7, 10, 20, 0.85)"
+    >
+      <div class="panel p-5 w-full max-w-2xl">
+        <div class="flex items-center justify-between gap-3 mb-2">
+          <div>
+            <span class="text-[10px] tracking-[.25em] text-orange-300 font-bold"
+              >REAL PYTHON // PYODIDE</span
+            >
+            <span id="pyStatus" class="chip text-slate-400 ml-2">idle</span>
+          </div>
+          <button id="btnClosePy" class="btn">Close</button>
+        </div>
+        <p class="text-[11px] text-slate-500 mb-2">
+          Runs actual CPython in your browser.
+          <code class="mono">import numpy</code> /
+          <code class="mono">pandas</code> load on demand. Torch &amp;
+          transformers aren't available in-browser.
+        </p>
+        <textarea id="pyCode" spellcheck="false" autocomplete="off"></textarea>
+        <div class="flex items-center gap-2 mt-2">
+          <button id="pyRun" class="btn btn-cyan">Run ▶</button>
+          <span class="text-[10px] text-slate-500 tracking-widest"
+            >CTRL + ENTER</span
+          >
+          <button id="pyClear" class="btn ml-auto">Clear output</button>
+        </div>
+        <div id="pyOut" class="mt-3">
+          <div class="t-in">python console — write code, hit Run</div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="toasts"
+      class="fixed top-3 left-1/2 -translate-x-1/2 z-50 space-y-2 pointer-events-none"
+    ></div>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js"
+        }
+      }
+    </script>
+    <script type="module">
+      import * as THREE from "three";
+
+      /* ================================================================
+   COURSE DATA — course.json is a manifest (ranks, badges, module file
+   paths); each module's content lives in its own file under modules/
+   (see modules/*.json) so a single module can be read/edited on its own.
+================================================================ */
+      const manifest = await fetch("./course.json").then((r) => r.json());
+      const COURSE = {
+        ranks: manifest.ranks,
+        badges: manifest.badges,
+        modules: await Promise.all(
+          manifest.modules.map((path) => fetch(path).then((r) => r.json())),
+        ),
+      };
+      const hex = (v) => (typeof v === "string" ? Number(v) : v);
+      const compileStep = (s) => {
+        s.re = new RegExp(s.re);
+        (s.checks || []).forEach((c) => (c.re = new RegExp(c.re)));
+        return s;
+      };
+      const RANKS = COURSE.ranks;
+      const BADGES = COURSE.badges.map((b) => ({ ...b, color: hex(b.color) }));
+      const MODULES = COURSE.modules.map((m) => {
+        const checkpoints = m.checkpoints.map((cp) => ({
+          ...cp,
+          questions: cp.questions.map(compileStep),
+        }));
+        let n = 0;
+        checkpoints.forEach((cp) => {
+          cp.start = n;
+          n += cp.questions.length;
+          cp.end = n;
+        }); // flat-index bounds
+        return {
+          ...m,
+          color: hex(m.color),
+          checkpoints,
+          questions: checkpoints.flatMap((cp) => cp.questions),
+        };
+      });
+      // which checkpoint a flat question index falls in
+      const cpOfIndex = (m, i) =>
+        m.checkpoints.find((cp) => i < cp.end) ||
+        m.checkpoints[m.checkpoints.length - 1];
+      const PROBES = [
+        ["P-01", 88, 72],
+        ["P-02", 132, 91],
+        ["P-03", 99, 64],
+        ["P-04", 145, 88],
+      ];
+
+      /* ================================================================
+   STATE — localStorage
+================================================================ */
+      const KEY = "nebula-academy-v2";
+      const defaults = {
+        xp: 0,
+        steps: {},
+        completed: {},
+        badges: [],
+        streak: 0,
+        lastDay: null,
+        intro: false,
+      };
+      let state = load();
+      function load() {
+        try {
+          return Object.assign(
+            {},
+            defaults,
+            JSON.parse(localStorage.getItem(KEY)) || {},
+          );
+        } catch (e) {
+          return { ...defaults };
+        }
+      }
+      function save() {
+        localStorage.setItem(KEY, JSON.stringify(state));
+      }
+
+      const level = () => Math.floor(state.xp / 100) + 1;
+      const rank = () => RANKS[Math.min(level(), RANKS.length) - 1];
+      const stepsDone = (m) => state.steps[m.id] || 0;
+      const isComplete = (m) => !!state.completed[m.id];
+      // dev-only unlock: localStorage.bypassPin === "2604" opens every planet/
+      // checkpoint/lesson for browsing, but runCode() still blocks submitting
+      const bypassActive = () => localStorage.getItem("bypassPin") === "2604";
+      const isUnlocked = (i) =>
+        bypassActive() || i === 0 || isComplete(MODULES[i - 1]);
+      const curPlanetIdx = () => {
+        for (let i = 0; i < MODULES.length; i++)
+          if (!isComplete(MODULES[i])) return i;
+        return MODULES.length - 1;
+      };
+
+      function dayStr(d) {
+        return d.toISOString().slice(0, 10);
+      }
+      function touchStreak() {
+        const today = dayStr(new Date());
+        if (state.lastDay === today) return;
+        const y = new Date();
+        y.setDate(y.getDate() - 1);
+        state.streak = state.lastDay === dayStr(y) ? state.streak + 1 : 1;
+        state.lastDay = today;
+        if (state.streak >= 3) award("streak");
+      }
+      function award(id) {
+        if (state.badges.includes(id)) return;
+        state.badges.push(id);
+        save();
+        const b = BADGES.find((x) => x.id === id);
+        toast(
+          `ARTIFACT RECOVERED: ${b.name} — "${b.artifact}" now drifts in open space`,
+          "badge",
+        );
+        syncArtifacts();
+        renderBadges();
+      }
+      function addXP(n) {
+        const before = level();
+        touchStreak();
+        state.xp += n;
+        save();
+        toast(`+${n} XP`);
+        if (level() > before)
+          toast(`PROMOTION — Level ${level()} · Rank ${rank()}`, "level");
+        renderHUD();
+      }
+
+      /* ================================================================
+   THREE.JS SCENE — cel-shaded space
+================================================================ */
+      const canvas = document.getElementById("bg");
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070a14);
+      scene.fog = new THREE.FogExp2(0x070a14, 0.005);
+      const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 600);
+      function resize() {
+        renderer.setSize(innerWidth, innerHeight);
+        camera.aspect = innerWidth / innerHeight;
+        camera.updateProjectionMatrix();
+      }
+      addEventListener("resize", resize);
+      resize();
+
+      scene.add(new THREE.AmbientLight(0x4c5a80, 0.9));
+      const sun = new THREE.DirectionalLight(0xffffff, 1.6);
+      sun.position.set(30, 45, 25);
+      scene.add(sun);
+
+      // 3-band gradient map = the cel shading
+      function toonGradient() {
+        const data = new Uint8Array([70, 150, 255]);
+        const tex = new THREE.DataTexture(data, 3, 1, THREE.RedFormat);
+        tex.minFilter = tex.magFilter = THREE.NearestFilter;
+        tex.needsUpdate = true;
+        return tex;
+      }
+      const GRAD = toonGradient();
+      const toon = (color, opts = {}) =>
+        new THREE.MeshToonMaterial({ color, gradientMap: GRAD, ...opts });
+      const blueprintMat = new THREE.MeshBasicMaterial({
+        color: 0x2b3b57,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.55,
+      });
+
+      // inverted-hull ink outline
+      function outline(mesh, scale = 1.06) {
+        const o = new THREE.Mesh(
+          mesh.geometry,
+          new THREE.MeshBasicMaterial({
+            color: 0x05070d,
+            side: THREE.BackSide,
+          }),
+        );
+        o.scale.setScalar(scale);
+        mesh.add(o);
+        return o;
+      }
+
+      // ---- stars ----
+      {
+        const N = 1800,
+          pos = new Float32Array(N * 3);
+        for (let i = 0; i < N; i++) {
+          const r = 180 + Math.random() * 220,
+            th = Math.random() * Math.PI * 2,
+            ph = Math.acos(2 * Math.random() - 1);
+          pos[i * 3] = r * Math.sin(ph) * Math.cos(th);
+          pos[i * 3 + 1] = r * Math.cos(ph) * 0.6;
+          pos[i * 3 + 2] = r * Math.sin(ph) * Math.sin(th);
+        }
+        const g = new THREE.BufferGeometry();
+        g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+        var stars = new THREE.Points(
+          g,
+          new THREE.PointsMaterial({
+            color: 0xcfe3ff,
+            size: 0.9,
+            sizeAttenuation: true,
+          }),
+        );
+        scene.add(stars);
+      }
+
+      // ---- planets ----
+      // one position per module; extend the receding path if the course grows
+      const PLANET_POS = [
+        new THREE.Vector3(-72, -2, 30),
+        new THREE.Vector3(-45, -4, 0),
+        new THREE.Vector3(10, 4, -40),
+        new THREE.Vector3(62, -2, -88),
+        new THREE.Vector3(24, 8, -140),
+        new THREE.Vector3(-40, -6, -186),
+        new THREE.Vector3(30, 10, -238),
+        new THREE.Vector3(58, -14, -290),
+      ].slice(0, MODULES.length);
+      const planets = MODULES.map((m, i) => {
+        const grp = new THREE.Group();
+        const mesh = new THREE.Mesh(
+          new THREE.SphereGeometry(7, 40, 28),
+          toon(m.color),
+        );
+        outline(mesh, 1.05);
+        grp.add(mesh);
+        // flat cel surface bands: darker polar cap
+        const cap = new THREE.Mesh(
+          new THREE.SphereGeometry(7.03, 40, 10, 0, Math.PI * 2, 0, 0.55),
+          toon(new THREE.Color(m.color).multiplyScalar(0.55)),
+        );
+        grp.add(cap);
+        if (i === MODULES.length - 1) {
+          // ring for the final world
+          const ring = new THREE.Mesh(
+            new THREE.TorusGeometry(11, 0.55, 10, 60),
+            toon(0x8f7bd8),
+          );
+          ring.rotation.x = Math.PI / 2.25;
+          outline(ring, 1.15);
+          grp.add(ring);
+        }
+        grp.position.copy(PLANET_POS[i]);
+        scene.add(grp);
+        return {
+          grp,
+          mesh,
+          pos: PLANET_POS[i],
+          spin: 0.06 + i * 0.02,
+          module: m,
+        };
+      });
+
+      // ---- checkpoint satellites (one per checkpoint) ----
+      const moonRigs = [];
+      MODULES.forEach((m, mi) => {
+        m.checkpoints.forEach((cp, ci) => {
+          let mesh;
+          if (ci % 2 === 0) {
+            // moon
+            mesh = new THREE.Mesh(
+              new THREE.SphereGeometry(0.9, 18, 14),
+              toon(0x3a4666),
+            );
+            outline(mesh, 1.12);
+          } else {
+            // satellite: body + solar wings
+            mesh = new THREE.Group();
+            const body = new THREE.Mesh(
+              new THREE.BoxGeometry(0.8, 0.8, 1.1),
+              toon(0x3a4666),
+            );
+            outline(body, 1.12);
+            const w1 = new THREE.Mesh(
+              new THREE.BoxGeometry(2.0, 0.06, 0.7),
+              toon(0x1c4d8a),
+            );
+            const w2 = w1.clone();
+            w1.position.x = 1.5;
+            w2.position.x = -1.5;
+            mesh.add(body, w1, w2);
+          }
+          scene.add(mesh);
+          moonRigs.push({
+            mesh,
+            mi,
+            ci,
+            r: 11 + ci * 2.2,
+            speed: 0.24 - ci * 0.025,
+            angle: (ci / m.checkpoints.length) * Math.PI * 2,
+            lit: false,
+          });
+        });
+      });
+      function litMaterialTargets(rig, color) {
+        const apply = (o) => {
+          if (
+            o.isMesh &&
+            o.material !== blueprintMat &&
+            o.material.color &&
+            !o.material.side
+          )
+            o.material = toon(color);
+        };
+        // simpler: rebuild materials on core meshes
+        if (rig.mesh.isMesh) rig.mesh.material = toon(color);
+        else
+          rig.mesh.children.forEach((c) => {
+            if (c.isMesh) c.material = toon(color);
+          });
+      }
+      function syncMoons() {
+        moonRigs.forEach((rig) => {
+          const m = MODULES[rig.mi];
+          const done =
+            bypassActive() || stepsDone(m) >= m.checkpoints[rig.ci].end; // checkpoint cleared
+          if (done && !rig.lit) {
+            rig.lit = true;
+            litMaterialTargets(rig, m.color);
+          }
+        });
+      }
+
+      // ---- rocket: 5 parts, blueprint until built ----
+      const rocket = new THREE.Group();
+      const rocketParts = [];
+      {
+        const mk = (geo, color, y) => {
+          const mesh = new THREE.Mesh(geo, toon(color));
+          mesh.position.y = y;
+          const ol = outline(mesh, 1.09);
+          ol.visible = false;
+          rocket.add(mesh);
+          rocketParts.push({ mesh, ol, mat: toon(color) });
+          return mesh;
+        };
+        // build order: nozzle, fins, lower tank, upper tank, nose cone
+        mk(new THREE.CylinderGeometry(0.55, 0.95, 1.0, 14), 0x9aa7c7, 0.5);
+        const fins = new THREE.Group();
+        for (let k = 0; k < 3; k++) {
+          const f = new THREE.Mesh(
+            new THREE.BoxGeometry(0.22, 1.5, 1.4),
+            toon(0xff5d5d),
+          );
+          const a = (k * Math.PI * 2) / 3;
+          f.position.set(Math.cos(a) * 1.05, 0.9, Math.sin(a) * 1.05);
+          f.rotation.y = -a;
+          fins.add(f);
+        }
+        rocket.add(fins);
+        rocketParts.splice(1, 0, null); // placeholder replaced below
+        rocketParts[1] = {
+          mesh: fins,
+          ol: null,
+          mat: null,
+          group: true,
+          mats: fins.children.map((c) => c.material),
+        };
+        mk(new THREE.CylinderGeometry(0.85, 0.85, 2.4, 14), 0xff9f2e, 2.2);
+        mk(new THREE.CylinderGeometry(0.72, 0.85, 1.9, 14), 0xe8eefc, 4.35);
+        mk(new THREE.ConeGeometry(0.72, 1.5, 14), 0xff5d5d, 6.05);
+      }
+      const pad = new THREE.Mesh(
+        new THREE.CylinderGeometry(2.4, 2.8, 0.5, 18),
+        toon(0x22335c),
+      );
+      outline(pad, 1.08);
+      scene.add(rocket, pad);
+      rocket.scale.setScalar(0.78); // smaller rocket
+
+      function builtCount(m) {
+        return Math.ceil((stepsDone(m) / m.questions.length) * 5);
+      }
+      function placeRocket(idx) {
+        const p = planets[idx].pos;
+        rocket.position.set(p.x, p.y + 7.1, p.z);
+        rocket.quaternion.identity();
+        pad.position.set(p.x, p.y + 6.9, p.z);
+      }
+      const pops = [];
+      function syncRocket(pop = false) {
+        const m = MODULES[focusIdx];
+        const n = isComplete(m) ? 5 : builtCount(m);
+        rocketParts.forEach((p, i) => {
+          const built = i < n;
+          if (p.group) {
+            p.mesh.children.forEach(
+              (c, j) => (c.material = built ? p.mats[j] : blueprintMat),
+            );
+          } else {
+            p.mesh.material = built ? p.mat : blueprintMat;
+            p.ol.visible = built;
+          }
+          if (built && pop && i === n - 1) {
+            pops.push({ obj: p.mesh, t: 0 });
+          }
+        });
+        document.getElementById("rocketStatus").textContent =
+          `${n} / 5 parts — ${m.planet}`;
+        document.getElementById("rocketBar").style.width = (n / 5) * 100 + "%";
+      }
+
+      // ---- badge artifacts ----
+      const artifactGeos = {
+        ico: () => new THREE.IcosahedronGeometry(1.6, 0),
+        knot: () => new THREE.TorusKnotGeometry(1.1, 0.36, 64, 10),
+        oct: () => new THREE.OctahedronGeometry(1.7, 0),
+        torus: () => new THREE.TorusGeometry(1.4, 0.45, 10, 24),
+        tetra: () => new THREE.TetrahedronGeometry(1.8, 0),
+        dodec: () => new THREE.DodecahedronGeometry(1.6, 0),
+        cube: () => new THREE.BoxGeometry(2.2, 2.2, 2.2),
+        cone: () => new THREE.ConeGeometry(1.5, 2.6, 6),
+      };
+      const artifacts = BADGES.map((b, i) => {
+        const geo = artifactGeos[b.geo]();
+        const mesh = new THREE.Mesh(geo, blueprintMat);
+        mesh.position.set(...b.pos);
+        scene.add(mesh);
+        return {
+          mesh,
+          badge: b,
+          earned: false,
+          phase: i * 1.3,
+          outlined: false,
+        };
+      });
+      function syncArtifacts() {
+        artifacts.forEach((a) => {
+          const earned = bypassActive() || state.badges.includes(a.badge.id);
+          if (earned && !a.earned) {
+            a.earned = true;
+            a.mesh.material = toon(a.badge.color);
+            if (!a.outlined) {
+              outline(a.mesh, 1.1);
+              a.outlined = true;
+            }
+            burst(a.mesh.position, a.badge.color);
+          }
+        });
+      }
+
+      // ---- particle bursts ----
+      const bursts = [];
+      function burst(pos, color, n = 90) {
+        const p = new Float32Array(n * 3),
+          vel = [];
+        for (let i = 0; i < n; i++) {
+          p[i * 3] = pos.x;
+          p[i * 3 + 1] = pos.y;
+          p[i * 3 + 2] = pos.z;
+          const v = new THREE.Vector3()
+            .randomDirection()
+            .multiplyScalar(5 + Math.random() * 11);
+          vel.push(v);
+        }
+        const g = new THREE.BufferGeometry();
+        g.setAttribute("position", new THREE.BufferAttribute(p, 3));
+        const mat = new THREE.PointsMaterial({
+          color,
+          size: 0.55,
+          transparent: true,
+          opacity: 1,
+        });
+        const pts = new THREE.Points(g, mat);
+        scene.add(pts);
+        bursts.push({ pts, vel, life: 1 });
+      }
+
+      /* ================================================================
+   CAMERA MODES: dash | free | flight
+================================================================ */
+      let mode = "dash";
+      let focusIdx = curPlanetIdx();
+      let t = 0,
+        last = performance.now();
+      const camLook = new THREE.Vector3().copy(PLANET_POS[focusIdx]);
+      camera.position
+        .copy(PLANET_POS[focusIdx])
+        .add(new THREE.Vector3(0, 16, 46));
+
+      let yaw = 0,
+        pitch = 0;
+      const keys = {};
+      addEventListener("keydown", (e) => {
+        keys[e.key] = true;
+        if (
+          mode === "free" &&
+          ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)
+        )
+          e.preventDefault();
+        if (
+          e.key === "Escape" &&
+          !document.getElementById("lesson").classList.contains("hidden")
+        )
+          closeLesson();
+        if (e.key === "Escape" && mode === "free") exitFree();
+      });
+      addEventListener("keyup", (e) => (keys[e.key] = false));
+
+      // mouse free-look: drives yaw/pitch while in free float (pointer-lock for continuous turn)
+      canvas.addEventListener("mousedown", () => {
+        if (mode === "free") canvas.requestPointerLock?.();
+      });
+      addEventListener("mousemove", (e) => {
+        if (mode !== "free") return;
+        const sens = 0.0024;
+        yaw -= (e.movementX || 0) * sens;
+        pitch = Math.max(
+          -1.45,
+          Math.min(1.45, pitch - (e.movementY || 0) * sens),
+        );
+      });
+
+      function showNav(v) {
+        document.getElementById("planetNav").classList.toggle("hidden", !v);
+      }
+      function enterFree() {
+        mode = "free";
+        const e = new THREE.Euler().setFromQuaternion(camera.quaternion, "YXZ");
+        yaw = e.y;
+        pitch = e.x;
+        document.getElementById("freeHud").classList.remove("hidden");
+        document.getElementById("leftpanel").classList.add("hidden");
+        document.getElementById("btnFree").textContent = "EXIT FLOAT";
+        showNav(false);
+      }
+      function exitFree() {
+        mode = "dash";
+        document.exitPointerLock?.();
+        document.getElementById("freeHud").classList.add("hidden");
+        document.getElementById("leftpanel").classList.remove("hidden");
+        document.getElementById("dash").classList.remove("hidden");
+        document.getElementById("btnFree").textContent = "FREE FLOAT";
+        document.getElementById("tags").innerHTML = "";
+        showNav(true);
+      }
+      // jump the camera focus across unlocked planets
+      function updateNavButtons() {
+        const unlocked = MODULES.map((_, i) => i).filter(isUnlocked);
+        const pos = unlocked.indexOf(focusIdx);
+        document.getElementById("btnPrevPlanet").disabled = pos <= 0;
+        document.getElementById("btnNextPlanet").disabled =
+          pos < 0 || pos >= unlocked.length - 1;
+      }
+      function focusPlanet(dir) {
+        const unlocked = MODULES.map((_, i) => i).filter(isUnlocked);
+        const pos = Math.max(0, unlocked.indexOf(focusIdx));
+        const nxt = Math.min(Math.max(pos + dir, 0), unlocked.length - 1);
+        focusIdx = unlocked[nxt];
+        placeRocket(focusIdx);
+        syncRocket();
+        toast(`VIEWING ${MODULES[focusIdx].planet.toUpperCase()}`);
+        updateNavButtons();
+      }
+      function goHome() {
+        const p = planets[0].pos;
+        camera.position.set(p.x, p.y + 8, p.z + 26);
+        yaw = 0;
+        pitch = -0.28;
+        toast("WARPED TO TERRA PRIME — home planet");
+      }
+      function freeMove(dt) {
+        const turn = 1.7 * dt,
+          speed = 26 * dt;
+        if (keys["ArrowLeft"]) yaw += turn;
+        if (keys["ArrowRight"]) yaw -= turn;
+        camera.quaternion.setFromEuler(new THREE.Euler(pitch, yaw, 0, "YXZ"));
+        const dir = new THREE.Vector3();
+        camera.getWorldDirection(dir);
+        if (keys["Shift"]) {
+          if (keys["ArrowUp"]) camera.position.y += speed;
+          if (keys["ArrowDown"]) camera.position.y -= speed;
+        } else {
+          if (keys["ArrowUp"]) camera.position.addScaledVector(dir, speed);
+          if (keys["ArrowDown"]) camera.position.addScaledVector(dir, -speed);
+        }
+      }
+
+      // ---- flight between planets ----
+      let flight = null;
+      function startFlight(fromIdx, toIdx) {
+        const a = planets[fromIdx].pos
+          .clone()
+          .add(new THREE.Vector3(0, 7.1, 0));
+        const b = planets[toIdx].pos.clone().add(new THREE.Vector3(0, 7.1, 0));
+        const mid = a
+          .clone()
+          .lerp(b, 0.5)
+          .add(new THREE.Vector3(0, 28, 6));
+        flight = {
+          curve: new THREE.QuadraticBezierCurve3(a, mid, b),
+          t: 0,
+          toIdx,
+        };
+        mode = "flight";
+        toast(`LAUNCH — destination ${MODULES[toIdx].planet}`);
+      }
+      function flightTick(dt) {
+        flight.t += dt / 6;
+        const tt = Math.min(flight.t, 1);
+        const e = tt * tt * (3 - 2 * tt); // smoothstep
+        const p = flight.curve.getPoint(e);
+        const ahead = flight.curve.getPoint(Math.min(e + 0.02, 1));
+        rocket.position.copy(p);
+        const dir = ahead.clone().sub(p);
+        if (e < 0.8 && dir.lengthSq() > 1e-6) {
+          rocket.quaternion.setFromUnitVectors(
+            new THREE.Vector3(0, 1, 0),
+            dir.normalize(),
+          );
+          if (Math.random() < 0.5)
+            burst(p.clone().sub(dir.multiplyScalar(2)), 0xff9f2e, 6); // exhaust
+        } else {
+          rocket.quaternion.slerp(new THREE.Quaternion(), 0.18); // final approach: right itself for descent
+        }
+        camera.position.lerp(p.clone().add(new THREE.Vector3(12, 7, 20)), 0.06);
+        camLook.lerp(p, 0.12);
+        camera.lookAt(camLook);
+        if (flight.t >= 1) {
+          focusIdx = flight.toIdx;
+          placeRocket(focusIdx);
+          const impact = rocket.position.clone();
+          burst(impact, 0xff5d5d, 130); // fiery impact — it breaks apart
+          burst(impact, 0xff9f2e, 90);
+          burst(impact.clone().add(new THREE.Vector3(0, 1.5, 0)), 0xffe9a8, 60);
+          syncRocket(); // new planet = 0 built → back to blueprint
+          toast(
+            `CRASH-LANDING ON ${MODULES[focusIdx].planet.toUpperCase()} — frame shattered, rebuild it here`,
+            "badge",
+          );
+          flight = null;
+          mode = "dash";
+          renderModules();
+        }
+      }
+
+      // ---- name tags in free float ----
+      const tagLayer = document.getElementById("tags");
+      const projV = new THREE.Vector3();
+      function updateTags() {
+        if (mode !== "free") {
+          if (tagLayer.childElementCount) tagLayer.innerHTML = "";
+          return;
+        }
+        let html = "";
+        const put = (pos, label, color) => {
+          projV.copy(pos).project(camera);
+          if (projV.z > 1) return;
+          const d = camera.position.distanceTo(pos);
+          if (d > 70) return;
+          const x = (projV.x * 0.5 + 0.5) * innerWidth,
+            y = (-projV.y * 0.5 + 0.5) * innerHeight;
+          html += `<div class="tag" style="left:${x}px;top:${y}px;color:${color}">${label}</div>`;
+        };
+        planets.forEach((p, i) =>
+          put(
+            p.pos.clone().add(new THREE.Vector3(0, 9.5, 0)),
+            MODULES[i].planet,
+            "#cfe3ff",
+          ),
+        );
+        artifacts.forEach((a) => {
+          const c = "#" + a.badge.color.toString(16).padStart(6, "0");
+          put(
+            a.mesh.position,
+            a.earned
+              ? `${a.badge.artifact} — ${a.badge.name}`
+              : "UNDISCOVERED ARTIFACT",
+            a.earned ? c : "#5b6b93",
+          );
+        });
+        tagLayer.innerHTML = html;
+      }
+
+      // ---- planet click ----
+      const raycaster = new THREE.Raycaster(),
+        pointer = new THREE.Vector2();
+      canvas.addEventListener("pointerdown", (e) => {
+        if (mode !== "dash") return;
+        pointer.set(
+          (e.clientX / innerWidth) * 2 - 1,
+          -(e.clientY / innerHeight) * 2 + 1,
+        );
+        raycaster.setFromCamera(pointer, camera);
+        const hits = raycaster.intersectObjects(planets.map((p) => p.mesh));
+        if (!hits.length) return;
+        const idx = planets.findIndex(
+          (p) => p.mesh === hits[0].object || hits[0].object.parent === p.grp,
+        );
+        if (idx >= 0 && isUnlocked(idx)) openLesson(idx);
+        else if (idx >= 0)
+          toast(`LOCKED — complete ${MODULES[idx - 1].name} first`);
+      });
+
+      // ---- main loop ----
+      function tick(now) {
+        const dt = Math.min((now - last) / 1000, 0.05);
+        last = now;
+        t += dt;
+        stars.rotation.y += dt * 0.004;
+        planets.forEach((p) => (p.grp.rotation.y += dt * p.spin));
+        moonRigs.forEach((r) => {
+          r.angle += dt * r.speed;
+          const c = planets[r.mi].pos;
+          r.mesh.position.set(
+            c.x + Math.cos(r.angle) * r.r,
+            c.y + Math.sin(r.angle * 1.3) * 2.2,
+            c.z + Math.sin(r.angle) * r.r,
+          );
+          r.mesh.rotation.y += dt * 0.5;
+        });
+        artifacts.forEach((a) => {
+          a.mesh.rotation.x += dt * 0.25;
+          a.mesh.rotation.y += dt * 0.4;
+          a.mesh.position.y += Math.sin(t * 0.8 + a.phase) * dt * 0.6;
+          if (a.earned)
+            a.mesh.scale.setScalar(1 + Math.sin(t * 2 + a.phase) * 0.07);
+        });
+        for (let i = bursts.length - 1; i >= 0; i--) {
+          const b = bursts[i];
+          b.life -= dt / 1.15;
+          if (b.life <= 0) {
+            scene.remove(b.pts);
+            b.pts.geometry.dispose();
+            bursts.splice(i, 1);
+            continue;
+          }
+          const arr = b.pts.geometry.attributes.position.array;
+          b.vel.forEach((v, j) => {
+            arr[j * 3] += v.x * dt;
+            arr[j * 3 + 1] += v.y * dt;
+            arr[j * 3 + 2] += v.z * dt;
+            v.multiplyScalar(1 - dt * 0.9);
+          });
+          b.pts.geometry.attributes.position.needsUpdate = true;
+          b.pts.material.opacity = b.life;
+        }
+        for (let i = pops.length - 1; i >= 0; i--) {
+          const p = pops[i];
+          p.t += dt * 3;
+          const s =
+            p.t >= 1 ? 1 : 0.3 + 0.7 * p.t + Math.sin(p.t * Math.PI) * 0.35;
+          p.obj.scale.setScalar(s);
+          if (p.t >= 1) {
+            p.obj.scale.setScalar(1);
+            pops.splice(i, 1);
+          }
+        }
+        if (mode === "free") freeMove(dt);
+        else if (mode === "flight" && flight) flightTick(dt);
+        else {
+          const lessonOpen = !document
+            .getElementById("lesson")
+            .classList.contains("hidden");
+          const p = planets[focusIdx].pos;
+          const ang = t * 0.05,
+            r = lessonOpen ? 18 : 42,
+            h = lessonOpen ? 5 : 16;
+          camera.position.lerp(
+            new THREE.Vector3(
+              p.x + Math.sin(ang) * r,
+              p.y + h,
+              p.z + Math.cos(ang) * r,
+            ),
+            0.03,
+          );
+          camLook.lerp(p, 0.06);
+          camera.lookAt(camLook);
+        }
+        updateTags();
+        renderer.render(scene, camera);
+        requestAnimationFrame(tick);
+      }
+
+      /* ================================================================
+   UI — dashboard, lesson engine, terminal
+================================================================ */
+      const $ = (id) => document.getElementById(id);
+      function toast(msg, cls = "") {
+        const d = document.createElement("div");
+        d.className = "toast " + cls;
+        d.textContent = msg;
+        $("toasts").appendChild(d);
+        setTimeout(() => {
+          d.style.opacity = "0";
+          d.style.transition = "opacity .4s";
+          setTimeout(() => d.remove(), 450);
+        }, 3400);
+      }
+      function renderHUD() {
+        $("hudRank").textContent = rank();
+        $("hudLevel").textContent = "LVL " + level();
+        $("hudXP").textContent = state.xp + " XP";
+        $("hudXPBar").style.width = (state.xp % 100) + "%";
+        $("hudStreak").textContent =
+          "STREAK " +
+          state.streak +
+          (state.streak >= 3 ? " — CONSTELLATION" : "");
+      }
+      function renderBadges() {
+        $("badgeList").innerHTML = BADGES.map((b) => {
+          const got = bypassActive() || state.badges.includes(b.id);
+          const c = "#" + b.color.toString(16).padStart(6, "0");
+          return `<div class="flex items-center justify-between gap-2">
+      <span class="${got ? "text-white font-bold" : "text-slate-500"}">${b.name}</span>
+      <span class="chip" style="${got ? `color:${c};border-color:${c}` : "color:#5b6b93"}">${got ? "SECURED" : b.how}</span>
+    </div>`;
+        }).join("");
+      }
+      function renderModules() {
+        $("moduleList").innerHTML = MODULES.map((m, i) => {
+          const done = stepsDone(m),
+            total = m.questions.length,
+            unlocked = isUnlocked(i),
+            complete = isComplete(m);
+          const cpDone = m.checkpoints.filter((cp) => done >= cp.end).length;
+          const c = "#" + m.color.toString(16).padStart(6, "0");
+          const label = !unlocked
+            ? "LOCKED"
+            : complete
+              ? "REPLAY"
+              : done > 0
+                ? "CONTINUE"
+                : "BEGIN";
+          return `<div class="border-2 border-[#22335c] rounded-lg p-2.5 ${unlocked ? "" : "opacity-50"}">
+      <div class="flex items-center justify-between">
+        <div>
+          <span class="chip" style="color:${c};border-color:${c}">${m.id}</span>
+          <span class="text-sm font-bold text-white ml-1.5">${m.planet}</span>
+        </div>
+        <button class="btn ${complete ? "" : "btn-cyan"}" data-mod="${i}" ${unlocked ? "" : "disabled"}>${label}</button>
+      </div>
+      <div class="text-[11px] text-slate-400 mt-1">${m.name} · ${m.tier} — ${m.desc}</div>
+      <div class="flex items-center gap-2 mt-1.5">
+        <div class="prog flex-1"><div style="width:${(done / total) * 100}%;background:${c}"></div></div>
+        <span class="mono text-[10px] text-slate-400">${done}/${total} · ${cpDone}/${m.checkpoints.length} CP</span>
+      </div>
+    </div>`;
+        }).join("");
+        $("moduleList")
+          .querySelectorAll("button[data-mod]")
+          .forEach((b) =>
+            b.addEventListener("click", () => openLesson(+b.dataset.mod)),
+          );
+        updateNavButtons();
+      }
+
+      /* ---- lesson engine ---- */
+      let curM = 0,
+        curS = 0;
+      function openLesson(mi) {
+        curM = mi;
+        focusIdx = mi;
+        placeRocket(mi);
+        syncRocket();
+        const m = MODULES[mi];
+        curS = Math.min(stepsDone(m), m.questions.length - 1);
+        $("lesson").classList.remove("hidden");
+        $("lessonBackdrop").classList.remove("hidden");
+        showNav(false);
+        if (mode === "free") exitFree();
+        renderStep();
+      }
+      function closeLesson() {
+        $("lesson").classList.add("hidden");
+        $("lessonBackdrop").classList.add("hidden");
+        showNav(true);
+        focusIdx = curPlanetIdx();
+        placeRocket(focusIdx);
+        syncRocket();
+        renderModules();
+      }
+      function renderStep() {
+        const m = MODULES[curM],
+          s = m.questions[curS];
+        const cp = cpOfIndex(m, curS),
+          cpIdx = m.checkpoints.indexOf(cp);
+        $("lsCodename").textContent = m.id;
+        $("lsModule").textContent =
+          `${cp.name} · CP ${cpIdx + 1}/${m.checkpoints.length}`;
+        $("lsTitle").textContent = `${curS - cp.start + 1}. ${s.t}`;
+        $("lsCard").innerHTML = s.card;
+        $("lsMission").innerHTML = s.mission;
+        $("lsXP").textContent = `+${m.xp} XP`;
+        $("lsCtxWrap").classList.toggle("hidden", !s.ctx);
+        if (s.ctx) $("lsCtx").textContent = s.ctx;
+        const ed = $("editor");
+        ed.value = "";
+        ed.placeholder = s.ph;
+        ed.focus();
+        // dots for the current checkpoint's questions only — bypass mode
+        // widens this to every question in the module, so any lesson is browsable
+        const bypass = bypassActive();
+        const [dotStart, dotEnd] = bypass
+          ? [0, m.questions.length]
+          : [cp.start, cp.end];
+        let dots = "";
+        for (let i = dotStart; i < dotEnd; i++) {
+          const done = i < stepsDone(m);
+          const reachable = i <= stepsDone(m) || bypass;
+          dots += `<span class="dot ${done ? "done" : ""} ${i === curS ? "cur" : ""}" data-step="${i}" style="cursor:${reachable ? "pointer" : "default"}"></span>`;
+        }
+        $("lsDots").innerHTML = dots;
+        $("lsDots")
+          .querySelectorAll(".dot")
+          .forEach((d) =>
+            d.addEventListener("click", () => {
+              const i = +d.dataset.step;
+              if (i <= stepsDone(m) || bypassActive()) {
+                curS = Math.min(i, m.questions.length - 1);
+                renderStep();
+              }
+            }),
+          );
+        $("terminal").innerHTML =
+          '<div class="t-in">nebula-shell v2.0 — awaiting input</div>';
+        renderViz();
+      }
+      function renderViz() {
+        const m = MODULES[curM];
+        const viz = $("lsViz");
+        if (!m.viz) {
+          viz.classList.add("hidden");
+          return;
+        }
+        viz.classList.remove("hidden");
+        const done = stepsDone(m);
+        if (m.viz === "data") {
+          $("lsVizTitle").textContent = "LIVE TELEMETRY MATRIX";
+          $("lsVizBody").innerHTML = dataVizHTML(done);
+        } else {
+          $("lsVizTitle").textContent = "MODEL PERFORMANCE MONITOR";
+          $("lsVizBody").innerHTML =
+            '<canvas id="mlCanvas" width="520" height="140" style="width:100%;height:140px"></canvas>';
+          drawML(done);
+        }
+      }
+      function dataVizHTML(done) {
+        const meanChip =
+          done >= 2
+            ? `<div class="mb-1.5"><span class="chip" style="color:var(--cyan);border-color:var(--cyan)">speeds.mean() = 116.0</span></div>`
+            : "";
+        const isDF = done >= 3,
+          masked = done >= 4;
+        let rows = PROBES.map((r, i) => {
+          const fast = r[1] > 100;
+          const cls = masked ? (fast ? "keep" : "dim") : "";
+          return `<tr class="${cls}">${isDF ? `<td>${i}</td>` : ""}<td style="text-align:left">${r[0]}</td><td class="${done >= 1 ? "hl" : ""}">${r[1]}</td><td>${r[2]}</td></tr>`;
+        }).join("");
+        return (
+          meanChip +
+          `<table class="dv"><tr>${isDF ? "<th>idx</th>" : ""}<th style="text-align:left">probe</th><th>speed</th><th>signal</th></tr>${rows}</table>
+    <div class="text-[10px] text-slate-500 mt-1.5">${
+      masked
+        ? 'mask df["speed"] > 100 — 2 rows survive'
+        : isDF
+          ? "pd.DataFrame(probes) — labelled columns, numeric index"
+          : done >= 2
+            ? "aggregated: one number from four readings"
+            : done >= 1
+              ? "np.array — speed vector loaded"
+              : "raw probe records awaiting vectorization"
+    }</div>`
+        );
+      }
+      function drawML(done) {
+        const cv = $("mlCanvas");
+        if (!cv) return;
+        const ctx = cv.getContext("2d"),
+          W = cv.width,
+          H = cv.height;
+        ctx.clearRect(0, 0, W, H);
+        ctx.strokeStyle = "#22335c";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(1, 1, W - 2, H - 2);
+        ctx.font = "11px JetBrains Mono";
+        ctx.fillStyle = "#7f93c4";
+        if (done === 0) {
+          ctx.fillText(
+            "awaiting telemetry — split the data to begin",
+            14,
+            H / 2,
+          );
+          return;
+        }
+        // split bar
+        ctx.fillStyle = "#35e0ff";
+        ctx.fillRect(12, 12, (W - 24) * 0.8, 12);
+        ctx.fillStyle = "#ff9f2e";
+        ctx.fillRect(12 + (W - 24) * 0.8, 12, (W - 24) * 0.2, 12);
+        ctx.fillStyle = "#7f93c4";
+        ctx.fillText("train 80%", 14, 38);
+        ctx.fillText("test 20%", W - 80, 38);
+        const plot = (fn, color, y0 = 52, h = H - 64) => {
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          for (let i = 0; i <= 50; i++) {
+            const x = 12 + ((W - 24) * i) / 50,
+              y = y0 + h * (1 - fn(i / 50));
+            i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+          }
+          ctx.stroke();
+        };
+        if (done === 1) {
+          plot((x) => Math.min(1, 0.2 + x * x * 2.2), "#ff5d5d");
+          ctx.fillStyle = "#ff5d5d";
+          ctx.fillText("loss DIVERGING — lr 5.0 overshooting", 14, H - 8);
+          return;
+        }
+        plot((x) => 1 - Math.pow(x, 0.45), "#ff5d5d"); // loss descending
+        if (done >= 3) {
+          plot((x) => 0.5 + 0.44 * Math.pow(x, 0.6), "#3ecf8e"); // accuracy climbing
+          ctx.fillStyle = "#3ecf8e";
+          ctx.fillText(
+            done >= 4
+              ? "val_acc 0.97 — calibrated"
+              : "val_acc 0.94 after 50 epochs",
+            14,
+            H - 8,
+          );
+        } else {
+          ctx.fillStyle = "#35e0ff";
+          ctx.fillText("loss descending smoothly — lr 0.01", 14, H - 8);
+        }
+        ctx.fillStyle = "#ff5d5d";
+        ctx.fillText("loss", W - 46, 64);
+      }
+
+      /* ---- terminal + verification ---- */
+      function echo(line, cls = "t-out", delay = 0) {
+        setTimeout(() => {
+          const d = document.createElement("div");
+          d.className = cls;
+          d.textContent = line;
+          $("terminal").appendChild(d);
+          $("terminal").scrollTop = $("terminal").scrollHeight;
+        }, delay);
+      }
+      let running = false;
+      async function runCode() {
+        if (running) return;
+        const m = MODULES[curM],
+          s = m.questions[curS];
+        const code = $("editor").value.trim().replace(/\s+$/gm, "");
+        echo(">>> " + (code || "(empty)"), "t-in");
+        if (curS > stepsDone(m)) {
+          echo(
+            "LOCKED: reach this lesson through the checkpoint first — bypass is browse-only",
+            "t-err",
+          );
+          return;
+        }
+        if (!code) {
+          echo("SyntaxError: nothing to run", "t-err");
+          return;
+        }
+        if (s.tests) {
+          await runTests(s, code);
+          return;
+        }
+        if (s.re.test(code)) {
+          running = true;
+          s.ok.forEach((l, i) =>
+            echo(l, i === s.ok.length - 1 ? "t-ok" : "t-out", 150 + i * 180),
+          );
+          setTimeout(
+            () => {
+              running = false;
+              stepVerified();
+            },
+            150 + s.ok.length * 180 + 200,
+          );
+        } else {
+          for (const c of s.checks) {
+            const hit = c.re.test(code);
+            if (c.bad ? hit : !hit) {
+              echo("MissionCheckError: line not verified", "t-err", 120);
+              echo("HINT: " + c.msg, "t-hint", 300);
+              return;
+            }
+          }
+          echo(
+            "MissionCheckError: close — check spacing and exact names",
+            "t-err",
+            120,
+          );
+          echo("HINT: expected shape: " + s.ph, "t-hint", 300);
+        }
+      }
+
+      /* ---- interpreter-backed test verification (real CPython via Pyodide) ----
+         A question with `s.tests` is graded LeetCode-style: the learner's code
+         is executed for real, once per test case (fresh globals each time), then
+         either a call/read expression or captured stdout is compared against the
+         expected value. A settrace deadline guards against learner infinite loops
+         hanging the tab (e.g. a `while` that never terminates). */
+      const GUARD_SRC = `import sys as _g_sys, time as _g_time
+_g_deadline = _g_time.time() + 3
+def _g_guard(frame, event, arg):
+    if _g_time.time() > _g_deadline:
+        raise TimeoutError("execution exceeded 3s — check for an infinite loop")
+    return _g_guard
+_g_sys.settrace(_g_guard)
+_g_sys._getframe(0).f_trace = _g_guard
+`;
+      function toJS(v) {
+        if (v && typeof v === "object" && typeof v.toJs === "function") {
+          const j = v.toJs({ dict_converter: Object.fromEntries });
+          if (typeof v.destroy === "function") v.destroy();
+          return j;
+        }
+        return v;
+      }
+      function fmt(v) {
+        if (v instanceof Set) return `{${[...v].sort().join(", ")}}`;
+        return JSON.stringify(v);
+      }
+      function deepEqual(a, b) {
+        if (a instanceof Set) {
+          const as = [...a].sort(),
+            bs = [...(Array.isArray(b) ? b : [])].sort();
+          return JSON.stringify(as) === JSON.stringify(bs);
+        }
+        if (b === null) return a === null || a === undefined;
+        if (typeof a === "number" && typeof b === "number")
+          return Math.abs(a - b) < 1e-9;
+        if (Array.isArray(a) && Array.isArray(b))
+          return a.length === b.length && a.every((x, i) => deepEqual(x, b[i]));
+        if (a && b && typeof a === "object" && typeof b === "object") {
+          const ak = Object.keys(a),
+            bk = Object.keys(b);
+          return (
+            ak.length === bk.length && ak.every((k) => deepEqual(a[k], b[k]))
+          );
+        }
+        return a === b;
+      }
+      async function runOneCase(py, s, code, tc) {
+        const ctx = tc.ctx ?? s.ctx ?? "";
+        const tail = tc.call
+          ? `_g_result = ${tc.call}`
+          : tc.read
+            ? `_g_result = ${tc.read}`
+            : "";
+        const fullSrc = `${GUARD_SRC}
+import io as _g_io
+_g_orig_stdout = _g_sys.stdout
+_g_sys.stdout = _g_io.StringIO()
+${ctx ? ctx + "\n" : ""}${code}
+${tail}
+_g_captured = _g_sys.stdout.getvalue()
+_g_sys.stdout = _g_orig_stdout
+`;
+        const ns = py.globals.get("dict")();
+        try {
+          await py.runPythonAsync(fullSrc, { globals: ns });
+          const stdout = toJS(ns.get("_g_captured"));
+          const value =
+            tc.call || tc.read ? toJS(ns.get("_g_result")) : undefined;
+          return { stdout, value };
+        } finally {
+          py.runPython("import sys as _g_sys2; _g_sys2.settrace(None)");
+          ns.destroy();
+        }
+      }
+      function failHint(s, code) {
+        running = false;
+        $("btnRun").disabled = false;
+        for (const c of s.checks || []) {
+          const hit = new RegExp(c.re).test(code);
+          if (c.bad ? hit : !hit) {
+            echo("HINT: " + c.msg, "t-hint", 260);
+            return;
+          }
+        }
+        echo("HINT: expected shape: " + s.ph, "t-hint", 260);
+      }
+      async function runTests(s, code) {
+        running = true;
+        $("btnRun").disabled = true;
+        try {
+          echo(
+            _py ? "running tests…" : "booting CPython (first run ~5s)…",
+            "t-out",
+          );
+          const py = await getPyodide();
+          for (let i = 0; i < s.tests.length; i++) {
+            const tc = s.tests[i];
+            const label = tc.call || tc.read || "(script)";
+            let out;
+            try {
+              out = await runOneCase(py, s, code, tc);
+            } catch (e) {
+              echo(
+                `Test ${i + 1}/${s.tests.length} — runtime error`,
+                "t-err",
+                60,
+              );
+              String(e.message || e)
+                .split("\n")
+                .filter(Boolean)
+                .slice(-6)
+                .forEach((l, j) => echo(l, "t-err", 100 + j * 40));
+              return failHint(s, code);
+            }
+            if (tc.stdout !== undefined) {
+              const got = (out.stdout || "").replace(/\s+$/, "");
+              const want = tc.stdout.replace(/\s+$/, "");
+              if (got !== want) {
+                echo(
+                  `Test ${i + 1}/${s.tests.length} failed — ${label}`,
+                  "t-err",
+                  60,
+                );
+                echo(
+                  `  expected output: ${JSON.stringify(want)}`,
+                  "t-out",
+                  120,
+                );
+                echo(`  got:             ${JSON.stringify(got)}`, "t-err", 180);
+                return failHint(s, code);
+              }
+            } else if (!deepEqual(out.value, tc.expected)) {
+              echo(
+                `Test ${i + 1}/${s.tests.length} failed — ${label}`,
+                "t-err",
+                60,
+              );
+              echo(`  expected: ${fmt(tc.expected)}`, "t-out", 120);
+              echo(`  got:      ${fmt(out.value)}`, "t-err", 180);
+              return failHint(s, code);
+            }
+            echo(
+              `Test ${i + 1}/${s.tests.length} ✓ ${label}${tc.expected !== undefined ? " -> " + fmt(tc.expected) : ""}`,
+              i === s.tests.length - 1 ? "t-ok" : "t-out",
+              60 + i * 40,
+            );
+          }
+          setTimeout(
+            () => {
+              running = false;
+              $("btnRun").disabled = false;
+              stepVerified();
+            },
+            120 + s.tests.length * 40,
+          );
+        } catch (e) {
+          running = false;
+          $("btnRun").disabled = false;
+          echo("Python runtime failed to load: " + (e.message || e), "t-err");
+        }
+      }
+      function stepVerified() {
+        const m = MODULES[curM];
+        const isNew = curS === stepsDone(m) && !isComplete(m);
+        const cp = cpOfIndex(m, curS);
+        const rig = moonRigs.find(
+          (r) => r.mi === curM && r.ci === m.checkpoints.indexOf(cp),
+        );
+        if (rig) burst(rig.mesh.position, m.color, 40);
+        if (!isNew) {
+          echo("replay verified — no duplicate XP", "t-in", 100);
+          if (curS < m.questions.length - 1) {
+            setTimeout(() => {
+              curS++;
+              renderStep();
+            }, 900);
+          }
+          return;
+        }
+        state.steps[m.id] = curS + 1;
+        save();
+        addXP(m.xp);
+        award("signal");
+        syncMoons();
+        syncRocket(true);
+        renderViz();
+        if (curS + 1 === cp.end && curS + 1 < m.questions.length) {
+          // checkpoint cleared (not the final one)
+          toast(`CHECKPOINT CLEARED: ${cp.name} — satellite online`, "level");
+          if (rig) burst(rig.mesh.position, m.color, 130);
+        }
+        if (curS + 1 >= m.questions.length) {
+          // module complete
+          state.completed[m.id] = true;
+          save();
+          addXP(50);
+          toast(`MODULE COMPLETE: ${m.name} — +50 XP bonus`, "level");
+          if (m.badge) award(m.badge);
+          if (MODULES.every(isComplete)) award("operational");
+          burst(
+            planets[curM].pos.clone().add(new THREE.Vector3(0, 9, 0)),
+            m.color,
+            160,
+          );
+          const next = curM + 1;
+          setTimeout(() => {
+            closeLesson();
+            if (next < MODULES.length && curPlanetIdx() === next) {
+              focusIdx = curM;
+              placeRocket(curM);
+              rocketParts.forEach((p) => {
+                // fully built for launch
+                if (p.group)
+                  p.mesh.children.forEach((c, j) => (c.material = p.mats[j]));
+                else {
+                  p.mesh.material = p.mat;
+                  p.ol.visible = true;
+                }
+              });
+              startFlight(curM, next);
+            }
+          }, 1400);
+        } else {
+          setTimeout(() => {
+            curS++;
+            renderStep();
+          }, 1000);
+        }
+        renderModules();
+        renderBadges();
+      }
+
+      /* ---- certificate ---- */
+      function certJSON() {
+        const name = $("certName").value.trim() || "Astronaut-Engineer";
+        const code =
+          "NA2-" +
+          btoa(`${state.xp}:${state.lastDay}:${name}`)
+            .replace(/[^A-Z0-9]/gi, "")
+            .slice(0, 12)
+            .toUpperCase();
+        return {
+          certificate: "NEBULA ACADEMY — TRAINING RECEIPT",
+          holder: name,
+          issued: new Date().toISOString(),
+          level: level(),
+          rank: rank(),
+          xp: state.xp,
+          streak: state.streak,
+          modules: Object.fromEntries(
+            MODULES.map((m) => [
+              m.id,
+              {
+                questions: `${stepsDone(m)}/${m.questions.length}`,
+                checkpoints: m.checkpoints.length,
+                complete: isComplete(m),
+              },
+            ]),
+          ),
+          artifacts: state.badges.map(
+            (id) => BADGES.find((b) => b.id === id).name,
+          ),
+          verification: code,
+        };
+      }
+      function openCert() {
+        $("certPreview").textContent = JSON.stringify(certJSON(), null, 2);
+        $("certModal").classList.remove("hidden");
+      }
+      $("certName").addEventListener(
+        "input",
+        () =>
+          ($("certPreview").textContent = JSON.stringify(certJSON(), null, 2)),
+      );
+      $("btnDownloadCert").addEventListener("click", () => {
+        const blob = new Blob([JSON.stringify(certJSON(), null, 2)], {
+          type: "application/json",
+        });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "nebula-academy-certificate.json";
+        a.click();
+        URL.revokeObjectURL(a.href);
+      });
+
+      /* ---- real Python console (Pyodide, lazy-loaded) ---- */
+      const PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+      let _py = null,
+        _pyLoading = null,
+        pyBusy = false;
+      function pyEcho(text, cls = "t-out") {
+        String(text)
+          .replace(/\s+$/, "")
+          .split("\n")
+          .forEach((line) => {
+            const d = document.createElement("div");
+            d.className = cls;
+            d.textContent = line || " ";
+            $("pyOut").appendChild(d);
+          });
+        $("pyOut").scrollTop = $("pyOut").scrollHeight;
+      }
+      function setPyStatus(s) {
+        $("pyStatus").textContent = s;
+      }
+      function loadScript(src) {
+        return new Promise((res, rej) => {
+          const el = document.createElement("script");
+          el.src = src;
+          el.onload = res;
+          el.onerror = () => rej(new Error("failed to load " + src));
+          document.head.appendChild(el);
+        });
+      }
+      async function getPyodide() {
+        if (_py) return _py;
+        if (!_pyLoading)
+          _pyLoading = (async () => {
+            if (!window.loadPyodide)
+              await loadScript(PYODIDE_URL + "pyodide.js");
+            _py = await window.loadPyodide({ indexURL: PYODIDE_URL });
+            return _py;
+          })();
+        return _pyLoading;
+      }
+      async function runPy() {
+        if (pyBusy) return;
+        const codeSrc = $("pyCode").value;
+        if (!codeSrc.trim()) {
+          pyEcho("nothing to run", "t-err");
+          return;
+        }
+        pyBusy = true;
+        $("pyRun").disabled = true;
+        try {
+          setPyStatus(_py ? "running…" : "booting CPython (first run ~5s)…");
+          const py = await getPyodide();
+          setPyStatus("resolving imports…");
+          try {
+            await py.loadPackagesFromImports(codeSrc);
+          } catch (_) {} // best-effort; missing pkgs surface as real errors
+          setPyStatus("running…");
+          py.setStdout({ batched: (s) => pyEcho(s, "t-out") });
+          py.setStderr({ batched: (s) => pyEcho(s, "t-err") });
+          pyEcho(">>> run", "t-in");
+          try {
+            const res = await py.runPythonAsync(codeSrc);
+            if (res !== undefined && res !== null)
+              pyEcho(res.toString ? res.toString() : String(res), "t-ok");
+            setPyStatus("done ✓");
+          } catch (e) {
+            String(e.message || e)
+              .split("\n")
+              .filter(Boolean)
+              .slice(-14)
+              .forEach((l) => pyEcho(l, "t-err"));
+            setPyStatus("error");
+          }
+        } catch (e) {
+          pyEcho("Python runtime failed to load: " + (e.message || e), "t-err");
+          setPyStatus("load failed");
+        } finally {
+          pyBusy = false;
+          $("pyRun").disabled = false;
+        }
+      }
+      const PY_DEMO =
+        'import numpy as np\n\nspeeds = np.array([88, 132, 99, 145])\nprint("mean:", speeds.mean())\nprint("scaled:", (speeds - speeds.min()) / (speeds.max() - speeds.min()))';
+      function openPy(prefill) {
+        $("pyCode").value =
+          prefill != null && prefill.trim()
+            ? prefill
+            : $("pyCode").value || PY_DEMO;
+        $("pyModal").classList.remove("hidden");
+        $("pyCode").focus();
+      }
+
+      /* ---- wiring ---- */
+      $("btnRun").addEventListener("click", runCode);
+      $("btnPy").addEventListener("click", () => openPy());
+      $("btnRunReal").addEventListener("click", () => {
+        const s = MODULES[curM].questions[curS];
+        openPy((s.ctx ? s.ctx + "\n" : "") + $("editor").value);
+      });
+      $("pyRun").addEventListener("click", runPy);
+      $("pyClear").addEventListener("click", () => ($("pyOut").innerHTML = ""));
+      $("btnClosePy").addEventListener("click", () =>
+        $("pyModal").classList.add("hidden"),
+      );
+      $("pyCode").addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+          e.preventDefault();
+          runPy();
+        }
+      });
+      $("editor").addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          runCode();
+        }
+      });
+      $("btnCloseLesson").addEventListener("click", closeLesson);
+      $("btnFree").addEventListener("click", () =>
+        mode === "free" ? exitFree() : enterFree(),
+      );
+      $("btnExitFree").addEventListener("click", exitFree);
+      $("btnHome").addEventListener("click", goHome);
+      $("btnPrevPlanet").addEventListener("click", () => focusPlanet(-1));
+      $("btnNextPlanet").addEventListener("click", () => focusPlanet(1));
+      // $("btnCert").addEventListener("click", openCert);
+      $("btnCloseCert").addEventListener("click", () =>
+        $("certModal").classList.add("hidden"),
+      );
+      $("btnReset").addEventListener("click", () => {
+        if (
+          confirm(
+            "Reset ALL training progress? XP, artifacts and streak will be wiped.",
+          )
+        ) {
+          localStorage.removeItem(KEY);
+          location.reload();
+        }
+      });
+      $("btnBegin").addEventListener("click", () => {
+        state.intro = true;
+        save();
+        $("intro").classList.add("hidden");
+      });
+
+      /* ---- boot ---- */
+      if (!state.intro) $("intro").classList.remove("hidden");
+      state.badges.forEach(() => {}); // noop keep
+      syncMoons();
+      syncArtifacts();
+      placeRocket(focusIdx);
+      syncRocket();
+      renderHUD();
+      renderModules();
+      renderBadges();
+      requestAnimationFrame(tick);
+    </script>
+  </body>
+</html>
