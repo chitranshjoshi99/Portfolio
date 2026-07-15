@@ -1,5 +1,7 @@
 {
   "rewrites": [
+    { "source": "/apps/stylophone-visualiser", "destination": "/apps/stylophone-visualiser/index.html" },
+    { "source": "/apps/stylophone-visualiser/", "destination": "/apps/stylophone-visualiser/index.html" },
     { "source": "/about", "destination": "/api/page?route=about" },
     { "source": "/labs", "destination": "/api/page?route=labs" },
     { "source": "/blogs", "destination": "/api/page?route=blogs" },
