@@ -1,0 +1,33 @@
+{
+  "requirement": "Implement v1.3 EPIC 4 Story 2: make on-screen pad practice comfortable and legible on touch devices.",
+  "workspace": "/Users/chitranshjoshi/Work/Stylophone",
+  "checkpointEvery": 3,
+  "approvalCheckpoints": false,
+  "architecture": {
+    "decision": "Extend the existing pad verdict props with a short-lived miss state, trigger native haptics only on correct hits, and enlarge the existing pad on coarse pointers.",
+    "alternatives": ["New scoring state machine", "A dependency-based haptics abstraction"],
+    "tradeoffs": ["Reusing the current hit timer/pad prop flow keeps the pad a display and signal-emitter surface while scoring stays in useLiveInput."],
+    "seams": ["useLiveInput owns practice verdict timing", "VisualizerPad forwards verdict props", "BeatPad and CSS render state and target sizing"]
+  },
+  "tasks": [
+    {
+      "id": "E4.2",
+      "title": "Touch-enhance practice pad",
+      "intent": "Give tablet learners clear hit/miss feedback, a native success haptic, and comfortably large pad targets.",
+      "ownership": ["src/hooks/useLiveInput.ts", "src/components/VisualizerPad.tsx", "src/components/BeatPad.tsx", "src/components/BeatPad.css", "src/App.css"],
+      "constraints": ["No dependencies", "Reuse existing hit verdict flow", "Keep hover gated", "Use feature-detected navigator.vibrate"],
+      "acceptance": "Correct practice taps flash green and request a short haptic where supported; wrong/late taps flash a distinct miss state; coarse-pointer pad targets are enlarged; the existing cue remains visible.",
+      "verify": ["npm run build", "Live app browser inspection", "CSS and source inspection for haptic/miss/coarse-pointer paths"],
+      "visual": "Run the Vite app and inspect the pad at desktop and tablet dimensions.",
+      "dependsOn": ["E4.1", "E3.1"],
+      "status": "completed",
+      "result": "Added a mutually exclusive miss verdict alongside the existing hit verdict, native 12ms correct-hit haptics, and coarse-pointer visualizer sizing that restores the 300px pad geometry floor.",
+      "evidence": [
+        "npm run build — passed (tsc && vite build)",
+        "Source inspection — missPad flows useLiveInput → App → VisualizerPad → BeatPad; native navigator.vibrate?.(12) is called only for practice hits; .is-miss has red, dashed, and reduced-motion-safe styling.",
+        "Live Vite app at http://127.0.0.1:5173/: 12 pad buttons rendered and console had no warnings/errors at desktop and 768px tablet dimensions. The browser runtime cannot emulate a coarse pointer."
+      ],
+      "error": null
+    }
+  ]
+}

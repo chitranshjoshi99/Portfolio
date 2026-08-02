@@ -1,0 +1,163 @@
+{
+  "requirement": "Implement EPIC-2 story 2.3: validated local-file and YouTube ingest that produces a canonical WAV clip of at most 15 seconds for reduction.",
+  "workspace": "/Users/chitranshjoshi/Work/Stylophone",
+  "checkpointEvery": 3,
+  "approvalCheckpoints": false,
+  "architecture": {
+    "decision": "Add a dedicated sidecar ingest module that validates exactly one source, acquires it into a request-scoped workspace, validates duration, clips it to mono 44.1 kHz WAV, and passes only that clip to the unchanged reduce() interface.",
+    "alternatives": [
+      "Keep decoding and clipping implicit inside reduce()",
+      "Let the FastAPI route directly assemble yt-dlp and ffmpeg commands"
+    ],
+    "tradeoffs": [
+      "A separate ingest seam adds one module but keeps hostile-input validation and subprocess policy testable without Demucs.",
+      "Sources are capped at 50 MiB and 30 minutes while selected clips remain capped at 15 seconds; this permits normal songs without allowing unbounded local processing."
+    ],
+    "seams": [
+      "ingest(file_path=... | youtube_url=..., work_dir=...) -> IngestedAudio",
+      "clip(audio, clip_start, clip_end, work_dir) -> wav_path",
+      "reduce(wav_path, 0, clip_duration, bpm)"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Publish the ingest execution state",
+      "intent": "Create the durable EPIC-2.3 queue and make both trackers the honest resume point.",
+      "ownership": [
+        "sidecar/requirements.txt",
+        "sidecar/README.md",
+        "docs/executions/v1/EPIC-2-ingest.json",
+        "docs/product/v1/README.md",
+        "docs/product/v1/EPIC-2-reduction.md"
+      ],
+      "constraints": [
+        "Use Session S7",
+        "Preserve completed story 2.2 evidence"
+      ],
+      "acceptance": "The durable plan exists and story 2.3 is In progress in both trackers.",
+      "verify": [
+        "python3 -m json.tool docs/executions/v1/EPIC-2-ingest.json",
+        "rg -n '\\| 2( \\| 2\\.3|\\.3 \\|).*In progress.*S7' docs/product/v1/README.md docs/product/v1/EPIC-2-reduction.md"
+      ],
+      "visual": null,
+      "dependsOn": [],
+      "status": "completed",
+      "result": "Exported the EPIC-2.3 queue and marked story 2.3 In progress in both trackers for Session S7.",
+      "evidence": [
+        "python3 -m json.tool docs/executions/v1/EPIC-2-ingest.json (exit 0)",
+        "Tracker rg check found In progress and S7 in both files"
+      ],
+      "error": null
+    },
+    {
+      "id": "T2",
+      "title": "Build the validated ingest seam",
+      "intent": "Implement file and YouTube acquisition plus deterministic ffmpeg clipping behind small testable functions.",
+      "ownership": [
+        "sidecar/ingest.py",
+        "sidecar/test_ingest.py"
+      ],
+      "constraints": [
+        "Python 3.9 compatible",
+        "Pass subprocess arguments as lists with shell disabled",
+        "Accept only http(s) YouTube/youtu.be URLs and no playlists",
+        "Validate local metadata before ffmpeg",
+        "Cap source size at 50 MiB, source duration at 30 minutes, and clip duration at 15 seconds",
+        "Do not invoke Demucs or alter reduce.py"
+      ],
+      "acceptance": "A valid local audio path or YouTube URL yields an IngestedAudio source and clip() emits a mono 44.1 kHz WAV no longer than 15 seconds; invalid type/size/duration/URL/range fails before heavy processing; subprocess failures become safe ingest errors; temporary output remains request-scoped.",
+      "verify": [
+        "sidecar/.venv/bin/python -m unittest sidecar.test_ingest -v",
+        "PYTHONPYCACHEPREFIX=/tmp/stylophone-pycache sidecar/.venv/bin/python -m py_compile sidecar/ingest.py sidecar/test_ingest.py"
+      ],
+      "visual": null,
+      "dependsOn": [
+        "T1"
+      ],
+      "status": "completed",
+      "result": "Added a validated ingest seam for MP3/WAV uploads and constrained YouTube URLs plus canonical mono 44.1 kHz WAV clipping capped at 15 seconds.",
+      "evidence": [
+        "sidecar/.venv/bin/python -m unittest sidecar.test_ingest -v (8 tests, exit 0)",
+        "PYTHONPYCACHEPREFIX=/tmp/stylophone-pycache sidecar/.venv/bin/python -m py_compile sidecar/ingest.py sidecar/test_ingest.py (exit 0)",
+        "Supervisor repaired yt-dlp invocation to use sys.executable -m yt_dlp; gates reran successfully"
+      ],
+      "error": null
+    },
+    {
+      "id": "T3",
+      "title": "Route reductions through ingest",
+      "intent": "Wire both multipart source choices through the ingest/clip seam, preserve source metadata, map ingest failures to the documented HTTP classes, and update API contracts and documentation.",
+      "ownership": [
+        "sidecar/app.py",
+        "sidecar/test_app.py",
+        "sidecar/README.md"
+      ],
+      "constraints": [
+        "Accept exactly one of file or youtube_url",
+        "Run acquisition, clipping, and reduction off the async event loop",
+        "Keep localhost binding and CORS unchanged",
+        "Preserve 400/413/422 response classes",
+        "Always clean request-scoped files"
+      ],
+      "acceptance": "POST /reduce accepts either a validated file or YouTube URL, reduces only the canonical clip, restores upload/YouTube source metadata and original clip offsets in the response, rejects ambiguous sources, and all old plus new API tests pass.",
+      "verify": [
+        "sidecar/.venv/bin/python -m unittest sidecar.test_ingest sidecar.test_app -v",
+        "git diff --check"
+      ],
+      "visual": null,
+      "dependsOn": [
+        "T2"
+      ],
+      "status": "completed",
+      "result": "Wired exactly-one-source requests through ingest, canonical clipping, and unchanged reduce() in one thread-pool dispatch; preserved original source metadata and documented the contract.",
+      "evidence": [
+        "sidecar/.venv/bin/python -m unittest sidecar.test_ingest sidecar.test_app -v (19 tests, exit 0)",
+        "PYTHONPYCACHEPREFIX=/tmp/stylophone-pycache sidecar/.venv/bin/python -m py_compile sidecar/ingest.py sidecar/test_ingest.py sidecar/app.py sidecar/test_app.py (exit 0)",
+        "git diff --check (exit 0)"
+      ],
+      "error": null
+    },
+    {
+      "id": "T4",
+      "title": "Verify real media flows and close the story",
+      "intent": "Exercise local MP3/WAV clipping, a YouTube ingest when network access permits, the live API and full reduction regression, then record results in both trackers.",
+      "ownership": [
+        "docs/executions/v1/EPIC-2-ingest.json",
+        "docs/product/v1/README.md",
+        "docs/product/v1/EPIC-2-reduction.md"
+      ],
+      "constraints": [
+        "Do not mark Done until real MP3 and WAV clips are inspected",
+        "Record an exact blocker rather than claiming live YouTube success if the upstream service rejects automation",
+        "Do not commit the new story without user authorization"
+      ],
+      "acceptance": "Real MP3 and WAV sources produce valid <=15s mono 44.1 kHz clips; the live endpoint returns schema-valid JSON through the new seam; YouTube acquisition is verified live or its deterministic command/contract is verified with the upstream blocker explicitly recorded; regression tests and frontend build pass; both trackers are synchronized.",
+      "verify": [
+        "sidecar/.venv/bin/python -m unittest sidecar.test_ingest sidecar.test_app -v",
+        "npm run build",
+        "Inspect real MP3 and WAV outputs with ffprobe",
+        "Exercise yt-dlp against a real YouTube URL when available",
+        "POST one real source through http://127.0.0.1:8000/reduce and validate its returned lesson JSON"
+      ],
+      "visual": "Inspect ffprobe metadata and the live lesson response for correct source type/ref and original clip offsets.",
+      "dependsOn": [
+        "T3"
+      ],
+      "status": "completed",
+      "result": "Verified real WAV and MP3 clipping, live localhost MP3 reduction, and live YouTube ingest with the current Python 3.11+/yt-dlp baseline; raised the documented/runtime dependency floor after proving the old Python 3.9-compatible extractor was obsolete.",
+      "evidence": [
+        "sidecar/.venv/bin/python -m unittest sidecar.test_ingest sidecar.test_app -v (20 tests, exit 0)",
+        "npm run build (exit 0)",
+        "Real kick.wav -> WAV mono 44100 Hz 0.4s",
+        "Real Janice-STFU.mp3 -> WAV mono 44100 Hz 15.0s after focused MP3 format-alias repair",
+        "Live localhost Janice multipart POST -> HTTP 200; returned schema v1 with upload ref Janice-STFU.mp3 and original offsets 15.0..30.0",
+        "sidecar/.venv/bin/python sidecar/reduce.py --validate /tmp/stylophone-ingest-live.json (exit 0)",
+        "Old Python 3.9 / yt-dlp 2025.10.14 live attempts failed on current YouTube; pip could not select a newer compatible release",
+        "Isolated Python 3.12 / yt-dlp 2026.07.04 live ingest of jNQXAC9IVRw -> WAV mono 44100 Hz 8.0s",
+        "Updated setup to Python 3.11+ and yt-dlp>=2026.7.4"
+      ],
+      "error": null
+    }
+  ]
+}

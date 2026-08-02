@@ -1,0 +1,174 @@
+/* Chassis control regions. Layout of the regions themselves lives in Device.css;
+   this file owns the buttons inside them. */
+
+.tbtn {
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+  background: var(--surface);
+  border: 1px solid var(--edge);
+  border-radius: calc(var(--radius) - 6px);
+  padding: var(--space-3) var(--space-6);
+  cursor: pointer;
+  /* 44px min touch target (WCAG 2.5.5); inline-flex centers the label. */
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative; /* tooltip anchor */
+}
+
+@media (hover: hover) {
+  .tbtn:hover:not(:disabled) {
+    color: var(--text);
+    background: var(--surface-2);
+  }
+}
+
+/* Pressed / active states use accent brightness to encode state. */
+.tbtn[aria-pressed="true"],
+.tbtn.is-active {
+  color: var(--text);
+  background: var(--accent-dim);
+  border-color: var(--accent);
+}
+
+.tbtn--rec[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent-bright);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.tbtn--mode.is-active {
+  /* background: var(--accent);
+  border-color: var(--accent-bright);
+  color: var(--text); */
+  color: var(--text);
+  background: var(--accent-dim);
+  border-color: var(--accent);
+}
+
+.tbtn--bank.is-active {
+  color: var(--text);
+  background: var(--accent-dim);
+  border-color: var(--accent);
+}
+
+.tbtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Unavailable reads by shape too, not just by dimming: a dashed edge. */
+.tbtn--bank:disabled {
+  border-style: dashed;
+}
+
+/* Icon-only keys: symbol, no text. Square 44px, glyph centered. */
+.tbtn--icon {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  flex: none;
+}
+.tbtn__icon {
+  display: block;
+  pointer-events: none;
+}
+
+/* Non-color state cue for the icon keys: a pressed inset + a heavier rim, so
+   active still reads with color vision off (and the play↔stop glyph changes). */
+.tbtn--icon[aria-pressed="true"] {
+  border-width: 2px;
+  box-shadow: inset 0 3px 7px rgba(0, 0, 0, 0.55);
+}
+
+/* Tooltip look and placement live in theme.css, shared by every [data-tip]. */
+
+/* Every control group reads as one array on the chassis: a framed cluster of
+   keys, not keys floating on the panel. */
+.transport-array,
+.mode-switch,
+.pad-mode-switch,
+.profile-grid,
+.octave-stack,
+.utility-dock {
+  padding: 5px;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius);
+  background: var(--bg-2);
+  width: max-content;
+}
+
+/* Structure pane's Upload/Download pair — same framed-cluster look as the
+   chassis arrays on the left, not bare floating icons. */
+.utility-dock {
+  display: flex;
+  gap: var(--space-1);
+}
+
+/* BOTTOM-RIGHT: profile selector — ROK / HIP / TEC / BOX in one flat row. */
+.profile-grid {
+  display: flex;
+  gap: var(--space-1);
+}
+.tbtn--bank {
+  padding: 0;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+/* BELOW THE PAD: one horizontal axis — down, readout, up. */
+.octave-stack {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* DRUMS has no octave layer. Keep its selected value visible for the next
+   BASS switch, while muting the whole control as an unavailable group. */
+.octave-stack.is-disabled .tbtn--readout {
+  color: var(--text-dim);
+  opacity: 0.4;
+}
+
+/* Octave value display: reads as current value, not a button. Fixed height so
+   the stack doesn't jump between "+0" and "-2". */
+.tbtn--readout {
+  min-width: 44px;
+  min-height: 28px;
+  height: 100%;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--text);
+  background: var(--bg-2);
+  cursor: default;
+  font-variant-numeric: tabular-nums;
+}
+
+/* BOTTOM-LEFT: three symbol keys — click, play/stop, record. */
+.transport-array {
+  display: flex;
+  gap: var(--space-1);
+}
+
+/* BOTTOM-MIDDLE: mode switch, one horizontal pair. */
+.mode-switch {
+  display: flex;
+  gap: var(--space-1);
+}
+.pad-mode-switch {
+  display: flex;
+  gap: var(--space-1);
+}
+.tbtn--mode {
+  flex: 1;
+  padding: 0;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}

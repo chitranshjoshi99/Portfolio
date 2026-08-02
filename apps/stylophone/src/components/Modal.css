@@ -1,0 +1,106 @@
+/* Themed chrome around the native <dialog>. The dialog box itself fills the
+   viewport (transparent, no border) so a click on the empty area around the
+   panel is a click on the dialog element — see Modal.tsx's overlay handler —
+   while the visible card is the centered .modal__panel child. */
+/* Author CSS always beats the UA stylesheet, so `display` here must stay
+   scoped to [open] — an unconditional rule would override the browser's own
+   `dialog:not([open]) { display: none }` and force the dialog to render even
+   while closed. */
+.modal {
+  margin: 0;
+  padding: 0;
+  border: none;
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh;
+  background: transparent;
+  /* Enter/exit is the native discrete-transition path: `display` and `overlay`
+     are only *delayed* off via allow-discrete — never declared outside [open] —
+     so the UA's `dialog:not([open]) { display: none }` still wins once the exit
+     finishes. A browser missing @starting-style/allow-discrete drops these
+     declarations and the dialog appears and disappears instantly, unchanged. */
+  transition:
+    display var(--dur-base) allow-discrete,
+    overlay var(--dur-base) allow-discrete;
+}
+
+.modal[open] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-snap);
+}
+
+.modal__panel {
+  /* ponytail: one custom property is the whole reduced-motion switch — it
+     overrides the base and the @starting-style value in a single declaration. */
+  --modal-enter: scale(0.97);
+  opacity: 0;
+  transform: var(--modal-enter);
+  transition:
+    opacity var(--dur-base) var(--ease-snap),
+    transform var(--dur-base) var(--ease-snap);
+  background: var(--bg-2);
+  color: var(--text);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius);
+  width: min(560px, 92vw);
+  max-height: 86vh;
+  overflow: auto;
+  padding: var(--space-7);
+}
+
+.modal[open]::backdrop,
+.modal[open] .modal__panel {
+  opacity: 1;
+}
+
+.modal[open] .modal__panel {
+  transform: none;
+}
+
+@starting-style {
+  .modal[open]::backdrop {
+    opacity: 0;
+  }
+
+  .modal[open] .modal__panel {
+    opacity: 0;
+    transform: var(--modal-enter);
+  }
+}
+
+/* Reduced motion: the fade stays — it is the state cue — while the scale travel
+   goes. Opening, closing, focus trapping and dismissal are dialog behaviour and
+   are untouched here. */
+@media (prefers-reduced-motion: reduce) {
+  .modal__panel {
+    --modal-enter: none;
+  }
+}
+
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  margin-bottom: var(--space-5);
+}
+
+.modal__title {
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text);
+  margin: 0;
+}
+
+.modal__body {
+  color: var(--text-dim);
+}

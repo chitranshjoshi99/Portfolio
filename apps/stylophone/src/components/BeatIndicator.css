@@ -1,0 +1,38 @@
+.beat-indicator {
+  display: flex;
+  gap: var(--space-4);
+  align-items: center;
+  justify-content: center;
+}
+
+.beat-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--edge);
+}
+
+/* Downbeats (the "1" of each bar) are marked even when not current. */
+.beat-dot--down {
+  width: 16px;
+  height: 16px;
+  border-color: var(--accent);
+}
+
+/* Static glow stays so the hit-now cue reads by brightness when motion is off. */
+.beat-dot.is-current {
+  background: var(--accent-bright);
+  border-color: var(--accent-bright);
+  box-shadow: 0 0 12px var(--accent-glow);
+  animation: bd-pulse var(--dur-pulse) ease-in-out infinite;
+}
+
+@keyframes bd-pulse {
+  0%, 100% { box-shadow: 0 0 8px var(--accent-glow); }
+  50%      { box-shadow: 0 0 18px var(--accent-glow); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beat-dot.is-current { animation: none; }
+}

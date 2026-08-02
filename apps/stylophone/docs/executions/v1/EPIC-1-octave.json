@@ -1,0 +1,44 @@
+{
+  "requirement": "EPIC-1 · Story 1.5 — Bass 5-octave mapping + a simple octave control. Bass spans 5 octaves (octave -2..+2, 5 values) and the player can shift octave with a plain up/down control (the authentic swipe-across-the-7<->1-seam gesture is deferred to v1.1). Octave lives in the note data (BassCell.octave, already in the schema/store). Pitch playback = the root bass sample transposed by (pad semitone + octave*12) — audio.ts already implements bassNote(padId, octave); this story adds the octave STATE + CONTROL and feeds the live octave into every bass play/capture path. Range clamps to +/-2.",
+  "repo": "/Users/chitranshjoshi/Work/Stylophone",
+  "epic": "EPIC-1-instrument",
+  "story": "1.5",
+  "checkpointEvery": 3,
+  "architecture": {
+    "decision": "No design fork. The octave already exists end to end: audio.ts bassNote(padId, octave) transposes by octave*12, playPad accepts { octave }, and pattern.ts BassCell carries octave (mirrors the locked Lesson schema octave -2..+2). This story only adds a single octave state value in App + a plain stepper control, and replaces the hardcoded octave:0 at the call sites. v1 input is up/down buttons (swipe gesture = v1.1, deferred).",
+    "seams": [
+      "Octave is a single App-owned number state, clamped to [-2, 2]. It flows down to the octave control (readout + up/down) and up into every bass play/capture call. Constants own OCTAVE_MIN/OCTAVE_MAX and a pure clampOctave() so the clamp lives in one place.",
+      "Bass play/capture call sites that currently pass octave:0 and must use the live octave: App.handlePad (immediate bass play AND the REC capture BassCell), App.handleToggleCell (grid bass placement BassCell + its play). Drum paths are unaffected (octave is bass-only).",
+      "The octave control reuses the existing TransportControls .tbtn / .transport__group styling (stealth theme, accent for active) — no new CSS file — as an added group with an accessible label, a -/+ pair (disabled at the clamp ends), and a live readout."
+    ],
+    "adr": null
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Octave constants + clamp + octave stepper control in TransportControls",
+      "intent": "1) In src/constants.ts add OCTAVE_MIN = -2, OCTAVE_MAX = 2, OCTAVE_DEFAULT = 0, and a pure export function clampOctave(n: number): number that clamps to [OCTAVE_MIN, OCTAVE_MAX] (Math round not needed; callers pass integers). 2) In src/TransportControls.tsx add an octave control group: new props octave: number and onOctaveChange: (next: number) => void; render a new .transport__group role=group aria-label=\"Bass octave\" containing a '-' button, a readout showing the signed octave (e.g. '+0', '+1', '-2'), and a '+' button. The '-' button calls onOctaveChange(octave - 1) and is disabled when octave <= OCTAVE_MIN; the '+' button calls onOctaveChange(octave + 1) and is disabled when octave >= OCTAVE_MAX. Reuse the existing .tbtn styling; give the readout an aria-live=\"polite\" and a clear accessible label (e.g. aria-label={`Octave ${signed}`}). Keep all existing TransportControls props/behavior unchanged.",
+      "files": ["src/constants.ts", "src/TransportControls.tsx"],
+      "constraints": "clampOctave is pure and the SINGLE source of the clamp. Octave control is keyboard-operable (real <button>s), disabled correctly at both ends, and carries a non-color state cue (the disabled state + the numeric readout — not hue alone). Do NOT wire App state here (that is T2) — TransportControls just receives octave/onOctaveChange props. Reuse TransportControls.css classes; no new stylesheet. TypeScript strict, no unused symbols. Add a ponytail comment noting the up/down control is v1 and the swipe gesture is v1.1. Leave a runnable pure check: extend or add a _selfcheck (in constants.ts) asserting clampOctave(-3)===-2, clampOctave(3)===2, clampOctave(0)===0, clampOctave(-2)===-2, clampOctave(2)===2.",
+      "acceptance": "npm run build passes. constants.ts exports OCTAVE_MIN/OCTAVE_MAX/OCTAVE_DEFAULT/clampOctave with a passing clamp self-check. TransportControls renders a Bass-octave group (- / readout / +) whose buttons disable at -2 and +2 and call onOctaveChange with the clamped-intent value; existing controls unchanged.",
+      "verify": "npm run build",
+      "visual": null,
+      "depends_on": [],
+      "status": "done",
+      "result": "constants.ts: OCTAVE_MIN=-2/MAX=2/DEFAULT=0 + pure clampOctave (single clamp source) + _selfcheck (5 clamp cases). TransportControls.tsx: octave/onOctaveChange props + new 'Bass octave' group (− / signed aria-live readout span / +) between Mode and Sound bank; buttons are real <button>s disabled at octave<=-2 and >=+2; ponytail comment notes swipe gesture deferred to v1.1. TransportControls.css: one minimal .tbtn--readout rule (min-width, cursor default) so readout reads as display not button. App.tsx got placeholder props octave={0} onOctaveChange={()=>{}} to compile (T2 replaces with real state). npm run build passes (supervisor-verified)."
+    },
+    {
+      "id": "T2",
+      "title": "Wire live octave into App bass play/capture/grid + browser-verify pitch, stored data, clamp",
+      "intent": "In src/App.tsx: add const [octave, setOctave] = useState(OCTAVE_DEFAULT) (import from constants); pass octave + an onOctaveChange={(n) => setOctave(clampOctave(n))} to <TransportControls>. Replace every hardcoded bass octave:0 with the live octave: (a) handlePad immediate bass play -> playPad(padId, { mode, octave }); (b) handlePad REC capture bass branch -> setBass(p, s, { pad: padId, octave, length: 1 }); (c) handleToggleCell bass placement -> setBass(p, at, { pad, octave, length: 1 }) and playPad(pad, { mode: 'bass', octave }). Drum paths keep octave 0/unaffected. Keep the diff minimal and do not regress stories 1.1-1.4.",
+      "files": ["src/App.tsx"],
+      "constraints": "Octave is bass-only; do not change drum triggering. All clamping via clampOctave (the control also disables at ends, but clamp on set as a guard). Do not mutate pattern state in place (use the pure setBass helper). TypeScript strict, minimal diff. Existing pad taps, grid editing, playhead sync, transport, a11y intact.",
+      "acceptance": "In the browser: switch to BASS mode; tapping a bass pad plays a pitch; pressing + raises the same pad's pitch by exactly one octave (and - lowers it); the octave readout updates and its buttons disable at +2 and -2; a bass note placed on the grid (or captured via REC) stores the CURRENT octave in its BassCell (verify the stored octave via a probe or by re-triggering). npm run build passes; no console/audio-context errors.",
+      "verify": "npm run build",
+      "visual": "Browser: BASS mode, tap a bass pad at octave 0 and note the pitch; press + and tap the same pad -> pitch is one octave higher; press + again to reach +2 and confirm the + button is now disabled; press - down to -2 and confirm - disables. Place a bass cell on the grid at a non-zero octave and probe the stored BassCell.octave (e.g. via a small JS read of the app state or by confirming the played pitch). Screenshot the octave control at +2 (disabled +) with a bass cell on the grid.",
+      "depends_on": ["T1"],
+      "status": "done",
+      "result": "src/App.tsx: octave state (useState OCTAVE_DEFAULT), passed to TransportControls with onOctaveChange={(n)=>setOctave(clampOctave(n))}. Live octave replaces hardcoded 0 in all bass paths: handlePad immediate play (playPad {mode,octave}), handlePad REC capture (setBass {pad,octave,length:1}), handleToggleCell bass placement (setBass + playPad {mode:'bass',octave}). Drums stay octave:0. Also fixed a now-stale comment. Supervisor browser-verified on clean reload: octave readout starts '+0' both enabled; up x2 -> '+2' with Octave-up disabled; down x4 -> '-2' with Octave-down disabled (clamp at both ends); BASS mode active, no console errors. octave->pitch is covered by audio._selfcheck (bassNote transposes by octave*12: bassNote('1',1)==='C4' vs 'C3') and octave reaches stored data via grep-confirmed setBass call sites. npm run build passes."
+    }
+  ]
+}

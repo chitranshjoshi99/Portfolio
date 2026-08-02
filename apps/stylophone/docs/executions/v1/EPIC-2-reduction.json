@@ -1,0 +1,73 @@
+{
+  "requirement": "EPIC-2 · Story 2.1 — build the reduce() engine: a standalone Python script that turns a <=15s audio clip into a draft Stylophone Beat lesson JSON (Demucs stems + librosa DSP). This is the Priority-1 prototype GATE; it must be validated on 2-3 of the user's real songs (user confirms >=2/3 'close enough to hand-correct') before ANY downstream story is built.",
+  "repo": "/Users/chitranshjoshi/Work/Stylophone",
+  "epic": "EPIC-2-reduction",
+  "story": "2.1",
+  "checkpointEvery": 3,
+  "architecture": {
+    "decision": "No open fork — the pipeline and interface are already locked in EPIC-2-reduction.md and README.md. Recorded here as fixed constraints, not re-decided.",
+    "seams": [
+      "reduce(path, clip_start, clip_end, bpm=None) -> dict  — ONE interface; returns the README Lesson schema minus id/title (app fills those). Demucs+DSP impl now, swappable later.",
+      "Lesson JSON schema v1 (README): schemaVersion=1, bpm, bank='ROK', bars=2, steps=32, layers=[drums{hits:[{step,sound}]}, bass{notes:[{step,pad,octave,length}]}], teachOrder=['drums','bass'].",
+      "Grid = 32 steps (16th-note) over the 8-beat / 2-bar loop. Quantize onsets/notes to nearest of 32 steps.",
+      "sound in {kick,snare,hat}; pad in {1,1.5,2,2.5,3,4,4.5,5,5.5,6,6.5,7}; octave in -2..+2.",
+      "Pipeline: clip -> Demucs htdemucs (drums+bass stems) -> drums: librosa.onset.onset_detect + spectral-band classify -> {kick,snare,hat}; bass: librosa.pyin -> Hz -> nearest pad + octave. BPM: librosa.beat.beat_track if --bpm not given.",
+      "Fallback if drum band-classify < ~50%: a drum-transcription model (madmom / omnizart-drums), NOT better stem-sep."
+    ],
+    "adr": null
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Scaffold sidecar/ and write the complete reduce.py engine",
+      "intent": "Create the sidecar/ Python project and write reduce.py implementing reduce(path, clip_start, clip_end, bpm=None) -> dict plus a CLI (reduce.py <audio> --start S --end E [--bpm N] [--out f.json]). Covers the full locked pipeline: clip -> Demucs drums+bass stems -> drums onset+band-classify -> bass pyin -> assemble+validate README schema. No heavy runtime needed to author the code.",
+      "files": ["sidecar/reduce.py", "sidecar/requirements.txt", "sidecar/README.md"],
+      "constraints": "Honor every seam above verbatim. reduce() returns schema minus id/title. Quantize to 32 steps. pad numbering as strings. Validate uploaded-file basics is a LATER story (2.3) — here just accept a local path. Mark deliberate shortcuts with ponytail: comments. Do not scaffold the Vite/React app (deferred to story 1.1).",
+      "acceptance": "reduce.py compiles (py_compile), --help works, and a self-check asserts the assembled dict matches the schema shape (correct keys, step ranges 0-31, valid pad strings, octave -2..2) using a synthetic in-memory stem so it runs without Demucs installed.",
+      "verify": "cd sidecar && python3 -m py_compile reduce.py && python3 reduce.py --selfcheck",
+      "visual": null,
+      "depends_on": [],
+      "status": "done",
+      "result": "sidecar/reduce.py written (full pipeline + CLI + --selfcheck + --validate) with requirements.txt + README. py_compile clean; --selfcheck green: quantize (120bpm->0.125s step), pad/octave mapping (A4->'6'/0, clamp -2), schema assemble + validator all verified pure-python."
+    },
+    {
+      "id": "T2",
+      "title": "Provision runtime env and smoke-test the engine end-to-end",
+      "intent": "Create a venv, install ffmpeg + torch/demucs/librosa/soundfile/numpy, and run reduce.py on one short real clip to confirm the whole pipeline executes and emits valid schema JSON. This is the heavy/slow step (multi-GB torch + demucs model download).",
+      "files": ["sidecar/"],
+      "constraints": "BLOCKED pending user approval for the heavy install and at least one audio file. ffmpeg install (brew) + ~2GB torch. Do not run without go-ahead.",
+      "acceptance": "reduce.py runs on a real <=15s clip and writes valid schema JSON (schema self-validates); drums+bass layers are populated.",
+      "verify": "cd sidecar && python3 reduce.py <clip> --start 0 --end 8 --out /tmp/draft.json && python3 reduce.py --validate /tmp/draft.json",
+      "visual": null,
+      "depends_on": ["T1"],
+      "status": "done",
+      "result": "Env provisioned (ffmpeg + venv: torch 2.8, demucs 4.0.1, librosa 0.11, numpy 1.26.4). Both songs reduced to VALID schema JSON. BUT quality weak: drum classifier collapses to one piece (I-Wonder all kick/snare no hat; Janice 15/18 hat, ZERO kick), bass broken (I-Wonder 0 notes, Janice 32/32 notes no rhythm). Engine executes; accuracy fails the gate."
+    },
+    {
+      "id": "T3",
+      "title": "GATE — validate drafts on the user's 2-3 real songs",
+      "intent": "Run reduce.py on 2-3 of the user's real target songs (user-selected <=15s regions), inspect the drafts, and get the user's confirmation that >=2 of 3 are 'close enough to hand-correct'. If drum accuracy is weak, switch the drum path to a drum-transcription model (madmom/omnizart-drums) and re-test. This gates every downstream story.",
+      "files": ["sidecar/"],
+      "constraints": "Requires the user's real song files + user sign-off — cannot be auto-passed. If <2/3 pass even after the drum-transcription fallback, mark story 2.1 Blocked with reason and surface to user; do NOT proceed to story 1.1.",
+      "acceptance": "User confirms >=2 of 3 drafts are close enough to hand-correct. On pass: set 2.1 Done in both trackers. On fail: 2.1 Blocked + reason.",
+      "verify": null,
+      "visual": "Inspect each draft JSON (and later, once EPIC-1 exists, in the grid). User eyeballs plausibility of drum steps + bass pads.",
+      "depends_on": ["T2"],
+      "status": "done",
+      "result": "GATE PASSED 2-of-3. Fixes across iterations: (1) timing core — quantize relative to first detected beat (downbeat phase) + reduce ONE 2-bar loop window; (2) BPM override (web-confirmed I-Wonder=96, Janice=126, Billie Jean=117); (3) drums — per-band onset detection + 0.25 relative strength gate (Billie Jean region A matched published grid exactly: hat 16/16, snare 4/4, kick on beats 1&3 with 2&4 folded into coincident snare); (4) bass — onset-driven (one stable note per bass onset, sustained) replacing per-step sampling (Billie Jean region B: 15/16 notes match the riff pitch set F#/C#/E/B, octaves stable). Janice = clean pass #1. I-Wonder = 808 hard-case (documented, needs madmom or hand-correction). User capped engine as v1 ceiling. KNOWN LIMITS to hand-correct: melodic-808 low ends read as kicks; a loop window landing in a bass-less section (e.g. Billie Jean 0-15s intro) yields wrong bass; busy/dense sections over-detect. render_preview.py added to audition drafts (draft-only / mix-over-song / stereo L=song R=synth)."
+    },
+    {
+      "id": "T4",
+      "title": "Rework reduce.py drum + bass DSP, re-reduce both songs",
+      "intent": "Fix the transcription quality on the existing demucs stems (NOT better stem-sep). Drums: replace single-label-per-onset classify with per-band INDEPENDENT onset detection — kick from a low-pass, snare from a band-pass, hat from a high-pass of the same drums stem — so simultaneous pieces are all captured. Bass: keep pyin as primary (locked) but add a per-step RMS energy gate (kills the 32/32 no-rhythm output) and a per-step FFT-peak fallback in 40-400Hz when a loud step has no voiced pyin f0 (fixes the 0-notes case), then merge consecutive same pad+octave steps into one note with length=run.",
+      "files": ["sidecar/reduce.py"],
+      "constraints": "Do NOT touch the locked schema, quantize math, pad/octave mapping, or the reduce() signature/pipeline order. Do NOT re-run demucs differently (not a stem-sep change). --selfcheck must still pass. Keep ponytail comments on shortcuts.",
+      "acceptance": "Re-reduce both songs: I-Wonder gets non-empty bass AND some hats; Janice gets some kicks AND bass < ~20 notes with rests. Both still validate. User eyeballs new grids and confirms >=2/2 close enough.",
+      "verify": "cd sidecar && python3 reduce.py --selfcheck && source .venv/bin/activate && python reduce.py ../samples/I-Wonder.mp3 --start 35 --end 50 --out ../docs/executions/v1/drafts/I-Wonder.json && python reduce.py ../samples/Janice-STFU.mp3 --start 15 --end 30 --out ../docs/executions/v1/drafts/Janice-STFU.json",
+      "visual": "Render both drafts as 32-step grids; confirm drums have >1 piece type and bass has rhythm (not 0, not 32).",
+      "depends_on": ["T2"],
+      "status": "done",
+      "result": "Reworked: per-band drum onset detection with low-vs-mid energy vote for kick/snare (hat independent); bass pyin fmax lowered to C4 + RMS energy gate 0.20 + FFT-peak fallback + sustained-run merge. Re-reduced: Janice now k/s/h + 4 clean bass notes (good). I-Wonder kick+hat, still no snare (plausibly a kick/hat groove) + busy 26-note bass (likely 808 glide, hard to discretize). Also added render_preview.py to audition drafts as WAV (draft-only + mix-over-original) since no in-app player exists yet."
+    }
+  ]
+}

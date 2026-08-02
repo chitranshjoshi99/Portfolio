@@ -1,0 +1,74 @@
+{
+  "requirement": "EPIC-1 · Story 1.1 — Beat replica shell: a static, stealth-styled, interactive on-screen replica of the Stylophone Beat. Circular SVG pad with native numbering (1,1.5,2,2.5,3,4,4.5,5,5.5,6,6.5,7), a rotary tempo knob whose angle reflects BPM, a speaker-grille info display showing the BPM number, CLICK/PLAY/REC transport buttons, and MODE (DRUMS/BASS) + sound-bank (ROK / others disabled) switches. No sound yet (that is 1.2) but pad click handlers are wired. This is the first UI story; it also does the one-time Vite + React + TS frontend scaffold.",
+  "repo": "/Users/chitranshjoshi/Work/Stylophone",
+  "epic": "EPIC-1-instrument",
+  "story": "1.1",
+  "checkpointEvery": 3,
+  "architecture": {
+    "decision": "No open fork — the stack and design are fully locked in README.md and EPIC-1-instrument.md (React + TS + Vite, Tone.js owns timing, SVG circular pad, stealth theme, Anthropic-orange accent, brightness=state). Recorded here as fixed constraints, not re-decided.",
+    "seams": [
+      "App-level local state (no persistence in 1.1): bpm:number (default 120, range ~40-240), mode:'drums'|'bass' (cosmetic in v1, ROK-only), selectedSound:'ROK'. Lifted into App.tsx; child components receive value + change callbacks.",
+      "Pad geometry fixed: 12 pitch positions in native numbering 1,1.5,2,2.5,3,4,4.5,5,5.5,6,6.5,7 (no 3.5, no 7.5). padId is the numbering STRING, e.g. '1.5'. onPad(padId:string) fires on wedge tap.",
+      "Tone.js is the locked timing owner for later stories (1.2+). Story 1.1 wires NO audio/transport — knob just updates a number, PLAY/REC are styled buttons with handlers stubbed. Never introduce setInterval.",
+      "Stealth theme via CSS custom properties: matte charcoal bg, grey surfaces, soft-white text, single accent = Anthropic orange (#D97757-ish), brightness encodes state. Grille = BPM info display.",
+      "Component split: App.tsx (state + two-pane layout), BeatPad.tsx (SVG pad), TempoKnob.tsx (rotary + grille BPM), TransportControls.tsx (CLICK/PLAY/REC + MODE + bank switches).",
+      "Two-pane CSS-grid layout placeholder now (replica left, structure pane right); FULL responsive + a11y baseline is story 1.6 — do not build it here, just don't block it (semantic controls, focusable)."
+    ],
+    "adr": null
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Scaffold Vite + React + TS app, install Tone.js, stealth theme + App shell with lifted state",
+      "intent": "One-time frontend scaffold at repo root (or app/): Vite React-TS template, add tone dep. Create the stealth theme CSS custom properties (charcoal/grey/soft-white + Anthropic orange accent). App.tsx holds lifted state (bpm=120, mode='drums', selectedSound='ROK') and renders a two-pane CSS-grid layout with a left 'instrument' pane and a right 'structure' placeholder pane. Child component slots are placeholders until T2-T4 fill them.",
+      "files": ["package.json", "index.html", "src/main.tsx", "src/App.tsx", "src/theme.css", "tsconfig.json", "vite.config.ts"],
+      "constraints": "Locked stack only: Vite + React + TypeScript, Tone.js as the audio dep (install now, unused until 1.2). Do NOT hand-roll timing anywhere. Stealth theme via CSS variables. Keep the scaffold minimal (ponytail: no router, no state lib, no component library). Do not build the sidecar (Python side is done). Node deps go in root package.json.",
+      "acceptance": "npm install succeeds; npm run build (tsc + vite build) succeeds with no type errors; dev server boots and renders the two-pane shell in the stealth theme with visible left/right panes.",
+      "verify": "npm run build",
+      "visual": "Dev server renders a dark stealth two-pane layout (left instrument pane, right structure pane placeholder).",
+      "depends_on": [],
+      "status": "done",
+      "result": "Hand-written minimal Vite+React+TS scaffold at repo root (no template cruft, no router/state-lib). tone@15 installed. src/theme.css = stealth tokens (charcoal/grey/soft-white + Anthropic-orange accent, brightness=state, :focus-visible ring). src/constants.ts = PAD_IDS (12 native positions), PadId/Mode types, BPM range. App.tsx lifts bpm/mode/selectedSound/lastPad + two-pane CSS-grid (instrument left, structure placeholder right, collapses <820px). Functional placeholder slots exercise state (replaced by T2-T4). npm run build clean (tsc+vite). Verified in browser: dark two-pane shell renders."
+    },
+    {
+      "id": "T2",
+      "title": "BeatPad SVG component — 12 wedges, native numbering, click handler",
+      "intent": "Build src/BeatPad.tsx: an SVG circular pad with 12 pitch-position wedges labelled in native numbering 1,1.5,2,2.5,3,4,4.5,5,5.5,6,6.5,7 arranged around the circle. Each wedge is a hit region; clicking/tapping (or Enter/Space when focused) fires props.onPad(padId) with the numbering STRING. Stealth-styled wedges with the orange accent on active/hover. Mount it in App's left pane, wired to a handler that logs/records the pad id.",
+      "files": ["src/BeatPad.tsx", "src/App.tsx"],
+      "constraints": "Exactly 12 wedges in the locked order/numbering (no 3.5, no 7.5). padId = the numbering string (e.g. '1.5'). SVG geometry (precise wedges + labels). Each wedge focusable and keyboard-activatable (role=button / tabindex) — a11y baseline is native here, full a11y is story 1.6. Use the theme CSS variables, do not hardcode colors. No audio (that is 1.2). ponytail-comment any geometry shortcut.",
+      "acceptance": "Pad renders 12 correctly-labelled wedges in the stealth theme; clicking a wedge fires onPad with the correct id (verify '1.5' etc.); each wedge is keyboard-focusable and activates on Enter/Space.",
+      "verify": "npm run build",
+      "visual": "Circular 12-wedge pad renders with correct native-numbering labels; clicking a wedge shows the fired padId (e.g. via an on-screen readout or console).",
+      "depends_on": ["T1"],
+      "status": "done",
+      "result": "src/BeatPad.tsx = SVG donut, 12 <path> wedges mapped over PAD_IDS (30 deg each, clockwise from 12 o'clock), each a role=button tabIndex=0 aria-label 'Pad N' firing onPad(padId) on click + Enter/Space (Space preventDefault). src/BeatPad.css uses theme vars only (idle --surface; hover/focus --accent + glow; active --accent-bright). Mounted in App via <BeatPad onPad={handlePad}/>. Verified in browser: 12 wedges labelled 1,1.5,2,2.5,3,4,4.5,5,5.5,6,6.5,7 in order; clicking 1.5 wedge lit orange + readout 'PAD: 1.5'. Build clean."
+    },
+    {
+      "id": "T3",
+      "title": "TempoKnob rotary + grille BPM display bound to bpm state",
+      "intent": "Build src/TempoKnob.tsx: a rotary knob control whose visual angle reflects the current bpm, draggable (pointer) and adjustable by keyboard arrows, calling props.onBpmChange within a clamped range (~40-240). Build the speaker-grille info display that shows the current BPM number. Wire both to App's bpm state so turning the knob updates the grille number live.",
+      "files": ["src/TempoKnob.tsx", "src/App.tsx"],
+      "constraints": "Knob angle maps to bpm; clamp to the range. Keyboard: ArrowUp/Down (and Left/Right) nudge bpm; control is focusable. Grille shows the number only (BPM). No Tone.js/transport wiring yet (1.3 owns transport) — knob only updates the number. Theme CSS variables. ponytail: no external knob/gauge library, hand-roll the rotary with SVG/CSS transform.",
+      "acceptance": "Knob turns (pointer drag + arrow keys) and the grille BPM number updates live and stays clamped to range; knob is keyboard-focusable.",
+      "verify": "npm run build",
+      "visual": "Rotary knob visibly rotates as BPM changes; grille shows the matching BPM number; dragging/arrow keys update both."
+      ,
+      "depends_on": ["T1"],
+      "status": "done",
+      "result": "src/TempoKnob.tsx = hand-rolled rotary (CSS transform:rotate, linear bpm->angle over 270deg arc [40,240]->[-135,+135], glowing pointer) + speaker-grille panel (repeating-linear-gradient) showing large live BPM digits. Pointer drag via setPointerCapture (up=faster, 2px~1bpm); role=slider tabIndex=0 aria-valuenow/min/max, ArrowUp/Right +1, ArrowDown/Left -1, PageUp/Down +/-10, clamped+rounded to [40,240]. Mounted <TempoKnob bpm onBpmChange={setBpm}/>. Verified in browser: focus ring appears, ArrowUp x15 moved 120->135 with pointer rotation + grille + readout all live. Build clean. (Note: browser key name must be 'ArrowUp' not 'Up'.)"
+    },
+    {
+      "id": "T4",
+      "title": "Transport (CLICK/PLAY/REC) + MODE + sound-bank switches, wired + keyboard-focusable",
+      "intent": "Build src/TransportControls.tsx: styled CLICK / PLAY / REC buttons (handlers stubbed — no transport logic, that is 1.3), a MODE toggle (DRUMS/BASS, bound to App.mode), and a sound-bank switch (ROK active, other banks present but disabled for fidelity). Mount in App. Ensure every control in the whole shell (pad wedges, knob, these buttons/switches) is reachable by keyboard Tab focus with a visible focus ring.",
+      "files": ["src/TransportControls.tsx", "src/App.tsx", "src/theme.css"],
+      "constraints": "Buttons are semantic <button>s; switches use accessible patterns (aria-pressed / radio). MODE flips App.mode (cosmetic in v1). ROK is the only enabled bank; others disabled. No audio/transport behavior (stubs only). Visible focus outline in the theme. Theme CSS variables only. ponytail: plain buttons/toggles, no UI library.",
+      "acceptance": "All controls visible in the stealth theme; MODE toggles App state; PLAY/CLICK/REC and bank switches render with correct enabled/disabled state; Tab cycles focus through EVERY control (pad wedges, knob, transport, mode, bank) with a visible focus ring.",
+      "verify": "npm run build",
+      "visual": "Full replica shell renders: pad + knob + grille + CLICK/PLAY/REC + MODE + ROK bank, all in stealth theme; Tab moves a visible focus ring across every control.",
+      "depends_on": ["T1", "T2", "T3"],
+      "status": "done",
+      "result": "src/TransportControls.tsx = CLICK/PLAY/REC semantic <button>s (stubbed no-ops, REC accent when pressed, NO timing/audio), MODE radiogroup (role=radio DRUMS/BASS, aria-checked, accent on active) bound to App.mode, sound-bank group (ROK enabled+selected via accent; HIP/TEC disabled+aria-disabled+dimmed). Mounted <TransportControls mode onModeChange={setMode} selectedSound/>. Verified in browser: clicking BASS flipped readout to MODE: BASS + accent moved; ROK lit, HIP/TEC dimmed/disabled. Accessibility tree confirms slider+8 buttons focusable; JS confirms all 12 pad wedges are g[role=button][tabindex=0][aria-label='Pad N'] and .focus()-able (read_page just doesn't surface SVG g roles). Build clean."
+    }
+  ]
+}

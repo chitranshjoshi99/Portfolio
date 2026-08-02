@@ -2,18 +2,18 @@
 # ─────────────────────────────────────────────────────────────
 #  pre-commit hook — CLAUDE.md freshness check
 #
-#  If any file under src/ is staged, CLAUDE.md must also be staged.
+#  If any portfolio source file is staged, CLAUDE.md must also be staged.
 #  Bypass:  git commit --no-verify
 # ─────────────────────────────────────────────────────────────
 
 STAGED=$(git diff --cached --name-only)
 
-# No src/ files staged → nothing to enforce
-if ! echo "$STAGED" | grep -q '^src/'; then
+# No portfolio source files staged → nothing to enforce
+if ! echo "$STAGED" | grep -q '^apps/portfolio/src/'; then
   exit 0
 fi
 
-# src/ files staged → require CLAUDE.md to be staged too
+# Portfolio source files staged → require CLAUDE.md to be staged too
 if echo "$STAGED" | grep -q '^CLAUDE\.md$'; then
   exit 0
 fi
@@ -22,7 +22,7 @@ echo ""
 echo "┌─────────────────────────────────────────────────────────┐"
 echo "│  ✗  CLAUDE.md is stale                                  │"
 echo "│                                                          │"
-echo "│  You staged changes in src/ but CLAUDE.md was not       │"
+echo "│  You staged portfolio source changes but CLAUDE.md was  │"
 echo "│  updated. Document what changed, then:                   │"
 echo "│                                                          │"
 echo "│    git add CLAUDE.md                                     │"

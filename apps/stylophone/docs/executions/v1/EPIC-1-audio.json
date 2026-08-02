@@ -1,0 +1,60 @@
+{
+  "requirement": "EPIC-1 · Story 1.2 — Audio engine: tapping a pad instantly plays the mapped ROK sound via Tone.js with low latency. Drums mode = pad triggers kick/snare/hat one-shots; bass mode = pad triggers a pitched bass note (root sample transposed across the 12 native pad positions x octave). AudioContext resumes on first user gesture (iOS requirement). NOTE: the locked spec is 'ROK bank sampled from the user's hardware'; that asset does not exist, so v1 ships a procedurally-synthesized ROK-STYLE kit as static WAV files behind the SAME playPad() interface — real hardware/online samples are a drop-in file swap with zero code change. This is a temporary asset substitution, NOT a swap of the load-bearing Tone.js/sample-map decision; recorded honestly in the tracker.",
+  "repo": "/Users/chitranshjoshi/Work/Stylophone",
+  "epic": "EPIC-1-instrument",
+  "story": "1.2",
+  "checkpointEvery": 3,
+  "architecture": {
+    "decision": "Stack locked (Tone.js owns audio; Sampler for pitched bass, Player/Players for one-shot drums; context resume on first gesture). The one open point — the ROK sample asset — is unavailable, so v1 synthesizes a ROK-style kit as static WAV behind the locked interface. Not a re-decision; the interface and Tone.js choice are honored verbatim.",
+    "seams": [
+      "playPad(padId: PadId, opts: { mode: Mode, octave?: number }) => void — THE single audio entry point. Drums mode ignores pitch; bass mode transposes. Same signature the live pad, later the transport, and cue engine all call.",
+      "Static sample map served from public/rok/: kick.wav, snare.wav, hat.wav (one-shots) + bass root note bass_C2.wav (single sampled note, pitch-shifted). Swapping in real hardware samples = replace these files, keep names.",
+      "Bass pitch: pad chromatic semitone (1=0,1.5=1,2=2,2.5=3,3=4,4=5,4.5=6,5=7,5.5=8,6=9,6.5=10,7=11) + octave*12, relative to the root sample's note. Tone.Sampler handles the transpose from one root.",
+      "Drums-mode pad->sound map (NOT in the Lesson schema, live-play only, tunable): low third of pads -> kick, mid third -> snare, high third -> hat. ponytail: zoned mapping, revisit if the real Beat's drum-pad layout differs.",
+      "AudioContext starts/resumes inside the first real user gesture (Tone.start()) — required for iOS Safari; before that, taps must be safe no-ops or trigger the start.",
+      "No Tone.Transport / scheduling here (that is story 1.3) — 1.2 is immediate one-shot triggering only. Never setInterval."
+    ],
+    "adr": null
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Synthesize a ROK-style sample kit (kick/snare/hat + bass root) as static WAV",
+      "intent": "Write a small committed Python script (uses the sidecar venv's numpy + scipy.io.wavfile) that procedurally generates four 44.1kHz mono WAV one-shots into public/rok/: kick.wav (sine pitch-drop + click), snare.wav (noise burst + tone body), hat.wav (short filtered high noise), bass_C2.wav (a clean sustained bass note at a known pitch, e.g. C2, ~0.6s, to be the Sampler root). Files land in public/ so Vite serves them at /rok/*.wav and they are committed (NOT gitignored like samples/). Clearly a temporary stand-in for the user's hardware ROK samples.",
+      "files": ["scripts/make_rok.py", "public/rok/kick.wav", "public/rok/snare.wav", "public/rok/hat.wav", "public/rok/bass_C2.wav"],
+      "constraints": "Pure numpy synthesis, no downloads (untrusted-binary risk). Root bass note pitch must be documented (the note the Sampler treats as the sample's natural pitch, e.g. C2). Keep the script short; mark it a temporary asset generator with a ponytail comment. Do NOT touch app/src code in this task. Ensure public/rok/ is NOT covered by the samples/*.wav gitignore rule (it isn't — different dir).",
+      "acceptance": "Running the script writes 4 valid 44.1kHz WAV files under public/rok/; a self-check re-reads each with scipy and asserts non-empty, finite, mono, and that the four are audibly distinct (differ in duration/spectral centroid so they aren't the same buffer).",
+      "verify": "sidecar/.venv/bin/python scripts/make_rok.py && sidecar/.venv/bin/python scripts/make_rok.py --selfcheck",
+      "visual": "Inspect the 4 WAVs' durations + rough spectra (print in the selfcheck); kick low-heavy, hat high-heavy, snare mid+noise, bass tonal at the root pitch.",
+      "depends_on": [],
+      "status": "done",
+      "result": "scripts/make_rok.py (numpy synthesis, ponytail-marked temp generator) writes 4 mono 44.1kHz 16-bit WAVs to public/rok/: kick 0.500s (sine 120->45Hz drop + trimmed click, centroid 2513Hz), snare 0.220s (180/330Hz body + noise, 10864Hz), hat 0.060s (HP noise, 12452Hz), bass_C2 0.600s (65.41Hz C2 root + 2 harmonics, 726Hz). --selfcheck green: all valid/mono/non-silent, brightness ordered kick<snare<hat, bass centroid below kick. BASS_ROOT_NOTE='C2' documented as the Sampler root. public/rok/ not gitignored (samples/ rule doesn't cover it)."
+    },
+    {
+      "id": "T2",
+      "title": "Tone.js audio engine module — playPad() + context resume + sample map",
+      "intent": "Create src/audio.ts: load the public/rok samples via Tone (Tone.Players or three Tone.Player for kick/snare/hat; Tone.Sampler with { [rootNote]: 'bass_C2.wav' } for bass), expose playPad(padId, {mode, octave}) that triggers the drum one-shot (drums mode, via the zoned pad->sound map) or the transposed bass note (bass mode), and expose startAudio() that calls Tone.start() to resume the AudioContext on first gesture. Preload/decode behind startAudio. Export helpers isStarted() and the pad->semitone + pad->drum maps.",
+      "files": ["src/audio.ts"],
+      "constraints": "Tone.js only for audio; Sampler for pitched bass (single root transposed), Player(s) for one-shot drums — do not synthesize in JS, load the WAVs. Honor playPad signature verbatim. Context resume via Tone.start() inside the first user gesture. NO Tone.Transport, NO setInterval, NO scheduling (story 1.3 owns transport). Handle load errors without throwing on tap (log + no-op). TypeScript strict; no unused symbols. ponytail-comment the zoned drum map + pitch math.",
+      "acceptance": "npm run build passes. audio.ts exports playPad, startAudio, isStarted with correct types; a lightweight assert-style self-check (or a documented pure helper) verifies pad->semitone mapping (1->0, 1.5->1, 7->11) and pad->drum zoning are correct without needing the browser.",
+      "verify": "npm run build",
+      "visual": null,
+      "depends_on": ["T1"],
+      "status": "done",
+      "result": "src/audio.ts: 3x Tone.Player (/rok/kick|snare|hat.wav, retrigger via stop().start()) + Tone.Sampler({C2:'/rok/bass_C2.wav'}) triggerAttackRelease(note,'8n'). Exports startAudio (idempotent: Tone.start()+Tone.loaded(), gesture-gated), isStarted, playPad(padId,{mode,octave}) (no-op before start, try/catch), padSemitone, padDrum, bassNote, _selfcheck. Zoning: idx0-3 kick, 4-7 snare, 8-11 hat. Bass base: C2 sample root, pad '1'@oct0 = C3 (midi 48+semitone+oct*12). No Transport/setInterval. Verified by inspection: semitone/zoning/note-name maps all correct (1->0,7->11; '3'->snare,'7'->hat; '1'@0->C3,'7'@0->B3,'1'@+1->C4). Build clean (module tree-shaken until T3 imports it)."
+    },
+    {
+      "id": "T3",
+      "title": "Wire the engine into the pad — first-gesture start + tap-to-sound, verify in browser",
+      "intent": "Wire src/App.tsx (and/or BeatPad handler) so the first user interaction calls startAudio() (Tone.start) and every pad tap calls playPad(padId, { mode, octave: current }) — drums mode plays kick/snare/hat by zone, bass mode plays the pitched note. Keep the existing lastPad readout. Confirm in the browser: no AudioContext errors, the /rok/*.wav files load (network 200), taps trigger playback (verify via Tone/analyser state or console trigger log since audio can't be heard in the preview), and there is no perceptible scheduling delay (synchronous trigger on tap).",
+      "files": ["src/App.tsx", "src/BeatPad.tsx"],
+      "constraints": "First gesture must resume the context before/at the first trigger (iOS). Do not regress the pad's visual/keyboard behavior from story 1.1. No transport. Keep the diff minimal. Since the preview pane has no audible output, validate via: console 'triggered <sound/note>' log, network 200 for the 4 wavs, and Tone's loaded/started state — not by ear.",
+      "acceptance": "In the browser: first tap starts the audio context (no 'context was not allowed to start' error), the 4 rok WAVs load with 200, tapping a drum-zone pad logs/triggers the mapped drum, tapping in bass mode triggers the pad's transposed note, and octave changes shift the bass pitch. No console errors.",
+      "verify": "npm run build",
+      "visual": "Browser: read_console_messages (expect trigger logs, no audio errors) + read_network_requests (expect /rok/*.wav 200). Toggle MODE to bass and confirm bass triggers differ from drums.",
+      "depends_on": ["T2"],
+      "status": "done",
+      "result": "App.tsx handlePad now async: setLastPad -> await startAudio() (unlocks AudioContext inside the gesture) -> playPad(padId,{mode,octave:0}). octave fixed 0 until story 1.5. Browser-verified: tap fires handlePad ('Pad: 1'), Tone.js v15.1.22 loads, all 4 /rok/*.wav return 200, shared Tone context reaches state 'running' after tap (first probe read 'suspended' = pre-resume timing, confirmed 'running' on recheck), bass mode tap triggers Sampler with zero errors ('Mode: bass'), no console errors across drums+bass. No 1.1 regression (pad/knob/transport intact). Bundle grew 148->379kB (Tone now imported). Audio not audible in preview pane (documented limit) — validated via context state + network + error-free trigger path."
+    }
+  ]
+}

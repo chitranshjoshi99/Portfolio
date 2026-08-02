@@ -1,0 +1,13 @@
+# Stylophone Beat Coach — Python sidecar (EPIC-2 reduction engine)
+# Heavy deps: installing torch/demucs pulls ~2GB. ffmpeg must be on PATH
+# (brew install ffmpeg) for librosa/demucs to decode mp3/m4a.
+demucs>=4.0.0
+librosa>=0.10.1
+soundfile>=0.12.1
+numpy>=1.24,<2.0
+# FastAPI sidecar (story 2.2) — listed now so one install covers it; unused by reduce.py.
+fastapi>=0.110
+uvicorn>=0.29
+python-multipart>=0.0.9
+# Current YouTube extractors require modern yt-dlp; 2026.07.04 recommends Python 3.11+.
+yt-dlp>=2026.7.4   # ingest (story 2.3)

@@ -1,0 +1,227 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "type": "upload",
+    "ref": "Billie-Jean.mp3",
+    "clipStart": 70.0,
+    "clipEnd": 85.0,
+    "phaseSec": 0.1741,
+    "loopLenSec": 4.1026
+  },
+  "bpm": 117.0,
+  "bank": "ROK",
+  "bars": 2,
+  "steps": 32,
+  "layers": [
+    {
+      "id": "drums",
+      "type": "drums",
+      "hits": [
+        {
+          "step": 0,
+          "sound": "kick"
+        },
+        {
+          "step": 4,
+          "sound": "hat"
+        },
+        {
+          "step": 4,
+          "sound": "snare"
+        },
+        {
+          "step": 6,
+          "sound": "hat"
+        },
+        {
+          "step": 6,
+          "sound": "snare"
+        },
+        {
+          "step": 7,
+          "sound": "kick"
+        },
+        {
+          "step": 8,
+          "sound": "hat"
+        },
+        {
+          "step": 8,
+          "sound": "kick"
+        },
+        {
+          "step": 12,
+          "sound": "snare"
+        },
+        {
+          "step": 16,
+          "sound": "kick"
+        },
+        {
+          "step": 20,
+          "sound": "hat"
+        },
+        {
+          "step": 20,
+          "sound": "snare"
+        },
+        {
+          "step": 22,
+          "sound": "hat"
+        },
+        {
+          "step": 24,
+          "sound": "hat"
+        },
+        {
+          "step": 24,
+          "sound": "kick"
+        },
+        {
+          "step": 28,
+          "sound": "hat"
+        },
+        {
+          "step": 28,
+          "sound": "snare"
+        }
+      ]
+    },
+    {
+      "id": "bass",
+      "type": "bass",
+      "notes": [
+        {
+          "step": 0,
+          "pad": "3",
+          "octave": 0,
+          "length": 2
+        },
+        {
+          "step": 2,
+          "pad": "1.5",
+          "octave": 0,
+          "length": 1
+        },
+        {
+          "step": 3,
+          "pad": "1.5",
+          "octave": 0,
+          "length": 1
+        },
+        {
+          "step": 4,
+          "pad": "7",
+          "octave": -1,
+          "length": 2
+        },
+        {
+          "step": 6,
+          "pad": "7",
+          "octave": -1,
+          "length": 2
+        },
+        {
+          "step": 8,
+          "pad": "2",
+          "octave": 0,
+          "length": 1
+        },
+        {
+          "step": 9,
+          "pad": "2",
+          "octave": 0,
+          "length": 1
+        },
+        {
+          "step": 10,
+          "pad": "2",
+          "octave": 0,
+          "length": 2
+        },
+        {
+          "step": 12,
+          "pad": "2",
+          "octave": 0,
+          "length": 2
+        },
+        {
+          "step": 14,
+          "pad": "2",
+          "octave": 0,
+          "length": 1
+        },
+        {
+          "step": 15,
+          "pad": "2",
+          "octave": 0,
+          "length": 1
+        },
+        {
+          "step": 16,
+          "pad": "2",
+          "octave": 0,
+          "length": 3
+        },
+        {
+          "step": 19,
+          "pad": "2",
+          "octave": 0,
+          "length": 1
+        },
+        {
+          "step": 20,
+          "pad": "2",
+          "octave": 0,
+          "length": 1
+        },
+        {
+          "step": 22,
+          "pad": "3",
+          "octave": 0,
+          "length": 2
+        },
+        {
+          "step": 24,
+          "pad": "4.5",
+          "octave": 0,
+          "length": 1
+        },
+        {
+          "step": 25,
+          "pad": "4.5",
+          "octave": 0,
+          "length": 1
+        },
+        {
+          "step": 26,
+          "pad": "4.5",
+          "octave": 0,
+          "length": 2
+        },
+        {
+          "step": 28,
+          "pad": "4.5",
+          "octave": 0,
+          "length": 1
+        },
+        {
+          "step": 29,
+          "pad": "4.5",
+          "octave": 0,
+          "length": 2
+        },
+        {
+          "step": 31,
+          "pad": "5",
+          "octave": 0,
+          "length": 1
+        }
+      ]
+    }
+  ],
+  "teachOrder": [
+    "drums",
+    "bass"
+  ]
+}

@@ -9,8 +9,11 @@ import matter from "gray-matter";
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 
-/** Absolute path to src/blogs/posts (repo-root/scripts/lib → repo-root). */
-export const POSTS_DIR = path.resolve(__dir, "../../src/blogs/posts");
+/** Absolute path to portfolio blog posts (repo-root/scripts/lib → app source). */
+export const POSTS_DIR = path.resolve(
+  __dir,
+  "../../apps/portfolio/src/blogs/posts",
+);
 
 // Frontmatter fields every post must declare. `order` is optional (sort hint),
 // and so is `gameKey` — posts not tied to a Lab game simply omit it (it then

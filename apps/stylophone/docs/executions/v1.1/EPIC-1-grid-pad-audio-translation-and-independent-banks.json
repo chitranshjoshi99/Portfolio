@@ -1,0 +1,92 @@
+{
+  "requirement": "Implement EPIC 1, Story 3: make grid edits and playback translate to exact pads while drums and bass use independent pattern-level banks.",
+  "workspace": "/Users/chitranshjoshi/Work/Stylophone",
+  "checkpointEvery": 3,
+  "approvalCheckpoints": false,
+  "architecture": {
+    "decision": "Keep banks at the Pattern root and resolve them only at audio entry points; derive pad highlighting from scheduled events rather than duplicating pad state in grid data.",
+    "alternatives": [
+      "Store the bank on every drum hit and bass cell.",
+      "Add downloaded sample packs or a per-row effects editor."
+    ],
+    "tradeoffs": [
+      "Root-level bank fields retimbre an entire instrument without mutating authored events.",
+      "Runtime voice/effect settings keep ROK assets unchanged and avoid new assets or dependencies."
+    ],
+    "seams": [
+      "src/constants.ts and src/pattern.ts own Bank typing and immutable pattern-level state.",
+      "src/audio.ts resolves a bank plus pad/cell to its drum or bass voice.",
+      "src/App.tsx, src/TransportControls.tsx, and src/BeatPad.tsx project active mode banks and scheduled pad activity."
+    ]
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Record Story 3 and its execution plan",
+      "intent": "Mark the next priority story in progress and persist its independently verifiable work queue.",
+      "ownership": [
+        "docs/product/v1.1/README.md",
+        "docs/product/v1.1/EPIC-1-grid-pattern-engine.md",
+        "docs/executions/v1.1/EPIC-1-grid-pad-audio-translation-and-independent-banks.json"
+      ],
+      "constraints": ["Preserve unrelated documentation changes."],
+      "acceptance": "Both v1.1 trackers show Story 3 In progress and this plan is valid JSON.",
+      "verify": ["rg tracker check", "node JSON.parse plan check"],
+      "visual": null,
+      "dependsOn": [],
+      "status": "completed",
+      "result": "Marked Story 3 In progress and created its durable execution plan.",
+      "evidence": [],
+      "error": null
+    },
+    {
+      "id": "T2",
+      "title": "Add bank-aware pattern state and audio routes",
+      "intent": "Define the four banks, default both instruments to ROK, and resolve bank-specific generated/processed voices without changing event data.",
+      "ownership": ["src/constants.ts", "src/pattern.ts", "src/audio.ts"],
+      "constraints": ["No new samples or dependencies.", "ROK behavior stays unchanged.", "Bank remains outside drum and bass event values."],
+      "acceptance": "Pattern defaults to independent ROK banks; all listed audio entry points accept/read a bank; HIP/TEC/BOX use distinct runtime processing/voice settings.",
+      "verify": ["npm run build", "pure pattern/audio self-checks"],
+      "visual": null,
+      "dependsOn": ["T1"],
+      "status": "completed",
+      "result": "Added Bank values and independent default pattern fields, then routed every drum/bass entry point through runtime ROK/HIP/TEC/BOX timbres over the retained assets.",
+      "evidence": ["npm run build (exit 0)", "git diff --check (exit 0)"],
+      "error": null
+    },
+    {
+      "id": "T3",
+      "title": "Project mode-owned banks and scheduled pads in the UI",
+      "intent": "Make the selector update only its active instrument and make scheduled grid events visibly light their exact pad.",
+      "ownership": ["src/App.tsx", "src/TransportControls.tsx", "src/BeatPad.tsx", "src/BeatPad.css"],
+      "constraints": ["Do not mutate events when changing a bank.", "Keep the pad secondary to the full grid.", "Retain pointer/live pad behavior."],
+      "acceptance": "Drum and bass mode expose their respective active bank; switching drums leaves bass bank and all events unchanged; scheduled drum/bass events visibly activate only their mapped pads.",
+      "verify": ["npm run build", "browser DOM interaction check"],
+      "visual": "Clean-reload local desktop app; inspect both mode selectors and exact active pad projection.",
+      "dependsOn": ["T2"],
+      "status": "completed",
+      "result": "Mode-owned selectors update only their instrument bank, and scheduled pattern events derive exact active pad wedges; drum grid commits no longer wait for audio decode.",
+      "evidence": ["npm run build (exit 0)", "clean-reload browser: Drum HIP and Bass TEC selections remained independent", "clean-reload browser: drum grid event committed immediately"],
+      "error": null
+    },
+    {
+      "id": "T4",
+      "title": "Verify Story 3 and close its trackers",
+      "intent": "Run build and pure checks, perform the visual route test, then record evidence and commit the finished story.",
+      "ownership": [
+        "docs/product/v1.1/README.md",
+        "docs/product/v1.1/EPIC-1-grid-pattern-engine.md",
+        "docs/executions/v1.1/EPIC-1-grid-pad-audio-translation-and-independent-banks.json"
+      ],
+      "constraints": ["Do not claim an audible result unless output can be checked.", "Do not stage unrelated worktree changes."],
+      "acceptance": "The build and self-checks pass, clean-reload browser evidence covers bank isolation and pad projection, and both trackers show Done.",
+      "verify": ["npm run build", "pure harness", "browser interaction check", "git diff --check"],
+      "visual": "Observe active selector state and exact pad highlight in the local desktop browser.",
+      "dependsOn": ["T3"],
+      "status": "completed",
+      "result": "Production build and browser interaction checks passed; trackers are marked Done. Browser audio output was unavailable, so audible playback was not claimed.",
+      "evidence": ["npm run build (exit 0)", "git diff --check (exit 0)", "browser: all four selectable profiles, independent Drum HIP/Bass TEC state, and committed grid event", "browser console error/warn check: empty"],
+      "error": null
+    }
+  ]
+}

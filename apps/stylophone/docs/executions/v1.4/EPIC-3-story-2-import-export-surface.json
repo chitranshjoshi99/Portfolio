@@ -1,0 +1,55 @@
+{
+  "requirement": "EPIC 3 Story 2 — a controlled, live-validated .beatcoach import surface (file + paste) plus export and a generic copy-schema-prompt button; Import is disabled unless the input parses valid, invalid input changes nothing, and unsupported old documents read as invalid rather than a silent empty beat.",
+  "repo": "Stylophone (Beats Drum Machine Coach) — v1.4",
+  "checkpointEvery": 3,
+  "story": "Net tracker: EPIC 3 #2 — Validate/paste/file-import compact .beatcoach documents (High, Priority 1).",
+  "architecture": {
+    "decision": null,
+    "seams": [
+      "The document + persistence contract is already locked (Story 1): BeatDocument, parseBeatDocument (no-throw, 512 KiB cap), serializeBeatDocument (.beatcoach / application/json), and the all-or-nothing import in useDraftPersistence.importPatternDocument (parse -> save validated doc -> atomically apply). Do NOT duplicate or fork the mutation path; the component only live-validates for button-enable/validity display and still routes the actual import through the existing hook path.",
+      "The copy button writes a GENERIC original-groove schema prompt to the clipboard. It must never name songs, artists, or suggest copyrighted arrangements (SM/LB constraint)."
+    ],
+    "adr": null
+  },
+  "tasks": [
+    {
+      "id": "S2-T1",
+      "title": "Live-validate the file/paste import surface in LessonLibrary",
+      "intent": "Make Import enabled only when the current input (selected file's text OR pasted text) parses to a valid BeatDocument via the exact parser, and show inline valid/invalid feedback. Invalid input must change nothing. Reuse parseBeatDocument + MAX_PATTERN_DOCUMENT_BYTES from document.ts; keep the actual import routed through the existing onImport (hook) path so the mutation stays single-sourced and all-or-nothing.",
+      "files": ["src/components/LessonLibrary.tsx", "src/components/LessonLibrary.css"],
+      "constraints": "Do not re-implement the size cap / save / apply differently — live validation is read-only feedback. On file selection, read the file text (guard 512 KiB via MAX_PATTERN_DOCUMENT_BYTES / file.size) and run parseBeatDocument; on paste text change, run parseBeatDocument. Disable Import unless the active input parses ok. Show a concise validity line (e.g. 'Valid .beatcoach' / the parser's error string). Keep accessible names, keyboard operability, and the existing save-status messaging. Update the file input accept to include .beatcoach. Do not build the copy button here (S2-T2).",
+      "acceptance": "Typing/pasting invalid JSON, an unknown key, or an old enveloped document keeps Import disabled and shows an invalid message; a valid document enables Import; clicking Import replaces the editor state; invalid input never mutates the beat.",
+      "verify": "npm run build",
+      "visual": "In the Save/Load modal: paste invalid text -> Import stays disabled + invalid note; paste a valid exported document -> Import enables; import it and confirm the grid changes; confirm an old enveloped JSON shows invalid, not an empty beat.",
+      "depends_on": [],
+      "status": "done",
+      "result": "LessonLibrary now live-validates active input (file text read once / paste text) via parseBeatDocument; Import disabled unless validation.ok; validity line (neutral/valid/error/size-cap); accept includes .beatcoach; import still routed through onImport (single mutation path); labels reworded Lesson->Beat. Build green; gating logic reviewed."
+    },
+    {
+      "id": "S2-T2",
+      "title": "Add a Copy schema-prompt button (generic, no copyrighted material)",
+      "intent": "Add a button that copies a generic, original-groove .beatcoach schema prompt to the clipboard so a user can ask an AI to author a compatible document. The text describes the JSON shape and constraints only; it names no songs, artists, or copyrighted arrangements.",
+      "files": ["src/components/LessonLibrary.tsx"],
+      "constraints": "Use navigator.clipboard.writeText with a graceful fallback/failure message if unavailable (no throw through UI). The prompt text is a static constant describing BeatDocument: { bpm within bounds, patterns '1'..'4', each { drums: sorted step indices 0..63 per pad, bass: [{step,pad,octave,length}] wrap-capable }. It MUST NOT reference any real song, artist, band, or copyrighted work. Give the button an accessible name and a copied/failed status. Keep it minimal — no new dependency.",
+      "acceptance": "Clicking Copy places the generic schema prompt on the clipboard and shows a copied confirmation; the text contains no song/artist/brand names; a clipboard failure surfaces a message rather than throwing.",
+      "verify": "npm run build",
+      "visual": "Click the Copy button; read the clipboard back and confirm it is the generic schema prompt with no copyrighted references; confirm the copied status appears.",
+      "depends_on": ["S2-T1"],
+      "status": "done",
+      "result": "Copy schema-prompt button added; static generic SCHEMA_PROMPT (1010 chars) describes only the BeatDocument JSON shape/constraints — no song/artist/brand (sole 'song' occurrence is the 'do not copy any existing song' instruction). Graceful failure verified in-browser ('Could not copy…', no throw); live clipboard read/write blocked by automated-browser permission (env limit)."
+    },
+    {
+      "id": "S2-T3",
+      "title": "Browser acceptance: export/import round trip, paste==file parity, old-doc invalid",
+      "intent": "Prove the story's acceptance end-to-end against the running app: export produces a .beatcoach (application/json) file; that file and identical pasted text both enable Import and yield the same bank; an export then import round-trips deep-equal (including a wrap-capable bass note); an old enveloped document is rejected as invalid, leaving the current beat unchanged.",
+      "files": [],
+      "constraints": "Manual/visual gate only. Reuse the running dev server. Verify deep equality of the persisted BeatDocument before vs after an export->import cycle. Confirm the download name ends in .beatcoach and the Blob MIME is application/json.",
+      "acceptance": "Round-trip export->import is deep-equal for bpm + all four slots; a valid file and identical pasted text both enable Import and produce the same bank; an old enveloped document keeps Import disabled/rejected and does not change the active beat.",
+      "verify": null,
+      "visual": "Author a beat (incl. a step-63-length-2 bass note if reachable), export, re-import the file, confirm deep-equal; paste the same text and confirm identical result; try an old enveloped document and confirm invalid + unchanged beat.",
+      "depends_on": ["S2-T2"],
+      "status": "done",
+      "result": "Browser acceptance passed. Old enveloped doc -> invalid ('Beat document has missing or unknown fields'), Import disabled, beat unchanged. Valid paste (bpm 140, slot1 wrap bass step63 len2) -> 'Valid .beatcoach document.', Import enabled; importing round-trips deep-equal (beatDocumentsEqual + re-parse of persisted text) incl wrap bass; grid+BPM applied. File import of the same doc yields an identical bank (paste==file parity). Export: groove.beatcoach / application/json, serialize->parse deep-equal. No console errors. Also fixed stale 'Lesson' labels: modal title 'Save & Load Beat', opener 'Save/Load Beat' (App.tsx, LayerStack.tsx)."
+    }
+  ]
+}

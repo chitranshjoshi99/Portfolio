@@ -1,0 +1,70 @@
+{
+  "requirement": "EPIC 1 Story 3 — a lesson practices only the active pattern, binds guidance to that slot, blocks pattern selection until lesson exit, and leaves all other slots untouched.",
+  "repo": "Stylophone (Beats Drum Machine Coach) — v1.4",
+  "checkpointEvery": 3,
+  "approvalCheckpoints": false,
+  "story": "Net tracker: EPIC 1 #3 — Active-pattern lesson lock (High, Priority 4).",
+  "architecture": {
+    "decision": "usePattern keeps ephemeral guidance state and derives guidancePasses from bank.activePattern. Starting guidance therefore binds to the currently active slot without copying or mutating other slots. Pattern selection is exposed through usePattern.selectSlot, which rejects all non-compose guide states; the score control also uses the same state to disable slot buttons accessibly.",
+    "alternatives": [
+      "Store guide state in the pattern bank: rejected because guidance is ephemeral and must not become slot document data.",
+      "Allow selection during lessons and retarget the guide: rejected because it could change the practiced pattern mid-lesson and violate the lock."
+    ],
+    "tradeoffs": [
+      "Paused and complete states remain locked until Continue editing exits the lesson, matching the story's until-exit requirement.",
+      "No additional code was needed; the lock was established in the Story 1 bank integration and is now independently verified."
+    ],
+    "seams": [
+      "guidancePasses is derived from bank.activePattern in usePattern.",
+      "usePattern.selectSlot returns false outside compose.",
+      "PatternSlots receives slotSelectionDisabled when guide status is not compose."
+    ]
+  },
+  "tasks": [
+    {
+      "id": "S3-T1",
+      "title": "Audit guide-to-active-slot ownership",
+      "intent": "Confirm lesson passes and edit gating read the active bank pattern, not a stale or separate pattern copy.",
+      "files": ["src/hooks/usePattern.ts", "src/hooks/usePatternBank.ts", "src/App.tsx"],
+      "constraints": "Do not introduce Context/store state or duplicate pattern state; preserve the existing guided read-only mutation gate.",
+      "acceptance": "Guidance derives from the active slot; starting guidance uses that pass list; selecting a slot is rejected unless guide status is compose.",
+      "verify": ["rg -n \"guidancePasses|activePattern|selectSlot|slotSelectionDisabled|status !== \\\"compose\\\"\" src/hooks/usePattern.ts src/hooks/usePatternBank.ts src/App.tsx"],
+      "visual": null,
+      "dependsOn": [],
+      "status": "done",
+      "result": "Audit passed: usePattern derives guidance from bank.activePattern and rejects selection outside compose; App disables PatternSlots for every active lesson state.",
+      "evidence": ["Committed source inspection"],
+      "error": null
+    },
+    {
+      "id": "S3-T2",
+      "title": "Run build and regression checks",
+      "intent": "Ensure the lesson-lock path remains type-safe and preserves the existing bank/transport integration.",
+      "files": [],
+      "constraints": "Preserve unrelated app-screenshot.png; no code changes unless a real gate failure appears.",
+      "acceptance": "Diff check and production build pass with no TypeScript errors.",
+      "verify": ["git diff --check", "npm run build"],
+      "visual": null,
+      "dependsOn": ["S3-T1"],
+      "status": "done",
+      "result": "Build and diff gates passed; active-pattern guidance and non-compose selection lock remain type-safe and integrated with the existing bank/transport path.",
+      "evidence": ["git diff --check", "npm run build (tsc + vite, 1034 modules)", "Source audit via rg"],
+      "error": null
+    },
+    {
+      "id": "S3-T3",
+      "title": "Verify slot-3 lesson isolation and selection lock",
+      "intent": "Prove the player-facing acceptance: slot 3 starts a lesson against slot 3, selection is blocked while the lesson is active, and exiting restores selection without changing other slots.",
+      "files": [],
+      "constraints": "Use the running browser; author distinct content in slot 3 and at least one other slot; start the actual lesson UI; verify disabled controls and unchanged other-slot content.",
+      "acceptance": "Starting guidance on slot 3 shows guided state for slot 3; all PatternSlots are disabled and an attempted click does not change active slot; after Continue editing, selection works again and other slot notes remain intact; no console errors.",
+      "verify": [],
+      "visual": "Run the Vite app, author a slot-1 note and a distinct slot-3 note, select slot 3, start guidance, inspect disabled slot buttons, exit the lesson, and confirm slot-1 content remains unchanged.",
+      "dependsOn": ["S3-T2"],
+      "status": "done",
+      "result": "Browser acceptance passed: authored distinct notes in slots 1 and 3; selected slot 3; started guidance with guided · 1/1 passes; all four PatternSlots were disabled and active slot stayed 3; completing the lesson and choosing Continue editing re-enabled selection; slot-1 and slot-3 notes remained true; console errors were zero.",
+      "evidence": ["Browser guided snapshot: active slot 3, all four slot buttons disabled", "Browser exit state: all four slot buttons enabled", "Browser isolation: slot1 step1=true and slot3 step3=true after lesson exit", "Browser console error count: 0", "Browser lesson screenshot captured"],
+      "error": null
+    }
+  ]
+}

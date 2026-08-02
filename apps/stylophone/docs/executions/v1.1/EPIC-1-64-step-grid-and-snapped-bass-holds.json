@@ -1,0 +1,92 @@
+{
+  "requirement": "Implement EPIC 1, Story 2: author drums and wrapped bass holds directly on a legible 64-step grid.",
+  "workspace": "/Users/chitranshjoshi/Work/Stylophone",
+  "checkpointEvery": 3,
+  "approvalCheckpoints": false,
+  "architecture": {
+    "decision": "Render bass starts and sustained cells from the existing Pattern; use pointer drag only to set an integer length on the start cell.",
+    "alternatives": [
+      "Materialize a bass object in every sustained cell.",
+      "Add a second drag-state representation to Pattern."
+    ],
+    "tradeoffs": [
+      "Deriving sustain cells preserves one persisted event per note and keeps playback/editor consistent.",
+      "The grid needs transient pointer state, but the Pattern remains immutable and overlap-safe."
+    ],
+    "seams": [
+      "src/StepGrid.tsx and src/StepGrid.css own visual projection, 64-column geometry, and pointer gestures.",
+      "src/App.tsx owns audio audition and pattern updates through setBass/setBassLength/clearBass.",
+      "src/BassInspector.tsx supplies an accessible length fallback for non-pointer editing."
+    ]
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Record Story 2 and its execution plan",
+      "intent": "Mark the next priority story in progress and persist the dependency-ordered implementation queue.",
+      "ownership": [
+        "docs/product/v1.1/README.md",
+        "docs/product/v1.1/EPIC-1-grid-pattern-engine.md",
+        "docs/executions/v1.1/EPIC-1-64-step-grid-and-snapped-bass-holds.json"
+      ],
+      "constraints": ["Preserve all unrelated user documentation changes."],
+      "acceptance": "Both v1.1 trackers show Story 2 In progress and this plan is valid JSON.",
+      "verify": ["rg -n '64-step grid and snapped bass holds.*In progress' docs/product/v1.1/README.md docs/product/v1.1/EPIC-1-grid-pattern-engine.md", "node JSON.parse plan check"],
+      "visual": null,
+      "dependsOn": [],
+      "status": "completed",
+      "result": "Marked Story 2 In progress in both v1.1 trackers and created this valid durable execution plan.",
+      "evidence": ["rg tracker check (exit 0)", "node JSON.parse plan check (exit 0)"],
+      "error": null
+    },
+    {
+      "id": "T2",
+      "title": "Render the full grid and derived bass holds",
+      "intent": "Make the score an explicit 64-column, 12-row surface with a divider after step 32 and distinct bass starts/sustains.",
+      "ownership": ["src/StepGrid.tsx", "src/StepGrid.css"],
+      "constraints": ["Keep all 64 columns visible at supported desktop width.", "Keep PAD_IDS native order.", "Derive sustain cells with activeBassCell; do not duplicate events."],
+      "acceptance": "The accessible grid label and CSS geometry say 64 steps; step 33 divides the two bars; drums render per row; bass differentiates a start from its sustained cells across the loop seam.",
+      "verify": ["npm run build"],
+      "visual": "Inspect a desktop browser screenshot/DOM with all 64 headers and the step-33 divider." ,
+      "dependsOn": ["T1"],
+      "status": "completed",
+      "result": "StepGrid now projects a full 64-column score with a step-33 divider and derived, distinct bass start/sustain cells.",
+      "evidence": ["supervisor npm run build (exit 0)", "git diff --check (exit 0)", "focused stale-copy repair build (exit 0)"],
+      "error": null
+    },
+    {
+      "id": "T3",
+      "title": "Wire snapped bass edit gestures and controls",
+      "intent": "Create, replace, extend, and clear one bass start through the score without overlapping events.",
+      "ownership": ["src/App.tsx", "src/BassInspector.tsx", "src/BassInspector.css"],
+      "constraints": ["Use the existing immutable pattern helpers.", "Audition grid edits through the existing audio path.", "No free-time bass."],
+      "acceptance": "A bass click creates/replaces a start; a drag from 62 through 1 writes length four; clearing a start removes the rendered hold; an accessible length control provides a non-pointer fallback.",
+      "verify": ["npm run build", "pattern pure harness"],
+      "visual": "Browser-test drums at step 64 and a wrapped bass hold from step 63 through step 2." ,
+      "dependsOn": ["T2"],
+      "status": "completed",
+      "result": "App now commits bass starts before audio unlock, applies wrapped drag lengths, and exposes an accessible 1..64 length control.",
+      "evidence": ["supervisor npm run build (exit 0)", "supervisor wrapped 62-to-1 bass harness (exit 0)", "git diff --check (exit 0)", "CSS token repair npm run build (exit 0)"],
+      "error": null
+    },
+    {
+      "id": "T4",
+      "title": "Verify Story 2 and close its trackers",
+      "intent": "Run the build, inspect the rendered desktop score, and record the completed acceptance evidence.",
+      "ownership": [
+        "docs/product/v1.1/README.md",
+        "docs/product/v1.1/EPIC-1-grid-pattern-engine.md",
+        "docs/executions/v1.1/EPIC-1-64-step-grid-and-snapped-bass-holds.json"
+      ],
+      "constraints": ["Do not claim an audible check without an available output device."],
+      "acceptance": "Build passes; the browser confirms 64 visible score columns and wrapped bass rendering/editing; both trackers show Story 2 Done with session notes.",
+      "verify": ["npm run build", "browser interaction check"],
+      "visual": "Desktop screenshot and DOM state from the local Vite app.",
+      "dependsOn": ["T3"],
+      "status": "completed",
+      "result": "Production build, wrapped-hold harness, and desktop browser inspection passed; both v1.1 trackers are marked Done.",
+      "evidence": ["npm run build (exit 0)", "wrapped bass hold harness: 62 to 1 = 4 cells (exit 0)", "in-app browser: 64 headers, 768 grid cells, step-33 divider, and visual wrapped hold from 62 through 1", "browser console error/warn check: empty"],
+      "error": null
+    }
+  ]
+}

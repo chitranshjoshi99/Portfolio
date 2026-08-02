@@ -1,0 +1,31 @@
+{
+  "requirement": "EPIC-3 · Story 3.3 — New-lesson-from-scratch. The user can start a blank lesson in the same editor without any upload/pipeline: empty drums + bass layers, default bpm 120, bank ROK, 32 steps, teachOrder ['drums','bass']. A 'New lesson' action resets the editor to that blank state. Because unsaved work would otherwise be silently discarded, guard the reset with a confirm when the current pattern is non-empty (the execute.md non-negotiable: never lose a user's lesson). Acceptance: from a cold/loaded state, New lesson clears the editor to defaults; the user can then hand-build a groove and Save it (persistence from 3.2), with the reduction pipeline never touched.",
+  "repo": "/Users/chitranshjoshi/Work/Stylophone",
+  "epic": "EPIC-3-authoring",
+  "story": "3.3",
+  "session": "S4",
+  "checkpointEvery": 3,
+  "architecture": {
+    "decision": "No new module or fork. The editor already initializes to a blank lesson (emptyPattern(), BPM_DEFAULT, empty title, null id) — 3.3 only needs an explicit 'New lesson' reset action that returns the loaded editor to that same blank state, plus a confirm guard so unsaved edits are not silently lost. Reuse emptyPattern/BPM_DEFAULT and the existing App state setters; the blank Lesson is realized on Save via the existing makeLesson (schemaVersion 1, bank ROK, bars 2, steps 32, teachOrder). Tiny 2-file change (App.tsx handler + LessonLibrary button) done inline by the supervisor — no subagent, no over-chunking.",
+    "seams": [
+      "src/App.tsx: handleNewLesson() resets the editor — setPattern(emptyPattern()), setBpm(BPM_DEFAULT), setCurrentTitle(''), setCurrentLessonId(null), setSelectedBassStep(null); guarded by window.confirm when the current pattern has any drum hit or bass note (dirty check), so accidental New does not discard unsaved work. Passed to LessonLibrary as onNew.",
+      "src/LessonLibrary.tsx: a labeled 'New lesson' button (reuse .tbtn, >=44px, keyboard-accessible) that calls onNew. Added prop onNew: () => void. No persistence logic here."
+    ],
+    "adr": null
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "New-lesson reset action + button (App handler + LessonLibrary button)",
+      "intent": "Add an explicit 'New lesson' reset. src/App.tsx: add handleNewLesson() that, if the current pattern is dirty (any of pattern.drums.kick/snare/hat has a true step, OR any pattern.bass cell is non-null), first calls window.confirm('Start a new lesson? Unsaved changes will be lost.') and returns early if the user cancels; then resets to a blank lesson: setPattern(emptyPattern()), setBpm(BPM_DEFAULT), setCurrentTitle(''), setCurrentLessonId(null), setSelectedBassStep(null). Pass onNew={handleNewLesson} to <LessonLibrary>. src/LessonLibrary.tsx: add onNew: () => void to Props (destructure it) and render a 'New lesson' button (className 'tbtn', type button) that calls onNew — place it in the save row (e.g. before the Save button) or a small toolbar under the heading. emptyPattern and BPM_DEFAULT are already imported in App; add nothing new beyond wiring. Keep the diff minimal; add a ponytail comment noting the editor already starts blank so this is just the reset+guard.",
+      "files": ["src/App.tsx", "src/LessonLibrary.tsx"],
+      "constraints": "Reuse emptyPattern() and BPM_DEFAULT (already imported) and the existing state setters — do NOT add a new module or duplicate the blank-lesson definition. The dirty-check + window.confirm is the data-loss guard (execute.md non-negotiable) — keep it. Do NOT reset instrument-only live settings that are not part of a lesson unnecessarily (octave is a live instrument knob, not lesson data — leaving it is fine; a ponytail comment is optional). a11y: the New button is a real, labeled, keyboard-operable >=44px .tbtn. Do NOT regress Save/Load/Delete/Export/Import, the grid editor, bass inspector, pattern playback, or transport. TypeScript strict, no unused symbols.",
+      "acceptance": "npm run build passes. In the browser: with a non-empty editor (or a loaded lesson), clicking 'New lesson' (confirming the prompt) clears the grid to empty, resets BPM to 120 and the title to empty, and drops the current lesson id (so a following Save mints a fresh lesson); canceling the confirm leaves the editor untouched. On an already-empty editor, New lesson resets without needing changes. After New, the user can place hits + a bass note and Save it as a new lesson. Save/Load/Delete/Export/Import and the rest of the editor still work; no console errors.",
+      "verify": "npm run build",
+      "visual": "Browser (prod build): load or build a pattern, click 'New lesson' -> confirm -> grid empties, BPM 120, title blank; build a fresh groove + Save -> appears as a new lesson row. Cancel path: with edits present, New lesson -> Cancel -> editor unchanged. Screenshot the emptied editor after New. Confirm no console errors.",
+      "depends_on": [],
+      "status": "done",
+      "result": "App.tsx: handleNewLesson() — dirty-check (any drum true OR any bass non-null) then window.confirm guard; on proceed resets setPattern(emptyPattern()), setBpm(BPM_DEFAULT), setCurrentTitle(''), setCurrentLessonId(null), setSelectedBassStep(null). Passed onNew to LessonLibrary. LessonLibrary.tsx: onNew prop + 'New lesson' .tbtn button before Save. Reused emptyPattern/BPM_DEFAULT + existing setters, no new module. Supervisor-verified on PROD build (window.confirm overridden per-path): dirty editor (kick2/snare1/bass1, title 'Temp') + New->Cancel => editor UNCHANGED (no data loss); New->Confirm => cleared (0 hits, title '', bpm 120); then built 'Fresh' groove + Save => NEW lesson id 6102eb23 added alongside 'Groove A' 04f84a93 (id reset to null, no overwrite). npm run build passes; no console errors."
+    }
+  ]
+}

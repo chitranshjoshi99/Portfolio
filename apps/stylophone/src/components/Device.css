@@ -1,0 +1,232 @@
+/* Device chassis (R7b): ONE composition, not a column of cards.
+   The whole spatial contract is stated once — in grid-template-areas below.
+   No boxed frame: the device IS the pane, so it takes the full height rather
+   than sitting in a small card inside it. */
+.chassis {
+  display: grid;
+  grid-template-areas:
+    "tempo     .      display"
+    "pad       pad    pad"
+    "octave    octave octave"
+    "transport mode   profile";
+  /* col 1 = three 44px transport keys + gaps; col 2 takes the slack so the mode
+     switch can centre in it; col 3 shrinks to the profile row. The pad row is
+     the only flexible track, so the pad absorbs every pixel the fixed rows
+     don't need. */
+  grid-template-columns: 140px minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  gap: var(--space-5) var(--space-3);
+  width: 100%;
+  height: 100%;
+}
+
+.chassis__display {
+  grid-area: display;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-start;
+  gap: var(--space-3);
+  overflow: hidden;
+}
+
+.chassis__nameplate {
+  margin: 0;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.chassis__pass {
+  margin: 0;
+  color: var(--accent-bright);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* The 8-dot beat row is the non-color playback cue; it reads as the device's
+   status strip, under the nameplate at the top right. */
+.chassis .beat-indicator {
+  justify-content: flex-end;
+  gap: 5px;
+}
+
+/* TOP-LEFT: BPM readout, tempo dial directly underneath it.
+   ponytail: column-reverse flips TempoKnob's own dial→grille order instead of
+   touching the component; it renders exactly two children, so this is stable. */
+.chassis__tempo {
+  grid-area: tempo;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+.chassis__tempo .tempo-knob {
+  flex-direction: column-reverse;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+.chassis__tempo .tempo-knob__dial {
+  width: 72px;
+  height: 72px;
+}
+.chassis__tempo .tempo-knob__pointer {
+  top: 6px;
+  height: 22px;
+}
+.chassis__tempo .tempo-knob__grille {
+  /* ponytail: tuned as a pair against the 72px dial, not a spacing step. */
+  padding: 3px 12px;
+}
+.chassis__tempo .tempo-knob__bpm {
+  font-size: 22px;
+}
+.chassis__tempo .tempo-knob__unit {
+  font-size: 8px;
+  margin-top: 1px;
+}
+
+/* CENTRE: the pad is the dominant control. It fills the flexible row, taking
+   whichever of the row's height or width runs out first. The square
+   aspect-ratio is load-bearing, not cosmetic: padAtPoint maps pointer
+   coordinates through the element's bounding box, so a letterboxed (non-square)
+   SVG would offset every hit test. 300px stays the a11y floor — below it a
+   half-step key stops clearing 44px (R7a geometry). */
+.chassis__pad {
+  grid-area: pad;
+  place-self: center;
+  height: 100%;
+  aspect-ratio: 1;
+  max-width: 100%;
+  min-width: 300px;
+}
+.chassis__pad .beatpad {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  max-width: none;
+}
+
+/* BOTTOM-RIGHT: profile selector, one flat row. */
+.chassis__profile {
+  grid-area: profile;
+  justify-self: end;
+}
+/* BELOW THE PAD: one horizontal axis — down, readout, up — centred under it and
+   sitting close to the pad it belongs to, not floating by the bottom keys. */
+.chassis__octave {
+  grid-area: octave;
+  justify-self: center;
+  margin-top: -16px;
+  margin-bottom: 24px;
+}
+.chassis__transport {
+  grid-area: transport;
+  align-self: end;
+}
+.chassis__mode {
+  grid-area: mode;
+  align-self: end;
+  justify-self: center;
+}
+.chassis__pad-mode {
+  grid-area: padmode;
+  align-self: end;
+  justify-self: center;
+}
+
+/* Epic 4 Story 1: the pad becomes a compact translator rail while the score
+   pane owns the width. TransportControls keeps its existing sibling groups;
+   these overrides stack them inside the rail without changing behavior. */
+.pane--instrument .chassis {
+  grid-template-areas:
+    "display"
+    "tempo"
+    "pad"
+    "profile"
+    "octave"
+    "transport"
+    "mode";
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(220px, 1fr) auto auto auto auto;
+  gap: var(--space-4);
+  padding: 0;
+}
+
+.pane--instrument .chassis__display {
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.pane--instrument .chassis .beat-indicator {
+  justify-content: center;
+  gap: 5px;
+}
+
+.pane--instrument .chassis__tempo {
+  justify-content: center;
+  align-items: center;
+}
+
+.pane--instrument .chassis__pad {
+  width: 100%;
+  height: auto;
+  min-width: 0;
+  max-height: 272px;
+}
+
+.pane--instrument .chassis__pad .beatpad {
+  width: min(100%, 260px);
+  height: auto;
+  min-width: 0;
+  max-width: 260px;
+}
+
+.pane--instrument .chassis__profile,
+.pane--instrument .chassis__octave,
+.pane--instrument .chassis__transport,
+.pane--instrument .chassis__mode,
+.pane--instrument .chassis__pad-mode {
+  align-self: stretch;
+  justify-self: stretch;
+  margin: 0;
+}
+
+.pane--instrument .profile-grid,
+.pane--instrument .octave-stack,
+.pane--instrument .transport-array,
+.pane--instrument .mode-switch,
+.pane--instrument .pad-mode-switch {
+  width: 100%;
+  justify-content: center;
+}
+
+.pane--instrument .profile-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.pane--instrument .tbtn--bank,
+.pane--instrument .tbtn--icon,
+.pane--instrument .tbtn--mode {
+  min-width: 0;
+  flex: 1 1 0;
+}
+
+/* Announced to assistive tech, not drawn: replaces the old "Pad: … · Mode: …"
+   diagnostic line, whose visible copy is now carried by control state. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

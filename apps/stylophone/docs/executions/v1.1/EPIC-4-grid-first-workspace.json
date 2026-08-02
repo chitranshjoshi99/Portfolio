@@ -1,0 +1,180 @@
+{
+  "requirement": "Implement and verify all Epic 4 stories: make the complete 64-step score dominant, keep the pad as a secondary translator, make controls mode-aware and compact, and close the desktop accessibility/UAT gaps.",
+  "workspace": "/Users/chitranshjoshi/Work/Stylophone",
+  "checkpointEvery": 3,
+  "approvalCheckpoints": false,
+  "architecture": {
+    "decision": "Use one responsive CSS workspace with a full-width score plane as the visual anchor, a narrow translator rail for the pad and status, and compact action/control rails that reuse the existing React component seams. Keep all layout state derived from the existing pattern, mode, bank, transport, and guidance state.",
+    "alternatives": [
+      "Keep the current equal two-pane chassis and tune only cell widths.",
+      "Add a separate desktop-only grid implementation beside the existing workspace."
+    ],
+    "tradeoffs": [
+      "A single score plane gives all 64 columns a stable shared width at the 1280px floor, but requires moving the existing chassis regions into a new shell.",
+      "Reusing StepGrid, BeatPad, TransportControls, LayerStack, and utility dialogs avoids a parallel interaction model while allowing their visual hierarchy to change."
+    ],
+    "seams": [
+      "src/App.tsx owns the workspace order and status copy.",
+      "src/theme.css and src/Device.css own the desktop shell and translator rail geometry.",
+      "src/StepGrid.css owns the score plane, bar/beat grouping, row rail, and playhead visibility.",
+      "src/TransportControls.tsx/.css and src/LayerStack.tsx/.css own the compact controls and lesson action strip.",
+      "src/Modal.tsx/.css and src/LessonLibrary.tsx/.css own keyboard-safe utility confirmation/error states."
+    ]
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Open Epic 4 Story 1 and record the execution plan",
+      "intent": "Synchronize the product tracker with the next priority story and persist the full Epic 4 dependency-ordered queue before implementation.",
+      "ownership": [
+        "docs/product/v1.1/README.md",
+        "docs/product/v1.1/EPIC-4-grid-first-workspace.md",
+        "docs/executions/v1.1/EPIC-4-grid-first-workspace.json"
+      ],
+      "constraints": ["Preserve the completed Epic 1–3 tracker rows.", "Do not stage unrelated .gitignore, lockfile, or preview changes."],
+      "acceptance": "Both trackers show Epic 4 Story 1 In progress and this file parses as valid JSON with all three stories queued.",
+      "verify": ["node JSON.parse plan check", "rg -n '64-step grid-first desktop layout.*In progress' docs/product/v1.1/README.md docs/product/v1.1/EPIC-4-grid-first-workspace.md"],
+      "visual": null,
+      "dependsOn": [],
+      "status": "completed",
+      "result": "Marked Epic 4 Story 1 in progress, created the nine-task Epic queue, and kept Stories 2 and 3 pending until Story 1 was committed.",
+      "evidence": ["plan JSON parse (exit 0)", "tracker rg check (exit 0)", "git diff --check (exit 0)"],
+      "error": null
+    },
+    {
+      "id": "T2",
+      "title": "Reframe the workspace around the full score",
+      "intent": "Make the 64-step grid the dominant desktop surface while keeping the circular pad, tempo, beat dots, and current instrument visible as a compact translator rail.",
+      "ownership": ["src/App.tsx", "src/theme.css", "src/Device.css", "src/StepGrid.css", "src/BeatPad.css", "src/BeatIndicator.css"],
+      "constraints": ["Keep all 64 columns visible at or above 1280px without horizontal movement.", "Preserve the two 32-step cycles and existing row-label rail.", "Do not change Pattern or transport behavior."],
+      "acceptance": "At 1280×720 the score, all 12 row labels, both 32-step cycles, playhead, and active row are visible together; the pad occupies less visual area than the score and remains a synchronized translator.",
+      "verify": ["npm run build", "git diff --check"],
+      "visual": "Clean local desktop browser at 1280×720; inspect score width, row labels, step-33 divider, playhead, active guide row, and pad-to-grid visual hierarchy.",
+      "dependsOn": ["T1"],
+      "status": "completed",
+      "result": "The first implementation pass preserved the 64-step score and translator rail, but the post-build Design-girl review found that it still uses a two-pane shell rather than the approved single-chassis wireframe. Story 1 is reopened for deliberate layout rework.",
+      "evidence": ["npm run build (exit 0)", "git diff --check (exit 0)", "browser at 1280×720: 64 headers, 768 cells, 952px Structure pane, 282px Instrument pane, active guide row, no console warnings/errors", "browser at 1680×1046: persistent two-pane split and unused vertical space beside the score"],
+      "error": null
+    },
+    {
+      "id": "T3",
+      "title": "Verify and close Story 1",
+      "intent": "Run the production and visual gates, record evidence, and close the first story before moving to controls.",
+      "ownership": ["docs/product/v1.1/README.md", "docs/product/v1.1/EPIC-4-grid-first-workspace.md", "docs/executions/v1.1/EPIC-4-grid-first-workspace.json"],
+      "constraints": ["Do not claim audible verification without an available output device."],
+      "acceptance": "Story 1 is Done in both trackers with browser evidence and the plan records passing build/diff checks; the story is committed before Story 2 starts.",
+      "verify": ["npm run build", "git diff --check", "browser desktop inspection"],
+      "visual": "Save a 1280×720 screenshot/evidence path and confirm no console errors.",
+      "dependsOn": ["T2"],
+      "status": "completed",
+      "result": "Story 1 acceptance passed in the desktop browser; both product trackers are Done and the story is committed before the next story begins.",
+      "evidence": ["browser DOM: BAR 1 · 1–32 and BAR 2 · 33–64", "browser DOM: one active guide row and one active label", "browser console error/warn check: empty"],
+      "error": null
+    },
+    {
+      "id": "T4",
+      "title": "Open Epic 4 Story 2",
+      "intent": "Mark the compact-controls story in progress in both trackers after Story 1 has been committed.",
+      "ownership": ["docs/product/v1.1/README.md", "docs/product/v1.1/EPIC-4-grid-first-workspace.md", "docs/executions/v1.1/EPIC-4-grid-first-workspace.json"],
+      "constraints": ["Do not reopen or rewrite completed stories."],
+      "acceptance": "Both trackers show Story 1 Done and Story 2 In progress.",
+      "verify": ["rg -n '64-step grid-first desktop layout.*Done|Mode-aware compact controls and REC states.*In progress' docs/product/v1.1/README.md docs/product/v1.1/EPIC-4-grid-first-workspace.md"],
+      "visual": null,
+      "dependsOn": ["T3"],
+      "status": "completed",
+      "result": "Opened Story 2 only after Story 1 was verified and committed.",
+      "evidence": ["Story 1 commit b79760a", "both trackers show Story 1 Done and Story 2 In progress"],
+      "error": null
+    },
+    {
+      "id": "T5",
+      "title": "Implement compact mode-aware controls and REC states",
+      "intent": "Group mode, active bank, conditional octave, click, transport, and REC into a subordinate control rail with clear ownership and recording safeguards.",
+      "ownership": ["src/App.tsx", "src/TransportControls.tsx", "src/TransportControls.css", "src/Device.css", "src/LayerStack.tsx", "src/LayerStack.css", "src/LessonLibrary.tsx", "src/LessonLibrary.css"],
+      "constraints": ["Switching mode changes only the active instrument bank control.", "REC writes only in Compose and is disabled in Guided with an explanation.", "Paused guidance remains visibly paused and accepted edits restart it.", "Keep import/export utility-sized."],
+      "acceptance": "A user can identify which instrument/profile each control affects; drum octave is unavailable with an explanation; Guided exposes pause behavior and disables grid/REC; Compose REC names its receiving mode/row.",
+      "verify": ["npm run build", "git diff --check"],
+      "visual": "Browser-test mode switching, bank isolation, Compose REC, Guided pause, and paused edit reset at 1280×720.",
+      "dependsOn": ["T4"],
+      "status": "completed",
+      "result": "Added compact action-strip buttons for import/draft, JSON export, and echo/pulse cue choice; made REC Compose-only with mode-specific accessible labels/tooltips; preserved independent bank and octave ownership.",
+      "evidence": ["npm run build (exit 0)", "git diff --check (exit 0)", "browser: action buttons visible and cue toggled Echo→Pulse", "browser: Bass/TEC and Drums/ROK remained independent; drum octave disabled", "browser: Guided grid and REC disabled; draft modal exposed import/export", "browser console error/warn check: empty"],
+      "error": null
+    },
+    {
+      "id": "T6",
+      "title": "Verify and close Story 2",
+      "intent": "Confirm control ownership and recording boundaries in the browser, then close Story 2 and commit it before accessibility work.",
+      "ownership": ["docs/product/v1.1/README.md", "docs/product/v1.1/EPIC-4-grid-first-workspace.md", "docs/executions/v1.1/EPIC-4-grid-first-workspace.json"],
+      "constraints": ["Preserve unrelated worktree changes."],
+      "acceptance": "Story 2 is Done in both trackers with build, diff, and desktop interaction evidence; Story 2 is committed.",
+      "verify": ["npm run build", "git diff --check", "browser interaction check"],
+      "visual": "Inspect the compact rail and action strip in Compose, Guided, and Paused states with no console errors.",
+      "dependsOn": ["T5"],
+      "status": "completed",
+      "result": "Story 2 acceptance passed in Compose and Guided browser checks; both product trackers are Done and the story is ready to commit before Story 3 starts.",
+      "evidence": ["browser DOM: Record drums enabled in Compose with REC captures drums at the playhead", "browser DOM: Record unavailable outside Compose disabled with explanatory tooltip", "browser DOM: Next row, Reset pattern, Import / draft, Export JSON, Cue: Pulse"],
+      "error": null
+    },
+    {
+      "id": "T7",
+      "title": "Open Epic 4 Story 3",
+      "intent": "Mark the accessibility and desktop UAT story in progress after the compact-controls result is committed.",
+      "ownership": ["docs/product/v1.1/README.md", "docs/product/v1.1/EPIC-4-grid-first-workspace.md", "docs/executions/v1.1/EPIC-4-grid-first-workspace.json"],
+      "constraints": ["Keep the previously verified layout and control contracts intact."],
+      "acceptance": "Both trackers show Story 2 Done and Story 3 In progress.",
+      "verify": ["rg -n 'Mode-aware compact controls and REC states.*Done|Accessibility and (real )?desktop UAT.*In progress' docs/product/v1.1/README.md docs/product/v1.1/EPIC-4-grid-first-workspace.md"],
+      "visual": null,
+      "dependsOn": ["T6"],
+      "status": "completed",
+      "result": "Opened Story 3 only after Story 2 was verified and committed.",
+      "evidence": ["Story 2 commit a8138e0", "both trackers show Story 2 Done and Story 3 In progress"],
+      "error": null
+    },
+    {
+      "id": "T8",
+      "title": "Close accessibility and desktop UAT gaps",
+      "intent": "Make live state announcements, keyboard interaction, reduced motion, contrast, labels, and dialog boundaries usable during a live recording moment.",
+      "ownership": ["src/App.tsx", "src/theme.css", "src/StepGrid.tsx", "src/StepGrid.css", "src/BeatPad.tsx", "src/BeatPad.css", "src/BeatIndicator.css", "src/TransportControls.tsx", "src/TransportControls.css", "src/Modal.tsx", "src/Modal.css"],
+      "constraints": ["Keep 44px controls and accessible pressed/disabled names.", "Colour cannot be the only guidance cue.", "Reduced motion suppresses sweeping animations.", "Do not introduce a focus trap that blocks modal keyboard use."],
+      "acceptance": "Compose, Guided, Paused/edit-reset, import error, and export states are keyboard-usable and announced; pad keyboard mappings remain intact; reduced-motion CSS disables playhead/pad sweeps; no hidden background action fires in dialogs.",
+      "verify": ["npm run build", "git diff --check"],
+      "visual": "Run keyboard and reduced-motion checks in the 1280×720 browser session and inspect console errors.",
+      "dependsOn": ["T7"],
+      "status": "completed",
+      "result": "Closed the reduced-motion and accessibility gaps: pad transitions calm under prefers-reduced-motion; icon controls retain names/titles/tooltips; live status and disabled-state semantics remain explicit.",
+      "evidence": ["npm run build (exit 0)", "git diff --check (exit 0)", "browser keyboard pad audition: Pad 1 announcement", "browser dialog isolation: typing q in Beat title did not trigger Pad q", "browser visible control target check: 17 visible tbtn controls, none below 44px", "browser icon metadata check: no missing aria-label/title/data-tip", "browser reduced-motion stylesheet check: true", "browser console error/warn check: empty"],
+      "error": null
+    },
+    {
+      "id": "T9",
+      "title": "Verify and close Epic 4",
+      "intent": "Run the full build, static checks, pure regressions, and desktop UAT, then close the Epic execution plan and trackers.",
+      "ownership": ["docs/product/v1.1/README.md", "docs/product/v1.1/EPIC-4-grid-first-workspace.md", "docs/executions/v1.1/EPIC-4-grid-first-workspace.json"],
+      "constraints": ["Do not claim an audible result unless an output device is available.", "Do not stage unrelated .gitignore, lockfile, or preview changes."],
+      "acceptance": "All Epic 4 stories are Done, all plan tasks are completed, build/diff checks pass, and desktop browser evidence covers the score hierarchy, controls, accessibility states, and no-console-error UAT; the final story is committed.",
+      "verify": ["npm run build", "git diff --check", "pure self-checks", "browser desktop UAT"],
+      "visual": "Final clean-reload 1280×720 screenshot/evidence path with Compose, Guided, Paused, import error, and export states checked.",
+      "dependsOn": ["T8"],
+      "status": "completed",
+      "result": "The prior Epic 4 pass was functionally verified, but it is not considered visually closed after the post-build Design-girl review. Story 1 is reopened with a new single-chassis layout contract; Stories 2 and 3 remain behaviorally implemented and must be rechecked against the revised shell.",
+      "evidence": ["previous 9-task pass completed", "browser at 1280×720: score 952px vs translator rail 282px, 64 headers, 768 cells, two bar labels", "browser final guided UAT: 1 active row, 768 disabled cells, REC disabled, Next row visible", "browser console error/warn check: empty", "post-build review: current two-pane shell does not match approved full-width header / dominant score / horizontal lower deck wireframe", "audio-device check: Tone sample load did not complete in the browser session; no audible result claimed"],
+      "error": null
+    },
+    {
+      "id": "T10",
+      "title": "Rework Story 1 around the approved single-chassis wireframe",
+      "intent": "Replace the current wide Structure plus narrow Instrument pane composition with one deliberate desktop chassis: full-width status band, dominant full-width score band, and horizontal lower action deck containing the control rail, lesson actions, and compact lower-right visualizer pad.",
+      "ownership": ["src/App.tsx", "src/main.tsx", "src/Workspace.css", "src/theme.css", "src/Device.css", "src/StepGrid.css", "src/BeatPad.css", "src/BeatIndicator.css", "src/TransportControls.css", "src/LayerStack.css", "docs/product/v1.1/EPIC-4-grid-first-workspace.md", "docs/product/v1.1/README.md"],
+      "constraints": ["Keep all 64 columns visible at 1280×720 and 1680×1046.", "Preserve the existing pattern, audio, transport, guidance, bank, and import/export behavior.", "Do not introduce a second desktop implementation or a permanent instrument sidebar.", "Keep the pad secondary and keep guided controls legible rather than globally dimmed.", "Do not stage unrelated .gitignore, lockfile, or preview changes."],
+      "acceptance": "At both target sizes, a clean Compose render matches the approved single-chassis hierarchy: four-zone full-width header, dominant score band with both 32-step cycles, horizontal lower action deck, and compact pad anchored at lower right. Compose, Guided, Paused, and Complete retain their state-specific controls and row emphasis without clipping, hidden core actions, or console errors.",
+      "verify": ["npm run build", "git diff --check", "browser screenshots at 1280×720 and 1680×1046", "browser checks for Compose, Guided, Paused, and Complete", "browser console error/warn check"],
+      "visual": "Compare against the locked wireframe anchors: header info/tempo/branding/metronome, full-width grid, left control rail, centre lesson deck, lower-right pad, and absence of unused vertical sidebar space.",
+      "dependsOn": ["T9"],
+      "status": "completed",
+      "result": "Reworked Story 1 into a single-chassis workstation with a full-width status header, dominant score band, and horizontal lower action deck. The existing guidance, transport, bank, pad, and import/export behavior remains wired through the new shell.",
+      "evidence": ["npm run build (exit 0)", "browser 1280×720: one-column shell, 1248px full-width score, all 64 columns visible, BAR 1 / BAR 2 labels, step 33 divider, horizontal lower deck", "browser 1680×1046: one-column shell, 1632px full-width score, lower-right visualizer pad retained", "browser DOM: Compose → Guided → Complete transitions preserved with Start guidance, Next row, and Restart controls", "source check: existing Guided → Paused and Paused → Guided transport lifecycle preserved in onTogglePlay", "browser console error/warn check: empty", "audio-device check: Tone sample load did not complete in the browser session; no audible result claimed"],
+      "error": null
+    }
+  ]
+}

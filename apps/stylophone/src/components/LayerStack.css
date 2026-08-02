@@ -1,0 +1,197 @@
+/* Guidance panel. Brightness encodes pass state:
+   passed = dim orange, active = bright orange + glow, unreached = grey. A state WORD
+   and a shape (filled/hollow) carry the state without relying on hue alone.
+   Static only — no keyframes, so no reduced-motion handling needed. */
+.layer-stack {
+  min-height: 0;
+  flex: 1 1 auto;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: var(--space-5) var(--space-6);
+  margin-top: var(--space-5);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 44px;
+  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "steps steps utility"
+    "actions primary utility";
+  gap: var(--space-3);
+}
+
+.layer-stack__step-display {
+  min-width: 0;
+  min-height: 0;
+  grid-area: steps;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  overflow: hidden;
+}
+
+.layer-stack__heading {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: 0;
+  max-height: 120px;
+}
+
+.layer-stack__rows {
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.layer-stack__empty {
+  color: var(--text-dim);
+  font-size: 13px;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.layer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-size: 14px;
+  width: 100%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  font: inherit;
+}
+
+button.layer:enabled {
+  cursor: pointer;
+}
+
+button.layer:enabled:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 3px;
+}
+
+@media (hover: hover) {
+  button.layer:enabled:hover {
+    outline: 1px solid currentColor;
+    outline-offset: 3px;
+  }
+}
+
+.layer__dot {
+  flex: 0 0 auto;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+}
+
+.layer__name {
+  flex: 1 1 auto;
+}
+
+.layer__state {
+  flex: 0 0 auto;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* passed: dim orange, hollow dot; passed rows remain enabled redo targets. */
+.layer--passed {
+  color: var(--accent-dim);
+}
+.layer--passed .layer__dot {
+  background: transparent;
+}
+
+/* active: bright orange + glow, filled dot */
+.layer--active {
+  color: var(--accent-bright);
+  text-shadow: 0 0 8px var(--accent-glow);
+}
+.layer--active .layer__dot {
+  background: currentColor;
+}
+
+/* unreached: grey, hollow dot */
+.layer--unreached {
+  color: var(--text-dim);
+}
+.layer--unreached .layer__dot {
+  background: transparent;
+}
+
+.layer-stack__utility {
+  grid-area: utility;
+  display: flex;
+  justify-content: flex-end;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.layer-stack__utility-button {
+  flex: 0 0 44px;
+}
+
+.layer-stack__utility-button--reset {
+  color: var(--text-dim);
+  opacity: 0.7;
+}
+
+.layer-stack__utility-icon {
+  display: block;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+  pointer-events: none;
+}
+
+.layer-stack__actions {
+  grid-area: actions;
+  display: flex;
+  min-width: 0;
+  gap: var(--space-3);
+}
+
+.layer-stack__actions .tbtn {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.layer-stack__primary {
+  grid-area: primary;
+  min-width: 0;
+}
+
+.layer-stack__primary-button {
+  width: 100%;
+}
+
+@media (max-width: 1100px) {
+  .layer-stack {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 44px;
+    grid-template-areas:
+      "steps steps utility"
+      "actions primary utility";
+  }
+
+  .layer-stack__utility {
+    flex-direction: column;
+  }
+}
+
+.guidance-notice {
+  margin: var(--space-3) 0 0;
+  color: var(--accent-bright);
+  font-size: 12px;
+}

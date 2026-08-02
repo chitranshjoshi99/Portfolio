@@ -1,0 +1,70 @@
+{
+  "requirement": "EPIC 1 Story 2 — while playing, queue pattern selection and atomically swap audio, grid, and active-slot state at the next loop boundary; rapid choices are latest-wins.",
+  "repo": "Stylophone (Beats Drum Machine Coach) — v1.4",
+  "checkpointEvery": 3,
+  "approvalCheckpoints": false,
+  "story": "Net tracker: EPIC 1 #2 — Queue loop-boundary swap (High, Priority 3).",
+  "architecture": {
+    "decision": "The story is implemented by the committed usePatternBank/useTransportEngine seam from EPIC 1 Story 1: commitQueuedSlot swaps activePatternRef synchronously at s === 0 inside the existing onStepAudio subscriber, before the pattern is read for scheduling; React active-slot state follows in the same tick.",
+    "alternatives": [
+      "Switch in the visual onStep callback: rejected because it runs after audio scheduling.",
+      "Register a separate audio subscriber for switching: rejected because correctness would depend on Set insertion order."
+    ],
+    "tradeoffs": [
+      "Story 1 introduced the full seam so authoring and playback could share one bank; Story 2 adds no duplicate implementation.",
+      "The selected slot is visible as queued immediately, while the active slot remains unchanged until step 0."
+    ],
+    "seams": [
+      "src/hooks/usePatternBank.ts owns queuedSlotRef, activePatternRef, and commitQueuedSlot.",
+      "src/hooks/useTransportEngine.ts calls commitQueuedSlot as the first operation inside onStepAudio when s === 0.",
+      "The existing transport callback order fires audio subscribers before visual subscribers."
+    ]
+  },
+  "tasks": [
+    {
+      "id": "S2-T1",
+      "title": "Audit the committed boundary-swap seam",
+      "intent": "Confirm the implementation matches the locked F4 ordering and that latest queued selection is the only state committed at the loop boundary.",
+      "files": ["src/hooks/usePatternBank.ts", "src/hooks/useTransportEngine.ts", "src/lib/transport.ts"],
+      "constraints": "Do not move switching to visual onStep, add a second subscriber, or introduce another audio engine; preserve synchronous ref replacement and no-op behavior when nothing is queued.",
+      "acceptance": "The bank owns active/queued refs; commitQueuedSlot clears the queue, changes active state/ref together, and the audio callback invokes it before reading patternRef.current at s === 0.",
+      "verify": ["rg -n 'commitQueuedSlot|onStepAudio|if \\(s === 0\\)' src/hooks/usePatternBank.ts src/hooks/useTransportEngine.ts src/lib/transport.ts"],
+      "visual": null,
+      "dependsOn": [],
+      "status": "done",
+      "result": "Audit passed in commit fb71041: commitQueuedSlot updates refs/state before the pattern read; queuedSlotRef gives latest-wins semantics; transport audio subscribers precede visual subscribers.",
+      "evidence": ["Committed source inspection"],
+      "error": null
+    },
+    {
+      "id": "S2-T2",
+      "title": "Run build and regression checks",
+      "intent": "Ensure the boundary implementation remains type-safe and does not regress the four-slot persistence or UI integration.",
+      "files": [],
+      "constraints": "Preserve unrelated app-screenshot.png; no code changes unless a real gate failure appears.",
+      "acceptance": "Diff check and production build pass with no TypeScript errors.",
+      "verify": ["git diff --check", "npm run build"],
+      "visual": null,
+      "dependsOn": ["S2-T1"],
+      "status": "done",
+      "result": "Build and diff gates passed; the existing committed bank/transport implementation remains type-safe and preserves four-slot integration.",
+      "evidence": ["git diff --check", "npm run build (tsc + vite, 1034 modules)"],
+      "error": null
+    },
+    {
+      "id": "S2-T3",
+      "title": "Verify stopped, queued, and latest-wins playback behavior",
+      "intent": "Prove the player-facing acceptance in the running browser, including actual transport playback and zero runtime errors.",
+      "files": [],
+      "constraints": "Start the real transport; verify stopped selection is immediate, playing selection leaves active state unchanged until the boundary, rapid 2→3→4 activates only 4, and audio/grid/active state update together.",
+      "acceptance": "Browser checks pass for immediate stopped switching, visible queued state, next-boundary activation, latest-wins selection, and no console errors.",
+      "verify": [],
+      "visual": "Run the Vite app, inspect the slot controls, start playback, queue 2→3→4, observe queued 4 then active 4 after the step-0 boundary, and capture evidence.",
+      "dependsOn": ["S2-T2"],
+      "status": "done",
+      "result": "Browser acceptance passed: stopped selection changed immediately; real transport playback kept active 1 while showing Queued 4 after rapid 2→3→4; the next loop boundary activated slot 4 and cleared the queue; playback stopped cleanly with zero console errors.",
+      "evidence": ["Browser stopped selection: active slot 2 then active slot 1", "Browser pre-boundary: Queued 2 · active 1 and then Queued 4 · active 1", "Browser post-boundary: active slot 4 and no queued status", "Browser console error count: 0", "Browser screenshots captured before and after the boundary"],
+      "error": null
+    }
+  ]
+}

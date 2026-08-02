@@ -1,0 +1,130 @@
+{
+  "requirement": "Implement all Epic 2 stories: replace the legacy lesson library with one safe local v1.1 draft, strict JSON interchange, and a manual-only active workspace.",
+  "workspace": "/Users/chitranshjoshi/Work/Stylophone",
+  "checkpointEvery": 3,
+  "approvalCheckpoints": false,
+  "architecture": {
+    "decision": "Introduce a strict PatternDocument boundary over the existing in-memory Pattern. The active UI owns one document and persists it only through a single v1.1 draft key; import is fully parsed and validated before any replacement.",
+    "alternatives": [
+      "Adapt the legacy Lesson schema and multi-record lesson index for v1.1.",
+      "Persist reactive editor state directly as separate localStorage values."
+    ],
+    "tradeoffs": [
+      "A dedicated document boundary makes export, import, validation, and dirty comparison exact and keeps transient UI/audio state out of storage.",
+      "Replacing rather than migrating the old library intentionally rejects legacy documents and removes catalogue behavior."
+    ],
+    "seams": [
+      "src/document.ts owns v1.1 document construction, validation, serialization, and equality.",
+      "src/storage.ts owns only the stylophone-beat:v1.1:draft browser key.",
+      "src/DraftPanel.tsx and src/App.tsx own safe user actions, dirty confirmation, and atomic UI replacement.",
+      "The legacy source, reduction, lesson, and sidecar files remain in the repository but are not reachable from the rendered app."
+    ]
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Record Epic 2 Story 1 as in progress",
+      "intent": "Synchronize the Epic and net trackers with the durable execution plan before implementation begins.",
+      "ownership": ["docs/product/v1.1/README.md", "docs/product/v1.1/EPIC-2-durable-local-pattern.md", "docs/executions/v1.1/EPIC-2-durable-local-pattern.json"],
+      "constraints": ["Preserve all completed Epic 1 tracker rows."],
+      "acceptance": "Both trackers show Epic 2 Story 1 In progress and the plan is valid JSON.",
+      "verify": ["node -e \"JSON.parse(require('fs').readFileSync('docs/executions/v1.1/EPIC-2-durable-local-pattern.json','utf8'))\"", "rg -n \"One local draft.*In progress\" docs/product/v1.1"],
+      "visual": null,
+      "dependsOn": [],
+      "status": "completed",
+      "result": "Marked Epic 2 Story 1 In progress in both trackers and created the durable seven-task execution queue.",
+      "evidence": ["node JSON.parse plan check (exit 0)", "tracker rg check (exit 0)", "git diff --check (exit 0)"],
+      "error": null
+    },
+    {
+      "id": "T2",
+      "title": "Add strict v1.1 document and single-draft persistence APIs",
+      "intent": "Define the exact schema v3 document boundary, its safe import/export contract, and the one local browser draft key.",
+      "ownership": ["src/document.ts", "src/storage.ts"],
+      "constraints": ["Reject schemas 1 and 2; do not migrate.", "Limit parsed input to 512 KiB.", "Accept exactly 12 known pad lanes of 64 booleans and valid non-overlapping bass starts.", "Never mutate parsed input or stored data in place."],
+      "acceptance": "Document creation, deep equality, Blob export, strict parse validation, and load/save/clear draft functions satisfy the Epic API contracts; invalid input leaves no storage mutation.",
+      "verify": ["npm run build", "node/tsx pure document self-check harness"],
+      "visual": null,
+      "dependsOn": ["T1"],
+      "status": "completed",
+      "result": "Added the strict copied schema-v3 PatternDocument boundary and one-key draft APIs; legacy storage exports remain only until the active UI replacement.",
+      "evidence": ["npm run build (exit 0)", "strict document and simulated localStorage harness (exit 0)", "git diff --check (exit 0)"],
+      "error": null
+    },
+    {
+      "id": "T3",
+      "title": "Replace the active lesson library with a durable single-draft workflow",
+      "intent": "Restore the local draft on load, save editor changes, accurately track dirty state, and require explicit New/Reset replacement decisions.",
+      "ownership": ["src/App.tsx", "src/DraftPanel.tsx", "src/LessonLibrary.tsx", "src/LessonLibrary.css"],
+      "constraints": ["Export and Cancel are offered before a dirty destructive action.", "New/Reset creates a new UUID and default title.", "Clearly describe browser-storage loss risk and export backup.", "Keep the grid and audio behavior intact."],
+      "acceptance": "A saved draft restores after reload; New/Reset cannot discard unsaved edits without explicit confirmation; no multi-lesson list, load, or delete flow remains reachable.",
+      "verify": ["npm run build", "clean-reload browser draft and dirty-confirmation interaction check"],
+      "visual": "Use the local desktop UI to save, reload, edit, and invoke New/Reset; inspect the utility dialog and browser console.",
+      "dependsOn": ["T2"],
+      "status": "completed",
+      "result": "Replaced the active multi-lesson library with one guarded local draft, document-based dirty state, export backup, and in-app replacement confirmation.",
+      "evidence": ["npm run build (exit 0)", "git diff --check (exit 0)", "clean reload browser: edited step 1 persisted (aria-pressed=true; is-filled)", "browser console errors/warnings: none"],
+      "error": null
+    },
+    {
+      "id": "T4",
+      "title": "Add atomic v1.1 JSON import and export interactions",
+      "intent": "Expose safe title-based export and strict import through the draft utility without corrupting the current editor on failure.",
+      "ownership": ["src/DraftPanel.tsx", "src/App.tsx", "src/document.ts"],
+      "constraints": ["Validate a complete candidate before React state or local storage replacement.", "Confirm dirty replacement.", "Reject non-JSON extension as a convenience check while treating contents as authoritative.", "Do not use innerHTML."],
+      "acceptance": "A valid exported document round-trips exactly; invalid JSON, legacy 32-step document, oversize file, invalid pad/bank, and overlap show recoverable errors and retain the current draft.",
+      "verify": ["npm run build", "pure parse rejection harness", "browser import/export interaction check"],
+      "visual": "Inspect status/error feedback in the draft dialog after valid and invalid imports.",
+      "dependsOn": ["T3"],
+      "status": "completed",
+      "result": "Added strict extension/size gating, parse-before-mutation import, recoverable errors, and storage-first atomic v3 replacement while preserving export backups.",
+      "evidence": ["npm run build (exit 0)", "document rejection self-check (exit 0)", "export→parse exact equality harness (exit 0)", "git diff --check (exit 0)"],
+      "error": null
+    },
+    {
+      "id": "T5",
+      "title": "Mark Story 1 and Story 2 complete",
+      "intent": "Run the relevant regression gates and update both trackers only after durable drafting and interchange are verified.",
+      "ownership": ["docs/product/v1.1/README.md", "docs/product/v1.1/EPIC-2-durable-local-pattern.md", "docs/executions/v1.1/EPIC-2-durable-local-pattern.json"],
+      "constraints": ["Do not claim audible output without an output-device check."],
+      "acceptance": "Stories 1 and 2 trackers are Done with recorded build, pure-check, and browser evidence.",
+      "verify": ["npm run build", "git diff --check"],
+      "visual": "Review the utility dialog on a clean local reload.",
+      "dependsOn": ["T4"],
+      "status": "completed",
+      "result": "Marked Stories 1 and 2 Done in both v1.1 trackers after build, strict-document, browser reload, and diff checks.",
+      "evidence": ["npm run build (exit 0)", "tracker rg checks (exit 0)", "git diff --check (exit 0)"],
+      "error": null
+    },
+    {
+      "id": "T6",
+      "title": "Remove the generator and source workflow from the active workspace",
+      "intent": "Make manual grid authoring the only rendered creation path while retaining legacy source and sidecar files in the repository.",
+      "ownership": ["src/App.tsx"],
+      "constraints": ["Do not delete legacy files.", "Do not start or expose the sidecar.", "Do not leave an upload or localhost-processing launcher in the rendered app."],
+      "acceptance": "No SourcePanel, reduction route, upload control, or active localhost processing call is reachable from the app; production build succeeds with no sidecar running.",
+      "verify": ["npm run build", "rg -n \"SourcePanel|processSource|reduction\" src/App.tsx", "clean-reload browser UI check"],
+      "visual": "Inspect the desktop workspace and utility controls for the absence of source/generator UI.",
+      "dependsOn": ["T5"],
+      "status": "completed",
+      "result": "Removed SourcePanel, reduction plumbing, source launcher, and source modal from App; retained legacy files and the Draft/Backup utility.",
+      "evidence": ["npm run build (exit 0)", "active-surface rg scan: no SourcePanel/processSource/reduction/upload/source references", "git diff --check (exit 0)"],
+      "error": null
+    },
+    {
+      "id": "T7",
+      "title": "Verify Epic 2 and close its trackers",
+      "intent": "Perform final build, diff, and desktop UI checks, then mark Story 3 and the Epic execution plan complete.",
+      "ownership": ["docs/product/v1.1/README.md", "docs/product/v1.1/EPIC-2-durable-local-pattern.md", "docs/executions/v1.1/EPIC-2-durable-local-pattern.json"],
+      "constraints": ["Preserve unrelated worktree changes and do not commit without authorization."],
+      "acceptance": "All Epic 2 stories show Done, build/diff checks pass, browser evidence covers the strict draft workflow and manual-only workspace, and the durable plan records each completed task.",
+      "verify": ["npm run build", "git diff --check", "node document regression harness"],
+      "visual": "Clean desktop reload verifies a saved draft, safe utilities, recoverable import errors, and no generator UI.",
+      "dependsOn": ["T6"],
+      "status": "completed",
+      "result": "Epic 2 passed final build, static surface scan, clean-reload draft persistence, and Draft/Backup import control checks; all three stories are closed.",
+      "evidence": ["npm run build (exit 0)", "git diff --check (exit 0)", "clean local browser: source launcher absent, Draft/Backup present, one JSON file input present, edited step restored after reload", "browser console errors/warnings: none"],
+      "error": null
+    }
+  ]
+}

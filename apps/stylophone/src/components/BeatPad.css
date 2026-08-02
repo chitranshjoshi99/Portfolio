@@ -1,0 +1,223 @@
+/* Brightness encodes state (locked rule): dim surface idle, orange when
+   hover/focus/active. */
+.beatpad {
+  display: block;
+  user-select: none;
+  touch-action: manipulation;
+  /* The 320 viewBox scales to fit, but never below 300px: at that floor a
+     half-step key is still 44 CSS px in both its radial depth and its arc. */
+  /* width: 100%; */
+  min-width: 300px;
+  max-width: 360px;
+  height: auto;
+}
+
+/* A bass slide owns the contact for its entire duration. Keep native scrolling
+   from cancelling the captured touch halfway across the wedges. */
+.beatpad--bass {
+  touch-action: none;
+}
+
+.beatpad--control {
+  touch-action: manipulation;
+}
+
+.beatpad--control .beatpad__wedge {
+  cursor: crosshair;
+}
+
+.beatpad--control .beatpad__wedge.is-control .beatpad__slice {
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+
+.beatpad--control .beatpad__wedge.is-inert {
+  opacity: 0.28;
+  cursor: not-allowed;
+}
+
+.beatpad--control .beatpad__wedge.is-inert .beatpad__slice {
+  stroke: var(--edge);
+}
+
+.beatpad__wedge {
+  cursor: pointer;
+  outline: none;
+}
+
+.beatpad__slice {
+  fill: var(--surface);
+  stroke: var(--edge);
+  stroke-width: 1;
+  transition:
+    fill var(--dur-fast) ease,
+    filter var(--dur-fast) ease;
+}
+
+/* Half-steps read as black piano keys sunk between two naturals. Same
+   specificity as the base rule, so source order carries it — and the state
+   rules below (0,2,0) still win over it. */
+.beatpad__slice--half {
+  fill: var(--bg-2);
+  stroke: var(--surface-2);
+  stroke-width: 2;
+}
+
+.beatpad__wedge:focus-visible .beatpad__slice {
+  fill: var(--accent-dim);
+  filter: drop-shadow(0 0 6px var(--accent-dim));
+}
+
+@media (hover: hover) {
+  .beatpad__wedge:hover .beatpad__slice {
+    fill: var(--accent-dim);
+    filter: drop-shadow(0 0 6px var(--accent-dim));
+  }
+}
+
+/* DRUMS is a discrete tap, so the browser's own :active is the right cue. In
+   BASS the pointer is captured for the whole slide, which pins :active to the
+   key the gesture started on — there, is-live (driven by the same coordinates
+   as the audio) is the only honest cue, so :active is suppressed. */
+.beatpad:not(.beatpad--bass) .beatpad__wedge:active .beatpad__slice,
+.beatpad__wedge.is-live .beatpad__slice {
+  fill: var(--accent-bright);
+  filter: drop-shadow(0 0 10px var(--accent-glow));
+}
+
+.beatpad__wedge.is-live .beatpad__label {
+  fill: var(--bg);
+}
+
+.beatpad__label {
+  fill: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.beatpad__wedge:focus-visible .beatpad__label,
+.beatpad:not(.beatpad--bass) .beatpad__wedge:active .beatpad__label {
+  fill: var(--bg);
+}
+
+@media (hover: hover) {
+  .beatpad__wedge:hover .beatpad__label {
+    fill: var(--bg);
+  }
+}
+
+/* Sequenced grid events project onto their exact physical pad. This is below
+   lesson and hit states so those more specific teaching signals still win. */
+.beatpad__wedge.is-sequenced .beatpad__slice {
+  fill: var(--accent);
+  stroke: var(--accent-bright);
+  stroke-width: 3;
+  filter: drop-shadow(0 0 8px var(--accent-glow));
+}
+
+.beatpad__wedge.is-sequenced .beatpad__label {
+  fill: var(--bg);
+}
+
+/* Cue: hit-now look. Reads by brightness + ring (shape), not hue alone. */
+.beatpad__wedge.is-cued .beatpad__slice {
+  fill: var(--accent-bright);
+  filter: drop-shadow(0 0 10px var(--accent-glow));
+  stroke: var(--accent-bright);
+  stroke-width: 3;
+}
+
+.beatpad__wedge.is-cued .beatpad__label {
+  fill: var(--bg);
+}
+
+/* Pulse variant animates the glow; echo relies on the static base rule. */
+.beatpad__wedge.is-cued--pulse .beatpad__slice {
+  animation: pad-cue-pulse var(--dur-pulse) ease-in-out infinite;
+}
+
+@keyframes pad-cue-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 6px var(--accent-glow));
+  }
+  50% {
+    filter: drop-shadow(0 0 16px var(--accent-glow));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beatpad__slice {
+    transition: none;
+  }
+
+  .beatpad__wedge.is-cued--pulse .beatpad__slice {
+    animation: none;
+  }
+}
+
+/* Hit confirm: green flash. Reads by hue + ring (shape) + pop motion.
+   Placed after is-cued so it wins by source order when both are present. */
+.beatpad__wedge.is-hit .beatpad__slice,
+.beatpad__wedge.is-cued.is-hit .beatpad__slice {
+  fill: var(--hit);
+  stroke: var(--hit);
+  stroke-width: 3;
+  filter: drop-shadow(0 0 12px var(--hit-glow));
+  animation: pad-hit-flash var(--dur-flash) ease-out;
+}
+
+.beatpad__wedge.is-hit .beatpad__label {
+  fill: var(--bg);
+}
+
+@keyframes pad-hit-flash {
+  0% {
+    filter: drop-shadow(0 0 20px var(--hit-glow));
+    transform: scale(1.06);
+  }
+  100% {
+    filter: drop-shadow(0 0 12px var(--hit-glow));
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beatpad__wedge.is-hit .beatpad__slice {
+    animation: none;
+  }
+}
+
+/* Miss confirm: red flash + dashed rim distinguish a wrong or late practice
+   tap from both the orange next-hit cue and the green success verdict. */
+.beatpad__wedge.is-miss .beatpad__slice,
+.beatpad__wedge.is-cued.is-miss .beatpad__slice {
+  fill: var(--miss);
+  stroke: var(--miss);
+  stroke-width: 3;
+  stroke-dasharray: 5 3;
+  filter: drop-shadow(0 0 12px var(--miss-glow));
+  animation: pad-miss-flash var(--dur-flash) ease-out;
+}
+
+.beatpad__wedge.is-miss .beatpad__label {
+  fill: var(--bg);
+}
+
+@keyframes pad-miss-flash {
+  0% {
+    filter: drop-shadow(0 0 20px var(--miss-glow));
+    transform: scale(0.96);
+  }
+  100% {
+    filter: drop-shadow(0 0 12px var(--miss-glow));
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beatpad__wedge.is-miss .beatpad__slice {
+    animation: none;
+  }
+}

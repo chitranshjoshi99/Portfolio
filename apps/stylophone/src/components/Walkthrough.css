@@ -1,0 +1,64 @@
+.walkthrough {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.walkthrough__highlight {
+  position: fixed;
+  border-radius: 10px;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.78);
+  transition: top var(--dur-base) ease, left var(--dur-base) ease, width var(--dur-base) ease, height var(--dur-base) ease;
+  pointer-events: none;
+}
+
+.walkthrough__highlight--instant {
+  transition: none;
+}
+
+.walkthrough__caption {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  max-width: 320px;
+  background: var(--surface);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius);
+  padding: var(--space-7);
+  color: var(--text);
+  pointer-events: auto;
+}
+
+.walkthrough__caption--top {
+  top: 24px;
+  bottom: auto;
+}
+
+.walkthrough__step-count {
+  margin: 0 0 var(--space-3);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.walkthrough__copy {
+  margin: 0 0 var(--space-5);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.walkthrough__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
+/* The highlight's travel is purely spatial; snapping it to each step's target
+   keeps the cue (the cut-out still moves) without the slide. */
+@media (prefers-reduced-motion: reduce) {
+  .walkthrough__highlight {
+    transition: none;
+  }
+}
