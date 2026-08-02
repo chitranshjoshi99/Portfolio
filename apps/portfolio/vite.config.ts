@@ -7,10 +7,21 @@ import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 import blogsPlugin from "./vite-plugin-blogs.mjs";
 import path from "path";
 
+const siteUrl = (process.env.VITE_SITE_URL ?? "https://chitransh.dev").replace(
+  /\/+$/,
+  "",
+);
+
 export default defineConfig({
   root: __dirname,
   publicDir: "public",
   plugins: [
+    {
+      name: "site-url-fallback",
+      transformIndexHtml(html) {
+        return html.replaceAll("%VITE_SITE_URL%", siteUrl);
+      },
+    },
     // MDX must run before the React (SWC) plugin
     {
       enforce: "pre",
