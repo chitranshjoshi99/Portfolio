@@ -6,7 +6,6 @@ import "./style.css";
 import { asset } from "@/assets";
 
 const NAV_LINKS = [
-  { to: "/", label: "> HOME", key: "home" },
   { to: "/about", label: "> ABOUT", key: "about" },
   { to: "/labs", label: "> LABS", key: "labs" },
   { to: "/apps", label: "> APPS", key: "apps" },

@@ -11,12 +11,16 @@ re-derive them from the code.
 ## What this project is
 
 Chitransh Joshi's Nx workspace. The portfolio is a React 18 + Vite + SWC +
-TypeScript app with four routes: Home (`/`), About (`/about`), Labs (`/labs`),
-Contact (`/contact`). Design language is pixel-art, muted palette, dark/light theme.
-The workspace also contains the standalone static Learn Python app.
+TypeScript app with routes for Home (`/`), About (`/about`), Labs (`/labs`),
+Apps (`/apps`), Blogs (`/blogs`), and Contact (`/contact`). Design language is
+pixel-art, muted palette, dark/light theme. The workspace also contains the
+standalone static Learn Python app and the Stylophone React app.
 
 Published workspace apps are configured in `apps/catalog.json`. The Vercel
 build bundles the portfolio at `/` and each catalogue entry at `/apps/<slug>/`.
+
+The Navbar's CJ logo is the home link; do not add a separate HOME navigation
+entry unless the navigation layout is intentionally redesigned.
 
 ---
 
