@@ -7,6 +7,13 @@
       "runtimeArgs": ["run", "dev"],
       "port": 5173,
       "autoPort": true
+    },
+    {
+      "name": "interview",
+      "runtimeExecutable": "node_modules/.bin/vite",
+      "runtimeArgs": ["--config", "apps/interview/vite.config.ts"],
+      "port": 5174,
+      "autoPort": true
     }
   ]
 }

@@ -8,6 +8,7 @@
     "dev:portfolio": "nx serve portfolio",
     "dev:learn-python": "nx serve learn-python",
     "dev:stylophone": "nx serve stylophone",
+    "dev:interview": "nx serve interview",
     "new:blog": "node scripts/new-blog.mjs",
     "gen:blogs": "node scripts/gen-blog-manifest.mjs",
     "build": "node scripts/build-vercel.mjs",

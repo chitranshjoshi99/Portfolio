@@ -10,6 +10,7 @@
     { "source": "/apps/", "destination": "/api/page?route=apps" },
     { "source": "/apps/:app", "destination": "/apps/:app/index.html" },
     { "source": "/apps/:app/", "destination": "/apps/:app/index.html" },
+    { "source": "/apps/:app/(.*)", "destination": "/apps/:app/index.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

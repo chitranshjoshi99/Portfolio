@@ -1,0 +1,107 @@
+.explorer {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  max-width: 560px;
+}
+
+.explorer__tree,
+.explorer__children {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.explorer__children {
+  margin-left: 14px;
+  padding-left: 10px;
+  border-left: 1px solid var(--border);
+}
+
+.explorer__node {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.explorer__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 6px;
+  padding: 2px 6px;
+  min-height: 30px;
+}
+
+.explorer__row:hover {
+  background: var(--surface-hover);
+}
+
+.explorer__label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: 0;
+  color: inherit;
+  padding: 0;
+  text-align: left;
+}
+
+.explorer__chevron {
+  width: 12px;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.explorer__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.explorer__actions {
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.1s ease;
+}
+
+.explorer__row:hover .explorer__actions,
+.explorer__actions:focus-within {
+  opacity: 1;
+}
+
+.explorer__actions button {
+  background: none;
+  border: 0;
+  border-radius: 4px;
+  padding: 2px 5px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.explorer__actions button:hover {
+  background: var(--border);
+}
+
+.explorer__input {
+  flex: 1;
+  background: var(--bg);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  padding: 3px 8px;
+}
+
+.explorer__error {
+  color: #f85149;
+  font-size: 13px;
+  margin-top: 10px;
+}
