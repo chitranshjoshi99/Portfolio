@@ -31,7 +31,7 @@
 
 .apps-index__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: 1fr 1fr;
   gap: var(--px4);
   margin-top: var(--px8);
   list-style: none;
