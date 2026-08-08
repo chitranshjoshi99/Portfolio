@@ -15,6 +15,14 @@
       "label": "MUSIC · 64-STEP · TONE.JS",
       "description": "Compose drum and bass grooves, see every hit on a Stylophone-inspired pad, and practise with guided lessons.",
       "accent": "#ff9f2e"
+    },
+    {
+      "project": "interview",
+      "slug": "interview",
+      "name": "Frontend Interview Prep",
+      "label": "REACT · DRILLS · A11Y",
+      "description": "Frontend interview drills — file explorer, feedback queue, typeahead and URL shortener, each with a build guide.",
+      "accent": "#7ee787"
     }
   ]
 }

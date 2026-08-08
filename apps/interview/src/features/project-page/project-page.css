@@ -1,0 +1,46 @@
+.project-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+}
+
+.project-page__header {
+  margin-bottom: 24px;
+}
+
+.project-page__back {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.project-page__back:hover {
+  color: var(--accent);
+}
+
+.project-page__title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.project-page__title {
+  font-size: 24px;
+  letter-spacing: -0.02em;
+}
+
+/* Same first-line centring as the card. */
+.project-page__guide {
+  margin-top: 5px;
+}
+
+.project-page__description {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.project-page__loading,
+.placeholder {
+  color: var(--text-muted);
+}

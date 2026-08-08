@@ -4,7 +4,7 @@ This file is read by Claude at the start of every session. It captures
 architecture decisions, conventions, and gotchas so you don't have to
 re-derive them from the code.
 
-**Last updated:** 2026-08-02
+**Last updated:** 2026-08-08
 
 ---
 
@@ -14,10 +14,17 @@ Chitransh Joshi's Nx workspace. The portfolio is a React 18 + Vite + SWC +
 TypeScript app with routes for Home (`/`), About (`/about`), Labs (`/labs`),
 Apps (`/apps`), Blogs (`/blogs`), and Contact (`/contact`). Design language is
 pixel-art, muted palette, dark/light theme. The workspace also contains the
-standalone static Learn Python app and the Stylophone React app.
+standalone static Learn Python app, the Stylophone React app, and the Frontend
+Interview Prep React app (`apps/interview`).
 
 Published workspace apps are configured in `apps/catalog.json`. The Vercel
 build bundles the portfolio at `/` and each catalogue entry at `/apps/<slug>/`.
+
+**Sub-app that has its own router** (currently only `interview`): it must pass
+`basename={import.meta.env.BASE_URL}` to `BrowserRouter` so its routes resolve
+under `/apps/<slug>/`, and `vercel.json` needs the
+`/apps/:app/(.*) → /apps/:app/index.html` rewrite (already there) so deep links
+don't fall through to the portfolio SPA.
 
 The Navbar's CJ logo is the home link; do not add a separate HOME navigation
 entry unless the navigation layout is intentionally redesigned.
@@ -637,6 +644,7 @@ SWC react plugin) + `@mdx-js/react` + `remark-gfm` + **`remark-frontmatter`**
 ```bash
 pnpm dev                       # portfolio dev server on :5173
 pnpm dev:learn-python          # Learn Python dev server
+pnpm dev:interview             # Frontend Interview Prep dev server
 pnpm build                     # portfolio build → dist/apps/portfolio
 pnpm nx build learn-python     # Learn Python build → dist/apps/learn-python
 pnpm build:all                 # build every Nx app

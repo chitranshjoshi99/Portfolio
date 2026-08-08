@@ -1,0 +1,137 @@
+.ta {
+  max-width: 520px;
+}
+
+.ta__combo {
+  position: relative;
+}
+
+.ta__input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font: inherit;
+  font-size: 15px;
+  padding: 11px 38px 11px 14px;
+}
+
+.ta__input:focus-visible {
+  border-color: var(--accent);
+}
+
+.ta__clear {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1;
+  padding: 4px 6px;
+}
+
+.ta__clear:hover {
+  color: var(--text);
+}
+
+.ta__list {
+  position: absolute;
+  z-index: 2;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 320px;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 28px rgb(0 0 0 / 45%);
+  padding: 4px;
+}
+
+.ta__option {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  padding: 8px 10px;
+}
+
+/* Highlight follows the keyboard, not the mouse hover state alone. */
+.ta__option--active {
+  background: var(--surface-hover);
+  outline: 1px solid var(--accent);
+}
+
+.ta__option-name {
+  font-size: 14px;
+}
+
+.ta__option-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  color: var(--text-muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.ta__option-pop {
+  color: var(--border);
+}
+
+.ta__mark {
+  background: none;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.ta__status {
+  color: var(--text-muted);
+  font-size: 13px;
+  padding: 12px 10px;
+  text-align: center;
+}
+
+.ta__status--error {
+  color: #f85149;
+}
+
+.ta__hint {
+  color: var(--text-muted);
+  font-size: 12px;
+  min-height: 18px;
+  margin-top: 8px;
+}
+
+.ta__selected {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  font-size: 14px;
+  padding: 12px 14px;
+}
+
+.ta__selected strong {
+  color: var(--text);
+}
+
+.ta__selected-pop {
+  margin-left: auto;
+  font-size: 12px;
+}
+
+.ta__stats {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin-top: 12px;
+}
