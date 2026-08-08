@@ -1,4 +1,4 @@
-// Scaffolds a new blog post: writes src/blogs/posts/<slug>.mdx with frontmatter
+// Scaffolds a new blog post in the portfolio app with frontmatter
 // boilerplate so the listing/routing/edge-sync all pick it up automatically.
 //
 //   pnpm new:blog --title "My code gen blog"
@@ -49,7 +49,7 @@ if (!slug) {
 const file = path.join(POSTS_DIR, `${slug}.mdx`);
 if (fs.existsSync(file)) {
   console.error(
-    `Refusing to overwrite existing post: src/blogs/posts/${slug}.mdx`,
+    `Refusing to overwrite existing post: apps/portfolio/src/blogs/posts/${slug}.mdx`,
   );
   process.exit(1);
 }
@@ -86,7 +86,7 @@ const content =
 
 fs.writeFileSync(file, content);
 console.log(
-  `Created src/blogs/posts/${slug}.mdx (order ${fm.order}).\n` +
+  `Created apps/portfolio/src/blogs/posts/${slug}.mdx (order ${fm.order}).\n` +
     `Next: fill in the frontmatter + body. The listing picks it up automatically; ` +
     `run \`pnpm gen:blogs\` (or any build) to sync the edge crawler.`,
 );

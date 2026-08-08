@@ -1,17 +1,20 @@
 {
-  "name": "chitransh-portfolio",
+  "name": "chitransh-dev",
   "private": true,
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "nx serve portfolio",
+    "dev:portfolio": "nx serve portfolio",
+    "dev:learn-python": "nx serve learn-python",
+    "dev:stylophone": "nx serve stylophone",
     "new:blog": "node scripts/new-blog.mjs",
     "gen:blogs": "node scripts/gen-blog-manifest.mjs",
-    "predev": "node scripts/gen-blog-manifest.mjs",
-    "prebuild": "node scripts/gen-blog-manifest.mjs",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview",
+    "build": "node scripts/build-vercel.mjs",
+    "build:portfolio": "nx build portfolio",
+    "build:all": "nx run-many -t build",
+    "lint": "nx run portfolio:lint",
+    "preview": "nx run portfolio:preview",
     "prepare": "git config core.hooksPath .githooks || true"
   },
   "dependencies": {
@@ -23,7 +26,8 @@
     "react-router-dom": "^6.26.2",
     "remark-frontmatter": "^5.0.0",
     "remark-gfm": "^4.0.1",
-    "remark-mdx-frontmatter": "^5.0.0"
+    "remark-mdx-frontmatter": "^5.0.0",
+    "tone": "^15.1.22"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
@@ -38,6 +42,7 @@
     "gh-pages": "^6.3.0",
     "globals": "^15.9.0",
     "gray-matter": "^4.0.3",
+    "nx": "^23.1.1",
     "typescript": "^5.5.3",
     "vercel": "^54.14.0",
     "vite": "^5.4.1"

@@ -1,0 +1,55 @@
+{
+  "requirement": "EPIC-4 story 4.3 — Hit/miss highlight: during a lesson, when the learner taps a pad, compare the tap's TRANSPORT time to the nearest active-layer target for that pad within a fixed tolerance window. On a hit (right pad, near the beat) flash the wedge GREEN; on a miss (off-beat or wrong pad) do nothing. Transport-time based so it stays honest at any BPM. No score kept.",
+  "repo": "Stylophone (Stylophone Beat Coach)",
+  "checkpointEvery": 3,
+  "architecture": {
+    "decision": "Reuse the cue's target model. The hit check is pure logic over (target step list, current fractional step, tolerance) with loop wraparound — put it in a small pure `src/hit.ts` module with a selfcheck (matches pattern.ts/teaching.ts convention). The only Transport-dependent piece is reading the current fractional 16th-step, added as `transport.currentStep16()`. App computes the tapped pad's target steps for the CURRENT layer exactly as the 4.2 cue does (drums: padDrum(padId) sound → its hit steps; bass: steps where bass[s].pad===padId), calls isHit, and flashes the wedge green. GREEN is the one deliberate exception to the single-orange accent — it is the locked hit/miss feedback color; pair it with motion/shape (flash/scale) so it is not color-alone, and keep a static green under reduced-motion.",
+    "seams": [
+      "src/hit.ts pure: `nearestStepDistance(targets: number[], now: number, loopSteps=32): number` (min circular distance, Infinity if no targets) and `isHit(targets: number[], now: number, tol: number, loopSteps=32): boolean`. + `_selfcheck`. Pure, testable, no Tone/DOM.",
+      "transport.currentStep16(): number — current position in fractional 16th-steps (0..loopSteps) read from the Tone.Transport clock (ticks/PPQ), wall-clock independent. Only Transport-dependent piece.",
+      "BeatPad presentational: `hitPad?: PadId | null` adds an `is-hit` class → green flash. Independent of the existing cuedPad/cueStyle cue. Reduced-motion keeps a static green (mirror the cue's reduced-motion approach)."
+    ],
+    "adr": null
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Add pure hit.ts (nearestStepDistance/isHit + selfcheck) and transport.currentStep16",
+      "intent": "The testable core of hit detection: a pure module for the tolerance-window check with loop wraparound, plus one Transport-clock reader for the current fractional step.",
+      "files": ["src/hit.ts", "src/transport.ts"],
+      "constraints": "src/hit.ts pure (no imports needed, no Tone/DOM): `nearestStepDistance(targets, now, loopSteps=32)` returns the minimum circular distance from `now` to any target step (handle wraparound: dist = min(|t-now|, loopSteps-|t-now|)); return Infinity when targets is empty. `isHit(targets, now, tol, loopSteps=32)` = nearestStepDistance(...) <= tol. Add `_selfcheck()` with console.assert covering: empty targets => not a hit; exact match dist 0; wraparound (now=31.5, target=0 => dist 0.5); just-inside vs just-outside tol. Mirror the style of src/teaching.ts. In src/transport.ts add `export function currentStep16(): number` reading the Tone.Transport position in fractional 16th steps modulo the 32-step loop (e.g. `(Tone.getTransport().ticks / Tone.getTransport().PPQ) * 4 % 32`); one-line comment that it is transport-time (BPM-honest), not wall-clock. Do NOT add setInterval/timeouts, do not change existing transport exports.",
+      "acceptance": "hit.ts exports nearestStepDistance/isHit/_selfcheck with correct wraparound; transport exports currentStep16; `npm run build` clean.",
+      "verify": "npm run build",
+      "visual": null,
+      "depends_on": [],
+      "status": "done",
+      "result": "hit.ts: pure nearestStepDistance (circular, Infinity if empty) + isHit + _selfcheck (6 asserts incl. wraparound 31.5→0=0.5). transport.currentStep16(): ((ticks/PPQ)*4)%32. Build clean."
+    },
+    {
+      "id": "T2",
+      "title": "BeatPad hitPad green-flash prop + CSS",
+      "intent": "Presentational green hit-confirm flash on a wedge, independent of the orange cue. Reads by color + motion/shape; reduced-motion keeps a static green.",
+      "files": ["src/BeatPad.tsx", "src/BeatPad.css"],
+      "constraints": "Add optional prop `hitPad?: PadId | null`. When a wedge's padId === hitPad, add an `is-hit` class to that <g> (compose with existing className logic; a wedge could be both cued and hit — is-hit should visually win). CSS: `.beatpad__wedge.is-hit .beatpad__slice` fills a clear GREEN (add a `--hit: #3fb950;` and `--hit-glow: rgba(63,185,80,0.55);` to src/theme.css :root and use them) with a glow and a distinct ring (stroke) so it reads by shape too; add a brief scale/flash `@keyframes` (e.g. `pad-hit-flash`, ~0.35s, non-infinite) for the motion cue; label fill to a readable value. `@media (prefers-reduced-motion: reduce)` sets animation:none but keeps the static green fill+glow. Do NOT disturb the existing hover/focus/active or is-cued rules; is-hit rules should override the cue fill while present. Keep onPad/keyboard/aria intact.",
+      "acceptance": "Passing hitPad='2.5' flashes that wedge green with a ring; reduced-motion keeps a static green; the orange cue rules still work when hitPad is null; build passes.",
+      "verify": "npm run build",
+      "visual": "Exercised in T3 — confirm a tapped correct pad flashes green in the prod preview.",
+      "depends_on": [],
+      "status": "done",
+      "result": "theme.css: --hit #3fb950 + --hit-glow. BeatPad hitPad? prop → appends is-hit; CSS .is-hit green fill+3px ring+glow+pad-hit-flash 0.35s once, .is-cued.is-hit override so green wins over orange, reduced-motion keeps static green. Build clean."
+    },
+    {
+      "id": "T3",
+      "title": "Wire hit detection in App: on tap during a lesson, flash green on hit",
+      "intent": "Turn the primitives into the feedback: during a lesson while playing, a pad tap that lands in the target window flashes the wedge green; a wrong pad or off-beat tap does not.",
+      "files": ["src/App.tsx"],
+      "constraints": "In handlePad (the existing pad-tap handler), after the sound plays, add: if teaching !== null AND playing, compute the tapped pad's target steps for the CURRENT layer (currentLayer(TEACH_ORDER, teaching.index)) exactly as the 4.2 cue does — drums layer: sound = padDrum(padId); targets = steps s where patternRef.current.drums[sound][s]; bass layer: targets = steps s where patternRef.current.bass[s]?.pad === padId. Read now = transport.currentStep16(); if isHit(targets, now, HIT_TOL) → set a `hitPad` state to padId and schedule clearing it after a short flash (~350ms). Add `const [hitPad, setHitPad] = useState<PadId|null>(null);` and a module const `HIT_TOL` (fixed step-window, e.g. 1.5 sixteenths — leave a `// ponytail:` note that it is tunable to feel). ponytail: a plain setTimeout is acceptable ONLY to clear the visual flash (it is a UI cosmetic timer, not audio scheduling — audio/cue timing must stay on Transport); mark it with a `// ponytail:` comment. Pass `hitPad` to BeatPad. Read teaching/pattern via the existing refs where needed so handlePad sees live values (handlePad already closes over state but is re-created each render, and patternRef is live — use patternRef.current for the pattern and the current `teaching`/`playing` state which are in scope). Only flash on hit; never on miss. Do not regress 4.1/4.2 or free-edit.",
+      "acceptance": "During a lesson while playing: tapping the cued pad near its beat flashes the wedge green; tapping a wrong pad or well off-beat does not flash; check uses transport time so it holds at different BPMs; free-edit/stopped never flashes. Build passes, no console errors.",
+      "verify": "npm run build",
+      "visual": "prod preview: start a lesson with a known pattern + PLAY; tap the cued pad on the beat → green flash; tap a wrong pad → no flash; verify via the is-hit class appearing/absent. Confirm no console errors.",
+      "depends_on": ["T1", "T2"],
+      "status": "done",
+      "result": "App handlePad: during teaching+playing, builds current-layer target steps (drums→padDrum(padId) lane hits; bass→bass[s].pad match), isHit(targets, currentStep16(), HIT_TOL=1.5) → setHitPad + ponytail cosmetic 350ms clear timer (UI only, not audio). hitPad passed to BeatPad. Done inline (single file, full context). Browser-verified prod build: kick-zone Pad 2.5 (kicks filled) → is-hit + green fill rgb~(63,185,80); empty snare-zone Pad 5 → no flash (miss); STOP → tap no flash; --hit #3fb950. No console errors, build clean."
+    }
+  ]
+}

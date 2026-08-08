@@ -1,0 +1,82 @@
+{
+  "requirement": "Implement EPIC-2 story 2.4: a minimal source and clip UI that processes audio through the localhost sidecar and loads the returned draft into the editor.",
+  "workspace": "/Users/chitranshjoshi/Work/Stylophone",
+  "checkpointEvery": 3,
+  "approvalCheckpoints": false,
+  "architecture": {
+    "decision": "Add a small typed reduction client and a focused SourcePanel component above the grid; App remains the editor-state owner and adopts a validated draft through its existing lesson loader.",
+    "alternatives": ["Put fetch and form state directly in App.tsx", "Merge source controls into LessonLibrary"],
+    "tradeoffs": ["One client module and one component keep the network trust boundary testable and avoid bloating App or conflating source creation with saved lessons."],
+    "seams": ["processSource(input) -> Promise<Lesson>", "SourcePanel.onDraft(lesson)", "App.handleLoadLesson(lesson)"]
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Publish the upload UI execution state",
+      "intent": "Create the durable queue and synchronize both trackers.",
+      "ownership": ["docs/executions/v1/EPIC-2-upload-ui.json", "docs/product/v1/README.md", "docs/product/v1/EPIC-2-reduction.md"],
+      "constraints": ["Use Session S8", "Preserve completed 2.2 and 2.3 evidence"],
+      "acceptance": "Plan exists and story 2.4 is In progress in both trackers.",
+      "verify": ["python3 -m json.tool docs/executions/v1/EPIC-2-upload-ui.json", "rg -n '\\| 2( \\| 2\\.4|\\.4 \\|).*In progress.*S8' docs/product/v1/README.md docs/product/v1/EPIC-2-reduction.md"],
+      "visual": null,
+      "dependsOn": [],
+      "status": "completed",
+      "result": "Exported the EPIC-2.4 queue and synchronized both trackers for Session S8.",
+      "evidence": ["Plan JSON check passed", "Both tracker rows are In progress S8"],
+      "error": null
+    },
+    {
+      "id": "T2",
+      "title": "Create the reduction client boundary",
+      "intent": "Build multipart requests, surface sidecar errors, enrich draft identity/title, and validate before editor adoption.",
+      "ownership": ["src/reduction.ts"],
+      "constraints": ["Use the locked Lesson schema", "Accept exactly one file or URL", "Do not mutate editor state on invalid responses"],
+      "acceptance": "A typed client posts source/clip/BPM fields to localhost, converts a valid draft into a Lesson with id/title, and throws actionable errors for HTTP or schema failures.",
+      "verify": ["npm run build"],
+      "visual": null,
+      "dependsOn": ["T1"],
+      "status": "completed",
+      "result": "Added a typed multipart reduction client with local validation, actionable HTTP errors, UUID/title enrichment, and the existing Lesson validator as the response trust boundary.",
+      "evidence": ["npm run build (exit 0)", "git diff --check (exit 0)"],
+      "error": null
+    },
+    {
+      "id": "T3",
+      "title": "Build and integrate the source panel",
+      "intent": "Add accessible file/YouTube, clip, optional BPM, Process, busy, success, and error states in the locked stealth design.",
+      "ownership": ["src/SourcePanel.tsx", "src/SourcePanel.css", "src/App.tsx"],
+      "constraints": ["Minimum 44px controls", "No color-only state", "Respect reduced motion", "Keep fetch in the event handler", "No new dependency"],
+      "acceptance": "The user can choose file or YouTube, enter a <=15s range and optional BPM, Process once, see honest progress/errors, and receive the draft in the existing editor ready to save.",
+      "verify": ["npm run build", "Browser interaction across file/URL/error/success states"],
+      "visual": "Inspect desktop and <=820px layouts, focus states, status semantics, and the 32-tick clip rail.",
+      "dependsOn": ["T2"],
+      "status": "completed",
+      "result": "Added and integrated an accessible stealth source panel with file/YouTube modes, clip/BPM controls, a 32-tick rail, honest busy/error/success states, and draft adoption through the existing editor loader.",
+      "evidence": ["npm run build (exit 0)", "React best-practices review passed hooks, a11y, render, and TypeScript checks"],
+      "error": null
+    },
+    {
+      "id": "T4",
+      "title": "Verify the complete pipeline and close EPIC-2",
+      "intent": "Run React quality review, production build, live browser processing through the sidecar, and synchronize final trackers.",
+      "ownership": ["docs/executions/v1/EPIC-2-upload-ui.json", "docs/product/v1/README.md", "docs/product/v1/EPIC-2-reduction.md"],
+      "constraints": ["Do not claim visual or end-to-end success without observing it", "Do not commit without user authorization"],
+      "acceptance": "Production build passes; browser QA passes at desktop/mobile widths; a real source processes into a populated editable grid with correct title/BPM; failures leave the current editor untouched; both trackers are Done.",
+      "verify": ["npm run build", "sidecar/.venv/bin/python -m unittest sidecar.test_ingest sidecar.test_app -v", "Live browser + localhost sidecar processing"],
+      "visual": "Capture browser evidence for the source panel and populated editor.",
+      "dependsOn": ["T3"],
+      "status": "completed",
+      "result": "Verified the production build, sidecar contract, responsive source panel, client-side failure isolation, and successful draft adoption; synchronized the product trackers to close EPIC-2.",
+      "evidence": [
+        "npm run build (exit 0; 1,015 modules transformed)",
+        "sidecar/.venv/bin/python -m unittest sidecar.test_ingest sidecar.test_app -v (20 tests passed)",
+        "Browser QA at desktop and 800x900: source controls and independently scrolling structure pane remained usable",
+        "Invalid 20-second URL clip produced an accessible alert and left the editor unchanged",
+        "Successful localhost HTTP flow loaded YouTube draft at 126 BPM with 23 populated cells",
+        "File-to-YouTube mode switch and successful processing produced no browser console errors after the keyed-input repair",
+        "Real sidecar processing was previously verified with the Janice MP3 endpoint returning HTTP 200 and a schema-valid populated draft"
+      ],
+      "error": null
+    }
+  ]
+}

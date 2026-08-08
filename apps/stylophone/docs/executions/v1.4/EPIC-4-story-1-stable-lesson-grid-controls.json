@@ -1,0 +1,173 @@
+{
+  "requirement": "EPIC 4 Story 1 — keep lesson actions spatially stable across compose, guided, paused, and complete states, and move Duplicate bar 1 → 2 to a discoverable score-grid control.",
+  "workspace": "/Users/chitranshjoshi/Work/Stylophone",
+  "checkpointEvery": 3,
+  "approvalCheckpoints": false,
+  "story": "Net tracker: EPIC 4 #1 — Stable lesson/grid controls (High, Priority 6).",
+  "architecture": {
+    "decision": "Keep LayerStack mounted as four permanent zones: guidance rows, utility icon stack, secondary actions, and one primary-action footprint. Move Duplicate bar 1 → 2 to the score section so it is discoverable beside the grid while retaining the existing guided-state disabled gate.",
+    "alternatives": [
+      "Continue conditionally mounting lesson buttons: rejected because compose/guided/paused/complete changes would reflow the action area.",
+      "Keep Duplicate in LessonPanel: rejected because the action belongs to the score grid and is hard to discover in the lesson action array.",
+      "Create a separate lesson state store: rejected because the existing guide hook already owns lifecycle state and the story is presentational."
+    ],
+    "tradeoffs": [
+      "Icon-only utility controls reduce copy but keep accessible labels and tooltips.",
+      "The primary action changes label and eligibility while its slot remains fixed.",
+      "The score duplicate control uses absolute positioning inside the score card so the grid geometry is unchanged."
+    ],
+    "seams": [
+      "LayerStack owns the permanent action zones; App continues to provide the existing callbacks.",
+      "ScoreSection receives the existing duplicate callback plus guide-state disabled input.",
+      "No guide, pattern, persistence, audio, or transport ownership changes."
+    ]
+  },
+  "tasks": [
+    {
+      "id": "S1-T1",
+      "title": "Rebuild lesson actions into permanent zones",
+      "intent": "Keep lesson-step display, utility actions, secondary actions, and the primary action footprint mounted across all guide states.",
+      "ownership": [
+        "src/components/LayerStack.tsx",
+        "src/components/LayerStack.css"
+      ],
+      "constraints": [
+        "Labels may change, but the primary action slot must not mount/unmount.",
+        "Use disabled and aria-describedby for eligibility instead of conditional layout removal.",
+        "Preserve existing callbacks and accessible names."
+      ],
+      "acceptance": "Compose, guided, paused, and complete render the same lesson action zones without outer-panel or action-array layout shift.",
+      "verify": [
+        "npm run build",
+        "Browser geometry across guide states"
+      ],
+      "visual": "Compare screenshots/DOM geometry for compose, guided, paused, and complete states.",
+      "dependsOn": [],
+      "status": "done",
+      "result": "Permanent guidance, utility, secondary-action, and primary-action zones remain mounted across compose, guided, and complete states; disabled controls retain prerequisite descriptions. npm run build and git diff --check passed. Browser geometry at 1280x720 stayed identical across compose/guided/complete (lesson 523.23×230.40; action/primary slots 497.23×44); no console warnings/errors.",
+      "evidence": ["npm run build", "git diff --check", "Browser geometry at 1280x720 across compose/guided/complete"],
+      "error": null
+    },
+    {
+      "id": "S1-T2",
+      "title": "Move Duplicate to the score grid",
+      "intent": "Expose Duplicate bar 1 → 2 as a keyboard-accessible lower-right score control while preserving the guided-state gate.",
+      "ownership": [
+        "src/App.tsx",
+        "src/components/ScoreSection.tsx",
+        "src/App.css"
+      ],
+      "constraints": [
+        "Do not duplicate pattern mutation logic.",
+        "Do not change the existing disabled-while-guided behavior.",
+        "The control must not alter grid dimensions."
+      ],
+      "acceptance": "Duplicate is discoverable at the score grid lower-right and remains keyboard-accessible without overlapping or clipping the grid.",
+      "verify": [
+        "npm run build",
+        "Browser screenshot and focus check"
+      ],
+      "visual": "Inspect the score card at supported horizontal widths and verify lower-right placement.",
+      "dependsOn": [
+        "S1-T1"
+      ],
+      "status": "done",
+      "result": "Duplicate is mounted beside the score grid at the lower-right, remains keyboard-accessible, and preserves the existing guided-state disabled gate. The grid/control seam was repaired so the 44px target clears the grid at 1280px, 1024px, and 821px widths. Click and Enter activation both invoke the existing duplicate callback. npm run build and git diff --check passed.",
+      "evidence": ["npm run build", "git diff --check", "Browser click + Enter activation", "Browser clearance at 1280px/1024px/821px"],
+      "error": null
+    },
+    {
+      "id": "S1-T3",
+      "title": "Verify stable lesson/grid acceptance",
+      "intent": "Exercise every guide state and the moved duplicate control in the running browser.",
+      "ownership": [],
+      "constraints": [
+        "Verify no overlap, clipping, or focus loss at supported horizontal widths.",
+        "Preserve unrelated app-screenshot.png."
+      ],
+      "acceptance": "Lesson panel geometry remains stable across compose/guided/paused/complete; Duplicate is discoverable and keyboard-accessible; build and diff checks pass.",
+      "verify": [
+        "git diff --check",
+        "npm run build"
+      ],
+      "visual": "Browser screenshots and DOM bounding-box comparison across guide states and widths.",
+      "dependsOn": [
+        "S1-T2"
+      ],
+      "status": "done",
+      "result": "Browser gate passed across compose, guided, paused, and complete: Lesson outer panel and all permanent zone rectangles stayed fixed at 1280x720; Continue editing enabled only in paused/complete; Start/Next/Restart remained in the same primary slot; Duplicate remained clear of the grid and disabled during guided; keyboard focus reached the Duplicate button. Browser logs contained no warnings/errors.",
+      "evidence": ["Browser geometry across compose/guided/paused/complete", "Responsive clearance at 1024px and 821px", "Keyboard focus check", "Browser logs: no warnings/errors", "npm run build", "git diff --check"],
+      "error": null
+    },
+    {
+      "id": "S1-T4",
+      "title": "Refine score and lesson control arrangement",
+      "intent": "Apply the follow-up control-surface refinement: borderless icon-only Delete and Duplicate controls, score-header ordering, and side-by-side lesson actions.",
+      "ownership": [
+        "src/components/ScoreSection.tsx",
+        "src/components/PatternSlots.tsx",
+        "src/components/PatternSlots.css",
+        "src/components/LayerStack.css",
+        "src/App.css"
+      ],
+      "constraints": [
+        "Preserve existing callbacks, mode gates, accessible names, and live pattern-slot status.",
+        "Keep Duplicate above the grid and avoid overlap at supported widths.",
+        "Keep the lesson utility column fixed while the two lesson actions share one row."
+      ],
+      "acceptance": "The score header reads visually as slots, breadcrumb, Duplicate; Delete and Duplicate have no border/background chrome; Continue editing and the primary guidance action are side by side without overlap.",
+      "verify": [
+        "npm run build",
+        "git diff --check",
+        "Browser geometry and computed styles at 1280px, 1024px, and 820px"
+      ],
+      "visual": "Inspect the final score header and lesson panel at desktop and narrow widths.",
+      "dependsOn": [
+        "S1-T3"
+      ],
+      "status": "done",
+      "result": "Implemented and browser-verified. Header child order is pattern-slots → breadcrumb → duplicate; the duplicate control now visibly reads 1 → 2, with a below-header tooltip at z-index 20; slot and active text are visually hidden while the live status remains accessible. Delete and Duplicate compute to transparent, borderless 44px icon controls. Lesson actions are side by side at 1280px, 1024px, and 820px with no overlap. The score grid keeps its original 6cqh row sizing now that Duplicate is above it; browser warnings/errors: none.",
+      "evidence": [
+        "npm run build",
+        "git diff --check",
+        "Browser screenshot at 1280px",
+        "Responsive geometry at 1024px and 820px",
+        "Computed styles and DOM order"
+      ],
+      "error": null
+    },
+    {
+      "id": "S1-T5",
+      "title": "Compact the control rail arrays",
+      "intent": "Match the Octave and Transport array heights to the lesson primary action and place compact Drum/Bass plus Pattern/Transpose controls in one frame.",
+      "ownership": [
+        "src/components/TransportControls.tsx",
+        "src/App.css"
+      ],
+      "constraints": [
+        "Preserve all existing mode callbacks, disabled states, accessible names, and tooltips.",
+        "Keep Pattern and Transpose below Drum/Bass inside the shared mode border.",
+        "Do not change audio or transport behavior."
+      ],
+      "acceptance": "Octave and Metronome/Play/Record arrays are 44px high like Start guidance; Drum/Bass and Pattern/Transpose share one framed stack; all four mode buttons are visibly shorter.",
+      "verify": [
+        "npm run build",
+        "git diff --check",
+        "Browser geometry at 1280px, 1024px, and 820px"
+      ],
+      "visual": "Inspect control-rail grouping and button proportions at desktop and narrow widths.",
+      "dependsOn": [
+        "S1-T4"
+      ],
+      "status": "done",
+      "result": "Implemented and verified. Octave and Transport outer arrays are 44px; the shared mode frame contains two 36px rows for Drum/Bass and Pattern/Transpose, and the four sound-profile buttons are also 36px inside a compact 48px row. No clipping at 1280px, 1024px, or 820px; behavior and accessibility contracts remain intact.",
+      "evidence": [
+        "npm run build",
+        "git diff --check",
+        "Browser screenshot at 1280px",
+        "Responsive geometry at 1024px and 820px"
+      ],
+      "error": null
+    }
+  ]
+}

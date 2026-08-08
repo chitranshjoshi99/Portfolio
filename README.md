@@ -1,6 +1,6 @@
 # Chitransh Joshi — Portfolio
 
-Personal portfolio site built with **React 18 + Vite + SWC + TypeScript**.  
+Nx workspace containing the portfolio and standalone projects, built with **React 18 + Vite + SWC + TypeScript**.
 Pixel-art design language, muted colour palette, dark/light theme, animated experience journey.
 
 ---
@@ -8,15 +8,18 @@ Pixel-art design language, muted colour palette, dark/light theme, animated expe
 ## Quick start
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm dev                  # portfolio at http://localhost:5173
+pnpm dev:learn-python     # Learn Python app
+pnpm dev:stylophone       # Stylophone Groove Coach
 ```
 
 Opens at `http://localhost:5173`.
 
 ```bash
-npm run build   # production build → dist/
-npm run preview # preview the production build locally
+pnpm build                 # portfolio → dist/apps/portfolio/
+pnpm nx build learn-python # Learn Python → dist/apps/learn-python/
+pnpm build:all             # build every workspace app
 ```
 
 ---
@@ -26,36 +29,34 @@ npm run preview # preview the production build locally
 Each component and page is a self-contained folder with `index.tsx` + `style.css`.
 
 ```
-src/
-├── components/
-│   ├── ExperienceCard/   # Scroll-snap company card (forwardRef, per-company accent)
-│   ├── JourneyProgress/  # Right-side dot progress indicator
-│   ├── Navbar/           # Fixed nav bar + pixel theme toggle
-│   ├── StatCard/         # Animated before/after performance metric card
-│   └── XPBar/            # Segmented pixel XP progress bar
-├── contexts/
-│   └── ThemeContext.tsx   # Dark/light theme, OS-preference default, localStorage
-├── data/
-│   └── resume.ts         # ← Single source of truth for all portfolio content
-├── hooks/
-│   └── useTypewriter.ts
-├── pages/
-│   ├── About/            # Experience journey with scroll-snap cards
-│   ├── Contact/          # WhatsApp + Formspree contact form
-│   └── Home/             # Hero, stat cards, skill XP bars
-└── styles/
-    ├── tokens.css        # All CSS custom properties — palette, spacing, fonts
-    └── global.css        # Reset, typography, utility classes, animations
-public/
-├── profile.jpeg          # Pixel-art avatar
-└── favicon.svg
+apps/
+├── portfolio/
+│   ├── src/
+│   │   ├── components/   # Self-contained component folders
+│   │   ├── contexts/     # Theme and scroll state
+│   │   ├── data/         # Resume and Labs content
+│   │   ├── hooks/        # Shared React hooks
+│   │   ├── pages/        # Portfolio routes
+│   └── styles/
+│       ├── tokens.css    # All CSS custom properties — palette, spacing, fonts
+│       └── global.css    # Reset, typography, utility classes, animations
+│   ├── public/           # Portfolio assets deployed to chitransh.dev
+│   └── project.json      # Nx targets
+├── learn-python/
+    ├── index.html        # Standalone static learning app
+    ├── public/           # Learn Python assets and course data
+    └── project.json      # Nx targets
+└── stylophone/
+    ├── src/              # Drum-and-bass groove coach
+    ├── public/           # Instrument samples and social assets
+    └── project.json      # Nx targets
 ```
 
 ---
 
 ## Customising content
 
-**All resume data lives in one file:** `src/data/resume.ts`
+**All resume data lives in one file:** `apps/portfolio/src/data/resume.ts`
 
 - `PERSON` — name, role, bio, contact details
 - `STATS` — the four performance metric cards on the Home page
@@ -75,7 +76,7 @@ To send email directly to your inbox without the user needing a mail app:
 1. Create a free account at [formspree.io](https://formspree.io)
 2. Create a new form → point it at `chitransh.joshi99@gmail.com`
 3. Copy the form ID (e.g. `xpzgkwqr`)
-4. Open `src/pages/Contact.tsx` and set:
+4. Open `apps/portfolio/src/pages/Contact.tsx` and set:
 
 ```ts
 const FORMSPREE_ID = "xpzgkwqr"; // ← your ID here
@@ -91,14 +92,14 @@ The **WHATSAPP** button always works with zero setup.
 The default theme follows the user's OS preference (`prefers-color-scheme`).  
 The toggle in the navbar overrides it and persists the choice in `localStorage`.
 
-Colour tokens are in `src/styles/tokens.css` under `[data-theme="light"]` and `[data-theme="dark"]`.  
+Colour tokens are in `apps/portfolio/src/styles/tokens.css` under `[data-theme="light"]` and `[data-theme="dark"]`.
 Company accent colours (`--nivoda-gold`, `--delhivery-red`, `--classplus-purple`) are also defined there.
 
 ---
 
 ## Fonts
 
-Loaded from Google Fonts in `index.html`:
+Loaded from Google Fonts in `apps/portfolio/index.html`:
 
 | Font           | Use                                 |
 | -------------- | ----------------------------------- |
@@ -110,7 +111,22 @@ Loaded from Google Fonts in `index.html`:
 
 ## Deployment
 
-The output of `npm run build` is a static site in `dist/` — deploy to any static host:
+The Vercel deployment builds the portfolio and every published workspace app into one static deployment bundle.
+
+## Publishing an app on chitransh.dev
+
+`pnpm build` creates one Vercel deployment bundle. The portfolio is served from
+the domain root and every app listed in `apps/catalog.json` is copied to
+`/apps/<slug>/` and shown at `https://chitransh.dev/apps`.
+
+To publish a future app:
+
+1. Add its Nx project under `apps/<project>/` with a `build` target that writes to `dist/apps/<project>/`.
+2. Add its project name, URL slug, title, label, description, and accent colour to `apps/catalog.json`.
+3. Run `pnpm build` and deploy as usual.
+
+Published apps are Learn Python at `/apps/learn-python/` and Stylophone Groove
+Coach at `/apps/stylophone/`.
 
 ```bash
 # Vercel (recommended)
@@ -119,7 +135,7 @@ npx vercel --prod
 # Netlify
 netlify deploy --dir=dist --prod
 
-# GitHub Pages — set base in vite.config.ts first:
+# GitHub Pages — set the portfolio base in apps/portfolio/vite.config.ts first:
 # base: '/your-repo-name/'
 ```
 

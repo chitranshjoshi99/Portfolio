@@ -1,0 +1,46 @@
+{
+  "requirement": "EPIC-1 · Story 1.3 — Metronome/click + 8-beat loop transport + live BPM readout. A faithful click that accents beat 1 of each bar (1234 2234), an 8-beat (2-bar, 4/4) loop that PLAY starts and stops, tempo that follows the knob live, and the grille BPM readout staying in sync. ALL timing goes through Tone.Transport (Tone.Draw for any visual sync) — never a setInterval sequencer. REC in v1 is minimal (toggle a recording flag; full tap-capture-into-pattern lands with the grid/editor in 1.4/3.1, which own the pattern store).",
+  "repo": "/Users/chitranshjoshi/Work/Stylophone",
+  "epic": "EPIC-1-instrument",
+  "story": "1.3",
+  "checkpointEvery": 3,
+  "architecture": {
+    "decision": "Stack locked: Tone.Transport owns the clock, loop, and click scheduling; Tone.Draw drives any visual beat sync. No custom clock, no setInterval. Recorded as fixed constraint, not re-decided.",
+    "seams": [
+      "src/transport.ts wraps Tone.Transport: startTransport()/stopTransport(), setTransportBpm(bpm), isPlaying(), and an onBeat(cb) subscription giving the current global beat index (0..7) so the UI can light a beat indicator via Tone.Draw. Loop = 8 beats (2 bars 4/4), Tone.Transport.loop=true, loopEnd='2m'.",
+      "Click = a short Tone.js blip (MembraneSynth or a synth) scheduled once per quarter-note via Tone.Transport.scheduleRepeat('4n'); ACCENT (higher pitch/louder) on beat 0 of each bar (global beats 0 and 4), normal on the others — the '1234 2234' feel.",
+      "BPM is the single source in App state; the knob's onBpmChange updates it, App pushes it to Tone.Transport via setTransportBpm, and the grille shows the same number. Changing BPM while playing retimes live.",
+      "startAudio() (from src/audio.ts, story 1.2) must run before/at transport start so the AudioContext is unlocked (iOS). PLAY is a user gesture — call startAudio() there.",
+      "REC minimal: a boolean recording flag toggled by the REC button (visual state). ponytail: no pattern store yet — quantized tap-capture into a 32-step pattern is deferred to the grid/editor (1.4/3.1) which own that data. Do not build a pattern model here."
+    ],
+    "adr": null
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Transport/click engine module (Tone.Transport 8-beat loop + accented metronome)",
+      "intent": "Create src/transport.ts wrapping Tone.Transport: configure an 8-beat (2-bar 4/4) loop; schedule a metronome click on every quarter-note via Tone.Transport.scheduleRepeat, accenting global beats 0 and 4 (beat 1 of each bar) with a higher/louder blip and the rest with a normal blip; expose startTransport(), stopTransport(), setTransportBpm(bpm), isPlaying(), and onBeat(cb: (beat: number) => void) that fires per quarter-note with the current beat index 0..7 (scheduled via Tone.Draw so it's paint-synced). Use a Tone.MembraneSynth or Tone.Synth for the click (no sample needed). Route to destination.",
+      "files": ["src/transport.ts"],
+      "constraints": "ALL timing via Tone.Transport + Tone.Draw. NO setInterval, NO custom clock. Do not import React. Click via Tone synth (a blip), accent = pitch/velocity difference on beats 0 & 4. Loop length exactly 8 beats (loopEnd '2m'). setTransportBpm sets Tone.Transport.bpm.value. onBeat callback list kept minimal (single or small array of subscribers). TypeScript strict, no unused symbols. ponytail-comment the accent-beat math and the deferred-REC note. Leave a pure self-check (guarded, no audio) verifying the beat index sequence 0..7 wraps correctly for a given position.",
+      "acceptance": "npm run build passes. transport.ts exports startTransport, stopTransport, setTransportBpm, isPlaying, onBeat with correct types. A pure helper (e.g. beatFromTicks or the accent predicate isAccent(beat)) is unit-checkable: isAccent(0)===true, isAccent(4)===true, isAccent(1..3,5..7)===false; beat wrap 0..7.",
+      "verify": "npm run build",
+      "visual": null,
+      "depends_on": [],
+      "status": "done",
+      "result": "src/transport.ts wraps Tone.getTransport(): loop=true, loopEnd='2m' (8 beats). scheduleRepeat('4n') click via Tone.MembraneSynth (accent C5@1.0 on beats 0&4, normal C4@0.5 else), triggered with the scheduled time arg (sample-accurate). mod-8 beat counter; onBeat subscribers fire inside Tone.Draw.schedule (paint-synced). Exports startTransport (idempotent scheduleRepeat guard), stopTransport (stop+position=0+beat=0), setTransportBpm, isPlaying, onBeat(unsub), isAccent, _selfcheck. NO setInterval/setTimeout (grep clean, only a comment mention). Build clean (tree-shaken until T2 imports)."
+    },
+    {
+      "id": "T2",
+      "title": "Wire transport into App — PLAY/stop, live BPM, beat indicator, REC toggle; browser-verify",
+      "intent": "Wire src/App.tsx and src/TransportControls.tsx: PLAY toggles startTransport/stopTransport (calling startAudio() first for the iOS unlock) and reflects playing state (e.g. label PLAY/STOP + accent when playing); the knob's BPM already flows to App state — add a useEffect pushing bpm to setTransportBpm so tempo changes live; add a small beat indicator (a row of 8 dots, or reuse the grille) driven by onBeat via Tone.Draw, highlighting the current beat and visibly marking beats 0 & 4 as accents; REC toggles a local recording boolean and its button's pressed state (no capture logic yet). Grille keeps showing the live BPM.",
+      "files": ["src/App.tsx", "src/TransportControls.tsx"],
+      "constraints": "PLAY is the gesture that must unlock audio (await startAudio() before startTransport). Do not regress story 1.1/1.2 (pad taps, knob, mode, bank). Keep the diff minimal. Beat indicator driven by Tone.Draw/onBeat, NOT a React interval. REC is a visual toggle only (ponytail: capture deferred to grid/editor). Accessible: PLAY/REC stay semantic buttons with aria-pressed; beat indicator has an accessible label or aria-hidden if purely decorative. TypeScript strict.",
+      "acceptance": "In the browser: clicking PLAY starts a looping transport (Tone.Transport.state='started'), the beat indicator advances 0..7 and loops, beats 0 & 4 read as accents; changing the knob while playing changes Tone.Transport.bpm live and the grille matches; STOP halts it (state='stopped'); REC toggles its pressed state. No console errors; no audio-context errors (PLAY unlocked it).",
+      "verify": "npm run build",
+      "visual": "Browser: click PLAY -> beat indicator sweeps and loops (accents on 1 & 5 of the 8), verify Tone.Transport.state='started' and bpm follows the knob via a JS probe; STOP resets. Screenshot the playing state.",
+      "depends_on": ["T1"],
+      "status": "done",
+      "result": "transport.ts gained setClickEnabled (module clickEnabled flag; scheduleRepeat skips the audible blip when false but still advances beat + fires onBeat). TransportControls lifted CLICK/PLAY/REC to props (PLAY shows STOP + is-active when playing, aria-pressed on all three). App owns playing/recording/clickEnabled/beat state: useEffect(()=>onBeat(setBeat),[]) subscribes once, useEffect(()=>setTransportBpm(bpm),[bpm]) tracks tempo live, async onTogglePlay awaits startAudio then start/stop, onToggleClick flips mute, REC visual-only. 8-dot beat indicator (BeatIndicator.css) driven purely by onBeat/Tone.Draw (no React timer); is-current on active dot, beat-dot--down ring on 0&4. Browser-verified on a CLEAN reload: PLAY -> transport state 'started', position loops at ~4s (8 beats @120), curDot sweeps 7->0->1->2 with status 'beat N of 8'; knob ArrowUp x20 while playing -> transport.bpm 120->140 + grille '140 BPM' live; STOP -> state 'stopped', label PLAY, curDot -1, status 'stopped'. Build clean, grep-clean of setInterval/setTimeout in App+TransportControls. (Note: a stale vite 'Failed to reload App.tsx' HMR message can appear mid-session from iterative saves; a full reload clears it — prod build + fresh page are correct.)"
+    }
+  ]
+}

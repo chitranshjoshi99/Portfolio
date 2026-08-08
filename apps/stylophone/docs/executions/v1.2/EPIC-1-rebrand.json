@@ -1,0 +1,33 @@
+{
+  "epic": 1,
+  "slug": "rebrand",
+  "title": "Rebrand",
+  "source": "docs/product/v1.2/EPIC-1-rebrand.md",
+  "generated": "2026-07-16",
+  "tasks": [
+    {
+      "id": "EPIC-1-S1-T1",
+      "story": "As the product owner, I want the app renamed away from \"Stylophone\" so that it can legally go live without trading on a trademark it has no rights to.",
+      "priority": 1,
+      "title": "Rename product to \"Beats Drum Machine Coach\" and add non-affiliation disclaimer",
+      "scope": [
+        "index.html",
+        "src/components/Header.tsx",
+        "src/theme.css",
+        "src/components/StepGrid.tsx",
+        "src/lib/constants.ts",
+        "package.json"
+      ],
+      "constraints": [
+        "Text-only change. No new component, no new asset, no logo work.",
+        "Keep v1.1's quiet-branding header treatment intact.",
+        "Do not touch og:url / og:image URL paths — those are deploy/hosting concerns, deferred to EPIC-3.",
+        "Do not touch docs/product/v1/ or docs/product/v1.1/ historical archives.",
+        "Do not touch scripts/, sidecar/, lessons/ — tooling/archival, not the shipped app."
+      ],
+      "acceptance": "grep the built app (src/, index.html, package.json) for \"Stylophone\" — zero matches. Non-affiliation disclaimer (\"not affiliated with or endorsed by Dubreq Ltd\") visible in-app without scrolling on the primary screen at 1280x720.",
+      "status": "done",
+      "result": "Renamed all app-visible + source-comment instances of Stylophone to Beats Drum Machine Coach across index.html, Header.tsx, theme.css, StepGrid.tsx, constants.ts, package.json; added Dubreq non-affiliation disclaimer under the header brand. Verified via grep (zero matches) and live dev-server screenshot at 1280x720."
+    }
+  ]
+}

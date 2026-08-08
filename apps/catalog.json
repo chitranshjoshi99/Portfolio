@@ -1,0 +1,20 @@
+{
+  "apps": [
+    {
+      "project": "learn-python",
+      "slug": "learn-python",
+      "name": "Nebula Academy",
+      "label": "PYTHON · ML · 3D",
+      "description": "Learn Python and machine learning by building rockets, exploring planets, and solving code challenges in-browser.",
+      "accent": "#35e0ff"
+    },
+    {
+      "project": "stylophone",
+      "slug": "stylophone",
+      "name": "Stylophone Groove Coach",
+      "label": "MUSIC · 64-STEP · TONE.JS",
+      "description": "Compose drum and bass grooves, see every hit on a Stylophone-inspired pad, and practise with guided lessons.",
+      "accent": "#ff9f2e"
+    }
+  ]
+}

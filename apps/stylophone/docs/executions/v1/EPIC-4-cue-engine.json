@@ -1,0 +1,55 @@
+{
+  "requirement": "EPIC-4 story 4.2 — Real-time cue engine: during a lesson, show which pad to hit on which beat for the ACTIVE layer, in time with the click. Grid playhead (exists) carries time; the pad wedge echoes the target, lit slightly ahead of the beat. Default = grid-cursor + pad-echo; user-switchable to a pulse-head alt. All timing on Tone.Transport/Tone.Draw (no setInterval), locked to the click with no drift, reduced-motion swaps to a non-sweeping cue, cues reflect the active layer's pattern.",
+  "repo": "Stylophone (Stylophone Beat Coach)",
+  "checkpointEvery": 3,
+  "architecture": {
+    "decision": "Reuse the existing seams. The grid-cursor already exists (transport.onStep → Tone.Draw → StepGrid playhead column). The NEW piece is the pad-echo: light the BeatPad wedge for the current layer's upcoming hit, scheduled slightly ahead of the beat. Add ONE tiny transport primitive `scheduleDraw(fn, time)` (thin Tone.Draw.schedule wrapper) + a `CUE_LEAD` constant, so App can schedule look-ahead visuals without importing Tone. App computes the target pad from currentLayer (teaching.ts) + the pattern inside a SECOND onStepAudio subscription (audio-thread, exact time), then scheduleDraw lights the wedge at time−CUE_LEAD and clears it after a short hold. BeatPad gains a presentational `cuedPad` + `cueStyle` prop. No new scheduler, no setInterval.",
+    "seams": [
+      "transport.scheduleDraw(fn: () => void, time: number): void — thin wrapper over Tone.Draw.schedule so the cue's look-ahead visual scheduling stays inside transport.ts (Tone lives there). Plus `export const CUE_LEAD` (seconds, e.g. 0.06) < Tone's lookAhead window. App must schedule cue visuals through this, never a timer.",
+      "Cue TARGET = currentLayer(TEACH_ORDER, teaching.index) from teaching.ts + the pattern: bass layer → bass[step].pad; drums layer → DRUM_PAD[first drum sound set at step] (the existing pad→drum inverse map in App). Only the CURRENT layer is cued (completed layers just play). Null when no hit at that step.",
+      "BeatPad presentational contract: `cuedPad?: PadId | null` lights that wedge; `cueStyle?: 'echo' | 'pulse'` selects steady-glow vs pulse-head. Cue reads by brightness + ring/shape + motion; reduced-motion keeps a static bright glow (mirror BeatIndicator.css: static glow + @keyframes killed under prefers-reduced-motion)."
+    ],
+    "adr": null
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Add transport.scheduleDraw look-ahead primitive + CUE_LEAD",
+      "intent": "Give App a way to schedule a visual callback at a precise Transport/AudioContext time slightly ahead of the beat, without App importing Tone. Keeps all timing inside transport.ts (the established seam).",
+      "files": ["src/transport.ts"],
+      "constraints": "Add `export const CUE_LEAD = 0.06;` (seconds; must stay below Tone's default lookAhead ~0.1s) and `export function scheduleDraw(fn: () => void, time: number): void` that calls `Tone.Draw.schedule(fn, time)`. Do NOT add any setInterval/setTimeout. Do not change existing exports or the loop. Keep the file's style.",
+      "acceptance": "transport.ts exports scheduleDraw + CUE_LEAD; `npm run build` typechecks clean; no timers added.",
+      "verify": "npm run build",
+      "visual": null,
+      "depends_on": [],
+      "status": "done",
+      "result": "transport.ts: CUE_LEAD=0.06 + scheduleDraw(fn,time) wrapper over Tone.Draw.schedule. No timers, existing exports/loop/selfcheck untouched. Build clean."
+    },
+    {
+      "id": "T2",
+      "title": "BeatPad cuedPad + cueStyle props with echo/pulse cue CSS",
+      "intent": "Make the pad wedge able to render a 'hit-now' cue. Presentational only — App decides which pad and which style. Echo = steady bright glow + ring; pulse = pulse-head animation. Reduced-motion keeps a static bright glow (no motion).",
+      "files": ["src/BeatPad.tsx", "src/BeatPad.css"],
+      "constraints": "Add optional props `cuedPad?: PadId | null` and `cueStyle?: 'echo' | 'pulse'` (default 'echo'). When a wedge's padId === cuedPad, add a cue class to that <g> (e.g. `is-cued` + `is-cued--echo`/`is-cued--pulse`). Style the cue with Anthropic-orange brightness (--accent-bright), a glow (--accent-glow), AND a ring/shape cue (e.g. a brighter stroke) so it never reads by hue alone. 'pulse' uses a @keyframes scale/glow pulse; 'echo' is a steady glow. MIRROR the existing reduced-motion pattern in BeatIndicator.css: keep the static bright glow but wrap any @keyframes animation so `@media (prefers-reduced-motion: reduce)` sets animation:none (cue still reads by the static glow + ring). Do NOT break existing hover/focus/active wedge styling. Keep onPad + a11y intact.",
+      "acceptance": "Passing cuedPad='1.5' lights that wedge bright with a ring; cueStyle 'pulse' animates it, 'echo' is steady; reduced-motion removes motion but keeps the bright glow; build passes.",
+      "verify": "npm run build",
+      "visual": "In the prod preview, drive a cued pad via props (exercised in T3) and confirm the lit wedge is clearly brighter than idle with a visible ring.",
+      "depends_on": [],
+      "status": "done",
+      "result": "BeatPad: cuedPad?+cueStyle?('echo'|'pulse',default echo) props; cued wedge gets is-cued + is-cued--echo/pulse. CSS: bright fill+glow+3px ring (not hue-alone), pulse @keyframes, reduced-motion kills motion keeps glow. Hover/focus/active + a11y intact. Build clean."
+    },
+    {
+      "id": "T3",
+      "title": "Wire cue engine in App: current-layer target, look-ahead light/clear, style toggle",
+      "intent": "Turn the primitives into the live cue: during a lesson, the pad wedge for the current layer's upcoming hit lights slightly ahead of the beat and stays locked to the click; a toggle switches grid-cursor+pad-echo vs pulse-head. This is the observable 4.2 feature.",
+      "files": ["src/App.tsx", "src/LayerStack.tsx", "src/LayerStack.css"],
+      "constraints": "Add a SECOND `onStepAudio((s, time) => ...)` subscription in App dedicated to cues (leave the existing gated-playback one alone). Compute the target pad: layer = currentLayer(TEACH_ORDER, teaching.index); bass → patternRef.bass[s]?.pad; drums → the existing DRUM_PAD map for the first of kick/snare/hat set at s; null if no hit or not teaching. Use transport.scheduleDraw to set a `cuedPad` state at `time - CUE_LEAD` (look-ahead) and schedule a clear (set null) after a short hold (e.g. one 16th ≈ (60/bpm)/4 s, or a fixed ~0.12s). Only cue while teaching !== null AND playing; in free-edit or stopped, cuedPad stays null. Add `cueStyle: 'echo' | 'pulse'` state (default 'echo') with a small toggle control in LayerStack (real buttons, ≥44px, aria-pressed, only shown during a lesson). Pass `cuedPad` + `cueStyle` to BeatPad. Read cuedPad target via refs (patternRef already exists; add a small ref for teaching index/current layer) so the once-registered audio callback sees live values — mirror activeLayersRef. NO setInterval/setTimeout/rAF; all timing via Tone.Transport + scheduleDraw. Do not regress 4.1 gating or free-edit.",
+      "acceptance": "Start a lesson + PLAY: the pad wedge for the current layer's hits lights in time with the click, slightly ahead of the beat, and the grid playhead + wedge stay locked with no drift over a long loop. Switching cue style (echo↔pulse) changes the wedge behavior. Cues reflect the active layer (drums first, then bass after advancing). Free-edit/stopped shows no cue. Build passes, no console errors, no setInterval.",
+      "verify": "npm run build",
+      "visual": "prod preview (npm run preview): Start lesson, PLAY; confirm a pad wedge lights synced to the click and stays locked across many bars; toggle Echo/Pulse and confirm the wedge behavior changes; advance to bass and confirm the cued wedge now follows bass notes; Exit/stop → no cue. Check console has no errors. Optionally verify prefers-reduced-motion via resize_window colorScheme/media emulation that motion stops but the glow remains.",
+      "depends_on": ["T1", "T2"],
+      "status": "done",
+      "result": "App: cuedPad+cueStyle state, teachingRef, second onStepAudio cue subscription computes current-layer target (bass→bass[s].pad, drums→DRUM_PAD[first sound]), scheduleDraw lights at time-CUE_LEAD + clears at time+0.12 (guarded so newer cue not clobbered); clear-effect on !teaching||!playing. LayerStack Echo/Pulse toggle (tbtn, aria-pressed). Browser-verified on prod build: drums layer cues wedge 2.5 (DRUM_PAD.kick) lit ~48% frames, exactly 1 wedge, locked to transport; Pulse toggle flips is-cued--echo→--pulse; advancing→Drums done/Bass now + cue follows bass pad '1'; STOP clears cue+playhead; no console errors, no setInterval."
+    }
+  ]
+}

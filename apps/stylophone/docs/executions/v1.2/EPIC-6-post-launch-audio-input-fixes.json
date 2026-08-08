@@ -1,0 +1,68 @@
+{
+  "epic": 6,
+  "slug": "post-launch-audio-input-fixes",
+  "title": "Post-launch audio and input fixes",
+  "source": "docs/product/v1.2/EPIC-6-post-launch-audio-input-fixes.md",
+  "generated": "2026-07-17",
+  "tasks": [
+    {
+      "id": "EPIC-6-S1-T1",
+      "story": "As a user, I want Reset Pattern to clear the grid but keep my current tempo, so that I don't lose a tempo I dialed in while experimenting with a groove.",
+      "priority": 11,
+      "title": "Preserve BPM on Reset Pattern",
+      "scope": ["src/hooks/useDraftPersistence.ts", "src/App.tsx"],
+      "constraints": [
+        "No new state. performReplacement gains a kind parameter; only \"reset\" seeds createPatternDocument with the current bpm.",
+        "\"New beat\" and import flows keep their existing default-BPM behavior."
+      ],
+      "acceptance": "Setting a non-default BPM then clicking Reset (direct path and the dirty-draft confirm-dialog path) clears the grid while BPM stays unchanged.",
+      "status": "done",
+      "result": "performReplacement(kind: \"new\" | \"reset\" = \"new\") now seeds createPatternDocument(kind === \"reset\" ? { bpm } : {}). handleResetPattern changed to call requestReplacement(\"reset\") instead of \"new\" (previously sent \"new\", which also meant the confirm-dialog's \"Reset this beat?\" title branch was dead code — now live). App.tsx's confirm handler threads pendingReplacement.kind through to performReplacement so the dirty-draft path preserves BPM too. tsc --noEmit passed clean; no test runner exists in the repo so no automated test was added."
+    },
+    {
+      "id": "EPIC-6-S2-T1",
+      "story": "As a user, I want the bass voice to sound like a plucked bass instead of a swelling brass patch, and the four drum/bass banks (ROK/HIP/TEC/BOX) to sound clearly distinct from each other, so that switching banks is audibly meaningful.",
+      "priority": 12,
+      "title": "Rework bass and drum-bank timbres",
+      "scope": ["src/lib/audio.ts"],
+      "constraints": [
+        "No new dependency. Character changes stay inside the existing Tone.MonoSynth/Tone.Filter parameter surface (oscillator type, envelope, filterEnvelope, filter type/frequency/Q).",
+        "Do not touch the sample-loading path, playDrumAt/playBassAt scheduling, or any transport-timing code."
+      ],
+      "acceptance": "Cycling ROK->HIP->TEC->BOX on both the drum row and bass row produces four audibly different characters each; the bass voice plucks (not swells) on every bank.",
+      "status": "done",
+      "result": "Root cause: ROK's BASS_TIMBRES entry was Tone.MonoSynth's factory default filterEnvelope (baseFrequency 200, octaves 3, attack 0.6s) on a sawtooth -- a slow filter sweep over 3 octaves is the textbook brass-patch shape, which is why it read as a trumpet. All 4 bass banks rewritten with filterEnvelope.attack <= 0.02s (a pluck): ROK = punchy resonant saw (Q2, 2.6-octave sweep, 250ms decay); HIP = deep triangle sub (small 1.8-octave sweep, +1dB gain since triangle carries less energy than saw); TEC = acid-adjacent saw stab (Q3.5, fast deep sweep, snappy amp); BOX = tight dry square (moved from bandpass Q4 -- which thinned it to a honk -- to lowpass, keeping the square's body). Also fixed a latent bug: liveBass/sequencedBass Tone.MonoSynth instances were constructed with only portamento+envelope set, so they played raw MonoSynth defaults (including the brass filterEnvelope) until the first applyBassBank() call actually changed something -- applyBassBank no-ops when the target bank matches the already-active \"ROK\" default, so a session that never left ROK never got the ROK timbre applied at all. Added createBassVoice() building both voices directly from BASS_TIMBRES.ROK. Drum bank filters retuned: HIP lowpass 6800Hz->3200Hz (was nearly inaudible), TEC highpass 110Hz->250Hz with higher Q (was barely cutting sub), BOX bandpass Q3.5->0.8 at 1500Hz (was a telephone-muffle narrow band). Self-check (_selfcheck in audio.ts) updated: replaced oscillator/filterType-only assertions with a pluck-attack invariant checked across all 4 banks (filterEnvelope.attack <= 0.02) plus updated TEC/BOX identity assertions. tsc --noEmit passed clean."
+    },
+    {
+      "id": "EPIC-6-S3-T1",
+      "story": "As a user playing bass on the visualizer pad, I want dragging across the 12 o'clock boundary to shift the octave up or down (clockwise = up, counter-clockwise = down), within the supported +-2 range, so that I can reach the full bass register without a separate control.",
+      "priority": 13,
+      "title": "Octave wrap on visualizer bass drags",
+      "scope": ["src/components/BeatPad.tsx", "src/components/VisualizerPad.tsx", "src/hooks/useLiveInput.ts"],
+      "constraints": [
+        "No new range or state constant -- reuse the existing OCTAVE_MIN/OCTAVE_MAX/clampOctave from src/lib/constants.ts.",
+        "Keyboard-driven bass slides must be unaffected (no octave shift from that input path).",
+        "Detection must not fire on ordinary intra-ring movement, only on an actual 12-o'clock crossing."
+      ],
+      "acceptance": "Holding a bass drag and circling clockwise past 12 o'clock raises pitch an octave per crossing, capping at base octave +2; circling back counter-clockwise unwinds it, capping at -2.",
+      "status": "done",
+      "result": "BeatPad.tsx tracks the angle (degreesAtPoint, same convention as padAtPoint: degrees clockwise from 12 o'clock) of each in-ring pointer sample during a held bass drag. wrapDirection(prevDeg, nextDeg) treats any angular jump exceeding 180 degrees between consecutive samples as a 12-o'clock crossing (real pointer samples land far closer together than 180 degrees apart, so a jump that size can only mean the sweep passed through zero) -- returns +1 for a clockwise (7->1) crossing, -1 for counter-clockwise (1->7), 0 otherwise. A drag-local dragOctaveShift ref accumulates these, clamped +-4 internally (the effective octave is clamped +-2 downstream via the existing clampOctave, so extra winding past the limit is simply inert while unwinding still works correctly). onPointerDown resets the shift to 0 for each new touch. onBassMove's signature gained an optional octaveShift parameter, threaded through VisualizerPad.tsx unchanged. useLiveInput.ts's handleBassMove(padId, octaveShift = 0) computes clampOctave(octave + octaveShift) and passes that as the effective octave to both moveBass() and captureBassSlide() (so REC capture records the shifted octave too). Keyboard bass slides call onBassMove with no second argument, so they default to shift 0 and are unaffected. Self-check (_selfcheck in BeatPad.tsx) extended with wrapDirection assertions: 7->1 raises, 1->7 lowers, an ordinary intra-ring slide does not wrap, and a 180-degree-exact jump does not wrap. tsc --noEmit passed clean.",
+      "open_gap": "Browser-drive tools (Claude Browser MCP) were disconnected mid-session, so this story's live behavior was verified by full code-path tracing and tsc, not a live pointer-drag screenshot. A manual drag test on the running dev server is recommended before considering this fully closed."
+    },
+    {
+      "id": "EPIC-6-S4-T1",
+      "story": "As a user running a groove, I want the visualizer to show only the drum map or only the bass map -- whichever mode is selected -- instead of lighting both voices at once, so that the labeled map matches what's actually shown.",
+      "priority": 14,
+      "title": "Visualizer shows only the selected mode's map",
+      "scope": ["src/hooks/useTransportEngine.ts", "src/App.tsx"],
+      "constraints": [
+        "Do not change the per-step scheduling logic itself (playDrumAt/playBassAt calls, guidance pass-state gain resolution) -- only how the resulting active-pad lists are shaped and consumed.",
+        "No new state beyond reshaping the existing sequencedPads value."
+      ],
+      "acceptance": "Running a groove with both drum and bass content populated, switching between Drums and Bass mode changes which pads light on the visualizer -- never both at once.",
+      "status": "done",
+      "result": "useTransportEngine.ts's onStepAudio scheduling effect previously pushed both sounding drum pads and the sounding bass pad into one flat `pads` array, stored as sequencedPads: PadId[] and handed unfiltered to the visualizer regardless of mode -- the actual bug, since the visualizer's own heading already said \"drum map\"/\"bass map\" but the lit pads never respected it. Changed sequencedPads to { drums: readonly PadId[]; bass: readonly PadId[] }, populated from two separate local arrays (drumPads, bassPads) built in the same per-step loop, committed together via one scheduleDraw call. The onTogglePlay stop-path reset (setSequencedPads([])) updated to the new shape ({ drums: [], bass: [] }). App.tsx's VisualizerPad activePads prop now reads transport.sequencedPads.drums when mode === \"drums\", otherwise transport.sequencedPads.bass. tsc --noEmit passed clean.",
+      "open_gap": "Same as EPIC-6-S3-T1: Browser-drive tools were unavailable this session, so live verification was full-flow code tracing plus tsc, not a screenshotted groove run. A manual playback check flipping Drums/Bass mid-groove is recommended before considering this fully closed."
+    }
+  ]
+}

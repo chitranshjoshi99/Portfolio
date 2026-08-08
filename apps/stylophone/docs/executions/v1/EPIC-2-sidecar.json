@@ -1,0 +1,150 @@
+{
+  "requirement": "Implement EPIC-2 story 2.2: expose the proven reduce() engine through a localhost-only FastAPI POST /reduce endpoint.",
+  "workspace": "/Users/chitranshjoshi/Work/Stylophone",
+  "checkpointEvery": 3,
+  "approvalCheckpoints": false,
+  "architecture": {
+    "decision": "Keep reduce() as the single reduction interface and call it with FastAPI's thread-pool helper from a multipart endpoint; the server entry point binds 127.0.0.1 and permits only local Vite origins.",
+    "alternatives": [
+      "Invoke the reduce.py CLI as a subprocess",
+      "Build the full file/YouTube ingest layer in this story"
+    ],
+    "tradeoffs": [
+      "An in-process thread preserves the locked reduce() seam and keeps the async server responsive, but a CPU-heavy reduction still shares the sidecar process.",
+      "This story accepts uploaded files and cleanly rejects YouTube requests until story 2.3 owns URL download and full ingest validation."
+    ],
+    "seams": [
+      "sidecar.reduce.reduce(path, clip_start, clip_end, bpm=None)",
+      "multipart POST /reduce",
+      "python -m sidecar.app binds 127.0.0.1:8000"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Publish the execution state",
+      "intent": "Create the durable EPIC-2.2 queue and make both product trackers the honest resume point.",
+      "ownership": [
+        "docs/executions/v1/EPIC-2-sidecar.json",
+        "docs/product/v1/README.md",
+        "docs/product/v1/EPIC-2-reduction.md"
+      ],
+      "constraints": [
+        "Use Session S6",
+        "Do not alter any completed story"
+      ],
+      "acceptance": "The durable plan exists and story 2.2 is In progress in both trackers.",
+      "verify": [
+        "python3 -m json.tool docs/executions/v1/EPIC-2-sidecar.json",
+        "rg -n '\\| 2( \\| 2\\.2|\\.2 \\|).*In progress' docs/product/v1/README.md docs/product/v1/EPIC-2-reduction.md"
+      ],
+      "visual": null,
+      "dependsOn": [],
+      "status": "completed",
+      "result": "Exported the four-task plan and marked story 2.2 In progress in the epic and net trackers.",
+      "evidence": [
+        "python3 -m json.tool docs/executions/v1/EPIC-2-sidecar.json (exit 0)",
+        "Tracker rg check found In progress in both files"
+      ],
+      "error": null
+    },
+    {
+      "id": "T2",
+      "title": "Expose reduce over localhost",
+      "intent": "Add the FastAPI application, multipart contract, validation, thread-worker execution, clean error mapping, local CORS, and localhost-only executable entry point.",
+      "ownership": [
+        "sidecar/app.py"
+      ],
+      "constraints": [
+        "Keep reduce() as the only engine interface",
+        "Do not implement yt-dlp ingest from story 2.3",
+        "Do not run unvalidated junk through reduce/Demucs",
+        "Bind only 127.0.0.1"
+      ],
+      "acceptance": "POST /reduce accepts one audio file plus valid clip fields, runs reduce in a worker thread, returns its lesson JSON, maps invalid input to 400/413 and engine failures to 422, allows only local Vite CORS origins, and the module entry point binds 127.0.0.1:8000.",
+      "verify": [
+        "sidecar/.venv/bin/python -m py_compile sidecar/app.py",
+        "sidecar/.venv/bin/python -c 'from sidecar.app import app; print(app.title)'"
+      ],
+      "visual": null,
+      "dependsOn": [
+        "T1"
+      ],
+      "status": "completed",
+      "result": "Added sidecar/app.py with multipart validation, bounded temporary uploads, thread-pooled reduce(), clean 400/413/422 errors, local Vite CORS, and a 127.0.0.1-only uvicorn entry point.",
+      "evidence": [
+        "PYTHONPYCACHEPREFIX=/tmp/stylophone-pycache sidecar/.venv/bin/python -m py_compile sidecar/app.py (exit 0)",
+        "sidecar/.venv/bin/python -c 'from sidecar.app import app; print(app.title)' (exit 0)"
+      ],
+      "error": null
+    },
+    {
+      "id": "T3",
+      "title": "Lock the API contract with tests",
+      "intent": "Cover success, junk input, oversized upload, invalid clip fields, unsupported URL input, engine failure, CORS, and localhost binding without invoking Demucs.",
+      "ownership": [
+        "sidecar/test_app.py",
+        "sidecar/README.md"
+      ],
+      "constraints": [
+        "Use the standard-library unittest runner",
+        "Mock only the proven reduce() engine boundary",
+        "Keep tests offline and deterministic"
+      ],
+      "acceptance": "The API behavior and documented start command are independently reproducible, and all contract tests pass without heavy DSP work.",
+      "verify": [
+        "sidecar/.venv/bin/python -m unittest sidecar.test_app -v"
+      ],
+      "visual": null,
+      "dependsOn": [
+        "T2"
+      ],
+      "status": "completed",
+      "result": "Added eight offline unittest contract checks and documented server startup, multipart fields, error classes, local boundary, and the story 2.3 URL deferral.",
+      "evidence": [
+        "sidecar/.venv/bin/python -m unittest sidecar.test_app -v (8 tests, exit 0)",
+        "git diff --check (exit 0)"
+      ],
+      "error": null
+    },
+    {
+      "id": "T4",
+      "title": "Verify the running sidecar and close the story",
+      "intent": "Run regression checks, exercise the endpoint against a real user clip with the proven engine, confirm localhost binding, then update both trackers with evidence.",
+      "ownership": [
+        "docs/executions/v1/EPIC-2-sidecar.json",
+        "docs/product/v1/README.md",
+        "docs/product/v1/EPIC-2-reduction.md"
+      ],
+      "constraints": [
+        "Do not mark Done until a real clip returns valid schema JSON",
+        "Do not commit without fresh user authorization"
+      ],
+      "acceptance": "Unit checks and reduce selfcheck pass; a real multipart request returns schema-valid JSON; the listener is 127.0.0.1-only; both trackers record Done with Session S6 and verification notes.",
+      "verify": [
+        "sidecar/.venv/bin/python sidecar/reduce.py --selfcheck",
+        "sidecar/.venv/bin/python -m unittest sidecar.test_app -v",
+        "npm run build",
+        "Run the server and POST one sample clip to http://127.0.0.1:8000/reduce",
+        "sidecar/.venv/bin/python sidecar/reduce.py --validate <returned-json>"
+      ],
+      "visual": "Inspect the real endpoint JSON response and confirm it is a complete, editable lesson draft.",
+      "dependsOn": [
+        "T3"
+      ],
+      "status": "completed",
+      "result": "Verified the localhost-only server over a real socket: junk returned 400 before reduction and Janice-STFU.mp3 returned HTTP 200 with a schema-valid populated lesson and the sanitized original source filename; all regression gates pass.",
+      "evidence": [
+        "sidecar/.venv/bin/python sidecar/reduce.py --selfcheck (exit 0)",
+        "sidecar/.venv/bin/python -m unittest sidecar.test_app -v (9 tests, exit 0)",
+        "npm run build (exit 0)",
+        "uvicorn startup: Uvicorn running on http://127.0.0.1:8000",
+        "Live disguised-junk multipart POST: HTTP 400",
+        "Live Janice-STFU.mp3 multipart POST (15s region): HTTP 200",
+        "Returned draft: schemaVersion 1, bpm 126.05, steps 32, populated drums and bass, source.ref Janice-STFU.mp3",
+        "sidecar/.venv/bin/python sidecar/reduce.py --validate /tmp/stylophone-sidecar-real-repaired.json (exit 0)"
+      ],
+      "error": null
+    }
+  ]
+}

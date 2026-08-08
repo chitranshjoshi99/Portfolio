@@ -100,6 +100,15 @@ const PAGES: Record<string, Page> = {
     tag: "LABS",
     accent: "#9e8562",
   },
+  apps: {
+    path: "/apps",
+    title: "Apps · Chitransh Joshi",
+    description:
+      "Standalone tools, learning experiences, and experiments built by Chitransh Joshi.",
+    imageTitle: "Independent Apps & Experiments",
+    tag: "APPS",
+    accent: "#35e0ff",
+  },
   blogs: {
     path: "/blogs",
     title: "Blog · Chitransh Joshi",

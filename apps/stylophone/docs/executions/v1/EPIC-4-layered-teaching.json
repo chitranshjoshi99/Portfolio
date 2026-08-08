@@ -1,0 +1,42 @@
+{
+  "requirement": "EPIC-4 story 4.1 — Layered teaching model: teach a lesson one layer at a time (drums → bass) with completed layers still playing underneath, driven by lesson.teachOrder, with a layer-stack UI whose state is encoded by Anthropic-orange brightness.",
+  "repo": "Stylophone (Stylophone Beat Coach)",
+  "checkpointEvery": 3,
+  "architecture": {
+    "decision": "Teaching state lives in a small pure `src/teaching.ts` seam over (teachOrder, index); App owns `teaching: { index } | null` React state plus an active-layer ref read on the audio thread. Playback gates inside the SINGLE existing App.onStepAudio callback by the active-layer set — no new scheduler. Free-edit mode (teaching === null) keeps the current full-mix playback unchanged so editing still hears everything.",
+    "seams": [
+      "src/teaching.ts pure API: activeLayers(teachOrder, index): string[] (completed + current = teachOrder.slice(0, index+1)); currentLayer(teachOrder, index): string | null; layerState(teachOrder, index, layer): 'locked' | 'active' | 'done'. Stories 4.2 (cue engine) and 4.3 (hit/miss) import currentLayer/activeLayers from here — do not inline this math in App.",
+      "Audio gating point = App's single onStepAudio callback, reading an active-layer ref. Never add a second scheduler or setInterval.",
+      "teachOrder source = the lesson (default [\"drums\",\"bass\"]). The Pattern's kick/snare/hat lanes collectively ARE the 'drums' layer; the bass lane IS the 'bass' layer. Gating maps active-layer names to those lanes."
+    ],
+    "adr": null
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Add teaching.ts pure seam (activeLayers/currentLayer/layerState + selfcheck)",
+      "intent": "Create the load-bearing pure module that computes teaching progression from (teachOrder, index). This is the seam 4.2 and 4.3 will import. No React, no audio, no DOM — pure functions plus a _selfcheck in the codebase convention.",
+      "files": ["src/teaching.ts"],
+      "constraints": "Mirror the existing pure-module style (see src/pattern.ts, src/constants.ts): named exports, a _selfcheck() with console.assert, no side effects at module load. activeLayers = teachOrder.slice(0, index+1). currentLayer = teachOrder[index] ?? null. layerState returns 'done' for indices < current, 'active' for == current, 'locked' for > current. Do NOT touch App or any other file.",
+      "acceptance": "src/teaching.ts exports activeLayers, currentLayer, layerState, and _selfcheck; logic is correct for teachOrder=['drums','bass'] across index -1..2; `npm run build` typechecks clean.",
+      "verify": "npm run build",
+      "visual": null,
+      "depends_on": [],
+      "status": "done",
+      "result": "src/teaching.ts created: pure activeLayers/currentLayer/layerState + _selfcheck (12 asserts, matches pattern.ts style). Build clean."
+    },
+    {
+      "id": "T2",
+      "title": "Wire teaching lifecycle: gate playback + layer-stack UI + grid lane state",
+      "intent": "Turn the teaching seam into the observable feature: a user can start a lesson, hear only the active layers, advance layer-by-layer with the mix audibly thickening, and see a layer-stack UI whose brightness encodes state (done=dim, active=bright, locked=neutral). Exiting returns to full-mix free-edit.",
+      "files": ["src/App.tsx", "src/LayerStack.tsx", "src/LayerStack.css", "src/StepGrid.tsx", "src/StepGrid.css"],
+      "constraints": "Respect the seams: import activeLayers/currentLayer/layerState from src/teaching.ts (do not reinline). Gate audio ONLY inside the existing App.onStepAudio callback by reading an active-layer ref (useRef kept in sync) — no new scheduler, no setInterval, all timing stays on Tone.Transport. teaching state = `{ index: number } | null`; null means free-edit and MUST preserve today's full-mix playback (all lanes sound). teachOrder default ['drums','bass']. Brightness uses existing theme vars: --accent-dim (done), --accent-bright + --accent-glow (active), --text-dim/--edge (locked). a11y non-negotiables: layer state must not be color-alone — pair brightness with a text label (e.g. 'done'/'now'/'locked') and/or shape; controls are real <button>s, keyboard-focusable, ≥44px targets like existing .tbtn. 'Complete/Next' is user-driven (a button); at the last layer the button finishes/exits the lesson. Grid lane dimming for not-yet-active layers is a light visual reflection of the active layer — keep it minimal, honor prefers-reduced-motion (no new sweeping animation). Do NOT build the per-beat pad-echo/grid-cursor cue engine (that is story 4.2) or hit/miss (4.3).",
+      "acceptance": "Starting a lesson gates playback to the first layer (drums only) and shows the stack with Drums active/bright, Bass locked. Advancing keeps drums playing (now dim) and cues bass (bright) — the mix audibly thickens. Exiting/finishing returns to full-mix free-edit playback. Build passes; no console errors; no setInterval added.",
+      "verify": "npm run build",
+      "visual": "Load the prod preview (npm run preview), Start lesson, PLAY: confirm only drums sound + stack shows Drums bright / Bass locked with text state; click Next: bass joins (mix thickens), Drums dims, Bass bright; Exit: full mix returns. Check console has no errors.",
+      "depends_on": ["T1"],
+      "status": "done",
+      "result": "App gates onStepAudio by activeLayersRef (null=free-edit full mix); teaching state {index}|null; TEACH_ORDER hardcoded to v1 default with ponytail note. New LayerStack.tsx/.css (state=brightness+word+dot: done/now/locked). StepGrid gains dimmedLanes prop (is-locked opacity 0.4). Browser-verified on prod build: Start→Drums NOW bright/Bass LOCKED+bass lane dimmed; Next→Drums DONE dim/Bass NOW bright+lanes normal (mix thickens); Finish→free-edit restored. No console errors, no setInterval, build clean."
+    }
+  ]
+}

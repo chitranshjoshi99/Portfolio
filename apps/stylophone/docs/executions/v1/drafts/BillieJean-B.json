@@ -1,0 +1,217 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "type": "upload",
+    "ref": "Billie-Jean.mp3",
+    "clipStart": 43.0,
+    "clipEnd": 58.0,
+    "phaseSec": 0.4296,
+    "loopLenSec": 4.1026
+  },
+  "bpm": 117.0,
+  "bank": "ROK",
+  "bars": 2,
+  "steps": 32,
+  "layers": [
+    {
+      "id": "drums",
+      "type": "drums",
+      "hits": [
+        {
+          "step": 0,
+          "sound": "hat"
+        },
+        {
+          "step": 0,
+          "sound": "kick"
+        },
+        {
+          "step": 2,
+          "sound": "hat"
+        },
+        {
+          "step": 2,
+          "sound": "snare"
+        },
+        {
+          "step": 4,
+          "sound": "hat"
+        },
+        {
+          "step": 4,
+          "sound": "snare"
+        },
+        {
+          "step": 6,
+          "sound": "hat"
+        },
+        {
+          "step": 6,
+          "sound": "snare"
+        },
+        {
+          "step": 8,
+          "sound": "hat"
+        },
+        {
+          "step": 12,
+          "sound": "hat"
+        },
+        {
+          "step": 12,
+          "sound": "snare"
+        },
+        {
+          "step": 14,
+          "sound": "snare"
+        },
+        {
+          "step": 16,
+          "sound": "hat"
+        },
+        {
+          "step": 16,
+          "sound": "kick"
+        },
+        {
+          "step": 18,
+          "sound": "hat"
+        },
+        {
+          "step": 18,
+          "sound": "snare"
+        },
+        {
+          "step": 20,
+          "sound": "snare"
+        },
+        {
+          "step": 24,
+          "sound": "hat"
+        },
+        {
+          "step": 24,
+          "sound": "kick"
+        },
+        {
+          "step": 26,
+          "sound": "hat"
+        },
+        {
+          "step": 28,
+          "sound": "hat"
+        },
+        {
+          "step": 28,
+          "sound": "snare"
+        }
+      ]
+    },
+    {
+      "id": "bass",
+      "type": "bass",
+      "notes": [
+        {
+          "step": 0,
+          "pad": "3",
+          "octave": 0,
+          "length": 2
+        },
+        {
+          "step": 2,
+          "pad": "1.5",
+          "octave": 0,
+          "length": 2
+        },
+        {
+          "step": 4,
+          "pad": "7",
+          "octave": -1,
+          "length": 2
+        },
+        {
+          "step": 6,
+          "pad": "1.5",
+          "octave": 0,
+          "length": 2
+        },
+        {
+          "step": 8,
+          "pad": "4.5",
+          "octave": -1,
+          "length": 2
+        },
+        {
+          "step": 10,
+          "pad": "1.5",
+          "octave": 0,
+          "length": 2
+        },
+        {
+          "step": 12,
+          "pad": "3",
+          "octave": 0,
+          "length": 2
+        },
+        {
+          "step": 14,
+          "pad": "4.5",
+          "octave": 0,
+          "length": 2
+        },
+        {
+          "step": 16,
+          "pad": "3",
+          "octave": 0,
+          "length": 2
+        },
+        {
+          "step": 18,
+          "pad": "1.5",
+          "octave": 0,
+          "length": 2
+        },
+        {
+          "step": 20,
+          "pad": "7",
+          "octave": -1,
+          "length": 2
+        },
+        {
+          "step": 22,
+          "pad": "1.5",
+          "octave": 0,
+          "length": 2
+        },
+        {
+          "step": 24,
+          "pad": "7",
+          "octave": -1,
+          "length": 2
+        },
+        {
+          "step": 26,
+          "pad": "4.5",
+          "octave": 0,
+          "length": 2
+        },
+        {
+          "step": 28,
+          "pad": "6",
+          "octave": 0,
+          "length": 2
+        },
+        {
+          "step": 30,
+          "pad": "7",
+          "octave": -1,
+          "length": 2
+        }
+      ]
+    }
+  ],
+  "teachOrder": [
+    "drums",
+    "bass"
+  ]
+}

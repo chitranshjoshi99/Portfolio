@@ -1,0 +1,92 @@
+{
+  "requirement": "Implement EPIC 1, Story 1: make the v1.1 in-memory pattern and Tone transport a single 64-step, eight-beat source of truth.",
+  "workspace": "/Users/chitranshjoshi/Work/Stylophone",
+  "checkpointEvery": 3,
+  "approvalCheckpoints": false,
+  "architecture": {
+    "decision": "Keep the Pattern as the sole 64-step event model and make transport import STEPS for every clock boundary.",
+    "alternatives": [
+      "Retain separate 32-step UI/audio clocks and translate at their boundary.",
+      "Store a second timing representation alongside the pattern."
+    ],
+    "tradeoffs": [
+      "A shared constant requires updating legacy 32-step assumptions now, but prevents pattern, playhead, and audio scheduling from drifting.",
+      "No serialization contract is added here; strict v3 import/export is owned by EPIC 2."
+    ],
+    "seams": [
+      "src/pattern.ts owns STEPS and immutable event operations.",
+      "src/transport.ts is the sole clock and emits 0..63.",
+      "Existing consumers derive their dimensions from STEPS."
+    ]
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Record the active story and durable execution plan",
+      "intent": "Mark the selected priority-one story in progress and persist its implementation queue for safe resumption.",
+      "ownership": [
+        "docs/product/v1.1/README.md",
+        "docs/product/v1.1/EPIC-1-grid-pattern-engine.md",
+        "docs/executions/v1.1/EPIC-1-v11-pattern-schema-and-64-step-clock.json"
+      ],
+      "constraints": ["Preserve all unrelated documentation changes."],
+      "acceptance": "Both trackers show Story 1 In progress and this plan identifies the verified task queue.",
+      "verify": ["rg -n 'V1.1 pattern schema and 64-step clock.*In progress' docs/product/v1.1/README.md docs/product/v1.1/EPIC-1-grid-pattern-engine.md"],
+      "visual": null,
+      "dependsOn": [],
+      "status": "completed",
+      "result": "Marked EPIC 1 Story 1 In progress in both v1.1 trackers and saved this valid JSON execution plan.",
+      "evidence": ["rg tracker check (exit 0)", "node JSON.parse plan check (exit 0)"],
+      "error": null
+    },
+    {
+      "id": "T2",
+      "title": "Make pattern events a deterministic 64-step model",
+      "intent": "Change the source-of-truth pattern helpers to 64 slots and enforce bounded, non-overlapping bass edits.",
+      "ownership": ["src/pattern.ts"],
+      "constraints": ["Keep edits immutable.", "Do not add a second clock or free-time bass representation."],
+      "acceptance": "Fresh drum and bass arrays have 64 entries; bass lengths clamp to 1..64; replacing a bass start deterministically removes conflicting starts; active cells resolve across the loop seam.",
+      "verify": ["npm run build", "node-based pure self-check harness for src/pattern.ts"],
+      "visual": null,
+      "dependsOn": ["T1"],
+      "status": "completed",
+      "result": "Pattern now owns a 64-step immutable model with clamped, deterministic non-overlapping bass holds.",
+      "evidence": ["supervisor esbuild pure pattern harness (exit 0)", "git diff --check (exit 0)", "worker npm run build (exit 0)"],
+      "error": null
+    },
+    {
+      "id": "T3",
+      "title": "Bind the transport and timing consumers to 64 steps",
+      "intent": "Ensure the Tone clock and pure timing defaults traverse 0..63 over the existing two-measure loop.",
+      "ownership": ["src/transport.ts", "src/hit.ts"],
+      "constraints": ["Keep loopEnd at 2m.", "Keep click accents on beats 0 and 4.", "Use the pattern-owned STEPS constant."],
+      "acceptance": "Step callbacks and current fractional position use the 64-step ring; pure checks cover 63 to 0; click accents remain at beats 0 and 4.",
+      "verify": ["npm run build", "node-based pure self-check harness for src/transport.ts and src/hit.ts"],
+      "visual": null,
+      "dependsOn": ["T2"],
+      "status": "completed",
+      "result": "Transport and hit-window timing now derive from STEPS, schedule 32nd notes, and cover the 63-to-0 seam.",
+      "evidence": ["supervisor isolated transport harness (exit 0)", "supervisor hit harness (exit 0)", "worker npm run build (exit 0)"],
+      "error": null
+    },
+    {
+      "id": "T4",
+      "title": "Verify the story and close its trackers",
+      "intent": "Independently build and exercise the pure 64-step seams, then record completion.",
+      "ownership": [
+        "docs/product/v1.1/README.md",
+        "docs/product/v1.1/EPIC-1-grid-pattern-engine.md",
+        "docs/executions/v1.1/EPIC-1-v11-pattern-schema-and-64-step-clock.json"
+      ],
+      "constraints": ["Do not claim browser audio output without an available audio device."],
+      "acceptance": "Build passes; pure checks prove the 64-step model and clock; both trackers show Story 1 Done with session notes.",
+      "verify": ["npm run build", "pure self-check harness"],
+      "visual": "No new visual surface belongs to Story 1; Story 2 owns the rendered 64-step grid.",
+      "dependsOn": ["T3"],
+      "status": "completed",
+      "result": "Production build and independent pure harnesses passed; both v1.1 trackers are marked Done.",
+      "evidence": ["npm run build (exit 0)", "pattern/hit/transport pure harnesses (exit 0)", "clean-reload browser DOM check: 64 grid headers and step controls; no console errors"],
+      "error": null
+    }
+  ]
+}

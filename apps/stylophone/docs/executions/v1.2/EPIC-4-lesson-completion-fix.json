@@ -1,0 +1,28 @@
+{
+  "epic": 4,
+  "slug": "lesson-completion-fix",
+  "title": "Lesson-completion UX fix",
+  "source": "docs/product/v1.2/EPIC-4-lesson-completion-fix.md",
+  "generated": "2026-07-16",
+  "tasks": [
+    {
+      "id": "EPIC-4-S1-T1",
+      "story": "As a user who just finished or wants to exit a guided lesson, I want an explicit control to return to editing so that I don't have to discover by accident that clicking the grid already works.",
+      "priority": 7,
+      "title": "Add Stop/Continue-editing control",
+      "scope": [
+        "src/components/LayerStack.tsx",
+        "src/components/LessonPanel.tsx",
+        "src/App.tsx"
+      ],
+      "constraints": [
+        "Not a state-machine change. Wire a new onStopLesson prop straight to the existing setGuideCompose() already exported from usePattern.ts.",
+        "Do not add a new GuideStatus value, do not touch derivePasses/passState in src/lib/guidance.ts.",
+        "Matches existing action-strip button styling (tbtn class), no new visual language."
+      ],
+      "acceptance": "From \"complete\" or \"paused\" status, clicking the new control lands in \"compose\" status with the grid editable — same observable result as the existing \"click the grid to restart\" path. Guided (\"guided\" status) editing remains blocked, unchanged.",
+      "status": "done",
+      "result": "Added onStopLesson prop threaded App.tsx -> LessonPanel.tsx -> LayerStack.tsx, wired to pattern.setGuideCompose(). New 'Continue editing' tbtn renders when status is paused or complete, alongside the existing Restart button. No new GuideStatus value, no changes to guidance.ts. Verified live: drove a kick+bass pattern through Start guidance -> Next row x2 to reach complete (2/2 passes), clicked Continue editing, header flipped to COMPOSE · 0/2 passes with the grid cell showing ACTIVE (editable) state. Paused-status rendering verified by code read only (same JSX branch and handler as complete; not driven live because reaching paused requires mid-playback transport pause)."
+    }
+  ]
+}

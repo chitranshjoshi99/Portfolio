@@ -1,0 +1,29 @@
+{
+  "epic": 2,
+  "slug": "single-source-audio-pipeline",
+  "title": "Single-source audio + timing pipeline",
+  "source": "docs/product/v1.3/EPIC-2-single-source-audio-pipeline.md",
+  "generated": "2026-07-17",
+  "architecture": "THE SPINE (locked): engine.triggerStep in transport.ts is the ONE drum-sampler caller; live pad/keyboard + sequencer route through it. Dedup coordinate = (row:step, loop-pass) within the nearest-snap tolerance window, realized as a per-(row,step) last-sounded audio-time compared within ±½ step — NOT a per-16th reset (a per-tick reset would double-sound a tap landing just before/after the exact tick, the exact bug this kills). Collision policy mode-aware but factored so the ledger stays uniform (within-window→skip): jam/record = earliest-wins; practice = live caller pre-suppresses a tap matching a sounded grid note so the sequencer is authoritative. Record mode stays orthogonal to sound (persistence only). Bass live is intentionally NOT routed through triggerStep: it is a sustained monophonic slide instrument (attack/move/release), not a step one-shot, and already uses a voice separate from the sequenced bass, so it never had the drum-flam doubling — forcing it through a per-step one-shot would break the slide/legato feel the design requires. No new deps.",
+  "tasks": [
+    {
+      "id": "EPIC-2-S1-T1",
+      "story": "As a player, I want one sound per beat even when my tap lands on an existing note, so correct timing sounds clean instead of doubled.",
+      "priority": 1,
+      "title": "Add triggerStep + dedup guard to transport.ts; route live drum pad/keyboard and sequencer through it",
+      "scope": ["src/lib/transport.ts", "src/hooks/useLiveInput.ts", "src/hooks/useTransportEngine.ts"],
+      "constraints": [
+        "triggerStep is the sole caller of playDrumAt (audio.ts); no input handler calls playDrum/playDrumAt directly anymore.",
+        "Dedup key = (row:step, last-sounded audio-time) within ±½-step window; NOT a per-16th reset.",
+        "Collision policy mode-aware: jam/record earliest-wins; practice sequencer-authoritative via live pre-suppression.",
+        "step<0 (stopped) bypasses dedup so the pad stays a responsive free instrument.",
+        "Preserve startAudio() iOS unlock inside the user gesture; keep existing isPlaying()&&recording persistence guards.",
+        "Bass live stays its own sustained voice (not a step one-shot) — documented, not silently swapped.",
+        "Pure dedup decision extracted (shouldSound) with a co-located assert self-check; no test framework; no new deps."
+      ],
+      "acceptance": "While playing (jam), a tap in time with an existing grid note yields ONE sound not a flam; an off-beat tap yields two separated sounds; stopped, a tap sounds immediately. shouldSound asserts: first sounds / within-window collapses / next pass sounds.",
+      "status": "done",
+      "result": "Added to transport.ts: TriggerSource type, SNAP_WINDOW_STEPS=0.5, lastSoundedAt Map, stepWindowSeconds() (½ of a 32nd at current bpm), pure shouldSound(prev,time,window), and triggerStep(source,row,step,bank,time?,gain) — sole playDrumAt caller, step<0 bypasses dedup, within-window→skip. Cleared lastSoundedAt in stopTransport. useLiveInput.handleDrumPad now computes nearest step (round(currentStep16())%STEPS when playing, else -1), pre-suppresses in practice (guide!==compose) when grid has the note, and calls triggerStep('live',...) instead of playDrum (import removed). useTransportEngine sequencer drum path calls triggerStep('sequencer',pad,s,bank,time,gain) instead of playDrumAt (import removed). Extended transport _selfcheck with the three shouldSound asserts. Verified: tsc clean; shouldSound math unit-checked; live in browser — kick filled, played back, drum sound-starts counted (23 in 6s with metronome) through the new pipeline, zero console errors."
+    }
+  ]
+}

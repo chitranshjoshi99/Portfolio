@@ -1,0 +1,33 @@
+{
+  "requirement": "Implement v1.3 EPIC 3 Story 1: prevent sticky touch hover states by gating every CSS hover rule behind @media (hover: hover).",
+  "workspace": "/Users/chitranshjoshi/Work/Stylophone",
+  "checkpointEvery": 3,
+  "approvalCheckpoints": false,
+  "architecture": {
+    "decision": "Use CSS @media (hover: hover) wrappers while keeping focus-visible and active feedback unguarded.",
+    "alternatives": ["JavaScript pointer-state handling"],
+    "tradeoffs": ["CSS media queries solve the platform-level cause without changing interaction code."],
+    "seams": ["Existing component CSS files own their local hover rules."]
+  },
+  "tasks": [
+    {
+      "id": "E3.1",
+      "title": "Gate all component hover styles",
+      "intent": "Prevent sticky hover visuals on touch while preserving mouse hover and keyboard focus feedback.",
+      "ownership": ["src/components/BeatPad.css", "src/components/LayerStack.css", "src/components/StepGrid.css", "src/components/TransportControls.css"],
+      "constraints": ["CSS only", "No dependencies", "Preserve :active and :focus-visible states"],
+      "acceptance": "Every :hover selector in src CSS is contained in a @media (hover: hover) block; desktop hover and touch active/focus behavior remain available.",
+      "verify": ["rg -n -C 3 ':hover' src --glob '*.css'", "npm run build", "Browser desktop and touch-emulation checks"],
+      "visual": "Run the Vite app and inspect mouse hover plus touch-emulated tap behavior.",
+      "dependsOn": [],
+      "status": "completed",
+      "result": "Wrapped all seven current hover selectors in @media (hover: hover) blocks, preserving focus-visible and active rules.",
+      "evidence": [
+        "rg -n -C 3 ':hover' src --glob '*.css' — all seven selectors show a surrounding hover-capable media block",
+        "npm run build — passed (tsc && vite build)",
+        "Live Vite app at http://127.0.0.1:5173/: grid toggle worked, no console warnings/errors; 768px tablet layout rendered. The browser runtime cannot emulate a coarse pointer."
+      ],
+      "error": null
+    }
+  ]
+}

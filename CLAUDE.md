@@ -4,19 +4,31 @@ This file is read by Claude at the start of every session. It captures
 architecture decisions, conventions, and gotchas so you don't have to
 re-derive them from the code.
 
-**Last updated:** 2026-07-02
+**Last updated:** 2026-08-02
 
 ---
 
 ## What this project is
 
-Chitransh Joshi's personal portfolio — a React 18 + Vite + SWC + TypeScript
-single-page app with four routes: Home (`/`), About (`/about`), Labs (`/labs`),
-Contact (`/contact`). Design language is pixel-art, muted palette, dark/light theme.
+Chitransh Joshi's Nx workspace. The portfolio is a React 18 + Vite + SWC +
+TypeScript app with routes for Home (`/`), About (`/about`), Labs (`/labs`),
+Apps (`/apps`), Blogs (`/blogs`), and Contact (`/contact`). Design language is
+pixel-art, muted palette, dark/light theme. The workspace also contains the
+standalone static Learn Python app and the Stylophone React app.
+
+Published workspace apps are configured in `apps/catalog.json`. The Vercel
+build bundles the portfolio at `/` and each catalogue entry at `/apps/<slug>/`.
+
+The Navbar's CJ logo is the home link; do not add a separate HOME navigation
+entry unless the navigation layout is intentionally redesigned.
 
 ---
 
 ## File & folder conventions
+
+Portfolio source is now rooted at `apps/portfolio`. Unless a path explicitly
+names another app, every `src/...` path in this document means
+`apps/portfolio/src/...`.
 
 Every component and page lives in its own folder with exactly two files:
 
@@ -479,18 +491,18 @@ const WA_NUMBER = "918126196827";
 
 ## Adding a new page
 
-1. Create `src/pages/NewPage/index.tsx` + `style.css`.
-2. Add the route in `src/App.tsx`.
-3. Add `{ to: "/newpage", label: "> LABEL", key: "newpage" }` to `NAV_LINKS` in `src/components/Navbar/index.tsx` — the mobile dropdown renders from the same array automatically.
-4. If the page has content driven by data, add an export to `src/data/resume.ts`.
+1. Create `apps/portfolio/src/pages/NewPage/index.tsx` + `style.css`.
+2. Add the route in `apps/portfolio/src/App.tsx`.
+3. Add `{ to: "/newpage", label: "> LABEL", key: "newpage" }` to `NAV_LINKS` in `apps/portfolio/src/components/Navbar/index.tsx` — the mobile dropdown renders from the same array automatically.
+4. If the page has content driven by data, add an export to `apps/portfolio/src/data/resume.ts`.
 5. Do not set an opaque `background: var(--bg-primary)` on the page's root container — see §Cursor & background layers, it will hide the shared `SpaceBackground` layer on that route.
-6. Update `CLAUDE.md` (required by pre-commit hook if you commit `src/` changes).
+6. Update `CLAUDE.md` (required by pre-commit hook if you commit portfolio source changes).
 
 ---
 
 ## Pre-commit hook — CLAUDE.md enforcement
 
-A git hook at `.githooks/pre-commit` (tracked) blocks commits that stage `src/` changes without also staging `CLAUDE.md`. This enforces the doc-with-feature contract.
+A git hook at `.githooks/pre-commit` (tracked) blocks commits that stage `apps/portfolio/src/` changes without also staging `CLAUDE.md`. This enforces the doc-with-feature contract.
 
 **One-time setup** (already added to `package.json` `prepare` script, runs after `npm install`):
 
@@ -506,7 +518,7 @@ git config core.hooksPath .githooks
 git commit --no-verify -m "chore: ..."
 ```
 
-**What triggers the check:** any staged file matching `src/**` — `.tsx`, `.ts`, `.css`, anything.
+**What triggers the check:** any staged file matching `apps/portfolio/src/**` — `.tsx`, `.ts`, `.css`, anything.
 
 ---
 
@@ -623,10 +635,13 @@ SWC react plugin) + `@mdx-js/react` + `remark-gfm` + **`remark-frontmatter`**
 ## Commands
 
 ```bash
-pnpm dev                       # dev server on :5173 (predev → gen:blogs)
-pnpm build                     # tsc -b && vite build (prebuild → gen:blogs)
-pnpm preview                   # serve dist/ locally
+pnpm dev                       # portfolio dev server on :5173
+pnpm dev:learn-python          # Learn Python dev server
+pnpm build                     # portfolio build → dist/apps/portfolio
+pnpm nx build learn-python     # Learn Python build → dist/apps/learn-python
+pnpm build:all                 # build every Nx app
+pnpm preview                   # preview the portfolio build
 pnpm lint                      # ESLint
 pnpm gen:blogs                 # regenerate api/page.ts BLOGS from MDX frontmatter
-pnpm new:blog --title "..."    # scaffold a new src/blogs/posts/<slug>.mdx
+pnpm new:blog --title "..."    # scaffold a new apps/portfolio/src/blogs/posts/<slug>.mdx
 ```

@@ -1,0 +1,114 @@
+{
+  "requirement": "Implement and verify all Epic 3 stories: derive honest hardware recording passes from the v1.1 pattern, give the owner explicit guide controls, and present active/passed/unreached material consistently in the grid, pad, and scheduled audio.",
+  "workspace": "/Users/chitranshjoshi/Work/Stylophone",
+  "checkpointEvery": 3,
+  "approvalCheckpoints": false,
+  "architecture": {
+    "decision": "Replace active layer-teaching state with an ephemeral pass-based guide. src/guidance.ts owns the pure pattern-to-pass and pass-state contract; App owns guide lifecycle and projects its derived state into the existing grid, pad, transport, and audio callback.",
+    "alternatives": [
+      "Persist guide order or completion alongside the pattern document.",
+      "Adapt the existing two-layer teaching model to approximate populated rows."
+    ],
+    "tradeoffs": [
+      "A pure derived pass list cannot drift from pattern edits and keeps hardware completion explicitly user-confirmed.",
+      "Replacing the two-layer abstraction touches existing UI projections, but preserves the locked drum-row-first order and supports bass-only patterns honestly."
+    ],
+    "seams": [
+      "src/guidance.ts exposes derivePasses, currentPass, passState, and redoPass as pure APIs.",
+      "src/App.tsx holds the non-persisted guide status and pass index, blocks/permits edits, and selects the presented instrument projection.",
+      "src/StepGrid.tsx, src/BeatPad.tsx, and src/audio.ts receive only derived pass-state/mix information."
+    ]
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Open Epic 3 Story 1 and create the pure guidance seam",
+      "intent": "Synchronize trackers, then derive a deterministic hardware recording order entirely from the pattern.",
+      "ownership": ["docs/product/v1.1/README.md", "docs/product/v1.1/EPIC-3-hardware-companion-guidance.md", "docs/executions/v1.1/EPIC-3-hardware-companion-guidance.json", "src/guidance.ts"],
+      "constraints": ["Do not persist passes or progress.", "Use PAD_IDS order.", "An empty pattern produces no passes and cannot be started."],
+      "acceptance": "Both trackers show Story 1 In progress; pure exports derive populated drums in visible pad order followed by bass, and distinguish not-started, active, and complete indices.",
+      "verify": ["npm run build", "node pure guidance self-check harness", "git diff --check"],
+      "visual": null,
+      "dependsOn": [],
+      "status": "completed",
+      "result": "Added the pure deterministic pass selector: populated drum pads in native order followed by one optional bass pass, with explicit index-derived pass states.",
+      "evidence": ["npm run build (exit 0)", "bundled guidance _selfcheck in Node (exit 0)", "git diff --check (exit 0)"],
+      "error": null
+    },
+    {
+      "id": "T2",
+      "title": "Integrate the derived guide and close Story 1",
+      "intent": "Expose an honest startable row-by-row guide from the deterministic pass list without storing guide metadata.",
+      "ownership": ["src/App.tsx", "src/LayerStack.tsx", "src/LayerStack.css", "docs/product/v1.1/README.md", "docs/product/v1.1/EPIC-3-hardware-companion-guidance.md", "docs/executions/v1.1/EPIC-3-hardware-companion-guidance.json"],
+      "constraints": ["Do not claim hardware verification.", "Empty patterns cannot start.", "Guide state remains ephemeral."],
+      "acceptance": "The visible guide describes the current derived target and refuses to start an empty pattern; Story 1 tracker rows are Done only after build and browser inspection.",
+      "verify": ["npm run build", "git diff --check", "clean-reload browser guide interaction check"],
+      "visual": "Inspect populated-drum, bass-only, and empty guide states in the desktop workspace.",
+      "dependsOn": ["T1"],
+      "status": "completed",
+      "result": "Integrated the derived pass list into the visible guidance panel, removed the reachable fixed two-layer lesson surface, and disabled start for empty patterns.",
+      "evidence": ["npm run build (exit 0)", "clean-reload browser: empty pattern shows disabled Start guidance", "browser: populated Pad 1 shows enabled Start guidance and active now state", "browser console warnings/errors: none", "git diff --check (exit 0)"],
+      "error": null
+    },
+    {
+      "id": "T3",
+      "title": "Implement explicit guide lifecycle controls and edit reset",
+      "intent": "Let the user start, manually advance, pause/resume, restart, and redo a populated pass while keeping edit behavior honest.",
+      "ownership": ["src/App.tsx", "src/LayerStack.tsx", "src/LayerStack.css", "src/TransportControls.tsx", "docs/product/v1.1/README.md", "docs/product/v1.1/EPIC-3-hardware-companion-guidance.md", "docs/executions/v1.1/EPIC-3-hardware-companion-guidance.json"],
+      "constraints": ["Next is user-only.", "Guided blocks edits; paused unlocks them and any accepted edit resets the guide.", "Audio/pad REC are disabled during guidance.", "Bass-only starts in bass projection."],
+      "acceptance": "A user can remain on a target, advance manually, pause/resume with Play/Stop, restart after completion, and redo a passed pass; guide state is never serialized.",
+      "verify": ["npm run build", "node pure guidance lifecycle harness", "clean-reload browser lifecycle check", "git diff --check"],
+      "visual": "Inspect Start/Next/Restart/Redo states and paused edit-reset feedback on desktop.",
+      "dependsOn": ["T2"],
+      "status": "completed",
+      "result": "Added ephemeral guide lifecycle state, manual Next/Restart/Redo controls, pause/resume labels, guided edit/REC locks, and restart-on-edit for paused or complete guides.",
+      "evidence": ["npm run build (exit 0)", "bundled guidance _selfcheck in Node (exit 0)", "browser: Start→Next→Restart and passed-row redo verified", "browser: guided grid and REC controls disabled", "browser console warnings/errors: none", "git diff --check (exit 0)"],
+      "error": null
+    },
+    {
+      "id": "T4",
+      "title": "Close Story 2 trackers and commit its verified result",
+      "intent": "Record Story 2 verification only after the guide lifecycle and its edit/recording boundaries pass.",
+      "ownership": ["docs/product/v1.1/README.md", "docs/product/v1.1/EPIC-3-hardware-companion-guidance.md", "docs/executions/v1.1/EPIC-3-hardware-companion-guidance.json"],
+      "constraints": ["Preserve unrelated user worktree changes."],
+      "acceptance": "Both Story 2 tracker rows are Done with build and interaction evidence before the Story 2 commit.",
+      "verify": ["npm run build", "git diff --check"],
+      "visual": null,
+      "dependsOn": ["T3"],
+      "status": "completed",
+      "result": "Closed Story 2 trackers after build, pure guidance, browser lifecycle, and accessibility-state checks; ready for the Story 3 mix hierarchy.",
+      "evidence": ["npm run build (exit 0)", "git diff --check (exit 0)", "clean-reload browser lifecycle evidence recorded"],
+      "error": null
+    },
+    {
+      "id": "T5",
+      "title": "Project pass state into grid, pad, and scheduled audio",
+      "intent": "Make active, passed, and unreached material visibly and audibly distinct from the one derived pass-state source.",
+      "ownership": ["src/App.tsx", "src/StepGrid.tsx", "src/StepGrid.css", "src/BeatPad.tsx", "src/BeatPad.css", "src/audio.ts", "src/LayerStack.tsx", "src/LayerStack.css"],
+      "constraints": ["Use existing Tone scheduling; no second transport or timers.", "Unreached material is silent, passed material has reduced gain, and active material is foreground.", "Colour is never the sole state cue."],
+      "acceptance": "The active target has a grid accent and pad echo; passed rows play quieter; later rows are silent; REC is disabled while guided.",
+      "verify": ["npm run build", "node pure pass-state/mix harness", "browser visual and console check", "git diff --check"],
+      "visual": "Inspect a three-pass guide through first and second passes, including the pad projection and disabled REC control.",
+      "dependsOn": ["T4"],
+      "status": "completed",
+      "result": "Projected the shared active/passed/unreached state into row labels/classes, LayerStack, active pad echoes, and Tone scheduling with -12 dB passed gain and silent unreached material.",
+      "evidence": ["npm run build (exit 0)", "bundled guidance _selfcheck in Node (exit 0)", "browser: first pass passed and second pass active with row classes/labels", "browser screenshot inspected at desktop viewport", "browser console warnings/errors: none", "git diff --check (exit 0)"],
+      "error": null
+    },
+    {
+      "id": "T6",
+      "title": "Close Story 3 and Epic 3 with final verification",
+      "intent": "Run complete Epic 3 checks, update durable and product trackers, and record the final implementation evidence.",
+      "ownership": ["docs/product/v1.1/README.md", "docs/product/v1.1/EPIC-3-hardware-companion-guidance.md", "docs/executions/v1.1/EPIC-3-hardware-companion-guidance.json"],
+      "constraints": ["Do not claim audible hardware verification without an output-device check.", "Do not commit unrelated .gitignore, lockfile, or preview changes."],
+      "acceptance": "All Epic 3 stories are Done, the production build passes, pure contracts pass, and desktop browser evidence records visual behavior with no console errors.",
+      "verify": ["npm run build", "git diff --check", "node pure guidance regression harness"],
+      "visual": "Clean local browser guide walkthrough covering active/passed/unreached states.",
+      "dependsOn": ["T5"],
+      "status": "completed",
+      "result": "Epic 3 closed after all three story commits, production build, pure guidance/gain checks, plan JSON validation, clean diff check, and desktop browser hierarchy inspection.",
+      "evidence": ["npm run build (exit 0)", "bundled guidance _selfcheck in Node (exit 0)", "plan JSON: all 6 tasks completed", "git diff --check (exit 0)", "browser clean-reload hierarchy: passed and active labels/classes verified", "browser console warnings/errors: none", "audio-device check: no audible device was available in the browser session; no audible claim made"],
+      "error": null
+    }
+  ]
+}

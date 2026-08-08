@@ -1,0 +1,136 @@
+{
+  "requirement": "EPIC 2 Story 1 — add explicit Pattern and one-shot Delete pad modes that never trigger musical input, route valid pad actions to slot/row clearing, and provide temporary whole-slot Undo.",
+  "workspace": "/Users/chitranshjoshi/Work/Stylophone",
+  "checkpointEvery": 3,
+  "approvalCheckpoints": false,
+  "story": "Net tracker: EPIC 2 #1 — Select/clear patterns or rows through explicit pad modes (High, Priority 4).",
+  "architecture": {
+    "decision": "Keep the existing instrument presentation mode (drums/bass) separate from pad ownership. usePatternBank owns the mutually-exclusive control mode, delete arming, and one undo snapshot because it already owns active/queued slots and atomic slot mutations. BeatPad receives the presentation mode plus padMode and routes Pattern/Delete taps to non-audio callbacks; the existing useLiveInput handlers are called only by normal Drums/Bass input.",
+    "alternatives": [
+      "Expand Mode to include pattern/delete: rejected because transport, recording, bank selection, grid editing, and audio code all treat Mode as drums/bass presentation.",
+      "Put clear/undo state in App: rejected because slot mutation and active-slot invalidation would split across owners.",
+      "Use a confirmation dialog for delete: rejected because the locked story specifies one-shot armed delete with temporary Undo only for whole-slot clears."
+    ],
+    "tradeoffs": [
+      "The mode is a focused presentation/control seam passed through App rather than a new Context/store.",
+      "Row clear has no snapshot; whole-slot clear replaces only the target slot and exposes one expiring snapshot for that slot.",
+      "Pattern selection keeps EPIC 1 stopped/playing timing through selectSlot; a queued choice remains visible and latest-wins."
+    ],
+    "seams": [
+      "usePatternBank.clearActiveRow/clearSlot and undoLastClear are the only whole-slot/row mutation paths.",
+      "Any edit, selection, replacement, or mode cancellation invalidates the undo snapshot; the timeout is owned by the hook and cleaned up on unmount.",
+      "Keyboard pad mapping checks padMode before musical input; Escape cancels Pattern/Delete and releases any held instrument keys."
+    ]
+  },
+  "tasks": [
+    {
+      "id": "S1-T1",
+      "title": "Add bank-owned control mode and clear/undo actions",
+      "intent": "Extend usePatternBank and pure pattern helpers with explicit pad ownership, row/slot clear operations, and a single 15-second whole-slot undo snapshot.",
+      "ownership": [
+        "src/hooks/usePatternBank.ts",
+        "src/lib/pattern.ts"
+      ],
+      "constraints": [
+        "Keep PatternSlot selection timing and global runtime banks intact.",
+        "Whole-slot clear must preserve runtime bank fields and restore only its original slot.",
+        "Row clear must not create undo.",
+        "Do not add Context/store/dependencies."
+      ],
+      "acceptance": "The bank exposes padMode, setPadMode, cancelPadMode, armDelete, clearActiveRow, clearSlot, undoLastClear, and undo state; clear actions are immutable, selection/edit/replacement invalidates stale undo, and the undo snapshot expires after 15 seconds.",
+      "verify": [
+        "npm run build"
+      ],
+      "visual": null,
+      "dependsOn": [],
+      "status": "done",
+      "result": "Added PadMode ownership plus immutable clearBassRow/clearPattern helpers; usePatternBank now owns row/slot clear actions, a single 15-second slot snapshot, timeout cleanup, and undo restoration while preserving runtime banks and the active audio ref.",
+      "evidence": ["npm run build", "git diff --check"],
+      "error": null
+    },
+    {
+      "id": "S1-T2",
+      "title": "Route Pattern/Delete ownership through the visualizer and keyboard",
+      "intent": "Make Pattern mode select slots 1–4 without audio, make Delete clear only its valid target then exit, and keep keyboard pad input inert while a control mode owns the pad.",
+      "ownership": [
+        "src/App.tsx",
+        "src/components/BeatPad.tsx",
+        "src/components/VisualizerPad.tsx",
+        "src/hooks/useKeyboardControls.ts"
+      ],
+      "constraints": [
+        "Normal Drums/Bass callbacks remain unchanged.",
+        "Pattern mode ignores pads 4.5–7 and Delete acts on the active selection only.",
+        "Escape cancels any control mode and releases held musical input.",
+        "Do not mutate notes outside the active/target slot."
+      ],
+      "acceptance": "Pointer and keyboard Pattern/Delete actions never call audio/recording; valid Pattern selection uses stopped/playing timing, Delete row/slot semantics are isolated, and Escape restores normal input.",
+      "verify": [
+        "npm run build"
+      ],
+      "visual": null,
+      "dependsOn": [
+        "S1-T1"
+      ],
+      "status": "done",
+      "result": "BeatPad and VisualizerPad now route Pattern/Delete taps separately from musical callbacks; keyboard mapped pads are inert for control modes, Escape releases held input and cancels ownership, and lesson/mode transitions cancel control ownership.",
+      "evidence": ["npm run build", "source audit of BeatPad, App, VisualizerPad, and useKeyboardControls"],
+      "error": null
+    },
+    {
+      "id": "S1-T3",
+      "title": "Expose accessible rail, badge, and undo states",
+      "intent": "Add icon-first Pattern/Delete controls in the rail, a matching visualizer ownership badge, and a non-color Undo affordance for whole-slot clears.",
+      "ownership": [
+        "src/components/ControlRail.tsx",
+        "src/components/TransportControls.tsx",
+        "src/components/VisualizerPad.tsx",
+        "src/components/TransportControls.css",
+        "src/components/BeatPad.css",
+        "src/App.tsx"
+      ],
+      "constraints": [
+        "Keep Pattern/Transpose below Drums/Bass and above octave controls.",
+        "Every icon-only control needs accessible name, title/data-tip, and pressed state where applicable.",
+        "Delete auto-exits after action; Undo is available for 15 seconds and cancels on edit/switch.",
+        "Preserve layout stability and reduced-motion behavior."
+      ],
+      "acceptance": "Users can discover and operate Pattern/Delete by keyboard/touch; mode ownership is visible in rail and visualizer heading; disabled/inert pad states are clear; Undo appears only after whole-slot clear and disappears on timeout/edit/switch.",
+      "verify": [
+        "npm run build"
+      ],
+      "visual": "Run the app and inspect normal, Pattern, armed Delete, post-slot-clear Undo, queued selection, focus, and reduced-motion states.",
+      "dependsOn": [
+        "S1-T2"
+      ],
+      "status": "done",
+      "result": "Added icon-first Pattern and disabled-but-explained Transpose rail controls, a lower-right one-shot Delete button, visualizer ownership badges, inert-pad styling, and a non-color Undo toast that avoids covering Delete.",
+      "evidence": ["npm run build", "Browser screenshot: Pattern badge, active slot state, and control rail", "Browser DOM checks for accessible labels, pressed states, and inert pad classes"],
+      "error": null
+    },
+    {
+      "id": "S1-T4",
+      "title": "Verify mode isolation and deletion acceptance",
+      "intent": "Prove the complete story in the running app, including audio isolation, slot/row targeting, undo expiry/cancellation, and no console errors.",
+      "ownership": [],
+      "constraints": [
+        "Use the running browser and existing local document flow.",
+        "Do not claim audio isolation without exercising Pattern/Delete while transport is playing.",
+        "Preserve unrelated app-screenshot.png."
+      ],
+      "acceptance": "Pattern selection never sounds; non-slot pads are inert; Delete row clears only the requested active row; Pattern Delete clears only the selected slot; Undo restores that slot only, expires at 15 seconds, and is canceled by the first edit or switch; Escape restores musical input.",
+      "verify": [
+        "git diff --check",
+        "npm run build"
+      ],
+      "visual": "Exercise stopped and playing Pattern selection, rapid queued choices, armed Delete row/slot clears, Undo restore/expiry/cancellation, Escape, keyboard inertness, focus states, and console errors.",
+      "dependsOn": [
+        "S1-T3"
+      ],
+      "status": "done",
+      "result": "Browser acceptance passed for stopped and playing flows: Pattern mode selected/queued slots without musical callbacks; pads 5–7 were inert; row Delete cleared only the active drum row and auto-exited; slot Delete cleared only slot 2; Undo restored slot 2 and disappeared on slot switch; Escape canceled Pattern mode; playback stopped cleanly with zero browser console errors.",
+      "evidence": ["Browser: Pattern badge and pads 5–7 marked inert", "Browser: stopped slot-2 selection active", "Browser: row delete step 1 changed true -> false and Delete exited", "Browser: slot-2 clear showed Undo and restored step 1", "Browser: slot switch canceled Undo", "Browser: playing Pattern mode showed active/queued slot state; inert Pad 5 did not change it", "Browser console error count: 0", "Browser screenshot captured"],
+      "error": null
+    }
+  ]
+}

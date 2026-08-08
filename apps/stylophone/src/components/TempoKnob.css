@@ -1,0 +1,81 @@
+.tempo-knob {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.tempo-knob__dial {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 35%,
+    var(--surface-2),
+    var(--surface)
+  );
+  border: 1px solid var(--edge);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.45);
+  position: relative;
+  cursor: grab;
+  touch-action: none;
+}
+.tempo-knob__dial:active {
+  cursor: grabbing;
+}
+
+.tempo-knob__indicator {
+  position: absolute;
+  inset: 0;
+}
+
+.tempo-knob__pointer {
+  position: absolute;
+  /* Proportions are relative to the dial, so a compact status-bar dial keeps
+     its indicator inside the same circular geometry. */
+  top: 11.111%;
+  left: 50%;
+  width: 4.167%;
+  height: 41.667%;
+  margin-left: -2.084%;
+  border-radius: 2px;
+  background: var(--accent-bright);
+  box-shadow: 0 0 6px var(--accent-glow);
+}
+
+.tempo-knob__grille {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-3) 20px;
+  border-radius: var(--radius);
+  background: repeating-linear-gradient(
+    90deg,
+    var(--bg-2),
+    var(--bg-2) 3px,
+    var(--surface) 3px,
+    var(--surface) 5px
+  );
+  border: 1px solid var(--edge);
+}
+
+/* Tabular figures keep the digits the same width, but 40 is still two glyphs
+   and 120 is three — reserve the full three so the display never resizes as the
+   tempo crosses 100. */
+.tempo-knob__bpm {
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  min-width: 3ch;
+  text-align: center;
+}
+
+.tempo-knob__unit {
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-top: var(--space-1);
+}

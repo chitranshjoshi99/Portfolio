@@ -1,0 +1,85 @@
+{
+  "requirement": "EPIC 1 Story 1 — author and select four independent note-only pattern slots while keeping global sound profiles and full-bank persistence intact.",
+  "repo": "Stylophone (Beats Drum Machine Coach) — v1.4",
+  "checkpointEvery": 3,
+  "approvalCheckpoints": false,
+  "story": "Net tracker: EPIC 1 #1 — Author/select four slots (High, Priority 2).",
+  "architecture": {
+    "decision": "usePatternBank owns the four Pattern values, activeSlot, queuedSlot, and activePatternRef. usePattern retains guide state and routes every note/grid/live-input mutation through commitActiveSlot. The existing BeatDocument bridge persists only slot notes; runtime drum/bass banks remain global and are mirrored across in-memory slot values without entering the document.",
+    "alternatives": [
+      "Keep pattern state in usePattern and hold slots in persistence: rejected because audio, grid, and mutation ownership would split across hooks.",
+      "Switch the grid in the visual onStep callback: rejected because the audio subscriber reads the old pattern first at the loop boundary."
+    ],
+    "tradeoffs": [
+      "Pattern keeps its existing runtime bank fields for compatibility with audio callers, while document serialization continues to strip them from slots.",
+      "Queued selection is visible immediately but active state changes only when commitQueuedSlot runs at step 0."
+    ],
+    "seams": [
+      "useTransportEngine calls bank.commitQueuedSlot() as the first operation inside onStepAudio when s === 0.",
+      "Hydration replaces all four bank slots before autosave is enabled; active slot starts at 1 because active slot is not part of BeatDocument.",
+      "Slot selection is rejected while guidance is not in compose status; accepted non-lesson selection resets ephemeral guidance."
+    ]
+  },
+  "tasks": [
+    {
+      "id": "S1-T1",
+      "title": "Create the four-slot pattern bank hook",
+      "intent": "Own four independent in-memory Pattern slots, active/queued selection, activePatternRef, active-slot edits, full-bank replacement, and global runtime sound-bank updates.",
+      "files": ["src/hooks/usePatternBank.ts"],
+      "constraints": "Use existing Pattern and immutable helpers; no Context/store/dependency; keep the active ref synchronous for the audio callback; latest queued slot wins; slots begin empty; preserve global drum/bass bank behavior without serializing banks.",
+      "acceptance": "The hook exposes PatternSlot, activePattern, patterns, activeSlot, queuedSlot, activePatternRef, commitActiveSlot, selectSlot, commitQueuedSlot, replacePatternBank, and setGlobalBank. Edits affect only the active slot; stopped selection updates immediately; playing selection only queues; commitQueuedSlot swaps the ref/state and clears the queue; global bank changes are shared by all slots.",
+      "verify": ["npm run build"],
+      "visual": null,
+      "dependsOn": [],
+      "status": "done",
+      "result": "Created usePatternBank with four empty slots, synchronous activePatternRef, active edits, stopped/immediate selection, latest-wins queued selection, loop-boundary commit, full-bank replacement, and global runtime bank mirroring.",
+      "evidence": ["npm run build (tsc + vite, 1032 modules)"],
+      "error": null
+    },
+    {
+      "id": "S1-T2",
+      "title": "Route editing, transport, and persistence through the bank",
+      "intent": "Remove pattern ownership from usePattern, connect all existing mutation paths and live audio refs to the bank, commit queued selection in the audio boundary, and persist all four slots.",
+      "files": ["src/hooks/usePattern.ts", "src/hooks/useDraftPersistence.ts", "src/hooks/useTransportEngine.ts", "src/App.tsx"],
+      "constraints": "Preserve guide gating and reset behavior; do not add a second audio engine; document shape stays unchanged; hydration must precede autosave; commitQueuedSlot must run before reading patternRef.current.",
+      "acceptance": "Grid, live input, guidance, audio scheduling, import/reset, export, and autosave all use the bank; currentDocument includes all four slots; no heldSlots/setPattern bridge remains; TypeScript/build are green.",
+      "verify": ["npm run build"],
+      "visual": null,
+      "dependsOn": ["S1-T1"],
+      "status": "done",
+      "result": "usePattern now keeps guidance while routing edits to usePatternBank; persistence serializes all four slots; transport commits queued slots at audio step 0 before reading patternRef; import/reset/hydration replace the full bank.",
+      "evidence": ["npm run build (tsc + vite, 1032 modules)", "rg confirms no heldSlots bridge or setPattern caller remains"],
+      "error": null
+    },
+    {
+      "id": "S1-T3",
+      "title": "Add accessible four-slot controls",
+      "intent": "Expose active and queued pattern slots in the score UI with clear state, keyboard access, and stable existing layout behavior.",
+      "files": ["src/components/PatternSlots.tsx", "src/components/PatternSlots.css", "src/components/ScoreSection.tsx", "src/App.tsx"],
+      "constraints": "Use existing visual tokens and button conventions; active slot is distinct from queued slot; controls remain usable while playing; guidance lock is communicated accessibly; no layout shift in the grid.",
+      "acceptance": "Four named slot buttons are visible and keyboard-operable; stopped selection changes active slot/grid immediately; playing selection shows queued state without changing the grid until the boundary; rapid selection leaves only the latest queued slot selected.",
+      "verify": ["npm run build"],
+      "visual": "Run the app and inspect stopped selection, playing queue state, rapid 2→3→4 selection, focus states, and no score/grid shift.",
+      "dependsOn": ["S1-T2"],
+      "status": "done",
+      "result": "Added PatternSlots with four keyboard-operable buttons, active/queued state, live status text, and guidance-disabled behavior; integrated it into the score header without shifting the grid.",
+      "evidence": ["npm run build (tsc + vite, 1034 modules)", "Browser DOM snapshot and screenshot show the four-slot control group and active slot state"],
+      "error": null
+    },
+    {
+      "id": "S1-T4",
+      "title": "Verify four-slot authoring and boundary behavior",
+      "intent": "Prove independent slot notes, full-bank persistence, latest-wins queued selection, and audio/grid/active synchronization in the running app.",
+      "files": [],
+      "constraints": "Manual/visual gate plus build; use the existing dev server and browser storage; do not claim an audio gate without starting transport and hearing the boundary swap.",
+      "acceptance": "Slots 2–4 start empty; edits remain isolated; refresh restores notes in multiple slots; stopped selection is immediate; while playing 2→3→4 activates only 4 at the next step-0 boundary with audio/grid/active state together; no console errors.",
+      "verify": ["npm run build"],
+      "visual": "Run the dev server, edit distinct cells in slots 1–4, reload, select while stopped, then play and exercise rapid queued selection at the loop boundary. Save screenshot/evidence path if available.",
+      "dependsOn": ["S1-T3"],
+      "status": "done",
+      "result": "Browser acceptance passed: slots 2 and 3 held distinct kick notes; refresh restored both; clean playback run started transport, accepted rapid 2→3→4 selection, and activated slot 4 at the loop boundary; playback stopped cleanly with zero console errors.",
+      "evidence": ["Browser: slot2Step1=true and slot3Step2=true after reload", "Browser: queued=1 and boundary=1 for 2→3→4 latest-wins run", "Browser screenshot captured after boundary activation", "Browser console error count: 0"],
+      "error": null
+    }
+  ]
+}

@@ -1,0 +1,119 @@
+/* Compact one-draft utility panel. Reuses .tbtn (TransportControls.css). */
+.lesson-lib {
+  margin-top: var(--space-7);
+  padding: var(--space-5);
+  background: var(--bg-2);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius);
+}
+
+.lesson-lib__heading {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: 0 0 var(--space-4);
+}
+
+.lesson-lib__save {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.lesson-lib__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  flex: 1 1 160px;
+}
+
+.lesson-lib__field-label {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+}
+
+.lesson-lib__input {
+  font: inherit;
+  min-height: 44px;
+  padding: var(--space-3) var(--space-5);
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--edge);
+  border-radius: calc(var(--radius) - 6px);
+}
+
+.lesson-lib__paste {
+  margin-top: var(--space-5);
+  flex-basis: 100%;
+}
+
+.lesson-lib__textarea {
+  font: 13px/1.4 var(--mono, ui-monospace, monospace);
+  width: 100%;
+  padding: var(--space-3) var(--space-5);
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--edge);
+  border-radius: calc(var(--radius) - 6px);
+  resize: vertical;
+}
+.tbtn--import{
+  width: 100%;
+}
+.lesson-lib__validity {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+/* No danger var in the theme; brighter text marks invalid without inventing a color. */
+.lesson-lib__validity--invalid {
+  color: var(--text);
+}
+/* Anchor the copy-prompt icon to the paste box's top-right corner. */
+.lesson-lib__paste-box {
+  position: relative;
+}
+/* Keep the first line of pasted text clear of the icon. */
+.lesson-lib__paste-box .lesson-lib__textarea {
+  padding-right: 36px;
+}
+.lesson-lib__copy-icon {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-1);
+  color: var(--text-dim);
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.lesson-lib__copy-icon:hover,
+.lesson-lib__copy-icon:focus-visible {
+  color: var(--accent);
+}
+.lesson-lib__copy-icon:active {
+  color: var(--accent-bright);
+}
+/* Tooltip look and placement live in theme.css, shared by every [data-tip]. */
+
+.lesson-lib__hint {
+  margin: var(--space-5) 0 0;
+  color: var(--text-dim);
+  font-size: 14px;
+}
+
+.lesson-lib__status {
+  margin: var(--space-5) 0 0;
+  min-height: 1.2em;
+  color: var(--text-dim);
+  font-size: 13px;
+}

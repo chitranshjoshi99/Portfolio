@@ -1,0 +1,71 @@
+{
+  "requirement": "EPIC 3 Story 1 — persist all four pattern slots plus BPM locally so a browser refresh restores the whole bank; settle the four-slot BeatDocument model that every later epic depends on.",
+  "repo": "Stylophone (Beats Drum Machine Coach) — v1.4",
+  "checkpointEvery": 3,
+  "story": "Net tracker: EPIC 3 #1 — Four-slot document/persistence (Critical, Priority 1).",
+  "architecture": {
+    "decision": "The four-slot runtime bank (usePatternBank) belongs to EPIC 1, not this story. EPIC 3 settles only the document + persistence model. During EPIC 3, useDraftPersistence holds slots 2-4 as in-hook state while the existing editor edits the active slot, fixed to slot \"1\" until EPIC 1 adds pattern switching. EPIC 1's usePatternBank will later own all four slots and feed the persistence layer; the document contract stays fixed across that move, so no second document migration.",
+    "seams": [
+      "BeatDocument = { bpm: number, patterns: Record<'1'|'2'|'3'|'4', SlotPattern> } where SlotPattern = { drums: Partial<Record<PadId, number[]>>, bass: Array<{ step, pad, octave, length }> }.",
+      "Each slot is validated by reusing the existing v4 sparse per-slot validator (readSparsePattern) unchanged: sorted ascending drum steps 0..63, step-indexed monophonic bass, bass length WRAPS the two-bar loop (do not impose end<=64).",
+      "No envelope fields: no schemaVersion, id, title, bars, steps, drumBank, bassBank. No v3 dense-read path, no legacy/migration parsing.",
+      "Parsing returns {ok, document} | {ok:false, error}; never throws through the UI. 512 KiB raw cap retained.",
+      "Global sound profiles (drumBank/bassBank) stay runtime-only and are never serialized into the document."
+    ],
+    "adr": null
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Reshape document.ts to the four-slot BeatDocument model",
+      "intent": "Replace the single-pattern PatternDocument with BeatDocument { bpm, patterns: {1,2,3,4} }. Reuse the existing v4 readSparsePattern per slot; drop the envelope fields, the v3 dense-read path, and all legacy/migration handling. Keep the pure sparse<->dense per-slot converters. Rewrite _selfcheck to cover the four-slot round trip including a wrap-capable bass note (step 63 length 2) and the rejection cases.",
+      "files": ["src/lib/document.ts"],
+      "constraints": "Reuse readSparsePattern exactly as the per-slot validator across all four keys; do NOT rewrite the bass model or ban wrap. Root must require exactly keys {bpm, patterns}; patterns must require exactly keys 1,2,3,4 (no unknown root/pattern keys). bpm within BPM_MIN..BPM_MAX. Retain the 512 KiB cap and the no-throw parse contract. Do not serialize banks/title/id. Keep helper names that callers can reuse (e.g. an export filename helper that yields a .beatcoach name, a beatDocument<->patterns bridge for the editor slot).",
+      "acceptance": "document.ts exports BeatDocument plus parse/validate/serialize/filename/create-empty/round-trip helpers over the four-slot shape; _selfcheck asserts a four-slot document with a step-63-length-2 bass note round-trips deep-equal, and that invalid JSON, unknown root/pattern key, oversized input, non-ascending drum steps, overlapping bass hold, and an old enveloped document are all rejected.",
+      "verify": "npx tsx -e \"import('./src/lib/document.ts').then(m=>{m._selfcheck();console.log('selfcheck ok')})\"",
+      "visual": null,
+      "depends_on": [],
+      "status": "done",
+      "result": "document.ts reshaped to BeatDocument {bpm, patterns:{1..4}}; per-slot readSparsePattern reused (wrap-capable bass); envelope/v3/legacy deleted. Verified via esbuild-bundled _selfcheck (SELFCHECK_OK, no assertion failures) — bare tsx blocked only by pre-existing import.meta.env in constants.ts."
+    },
+    {
+      "id": "T2",
+      "title": "Persist and hydrate the full four-slot bank in storage.ts and useDraftPersistence.ts",
+      "intent": "Move local persistence to BeatDocument. storage.ts load/save/clear operate on BeatDocument under a v1.4 draft key so old-shape drafts are simply absent (parsed as invalid -> null, never a silent empty beat mid-app). useDraftPersistence composes the live BeatDocument from the editor pattern (slot 1) + in-hook held slots 2-4 + BPM, hydrates all four before autosave is enabled, and keeps the existing save-failed status. Drop the title/id concept the model no longer carries; adapt export/import to BeatDocument.",
+      "files": ["src/lib/storage.ts", "src/hooks/useDraftPersistence.ts"],
+      "constraints": "Hydration MUST finish before the first autosave (existing draftHydrated gate). A failed save keeps the current in-memory beat and still surfaces draftSaveFailed. Editor still edits slot 1 only; slots 2-4 are held opaquely and round-trip untouched. Keep the replacement/import flow all-or-nothing (save validated doc before applying). Do not introduce usePatternBank or pattern switching — that is EPIC 1. Respect every architecture seam above.",
+      "acceptance": "The hook exposes a currentDocument of BeatDocument shape built from bpm + slot1 editor pattern + held slots 2-4; hydrate loads all four slots and bpm, applying slot 1 to the editor; autosave writes the full document; save-failed status still works; no references to dropped title/id/schemaVersion remain in these two files.",
+      "verify": "npx tsc --noEmit 2>&1 | (grep -E 'src/(lib/storage|hooks/useDraftPersistence)\\.ts' || echo 'no storage/persistence type errors')",
+      "visual": null,
+      "depends_on": ["T1"],
+      "status": "done",
+      "result": "storage.ts + useDraftPersistence.ts migrated to BeatDocument; held slots 2-4 in-hook, editor edits slot 1; v1.4 draft key; hydrate-before-autosave + all-or-nothing import + save-failed retention preserved; import accepts .beatcoach/.json. Verified: tsc shows only the 3 expected UI-caller errors."
+    },
+    {
+      "id": "T3",
+      "title": "Update UI callers and reach a green build",
+      "intent": "Bring the remaining callers in line with BeatDocument so the whole project typechecks and builds: ReplacementConfirmDialog's PatternDocument type, App's LessonLibrary wiring, and LessonLibrary's now-removed title field. Remove the title input since BeatDocument has no title; keep export + the existing file/paste import controls.",
+      "files": ["src/components/ReplacementConfirmDialog.tsx", "src/components/LessonLibrary.tsx", "src/App.tsx"],
+      "constraints": "Keep changes minimal and presentational; do not build the Story 2 copy-prompt button or new import UX here (that is EPIC 3 Story 2). Only remove what the dropped title/id forces and rewire types. Preserve accessible names and the existing save-status messaging. Do not touch audio/transport/usePattern logic.",
+      "acceptance": "npm run build (tsc + vite) completes with no errors; no remaining references to the removed title prop or PatternDocument type.",
+      "verify": "npm run build",
+      "visual": null,
+      "depends_on": ["T2"],
+      "status": "done",
+      "result": "ReplacementConfirmDialog type -> BeatDocument; removed dead beat-title field in LessonLibrary + its App wiring. npm run build fully green (tsc + vite, 1031 modules)."
+    },
+    {
+      "id": "T4",
+      "title": "Verify persistence acceptance in the browser",
+      "intent": "Prove the story's acceptance against the running app: author notes and change BPM, refresh, and confirm the grid and BPM restore; confirm an unreadable old-shape draft yields a clean fresh start with no crash; confirm the four-slot round trip via the document self-check in the console.",
+      "files": [],
+      "constraints": "Manual/visual gate only. Slots 2-4 are not yet user-authorable (EPIC 1); prove slot-1 note + BPM refresh restore in the app, and the full four-slot round trip via document _selfcheck.",
+      "acceptance": "After editing slot-1 notes + BPM and reloading, grid and BPM are restored; seeding the old localStorage key with an enveloped document does not crash and starts fresh; document _selfcheck passes in the console with no assertion failures.",
+      "verify": null,
+      "visual": "Run the dev server, edit a few cells + change BPM, reload the page, confirm cells and BPM persist and no console errors; set the pre-v1.4 draft key to an old enveloped JSON, reload, confirm a clean blank beat and no crash.",
+      "depends_on": ["T3"],
+      "status": "done",
+      "result": "Browser acceptance passed: authored kick 1/9/17 + BPM, reload restored grid + BPM; old enveloped doc under the v1.4 key yielded a clean fresh start (empty grid, default 120 BPM, storage re-normalized) with no crash; in-browser document _selfcheck (Vite-served) had zero assertion failures; no console errors."
+    }
+  ]
+}

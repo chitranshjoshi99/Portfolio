@@ -1,0 +1,342 @@
+/* 64-step grid — reuses stealth theme tokens. Filled = Anthropic orange;
+   playhead = outline/glow (non-color cue) so it reads without hue.
+
+   TWO regions: a fixed label RAIL and a full-width step PLANE. Labels are NOT
+   children of the step grid, so they cannot eat step columns. Header, every row
+   and the playhead all read the SAME --sg-cols template, so column centrelines
+   line up top to bottom. Beat grouping is its own narrow spacer track ahead of
+   each group of four, so the 64 step columns stay exactly equal to one another
+   while stretching to fill whatever width the plane has. */
+.step-grid {
+  --sg-gap: 1px; /* column + row gap */
+  --sg-beat: 3px; /* lead-in spacer ahead of every 4th step */
+  --sg-row: 24px; /* stable data row height */
+  --sg-head: 14px; /* step-number header height */
+  --sg-cycle: 16px; /* two-bar ruler above the numbered step header */
+  /* The one shared track list: 16 beats x (spacer + 4 equal step tracks) = 80
+     tracks carrying 64 cells. Cells are placed explicitly (see StepGrid.tsx), so
+     they skip the spacers. Zero-width minima retain every column in the desktop
+     score instead of reducing the second bar to a horizontal-scroll-only view. */
+  --sg-cols: repeat(
+    16,
+    var(--sg-beat) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr)
+  );
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+/* Locked grid while teaching (EPIC-4 4.1): the visible layer isn't in the active
+   set. Static opacity, no animation — no reduced-motion handling needed. */
+.step-grid.is-locked {
+  opacity: 0.4;
+}
+
+/* Fixed width regardless of mode: DRUMS labels ("4.5 · Closed hi-hat") run far
+   longer than BASS labels ("4.5 · F♯"). Sizing to content would shrink the rail
+   on every mode switch and shift the whole step plane sideways with it. */
+.step-grid__rail {
+  flex: 0 0 118px;
+  width: 118px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sg-gap);
+}
+
+/* Keeps the rail's first label level with the first data row. */
+.step-grid__rail-head {
+  height: calc(var(--sg-cycle) + var(--sg-head) + var(--sg-gap));
+}
+
+.step-grid__label {
+  position: relative; /* anchors the fills menu overlay */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1);
+  height: var(--sg-row);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--text-dim);
+}
+
+.step-grid__label-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ponytail: the fills toggle/chip insets below stay literal — dense-grid
+   affordances tuned per element, not steps off the spacing scale. */
+/* Per-row quick-fill menu. Its absolute positioning means opening it never
+   reflows the rail or shifts the step plane's column centrelines. */
+.step-grid__fills {
+  position: static;
+  flex: 0 0 auto;
+}
+
+.step-grid__fills-toggle {
+  cursor: pointer;
+  padding: 2px 5px;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  background: var(--surface);
+  border: 1px solid var(--edge);
+  border-radius: 3px;
+}
+@media (hover: hover) {
+  .step-grid__fills-toggle:hover {
+    color: var(--text);
+  }
+}
+.step-grid__fills.is-open .step-grid__fills-toggle {
+  color: var(--accent-bright);
+  border-color: var(--accent);
+}
+
+.step-grid__fills-menu {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + 2px);
+  left: 0;
+  right: auto;
+  display: flex;
+  gap: 3px;
+  padding: var(--space-1);
+  background: var(--surface-2);
+  border: 1px solid var(--accent-dim);
+  border-radius: 4px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+}
+
+/* The last row is closest to the score frame's bottom edge, so its menu opens
+   above the toggle instead of being clipped below the grid. */
+.step-grid__fills--upward .step-grid__fills-menu {
+  top: auto;
+  bottom: calc(100% + 2px);
+}
+
+.step-grid__fill-chip {
+  min-width: 24px;
+  padding: 4px 6px;
+  font: inherit;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--edge);
+  border-radius: 3px;
+  cursor: pointer;
+}
+@media (hover: hover) {
+  .step-grid__fill-chip:hover {
+    background: var(--accent);
+    border-color: var(--accent-bright);
+  }
+}
+
+/* Touch: bigger fill targets (AUDIT — touch-first). */
+@media (pointer: coarse) {
+  .step-grid__fills-toggle {
+    padding: 5px 8px;
+    font-size: 9px;
+  }
+  .step-grid__fill-chip {
+    min-width: 32px;
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+  /* E1.3: enlarge the single-cell finger target. Horizontal enlargement is
+     impossible (64 columns already pack to ~1/64 width), so grow the row
+     HEIGHT instead — this reflows vertically only and leaves the 64-column
+     layout untouched. Rail labels and plane rows both read --sg-row, so they
+     grow together and stay aligned. */
+  .step-grid {
+    --sg-row: 36px;
+  }
+}
+
+/* Guided pass hierarchy: the state word in the rail is paired with these
+   brightness and shape cues so colour is never the only signal. */
+.step-grid__label.is-guide-active {
+  color: var(--accent-bright);
+  font-weight: 700;
+}
+.step-grid__label.is-guide-passed {
+  color: var(--accent-dim);
+}
+.step-grid__label.is-guide-unreached {
+  color: var(--text-dim);
+}
+
+.step-grid__plane {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sg-gap);
+}
+
+.step-grid__head,
+.step-grid__row {
+  display: grid;
+  grid-template-columns: var(--sg-cols);
+  gap: var(--sg-gap);
+  width: 100%;
+}
+
+.step-grid__cycle-labels {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-1);
+  width: 100%;
+  height: var(--sg-cycle);
+}
+
+.step-grid__cycle-labels span {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-2);
+  border-left: 2px solid var(--accent-dim);
+  color: var(--accent-bright);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.step-grid__cycle-labels span + span {
+  border-left-color: var(--accent-bright);
+}
+
+.step-grid__head {
+  height: var(--sg-head);
+}
+
+.step-head {
+  position: relative; /* anchors the bar-divider pseudo-element below */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  overflow: hidden;
+  font-size: clamp(6px, 0.55vw, 8px);
+  line-height: 1;
+  color: var(--text-dim);
+}
+
+/* ponytail: dense sequencer grid — 64-across cannot reach the 44px AA target;
+   a stable 24px row height is the accepted density exception. */
+.step-cell {
+  position: relative; /* anchors the bar-divider pseudo-element below */
+  height: var(--sg-row);
+  min-width: 0;
+  padding: 0;
+  font: inherit;
+  font-size: 9px;
+  line-height: 1;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--edge);
+  border-radius: 3px;
+  cursor: pointer;
+  /* E1.3 touch scroll-claim: the cell IS the paint surface, so it must own the
+     touch gesture instead of ceding it to page scroll. Scoped to the cells only
+     (not a scroll container), so the rail and the page outside the grid still
+     scroll normally; setPointerCapture then drives the paint drag. */
+  touch-action: none;
+}
+
+@media (hover: hover) {
+  .step-cell:hover {
+    background: var(--surface-2);
+  }
+}
+
+/* Bar 2 (step 16) divider: a thin rule centered in the beat-spacer gap ahead of
+   the cell, not a border on the cell's own edge. A border there reads as part of
+   the next 4-step group's box, so the line visually collapses into that group
+   instead of separating the two cycles. */
+.step-cell.is-bar-start::before,
+.step-head.is-bar-start::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(-1 * var(--sg-beat) / 2 - 3px);
+  width: 2px;
+  background: var(--accent-bright);
+}
+
+.step-cell.is-filled {
+  background: var(--accent);
+  border-color: var(--accent-bright);
+}
+
+.step-grid__row.is-guide-passed,
+.step-cell.is-guide-passed {
+  opacity: 0.55;
+}
+.step-grid__row.is-guide-unreached,
+.step-cell.is-guide-unreached {
+  opacity: 0.42;
+  filter: grayscale(0.8);
+}
+.step-cell.is-guide-active {
+  outline: 2px solid var(--accent-bright);
+  outline-offset: -1px;
+  box-shadow: 0 0 9px var(--accent-glow);
+}
+
+/* A bass event exists only at its start. Sustains are derived on render, so use
+   a dashed rail as a non-colour cue while leaving starts as solid, labelled
+   anchors. This remains visible across the 63 → 0 loop seam. */
+.step-cell.is-bass-start {
+  font-weight: 700;
+  box-shadow: inset 3px 0 0 var(--text);
+}
+.step-cell.is-bass-sustain {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  border-style: dashed;
+}
+
+/* Selected bass cell (editing target): inset ring + notched corners.
+   Non-color cue distinct from the playhead's solid outline, reads without hue. */
+.step-cell.is-selected {
+  box-shadow: inset 0 0 0 2px var(--text);
+  border-radius: 3px 8px 3px 8px;
+}
+
+/* Playhead: outline + glow (non-color cue), highlights the whole column.
+   Static outline stays so the cue reads by shape when motion is off. */
+.step-cell.is-playhead {
+  outline: 2px solid var(--accent-bright);
+  outline-offset: -1px;
+  box-shadow: 0 0 8px var(--accent-glow);
+  animation: ph-pulse var(--dur-pulse) ease-in-out infinite;
+}
+.step-head.is-playhead {
+  color: var(--accent-bright);
+}
+
+@keyframes ph-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 6px var(--accent-glow);
+  }
+  50% {
+    box-shadow: 0 0 16px var(--accent-glow);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .step-cell.is-playhead {
+    animation: none;
+  }
+}

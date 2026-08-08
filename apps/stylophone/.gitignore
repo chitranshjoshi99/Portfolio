@@ -1,0 +1,25 @@
+# Node / Vite
+node_modules/
+dist/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# macOS / editor cruft
+.DS_Store
+.claude/
+
+# Local tooling config
+# User audio (copyright — keep the dir, ignore media)
+samples/*.mp3
+samples/*.wav
+samples/*.m4a
+samples/*.flac
+
+# Generated audio previews (large, regenerable via render_preview.py)
+docs/executions/v1/previews
+
+# Not ready to commit yet
+lessons/

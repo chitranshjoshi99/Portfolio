@@ -1,0 +1,125 @@
+{
+  "requirement": "EPIC 4 Story 2 — make motion and spacing feel consistent: introduce CSS custom-property spacing and motion tokens in theme.css, apply spring-snap only where position or size changes, animate visualizer expansion, sibling-panel layout and modal enter/exit, and keep short crisp transitions for playhead, painted cells, mode changes and disabled states, with reduced motion removing spatial travel while retaining every interaction.",
+  "workspace": "/Users/chitranshjoshi/Work/Stylophone",
+  "checkpointEvery": 3,
+  "approvalCheckpoints": false,
+  "story": "Net tracker: EPIC 4 #2 — Tokens and motion (Medium, Priority 7). Final v1.4 story; all other stories are Done.",
+  "architecture": {
+    "decision": "No design fork. This is a presentational consolidation inside the existing CSS. theme.css :root is the single source of truth for spacing and motion tokens; every other stylesheet consumes those tokens and owns no duration, easing or repeated spacing literal of its own. Modal enter/exit uses the native <dialog> CSS transition path (@starting-style plus transition-behavior: allow-discrete) rather than any JavaScript animation state.",
+    "alternatives": [
+      "Add an animation library: rejected by the locked product-wide decisions (React, TypeScript, Vite and existing Tone.js only).",
+      "Drive modal enter/exit from React state and class toggles: rejected because the native dialog CSS path needs no component change and no new state.",
+      "Mechanically rewrite every spacing literal to a token: rejected because the epic execution instructions forbid rewriting unrelated geometry; only repeated values in the shared scale are tokenised."
+    ],
+    "tradeoffs": [
+      "Token names are fixed early, so later spacing values that fall outside the scale stay as literals rather than forcing new tokens.",
+      "@starting-style and allow-discrete are modern-browser features; without them the modal simply appears instantly, which is an acceptable degradation.",
+      "Retrofitting existing durations to tokens changes some exact millisecond values, which must be checked visually rather than only by build."
+    ],
+    "seams": [
+      "theme.css :root owns --space-* and --dur-*/--ease-* tokens.",
+      "Component stylesheets reference tokens; they do not define new ones.",
+      "No TypeScript, component, audio, transport, persistence or accessibility contract changes are in scope."
+    ]
+  },
+  "tasks": [
+    {
+      "id": "S2-T1",
+      "title": "Define spacing and motion tokens and retrofit existing motion",
+      "intent": "Add a spacing scale and motion tokens (durations plus snap and spring easings) to theme.css, then replace the existing hardcoded durations and easing curves in App.css and the component stylesheets with those tokens so timing is consistent everywhere.",
+      "ownership": [
+        "src/theme.css",
+        "src/App.css",
+        "src/components/*.css"
+      ],
+      "constraints": [
+        "Spring easing (cubic-bezier overshoot) may only be used where position or size changes: visualizer expansion, sibling-panel layout, modal enter/exit.",
+        "Transport playhead, painted grid cells, mode changes and disabled states must keep short crisp transitions (no overshoot).",
+        "Do not change any existing animation's visual intent; only route its duration and easing through tokens.",
+        "Do not add new dependencies and do not change any .tsx file in this task."
+      ],
+      "acceptance": "theme.css :root defines the spacing and motion tokens; no duration or easing literal remains in App.css or the component stylesheets except inside @keyframes percentages; the app builds and every existing animation still runs with the same character.",
+      "verify": [
+        "npm run build",
+        "git diff --check",
+        "Browser: visualizer expansion, playhead and pad hit flash still animate"
+      ],
+      "visual": "Expand the visualizer and play the transport; confirm the spring on expansion and crisp playhead motion.",
+      "dependsOn": [],
+      "status": "done",
+      "result": "theme.css :root now defines --space-1..7 (4/6/8/10/12/14/16px) and motion tokens --dur-fast 0.12s, --dur-base 250ms, --dur-flash 0.35s, --dur-layout 420ms, --dur-spring 560ms, --dur-pulse 1s, --ease-snap cubic-bezier(0.22,0.85,0.3,1) and --ease-spring cubic-bezier(0.34,1.56,0.64,1). Every transition and animation in App.css and the component stylesheets now consumes those tokens; the only remaining literal is the SourcePanel spinner's 0.8s rotation rate, marked with a ponytail comment. Spring easing is confined to the workspace layout reflow, the visualizer pad expansion and the expand chevron; playhead, cells, mode and disabled fades stay on non-overshooting curves. One deliberate 260ms to 250ms consolidation on the chevron rotate.",
+      "evidence": [
+        "npm run build",
+        "git diff --check",
+        "Browser computed tokens at runtime: --dur-layout 420ms, --ease-snap/--ease-spring resolved",
+        "Browser getAnimations during visualizer expand: grid-template-rows, grid-template-columns, transform, visualizer-pad-spring all active"
+      ],
+      "error": null
+    },
+    {
+      "id": "S2-T2",
+      "title": "Apply the spacing token scale to repeated gaps and padding",
+      "intent": "Replace the repeated gap and padding literals across the stylesheets with the theme.css spacing tokens, leaving one-off geometry untouched.",
+      "ownership": [
+        "src/theme.css",
+        "src/App.css",
+        "src/components/*.css"
+      ],
+      "constraints": [
+        "Only replace values that already match the token scale and appear more than once; do not mechanically rewrite unrelated or one-off geometry.",
+        "Computed spacing must be pixel-identical to before this task.",
+        "Do not change any .tsx file in this task."
+      ],
+      "acceptance": "Repeated gap and padding values read as tokens, and the rendered layout is pixel-identical to the pre-task build at 1280px, 1024px and 820px widths.",
+      "verify": [
+        "npm run build",
+        "git diff --check",
+        "Browser: bounding boxes unchanged at 1280px, 1024px and 820px"
+      ],
+      "visual": "Compare workspace, score and deck bounding boxes before and after at the three supported widths.",
+      "dependsOn": ["S2-T1"],
+      "status": "done",
+      "result": "97 spacing declarations across 13 stylesheets now read as --space-* tokens. One-off geometry was left alone as the epic requires: the compact tempo dial inset, the source-panel clip inset and the step-grid fill chips, each marked with a ponytail comment, plus all zero, negative, off-scale and clamp/min-wrapped values. Pixel identity was proven independently, not merely self-reported: a script expanded every var(--space-N) back to px and compared the gap/padding/margin declarations against HEAD, matching exactly across all 14 CSS files.",
+      "evidence": [
+        "npm run build",
+        "git diff --check",
+        "Supervisor token-expansion diff script: spacing declarations pixel-identical across 14 files"
+      ],
+      "error": null
+    },
+    {
+      "id": "S2-T3",
+      "title": "Animate modal enter/exit and complete reduced-motion coverage",
+      "intent": "Give the native dialog a CSS-only enter and exit transition, then audit every stylesheet so prefers-reduced-motion removes spatial spring travel while keeping opacity or snap changes and every interaction intact.",
+      "ownership": [
+        "src/components/Modal.css",
+        "src/App.css",
+        "src/components/*.css"
+      ],
+      "constraints": [
+        "Modal animation must be CSS only: @starting-style plus transition-behavior: allow-discrete; no component or state changes in Modal.tsx.",
+        "Under prefers-reduced-motion, remove spatial travel (transform, position, size springs) but keep opacity or instant snap so every control remains usable and no interaction is lost.",
+        "Do not disable focus handling, dialog close behavior, or any accessible name."
+      ],
+      "acceptance": "The modal fades and settles in on open and out on close; with prefers-reduced-motion forced, no spatial spring travel occurs anywhere and every control still opens, closes, focuses and activates.",
+      "verify": [
+        "npm run build",
+        "git diff --check",
+        "Browser: open/close a modal normally, then repeat with reduced motion emulated"
+      ],
+      "visual": "Screenshot the modal mid-open in both motion settings and confirm no layout jump.",
+      "dependsOn": ["S2-T2"],
+      "status": "done",
+      "result": "Modal.css now animates enter and exit with CSS only: display and overlay transition with allow-discrete, the backdrop and panel fade, and the panel scales from 0.97 via a @starting-style block, all at --dur-base with --ease-snap. No .tsx file changed. The dialog's display declaration stays scoped to [open], so the UA's dialog:not([open]) rule still wins and an unsupporting browser simply opens and closes instantly. Reduced motion flips one custom property (--modal-enter: none), which removes the scale from both the base rule and @starting-style while keeping the fade as the state cue. The coverage audit added a reduced-motion rule for the Walkthrough highlight's top/left/width/height travel, the last uncovered spatial transition; LayerStack.css, Device.css and TempoKnob.css contain no motion at all.",
+      "evidence": [
+        "npm run build",
+        "git diff --check",
+        "Supervisor re-read of Modal.css: display declared only inside .modal[open]",
+        "Browser getAnimations on open: display, overlay, opacity x2 and transform transitions all running",
+        "Browser after close: dialog open=false, display none, height 0 — no stuck-visible dialog",
+        "Browser console: no errors"
+      ],
+      "error": "Not a failure, but a gap in evidence: the browser tool cannot force prefers-reduced-motion, so the reduced-motion behaviour is verified by rule inspection rather than at runtime. Worth one manual pass with the OS setting enabled before the v1.4 verification gate is signed off."
+    }
+  ]
+}

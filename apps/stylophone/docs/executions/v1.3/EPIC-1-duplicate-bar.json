@@ -1,0 +1,33 @@
+{
+  "requirement": "Implement v1.3 EPIC 1 Story 4: duplicate bar 1 into bar 2 across drum and bass pattern data.",
+  "workspace": "/Users/chitranshjoshi/Work/Stylophone",
+  "checkpointEvery": 3,
+  "approvalCheckpoints": false,
+  "architecture": {
+    "decision": "Use one pure duplicateBar1To2 Pattern mutation and invoke it from the existing Lesson Actions control path.",
+    "alternatives": ["Copy per-row in the component", "Add duplicate state to the grid"],
+    "tradeoffs": ["A pure helper keeps overwrite and bass-length rules independently checkable while preserving stateless grid architecture."],
+    "seams": ["pattern.ts owns copy semantics", "usePattern.commitPatternEdit owns editing rules", "LessonPanel/LayerStack own the action control"]
+  },
+  "tasks": [
+    {
+      "id": "E1.4",
+      "title": "Duplicate bar 1 into bar 2",
+      "intent": "Let composers copy a completed first bar into the second bar in one action.",
+      "ownership": ["src/lib/pattern.ts", "src/hooks/usePattern.ts", "src/App.tsx", "src/components/LessonPanel.tsx", "src/components/LayerStack.tsx"],
+      "constraints": ["No dependencies", "Overwrite bar 2", "Copy bass starts with cloned cells and clamp destination sustains at step 63", "Use existing commitPatternEdit path"],
+      "acceptance": "A Lesson Actions control copies every drum lane's steps 0–31 to 32–63 and copies bass starts with destination lengths clamped to the loop end.",
+      "verify": ["npm run build", "pattern.ts self-checks", "Live app interaction"],
+      "visual": "Run Vite and create bar-1 steps, use Duplicate bar 1 → 2, then confirm matching bar-2 cells.",
+      "dependsOn": ["E1.1", "E1.2"],
+      "status": "completed",
+      "result": "Added duplicateBar1To2 with immutable drum overwrite and bass start cloning; destination bass lengths are clamped at the loop end. Added the Lesson Actions control through commitPatternEdit.",
+      "evidence": [
+        "npm run build — passed (tsc && vite build)",
+        "pattern.ts self-checks — drum copy/overwrite, bass copy, final-step sustain clamp, and immutability assertions execute at module load",
+        "Live Vite app at http://127.0.0.1:5173/: Kick step 1 changed bar-2 step 33 false→true after Duplicate; clearing bar-1 bass then duplicating cleared bar 2 too; no console warnings/errors."
+      ],
+      "error": null
+    }
+  ]
+}

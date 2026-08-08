@@ -1,0 +1,93 @@
+{
+  "epic": 1,
+  "slug": "fast-groove-authoring",
+  "title": "Fast groove authoring",
+  "source": "docs/product/v1.3/EPIC-1-fast-groove-authoring.md",
+  "generated": "2026-07-17",
+  "architecture": "No design fork — story reuses the existing pointer-drag machinery in StepGrid.tsx (startBassDrag/extendBassDrag/endBassDrag/cellStepAtPoint) and the existing commitPatternEdit mutator path. StepGrid stays stateless/timerless; playhead from currentStep prop. No new deps.",
+  "tasks": [
+    {
+      "id": "EPIC-1-S1-T1",
+      "story": "As a composer, I want to drag across a drum row to paint/erase a run of steps, so I stop clicking each cell one at a time.",
+      "priority": 1,
+      "title": "Add setDrum(p, pad, step, on) explicit on/off mutator to pattern.ts",
+      "scope": ["src/lib/pattern.ts"],
+      "constraints": [
+        "Pure + immutable, mirror toggleDrum: fresh lane array, fresh drums record, inputs untouched.",
+        "A paint sweep needs explicit on/off, not a flip — toggleDrum flips and cannot be reused for the sweep.",
+        "Add assert coverage to the co-located _selfcheck (no test framework).",
+        "No new dependency."
+      ],
+      "acceptance": "setDrum(p,'1',5,true).drums['1'][5]===true; setDrum on a lit cell with on=false clears it; input pattern unchanged (immutable); other lanes/steps untouched. _selfcheck asserts pass with no console.assert failures.",
+      "status": "done",
+      "result": "Added setDrum(p, pad, step, on): early-returns the same Pattern when the cell already matches (no needless re-render), else clones the lane like toggleDrum. Extended _selfcheck with on/off/no-op/immutability asserts."
+    },
+    {
+      "id": "EPIC-1-S1-T2",
+      "story": "As a composer, I want to drag across a drum row to paint/erase a run of steps, so I stop clicking each cell one at a time.",
+      "priority": 1,
+      "title": "Generalize StepGrid pointer-drag to drums-mode paint; wire paint handler through usePattern",
+      "scope": ["src/components/StepGrid.tsx", "src/hooks/usePattern.ts", "src/App.tsx"],
+      "constraints": [
+        "Generalize the existing bass-drag handlers to run in drums mode too (today gated `if (!bass) return`). Do NOT write a new drag system.",
+        "paintTarget = !filled of the first cell touched (start empty -> paint ON; start lit -> erase). Applies within the drag start row only (per-voice); no cross-row paint.",
+        "pointermove resolves cell via existing cellStepAtPoint; only commit when the step changes (mirror bassDragStep ref). Track paint row + last painted step.",
+        "Suppress the trailing onClick after a drag (generalize suppressBassClick -> suppressClick).",
+        "Single click still toggles one cell via existing onToggleCell.",
+        "StepGrid stays stateless/timerless; all edits flow through commitPatternEdit; no new deps."
+      ],
+      "acceptance": "Press an empty kick step, drag right across 8 cells -> all 8 fill in one gesture; drag back over them -> all clear; single click on one cell still toggles just that cell; no stray extra toggle at drag end. Verified live in dev server + browser drag.",
+      "status": "done",
+      "result": "Generalized startBassDrag/extendBassDrag into mode-aware start/extend handlers: in drums mode pointerdown reads first-cell filled state, sets paintTarget=!filled, pins paint pad, applies via new onPaintDrum prop; pointermove paints each newly-entered cell in the same row only. suppressBassClick generalized to suppressClick. Added handlePaintDrum in usePattern (commitPatternEdit(setDrum) + audition on paint-on) and wired onPaintDrum in App.tsx. Verified in browser: 8-cell drag fills, reverse drag clears, single click toggles one, no stray end toggle."
+    },
+    {
+      "id": "EPIC-1-S2-T1",
+      "story": "As a composer, I want one-tap per-row fills (every 2/4/8, offbeat, backbeat, clear), so regular grooves need no manual clicking.",
+      "priority": 2,
+      "title": "Add fillRow/clearRow pure helpers to pattern.ts",
+      "scope": ["src/lib/pattern.ts"],
+      "constraints": [
+        "Pure + immutable, fresh lane/drums record.",
+        "fillRow REPLACES the row (clean pattern), not OR — acceptance says 'a clean four-on-the-floor'.",
+        "Layout is 8 steps/beat, 32 steps/bar (transport.ts loop = 8 beats at 32n). The EPIC doc's literal offsets (offbeat=every4 offset2, backbeat=every8 offset4) assume a 16-step/bar layout and are WRONG here; build to the acceptance contract instead.",
+        "Add asserts to co-located _selfcheck; no test framework."
+      ],
+      "acceptance": "fillRow(p,pad,8) = one hit per beat across both bars ([0,8,16,24,32,40,48,56]); fillRow(p,pad,16,8) = backbeat on beats 2 & 4 ([8,24,40,56]); clearRow empties the row; all immutable.",
+      "status": "done",
+      "result": "Added fillRow(p,pad,everyN,offset=0) (replace semantics, proper modulo) and clearRow(p,pad). Corrected fill offsets for the real 8-steps/beat / 32-steps/bar layout: every8=four-on-the-floor, every16 offset8=backbeat (2&4), every8 offset4=offbeats. Extended _selfcheck with asserts for each. Selfcheck follows the house pattern (guarded off render path, not auto-invoked)."
+    },
+    {
+      "id": "EPIC-1-S2-T2",
+      "story": "As a composer, I want one-tap per-row fills (every 2/4/8, offbeat, backbeat, clear), so regular grooves need no manual clicking.",
+      "priority": 2,
+      "title": "Render per-row quick-fill chips on the StepGrid rail (drums only)",
+      "scope": ["src/components/StepGrid.tsx", "src/components/StepGrid.css", "src/components/ScoreSection.tsx", "src/App.tsx"],
+      "constraints": [
+        "Chips on the .step-grid__rail row label, drums mode only (bass fills out of scope).",
+        "Each chip commits a pure helper via commitPatternEdit (threaded as onRowFill).",
+        "Fixed 118px rail can't hold 6 always-visible chips beside the long drum labels; used a native <details> disclosure (keyboard + touch accessible, no state code) with the menu absolutely positioned so opening it never reflows the rail or shifts the step-plane column centrelines.",
+        "Coarse-pointer (touch) gets larger chip/target sizes (AUDIT touch-first note).",
+        "No new deps."
+      ],
+      "acceptance": "On the kick row, tap x8 -> clean four-on-the-floor across both bars; clr empties the row; backbeat on snare lands on 2 & 4; chips absent in bass mode. Verified live in browser.",
+      "status": "done",
+      "result": "Added a per-drum-row <details class=step-grid__fills> disclosure with chips x8/x4/x2/off/back/clr, each calling onRowFill((p)=>fillRow/clearRow(p,pad,...)). Threaded onRowFill = commitPatternEdit through App -> ScoreSection -> StepGrid. Fixed initial left-overflow by dropping the menu down from the rail's left edge (left:0, top:100%). Verified live: x8 kick=[0,8,16,24,32,40,48,56], snare backbeat=[8,24,40,56], clr empties kick to [], bass mode = 0 fill disclosures. tsc clean; no runtime console errors."
+    },
+    {
+      "id": "EPIC-1-S3-T1",
+      "story": "As a touch user, I want grid drags to paint instead of scrolling the page, so authoring works on a tablet at all.",
+      "priority": 3,
+      "title": "Touch scroll-claim: touch-action:none on step cells + coarse-pointer single-tap target",
+      "scope": ["src/components/StepGrid.css"],
+      "constraints": [
+        "CSS-only. No gesture library, no paint-mode toggle, no new deps.",
+        "touch-action:none goes on the paint surface (.step-cell), NOT a scroll container, so the rail and page outside the grid still scroll.",
+        "Existing Pointer Events + setPointerCapture (E1.1) then own the drag; no JS change needed.",
+        "Enlarge single-cell touch target via @media (pointer: coarse) without breaking the 64-column layout; horizontal enlargement is impossible at 64 cols, so grow row height only, or accept the limit."
+      ],
+      "acceptance": "On coarse/touch, a finger-drag across a drum row paints a run and the page does not scroll; page scroll from outside the grid still works; single cell has a larger coarse-pointer hit area. Verified live.",
+      "status": "done",
+      "result": "Added touch-action:none to .step-cell (comment scopes it to the cell paint surface only, so rail + page-outside-grid keep scrolling; setPointerCapture drives the paint drag). Under @media (pointer: coarse), bumped --sg-row 24->36px on .step-grid — grows row height only (rail labels + plane rows both read --sg-row so they stay aligned), leaving the 64-column layout untouched since horizontal enlargement is impossible at 64 cols. Verified in browser: computed touch-action=none on .step-cell, coarse media rule '.step-grid{--sg-row:36px}' present in CSSOM; tsc clean, grid renders."
+    }
+  ]
+}

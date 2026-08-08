@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Stylophone Beat PatternDocument v1.1 (schemaVersion 4)",
+  "description": "Import-ready lesson file. Give this schema to a model and ask it to fill in title/bpm/pattern for a specific song. Validated by src/lib/document.ts:validatePatternDocument (which also still accepts the older dense schemaVersion 3 on read).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "title", "bpm", "bars", "steps", "drumBank", "bassBank", "pattern"],
+  "properties": {
+    "schemaVersion": { "const": 4 },
+    "id": {
+      "type": "string",
+      "description": "UUID v4",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "title": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "bpm": { "type": "number", "minimum": 40, "maximum": 240 },
+    "bars": { "const": 2 },
+    "steps": { "const": 64 },
+    "drumBank": { "enum": ["ROK", "HIP", "TEC", "BOX"] },
+    "bassBank": { "enum": ["ROK", "HIP", "TEC", "BOX"] },
+    "pattern": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["drums", "bass"],
+      "properties": {
+        "drums": {
+          "type": "object",
+          "description": "Sparse lanes: each key is a pad id, each value the strictly ascending list of active 16th-note step indices (0-63). Omit a pad entirely when it has no hits. Pad ids follow the native Stylophone chromatic layout (1=C ... 7=B, half-steps skip where a piano has no black key). In ROK bank: 1=kick, 1.5=clap, 2=snare, 2.5=rimshot, 3=claves, 4=open hi-hat, 4.5=closed hi-hat, 5=low tom, 5.5=mid tom, 6=high tom, 6.5=crash, 7=ride.",
+          "additionalProperties": false,
+          "properties": {
+            "1": { "$ref": "#/definitions/lane" },
+            "1.5": { "$ref": "#/definitions/lane" },
+            "2": { "$ref": "#/definitions/lane" },
+            "2.5": { "$ref": "#/definitions/lane" },
+            "3": { "$ref": "#/definitions/lane" },
+            "4": { "$ref": "#/definitions/lane" },
+            "4.5": { "$ref": "#/definitions/lane" },
+            "5": { "$ref": "#/definitions/lane" },
+            "5.5": { "$ref": "#/definitions/lane" },
+            "6": { "$ref": "#/definitions/lane" },
+            "6.5": { "$ref": "#/definitions/lane" },
+            "7": { "$ref": "#/definitions/lane" }
+          }
+        },
+        "bass": {
+          "type": "array",
+          "description": "Sparse note list sorted by strictly ascending `step`. Each note's `length` occupies that many consecutive steps starting at `step` (wrapping mod 64). Notes must not overlap. Empty array = no bass.",
+          "items": { "$ref": "#/definitions/bassNote" }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "lane": {
+      "type": "array",
+      "description": "Strictly ascending active step indices, 0-63.",
+      "minItems": 1,
+      "items": { "type": "integer", "minimum": 0, "maximum": 63 }
+    },
+    "bassNote": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["step", "pad", "octave", "length"],
+      "properties": {
+        "step": { "type": "integer", "minimum": 0, "maximum": 63 },
+        "pad": { "enum": ["1", "1.5", "2", "2.5", "3", "4", "4.5", "5", "5.5", "6", "6.5", "7"] },
+        "octave": { "type": "integer", "minimum": -2, "maximum": 2 },
+        "length": { "type": "integer", "minimum": 1, "maximum": 64 }
+      }
+    }
+  }
+}

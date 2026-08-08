@@ -1,0 +1,96 @@
+{
+  "epic": 5,
+  "slug": "first-visit-walkthrough",
+  "title": "First-visit walkthrough",
+  "source": "docs/product/v1.2/EPIC-5-first-visit-walkthrough.md",
+  "generated": "2026-07-16",
+  "tasks": [
+    {
+      "id": "EPIC-5-S1-T1",
+      "story": "As a first-time visitor, I want the app to demonstrate itself by setting a tempo, playing, and writing a groove into the grid, so that I understand what it does without reading instructions.",
+      "priority": 8,
+      "title": "Demo-mode controller",
+      "scope": [
+        "src/lib/demoGroove.ts",
+        "src/hooks/useWalkthrough.ts",
+        "src/App.tsx"
+      ],
+      "constraints": [
+        "No new dependency. No scripted per-cell timed write — one commitPatternEdit call with a static Pattern constant.",
+        "Groove must be original (not transcribed from an existing song) and must populate both drums and bass so derivePasses() emits a bass pass too (Auditor pre-build lock).",
+        "commitPatternEdit remains the sole pattern write boundary.",
+        "Guidance stepping reuses startGuidance()/advanceGuidance() exactly as a real lesson does — no new guidance state machine."
+      ],
+      "acceptance": "Triggering the demo results in a fully populated grid, audible playback, and a running guided lesson — all via calls to existing usePattern/useTransportEngine exports, zero new pattern-mutation code path. After the tour ends (finished or skipped), the demo groove remains in the draft exactly as if hand-authored.",
+      "status": "done",
+      "result": "Added src/lib/demoGroove.ts: an original, hand-composed 2-bar groove (kick/clap/closed-hihat drum hits + a simple C-F-G-C bass line) built from the existing emptyPattern/toggleDrum/setBass pure helpers. Added src/hooks/useWalkthrough.ts exporting startDemo(): setBpm(100) -> arm metronome if off -> single commitPatternEdit(() => DEMO_GROOVE) -> onTogglePlay() if not already playing -> startGuidance(). Guidance has no built-in auto-advance (a real lesson always waits for an explicit Next-row click), so armAutoAdvance() subscribes to the transport's existing onStep clock and calls advanceGuidance() once per loop boundary (step wraps to 0), unsubscribing once guide status reaches complete -- reusing the existing step clock instead of adding a new timer-driven progression path.",
+      "verification": "Wired a temporary click-triggered harness into App.tsx (documented with a `ponytail:` comment) since no real trigger exists yet -- that's Story 3's job. Confirmed live in the browser: click -> BPM jumps to 100, grid populates with the full groove, transport starts playing, guide status flips to guided/1-4 passes, and over several loop iterations progresses through all 4 passes to complete/4-4 passes with the Story-4 'Continue editing' control still present. Caught and fixed a real closure-staleness bug in the verification harness itself (useEffect with [] deps froze startDemo's closure over the initial empty-pattern render) by switching to a ref updated every render -- same pattern src/hooks/useKeyboardControls.ts already uses for exactly this reason. The debug console.log added during diagnosis was removed before commit.",
+      "cleanup_required_next_story": "App.tsx currently has a `ponytail:`-marked temporary click-triggered debug harness (gated behind a ?demo=1 query param) that calls walkthrough.startDemo(). Story 3 (First-visit trigger + retrigger) must remove this harness and replace it with the real first-visit auto-launch + \"?\" retrigger icon.",
+      "open_note_for_story3": "The real first-visit auto-launch effect must NOT use a useEffect(fn, []) that captures startDemo (or any function derived from it) directly in its closure -- that captures a stale pre-pattern-write closure (confirmed via a real bug caught during this story's own verification harness). Route through a ref updated every render (see the startDemoRef pattern in App.tsx, or fold the same technique into useWalkthrough itself) instead."
+    },
+    {
+      "id": "EPIC-5-S2-T1",
+      "story": "As a first-time visitor, I want a spotlight tour dimming everything except the section being explained, so that I'm not overwhelmed by the full interface at once.",
+      "priority": 9,
+      "title": "Spotlight/backdrop tour UI",
+      "scope": [
+        "src/components/Walkthrough.tsx",
+        "src/components/Walkthrough.css",
+        "src/hooks/useWalkthrough.ts",
+        "src/App.tsx",
+        "src/App.css"
+      ],
+      "constraints": [
+        "No new dependency, no tour/positioning library. Hand-rolled dim-only backdrop.",
+        "getBoundingClientRect on 5 fixed, always-present targets -- no dynamic DOM discovery.",
+        "Respect prefers-reduced-motion: instant swap, no crossfade, when set.",
+        "Below 1280px width, show the message-gate instead of attempting to scale the layout down (this gate did not exist in the codebase before this story -- confirmed by grep before starting; user explicitly approved building it as part of this story rather than treating it as a separate gap)."
+      ],
+      "acceptance": "At 1280x720 (and 1680x1046), each step's backdrop correctly dims every section except the current target; Next/Skip both function; reduced-motion setting removes the transition without breaking the sequence; below 1280px width, the app shows the message-gate instead of a broken layout.",
+      "status": "done",
+      "result": "Added src/components/Walkthrough.tsx + .css: a single positioned div over the measured target rect using box-shadow: 0 0 0 9999px rgba(0,0,0,.78) as the dim-punch (no clip-path/SVG mask, no library), plus a bottom-right caption card (step count, copy, Skip/Next reusing the existing .tbtn class). Extended src/hooks/useWalkthrough.ts with TOUR_STEPS (6 steps: Status Bar -> Control Rail -> Status Bar -> Grid -> Lesson Control -> Visualizer, targeting the 5 components' existing aria-label attributes as selectors) and tourStepIndex/startTour/nextTourStep/skipTour state. prefers-reduced-motion is checked once via matchMedia and swaps in a --instant class that removes the CSS transition. Added the sub-1280px viewport gate directly in App.tsx (inline useState+resize-listener, no new file, per the locked project structure not anticipating a dedicated file for it) plus .viewport-gate CSS in App.css -- this gate genuinely did not exist anywhere in the codebase before this story; confirmed by grep and by explicit user sign-off before building it.",
+      "verification": "Extended the same temporary click-triggered debug harness from Story 1 (still ponytail-marked, still gated on ?demo=1) to also call startTour(). Verified live at 1280x720: clicking through Next advanced correctly through all 6 steps in the documented order, each one dimming everything but the correct target (confirmed visually via screenshot + zoom on step 1's Status Bar cutout); Skip cleared the backdrop immediately mid-tour without disturbing the still-running demo/guidance underneath; clicking Done on the final step (button label correctly switches from 'Next' to 'Done' on the last step) closed the tour cleanly. Resized to 1024px width: the full app was replaced by the plain gate message, no broken/scaled layout. Resized back to 1280px: gate cleared and the full app re-rendered correctly, confirming the resize listener works both directions. POST-VERIFICATION REVISION (same session, user-requested): the hard gate was replaced with a dismissible info Modal (reusing the existing Modal component) so a narrow-viewport visitor can close it and keep using the app in the existing v1.1 responsive layout, instead of being blocked outright. Re-verified live at 1024px: modal shows with the app visible underneath, dismiss (X button) closes it and the app remains usable; resizing back to 1280px then down to 1000px re-arms the notice. The now-unused .viewport-gate CSS block was removed from App.css.",
+      "cleanup_required_next_story": "Same temporary ?demo=1 click harness in App.tsx (now calling both startDemo() and startTour()) still needs removing once Story 3 wires the real first-visit auto-launch + \"?\" retrigger icon."
+    },
+    {
+      "id": "EPIC-5-S3-T1",
+      "story": "As a returning visitor, I want to be able to replay the tour on demand, so that I'm not stuck if I skipped it or want a refresher.",
+      "priority": 10,
+      "title": "First-visit trigger + retrigger",
+      "scope": [
+        "src/lib/storage.ts",
+        "src/hooks/useWalkthrough.ts",
+        "src/components/Header.tsx",
+        "src/App.tsx",
+        "src/App.css"
+      ],
+      "constraints": [
+        "localStorage flag, same wrapped-try/catch pattern as DRAFT_KEY in storage.ts (browserStorage() helper) -- no direct localStorage calls in the hook.",
+        "No account/server-side persistence; a cleared browser resets the flag (accepted, Design-girl/Product-head).",
+        "Remove the Story 1/2 temporary ?demo=1 debug harness in App.tsx entirely -- replaced by the real trigger, not left alongside it.",
+        "44px min touch target (WCAG 2.5.5) preserved on the new \"?\" button by reusing the existing .tbtn base class, not overriding its size."
+      ],
+      "acceptance": "First load with no prior flag auto-launches the tour; reload after completion/skip does not relaunch it; clicking \"?\" relaunches it from step 1 regardless of the flag's state.",
+      "status": "done",
+      "result": "Added hasSeenWalkthrough()/markWalkthroughSeen() to src/lib/storage.ts (WALKTHROUGH_SEEN_KEY, same browserStorage()-wrapped try/catch as loadDraft/saveDraft; absent/unavailable storage reads as unseen, matching the accepted cleared-storage-resets behavior). useWalkthrough.ts now owns a first-gesture effect: on mount, if hasSeenWalkthrough() is false, it attaches a once:true window click listener that marks the flag seen and calls a new retriggerTour() (startDemo() + startTour()) -- gated on a real click because startAudio() needs the user gesture for the browser autoplay unlock, so 'auto-launch' means 'launch on the first click anywhere,' not on mount. retriggerTour() and the listener route through startDemoRef/startTourRef refs kept current every render, the same staleness fix Story 1 already used in App.tsx, now folded into the hook itself as the EPIC doc's placement rule requires (hook owns the first-visit flag). Removed the Story 1/2 ?demo=1 debug harness and its refs from App.tsx entirely. Added a permanent \"?\" button (aria-label \"Replay walkthrough tour\") to Header.tsx's progress column, wired to walkthrough.retriggerTour, reusing the .tbtn class (so it keeps the 44px WCAG touch target) with only border-radius:50% and padding:0 added in App.css -- no size override.",
+      "verification": "npx tsc --noEmit -p . passed clean. Verified live via the Browser pane dev server at the locked 1280x720 floor: fresh load showed no tour (flag unset, but demo needs a gesture) with the new circular \"?\" icon visible top-right of the header; a generic click anywhere triggered startDemo() (BPM -> 100, grid populated, guided/1-4 passes) and startTour() (spotlight step 1/6 on the Status Bar, everything else dimmed) together, confirming the first-visit path. Clicked Skip, then reloaded the page: no tour relaunched and the demo groove persisted in the draft (COMPOSE status, populated grid) -- confirming the flag suppresses relaunch across reload. Clicked the \"?\" button afterward (flag already set from the completed/skipped run): tour restarted from step 1/6 on the Status Bar, confirming the icon ignores the flag. read_console_messages showed zero errors throughout.",
+      "cleanup_required_next_story": null
+    },
+    {
+      "id": "EPIC-5-S4-T1",
+      "story": "As a first-time visitor, I want the demo to build up state step by step instead of dumping tempo, metronome, groove, and guidance on me all at once, so each tour step actually shows only what it's talking about.",
+      "priority": 10.1,
+      "title": "Re-choreograph demo to stage per tour step",
+      "scope": ["src/hooks/useWalkthrough.ts"],
+      "constraints": [
+        "No new dependency, no timer-driven progression path beyond the existing onStep auto-advance.",
+        "Reuse existing functions only: setBpm, onToggleClick, onTogglePlay, commitPatternEdit, startGuidance/advanceGuidance, setGuideCompose, emptyPattern.",
+        "Stage transitions must be transition-guarded (fire once per tourStepIndex change), not on every render at the same step."
+      ],
+      "acceptance": "Step 1 (Status Bar): empty grid, metronome off, transport stopped. Step 2 (Control Rail): metronome on, transport playing, grid still empty. Step 3 (Status Bar): no change from step 2. Step 4 (Grid): demo groove committed, guidance starts, auto-advance armed. Steps 5-6: no change. On finish or skip: grid stays painted, transport pauses.",
+      "status": "done",
+      "result": "Replaced the single startDemo() function with a transition-guarded effect keyed on tourStepIndex: step 0 sets demo BPM, clears the grid via commitPatternEdit(() => emptyPattern()), and turns off the metronome/transport if either was left on from a prior run; step 1 turns the metronome on and starts the transport; step 3 commits DEMO_GROOVE and calls startGuidance()+armAutoAdvance(); reaching tourStepIndex === null (finish or skip) stops auto-advance and pauses the transport without touching the grid. retriggerTour() calls setGuideCompose() before startTour() so the step-1 grid clear is never rejected by a guided-status commitPatternEdit guard when replay is clicked mid-demo. startDemo export removed (no remaining consumers).",
+      "verification": "npx tsc --noEmit passed clean. Dev server confirmed serving on :5199. Full flow traced by reading: retriggerTour -> setGuideCompose -> startTour(0) -> stage effect step 0 (rest state) -> Next -> step 1 (metronome+play) -> Next -> step 3 (groove+guidance) -> tour end (pause, grid kept). Browser-drive tools were disconnected mid-session so the live click-through was not re-screenshotted after this change; the equivalent flow was screenshotted and confirmed working prior to this restructuring in Story 3."
+    }
+  ]
+}

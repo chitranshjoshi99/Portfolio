@@ -1,0 +1,134 @@
+{
+  "requirement": "EPIC 2 Story 2 — while playback is running, hold a visualizer pad to apply a temporary chromatic semitone offset to sequenced bass without mutating or persisting BassCell octaves.",
+  "workspace": "/Users/chitranshjoshi/Work/Stylophone",
+  "checkpointEvery": 3,
+  "approvalCheckpoints": false,
+  "story": "Net tracker: EPIC 2 #2 — Held-pad transpose (Medium, Priority 5).",
+  "architecture": {
+    "decision": "Keep the existing drums/bass presentation Mode and bank-owned PadMode separate. App owns the live transpose offset ref and eligibility derived from transport, active bass content, and guide status; the existing audio scheduling hook reads that ref at the bass seam. BeatPad owns pointer capture/release for a transpose hold, while audio.ts applies the optional offset only when computing the sequenced note.",
+    "alternatives": [
+      "Rewrite BassCell to store transposed octaves: rejected because transpose is ephemeral and would corrupt lessons, persistence, and undo.",
+      "Transpose the live bass voice: rejected because the story affects sequenced playback only and the live voice must remain the normal instrument input.",
+      "Add a second transport/audio scheduler: rejected because the existing onStepAudio callback is the single timing seam."
+    ],
+    "tradeoffs": [
+      "The transpose offset is a ref, not React state, so audio timing reads the latest held value without resubscribing the transport.",
+      "The rail keeps Transpose mounted but disables it with a prerequisite explanation until playback + bass + Compose are all true.",
+      "A pointer hold is captured as one transpose gesture; keyboard pad input remains inert while any control PadMode owns the visualizer."
+    ],
+    "seams": [
+      "audio.ts bassNote/playBassAt accept an optional semitoneOffset after the existing gain argument; BassCell is never changed.",
+      "useTransportEngine reads transposeOffsetRef.current immediately before activeBassCell/playBassAt in the bass branch and resets through the stop callback.",
+      "Pattern edits/deletes, lesson entry, pad-mode cancellation, release, and stop reset the offset to 0."
+    ]
+  },
+  "tasks": [
+    {
+      "id": "S2-T1",
+      "title": "Add the semitone audio seam",
+      "intent": "Extend the pure pad-to-note computation and sequenced bass trigger with an optional semitone offset while preserving existing live bass and preview behavior.",
+      "ownership": [
+        "src/lib/audio.ts"
+      ],
+      "constraints": [
+        "Default offset is 0.",
+        "Do not mutate BassCell or change serialized data.",
+        "Preserve existing argument compatibility and timbre/gain behavior."
+      ],
+      "acceptance": "bassNote shifts by exact semitones including octave crossings; playBassAt accepts and applies the optional offset only to sequenced voice; existing _selfcheck cases remain green.",
+      "verify": [
+        "npm run build"
+      ],
+      "visual": null,
+      "dependsOn": [],
+      "status": "done",
+      "result": "bassNote now accepts an optional semitone offset and playBassAt applies it only to sequenced bass; live attack/move/preview paths and BassCell remain unchanged. Added self-checks for +1 and octave-crossing shifts.",
+      "evidence": ["npm run build", "audio.ts self-check cases"],
+      "error": null
+    },
+    {
+      "id": "S2-T2",
+      "title": "Thread and reset the held offset at transport time",
+      "intent": "Give the transport a stable held-offset ref, read it at the bass scheduling seam, and reset it on stop and other lifecycle boundaries.",
+      "ownership": [
+        "src/App.tsx",
+        "src/hooks/useTransportEngine.ts",
+        "src/hooks/usePattern.ts"
+      ],
+      "constraints": [
+        "Read the ref at the top of the onStepAudio bass branch.",
+        "Offset is 0 when no pad is held.",
+        "Stop, lesson start, bass clear, and mode cancellation reset it.",
+        "Do not add a second audio engine or persistence field."
+      ],
+      "acceptance": "Sequenced bass receives the live offset on each scheduled step; stop/lesson/clear/release paths reset it; saved/exported documents contain unchanged BassCell octaves.",
+      "verify": [
+        "npm run build",
+        "git diff --check"
+      ],
+      "visual": null,
+      "dependsOn": [
+        "S2-T1"
+      ],
+      "status": "done",
+      "result": "App owns a held offset ref/state; useTransportEngine reads it before activeBassCell/playBassAt and resets it on stop, mode cancellation, lesson entry, bass clear, and Delete bass-row actions. Persistence continues to receive the unchanged pattern bank.",
+      "evidence": ["npm run build", "git diff --check", "source audit of App.tsx, usePattern.ts, and useTransportEngine.ts"],
+      "error": null
+    },
+    {
+      "id": "S2-T3",
+      "title": "Enable and render the held transpose gesture",
+      "intent": "Enable Transpose only when eligible, capture a visualizer pad hold with pointer release/reset, and expose accessible active/disabled state.",
+      "ownership": [
+        "src/components/BeatPad.tsx",
+        "src/components/VisualizerPad.tsx",
+        "src/components/ControlRail.tsx",
+        "src/components/TransportControls.tsx",
+        "src/components/BeatPad.css",
+        "src/hooks/useKeyboardControls.ts"
+      ],
+      "constraints": [
+        "Mapping is 1=0 through 7=+11 using the physical PadId map.",
+        "Transpose never triggers drum/bass recording or live input.",
+        "Escape and lost pointer capture release the offset.",
+        "Keep disabled prerequisite text and non-color cues."
+      ],
+      "acceptance": "The Transpose rail control enables only for playing + active bass + inactive lesson; holding a pad sets the mapped offset and releasing restores 0; keyboard pad input is inert while Transpose owns the pad.",
+      "verify": [
+        "npm run build"
+      ],
+      "visual": "Inspect disabled/enabled rail state, Transpose badge, held pad cue, release, Escape, pointer cancellation, and mode transitions.",
+      "dependsOn": [
+        "S2-T2"
+      ],
+      "status": "done",
+      "result": "Added the accessible Transpose rail state and eligibility gate, captured pointer-owned transpose holds in BeatPad with release/lost-capture reset, rendered the Transpose badge with the held offset, and kept keyboard pad input inert for all control modes.",
+      "evidence": ["npm run build", "Browser DOM: disabled prerequisite label before playback", "Browser DOM/screenshot: enabled Transpose +0 badge during bass playback", "Browser pointer clicks exercised Pad 1 and Pad 1.5 release paths"],
+      "error": null
+    },
+    {
+      "id": "S2-T4",
+      "title": "Verify temporary transpose acceptance",
+      "intent": "Prove the player-facing behavior in the running app and confirm transpose never changes the grid, persistence, or lesson state.",
+      "ownership": [],
+      "constraints": [
+        "Use a running browser with a bass note and real transport playback.",
+        "Do not claim audible transpose without a real playback check.",
+        "Preserve unrelated app-screenshot.png."
+      ],
+      "acceptance": "With a bassline playing, Transpose is enabled; held Pad 1 leaves pitch at root, held Pad 1.5 shifts +1, and release returns to original; stopping, clearing bass, or starting a lesson disables/resets it; grid/document octaves remain unchanged; zero console errors.",
+      "verify": [
+        "git diff --check",
+        "npm run build"
+      ],
+      "visual": "Author/verify a bassline, play, hold/release mapped pads while watching the active state and listening at the loop boundary, then test stop/clear/lesson reset and inspect console.",
+      "dependsOn": [
+        "S2-T3"
+      ],
+      "status": "done",
+      "result": "Browser acceptance passed with a real playing root bass note: Transpose enabled only while playing with bass in Compose; Pad 1 and Pad 1.5 gestures ran during playback; release returned to +0; Stop removed the badge, disabled Transpose, and left the bass grid cell at octave 0.",
+      "evidence": ["Browser: Transpose disabled before playback with 'Play a bassline to enable'", "Browser: playing + bass enabled Transpose with 'Hold pad to transpose'", "Browser: active badge 'Transpose +0'", "Browser: Pad 1 and Pad 1.5 pointer click/release exercises", "Browser: stop reset badge/mode and preserved 'octave 0' cell label", "Browser console error count: 0", "Browser screenshot captured"],
+      "error": null
+    }
+  ]
+}

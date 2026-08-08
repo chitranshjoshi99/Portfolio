@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "type": "upload",
+    "ref": "I-Wonder.mp3",
+    "clipStart": 35.0,
+    "clipEnd": 50.0,
+    "phaseSec": 0.6037,
+    "loopLenSec": 5.0
+  },
+  "bpm": 96.0,
+  "bank": "ROK",
+  "bars": 2,
+  "steps": 32,
+  "layers": [
+    {
+      "id": "drums",
+      "type": "drums",
+      "hits": [
+        {
+          "step": 1,
+          "sound": "kick"
+        },
+        {
+          "step": 2,
+          "sound": "kick"
+        },
+        {
+          "step": 3,
+          "sound": "kick"
+        },
+        {
+          "step": 5,
+          "sound": "kick"
+        },
+        {
+          "step": 7,
+          "sound": "kick"
+        },
+        {
+          "step": 8,
+          "sound": "kick"
+        },
+        {
+          "step": 10,
+          "sound": "hat"
+        },
+        {
+          "step": 10,
+          "sound": "kick"
+        },
+        {
+          "step": 11,
+          "sound": "kick"
+        },
+        {
+          "step": 13,
+          "sound": "kick"
+        },
+        {
+          "step": 14,
+          "sound": "hat"
+        },
+        {
+          "step": 14,
+          "sound": "kick"
+        },
+        {
+          "step": 17,
+          "sound": "kick"
+        },
+        {
+          "step": 18,
+          "sound": "hat"
+        },
+        {
+          "step": 19,
+          "sound": "kick"
+        },
+        {
+          "step": 21,
+          "sound": "kick"
+        },
+        {
+          "step": 23,
+          "sound": "kick"
+        },
+        {
+          "step": 24,
+          "sound": "hat"
+        },
+        {
+          "step": 24,
+          "sound": "kick"
+        },
+        {
+          "step": 26,
+          "sound": "hat"
+        },
+        {
+          "step": 26,
+          "sound": "kick"
+        },
+        {
+          "step": 27,
+          "sound": "kick"
+        },
+        {
+          "step": 29,
+          "sound": "kick"
+        },
+        {
+          "step": 30,
+          "sound": "hat"
+        },
+        {
+          "step": 30,
+          "sound": "kick"
+        }
+      ]
+    },
+    {
+      "id": "bass",
+      "type": "bass",
+      "notes": [
+        {
+          "step": 8,
+          "pad": "1",
+          "octave": 0,
+          "length": 1
+        }
+      ]
+    }
+  ],
+  "teachOrder": [
+    "drums",
+    "bass"
+  ]
+}

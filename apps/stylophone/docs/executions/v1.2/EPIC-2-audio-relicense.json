@@ -1,0 +1,48 @@
+{
+  "epic": 2,
+  "slug": "audio-relicense",
+  "title": "Audio relicensing swap",
+  "source": "docs/product/v1.2/EPIC-2-audio-relicense.md",
+  "generated": "2026-07-16",
+  "tasks": [
+    {
+      "id": "EPIC-2-S1-T1",
+      "story": "As the product owner, I want 13 CC0-licensed replacement samples sourced and provenance-recorded so that every sound the app ships has a traceable, clean license.",
+      "priority": 2,
+      "title": "Source and verify 13 CC0 replacement samples",
+      "status": "done",
+      "result": "Executed in prior kimchi session — 13 files staged in public/rok-cc0/, CREDITS.md written with full per-file provenance."
+    },
+    {
+      "id": "EPIC-2-S2-T1",
+      "story": "As the product owner, I want the staged replacements swapped into the live asset path and the dead unused samples deleted so that the shipped build contains zero archive.org-sourced audio.",
+      "priority": 3,
+      "title": "Swap staged CC0 files into public/rok/, delete dead files",
+      "scope": ["public/rok/", "public/rok-cc0/"],
+      "constraints": [
+        "Pure file-ops. Do not refactor audio.ts's sample-loading code.",
+        "Convert pad-4-open-hihat.mp3 to WAV before wiring in, per Auditor lock.",
+        "Same filenames the app already references — zero src/ diff."
+      ],
+      "acceptance": "git status shows only file adds/deletes/renames under public/rok/ and public/rok-cc0/, zero diffs in src/. App boots, every drum pad and the metronome click play the new samples. kick.wav/snare.wav/hat.wav/bass_C2.wav no longer exist in the working tree.",
+      "status": "done",
+      "result": "Converted pad-4-open-hihat.mp3 to WAV via ffmpeg (44.1kHz/16-bit PCM, matching kit format). Copied all 13 staged files into public/rok/ at existing filenames; deleted kick.wav, snare.wav, hat.wav, bass_C2.wav. git status confirmed adds/mods/deletes scoped only to public/rok/, zero src/ diff. Verified live: clicking a pattern cell + playing triggered all 13 assets loading 200 OK over the network, zero console errors.",
+      "open_gap": "RESOLVED by EPIC-2-S3-T1 (2026-07-17): the flagged listen-through failed — kit v1 rejected, replaced by kit v2."
+    },
+    {
+      "id": "EPIC-2-S3-T1",
+      "story": "As the product owner, I want the CC0 kit to actually sound like a coherent drum kit, because kit v1 failed the human listen-through (synth D&B kick/snare, digitally silent ride, cross-kit tonal chaos, wild level spread).",
+      "priority": 1,
+      "title": "Re-source kit v2 after listen-through rejection of kit v1",
+      "scope": ["public/rok/", "public/rok-cc0/"],
+      "constraints": [
+        "CC0 only (Legal-bro lock). CC-BY/CC-BY-SA sources evaluated and rejected (AVL Drumkits, Salamander).",
+        "Same filenames, zero src/ diff.",
+        "Human ear gates every pick: two audition rounds on an A/B page before swap."
+      ],
+      "acceptance": "User approves kit in listen-through; all 13 files CC0 with per-file provenance in CREDITS.md; app serves all 13 assets 200 OK.",
+      "status": "done",
+      "result": "Kit v2 assembled from three CC0 sets after two user audition rounds: 9 voices from Sonic Pi bundled samples (kick=Zajo/4832; toms/hats/crash/ride all one creator menegass/100053-100066; stick=looppool elec_tick), snare+rimshot from Virtuosity Drums (sfzinstruments, one session, mid mics), clap=DigitalUnderglow/745868, claves=MarleneAyni/90017. All processed to 44.1kHz/16-bit WAV, peak-normalized to fixed kit-balance map. CREDITS.md rewritten with per-file provenance + processing record. Verified: all 13 assets 200 OK on dev server, byte-exact to approved audition files, Web Audio decode confirmed in-session. Virtuosity full-kit variant kept as documented fallback."
+    }
+  ]
+}
