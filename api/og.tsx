@@ -6,7 +6,7 @@ export const config = { runtime: "edge" };
 // api/page.js + the app via ogImageUrl in blogs.config.ts). No cross-module
 // imports, so the edge bundle stays clean.
 
-// Press Start 2P TTF — Satori needs a real font file in the edge runtime.
+// Press Start 2P TTF, Satori needs a real font file in the edge runtime.
 const FONT_URL =
   "https://raw.githubusercontent.com/google/fonts/main/ofl/pressstart2p/PressStart2P-Regular.ttf";
 
@@ -14,7 +14,7 @@ export default async function handler(req: Request) {
   const { searchParams } = new URL(req.url);
   const title = searchParams.get("title") ?? "Engineering notes & live POCs";
   const tag = searchParams.get("tag") ?? "LABS";
-  const accent = searchParams.get("accent") ?? "#9b8ea0";
+  const accent = searchParams.get("accent") ?? "#dad4c8";
 
   const font = await fetch(FONT_URL).then((r) => r.arrayBuffer());
 

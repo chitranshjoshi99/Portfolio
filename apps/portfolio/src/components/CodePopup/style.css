@@ -1,5 +1,5 @@
 /* ============================================================
-   CODE POPUP — 3D terminal that unfolds out of the button (mobile)
+   CODE POPUP: 3D terminal that unfolds out of the button (mobile)
    ============================================================ */
 
 .code-popup-overlay {
@@ -118,10 +118,10 @@
 
 .code-popup__close {
   align-self: center;
-  font-size: 8px;
+  font-size: var(--fs-pixel-sm);
   letter-spacing: 0.1em;
   padding: var(--px2) var(--px4);
-  border: var(--px) solid var(--cp-accent);
+  border: var(--border-width) solid var(--cp-accent);
   background: var(--bg-card);
   color: var(--cp-accent);
   cursor: pointer;

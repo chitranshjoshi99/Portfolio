@@ -1,5 +1,5 @@
 /* ============================================================
-   HANDHELD — retro brick-game console modal (mobile "See in Action")
+   HANDHELD: retro brick-game console modal (mobile "See in Action")
    ============================================================ */
 
 .handheld-overlay {
@@ -23,7 +23,7 @@
   height: 100%;
   padding: var(--px4) var(--px4) var(--px5);
   background: var(--bg-secondary);
-  border: var(--px) solid var(--border-primary);
+  border: var(--border-width) solid var(--border-primary);
   box-shadow:
     var(--px2) var(--px2) 0 var(--shadow-color),
     0 0 0 2px var(--bg-primary) inset;
@@ -62,7 +62,7 @@
 }
 
 .handheld__brand {
-  font-size: 6px;
+  font-size: var(--fs-pixel-2xs);
   letter-spacing: 0.12em;
   color: var(--text-muted);
 }
@@ -86,7 +86,7 @@
 .handheld__screen-frame {
   padding: var(--px3);
   background: #14110d;
-  border: var(--px) solid #2a2418;
+  border: var(--border-width) solid #2a2418;
   box-shadow: inset 0 0 0 2px #000;
 }
 
@@ -96,7 +96,7 @@
   align-items: center;
   justify-content: center;
   min-height: 150px;
-  background: #0c0a0e;
+  background: var(--crt-bg);
   overflow: hidden;
 }
 
@@ -123,8 +123,8 @@
 }
 
 .handheld__nosignal {
-  font-size: 8px;
-  color: var(--text-muted);
+  font-size: var(--fs-pixel-sm);
+  color: var(--crt-dim);
 }
 
 .handheld__paused {
@@ -133,10 +133,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
+  font-size: var(--fs-pixel-md);
   letter-spacing: 0.2em;
-  color: var(--hh-accent);
-  background: rgba(0, 0, 0, 0.55);
+  color: var(--crt-fg);
+  background: rgba(0, 0, 0, 0.72);
   animation: hh-blink 1s step-end infinite;
 }
 
@@ -160,7 +160,7 @@
 
 .handheld__game-name {
   text-align: center;
-  font-size: 6px;
+  font-size: var(--fs-pixel-2xs);
   letter-spacing: 0.18em;
   color: var(--hh-accent);
 }
@@ -184,7 +184,7 @@
 
 .handheld__pad,
 .handheld__ab {
-  border: var(--px) solid #1b1720;
+  border: var(--border-width) solid #1b1720;
   background: var(--bg-card);
   color: var(--text-secondary);
   cursor: pointer;
@@ -220,7 +220,7 @@
 .handheld__pad-center {
   grid-area: 2 / 2 / 3 / 3;
   background: var(--bg-card);
-  border: var(--px) solid #1b1720;
+  border: var(--border-width) solid #1b1720;
 }
 .handheld__pad--right {
   grid-area: 2 / 3 / 3 / 4;
@@ -269,10 +269,10 @@
 }
 
 .handheld__btn {
-  font-size: 7px;
+  font-size: var(--fs-pixel-xs);
   letter-spacing: 0.1em;
   padding: var(--px2) var(--px3);
-  border: var(--px) solid var(--border-primary);
+  border: var(--border-width) solid var(--border-primary);
   background: var(--bg-card);
   color: var(--text-secondary);
   cursor: pointer;
@@ -293,12 +293,12 @@
 }
 
 .handheld__btn--power {
-  color: var(--delhivery-red);
-  border-color: var(--delhivery-red);
+  color: var(--signal-danger);
+  border-color: var(--signal-danger);
 }
 
 .handheld__btn--power:hover {
-  background: color-mix(in srgb, var(--delhivery-red) 16%, transparent);
+  background: color-mix(in srgb, var(--signal-danger) 16%, transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,5 +1,9 @@
 /* ============================================================
    EXPERIENCE CARD COMPONENT
+
+   There is no per-company accent any more, every card draws
+   from the same neutral ink ramp, and "which company" is told
+   by the index, name and content instead of by hue.
    ============================================================ */
 
 .exp-card {
@@ -15,43 +19,29 @@
   padding: var(--px8) 0;
 }
 
-/* Tinted overlay per company */
-.exp-card__bg-overlay {
-  position: absolute;
-  inset: 0;
-  background: var(--exp-bg, transparent);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.6s ease;
-}
-
-.exp-card--active .exp-card__bg-overlay {
-  opacity: 0.28;
-}
-
 /* Left accent bar */
-.exp-card::after {
+/* .exp-card::after {
   content: "";
   position: absolute;
   left: 0;
   top: 12%;
   bottom: 12%;
-  width: 3px;
-  background: var(--exp-accent);
+  width: var(--px);
+  background: var(--accent-primary);
   opacity: 0;
   transition: opacity 0.5s ease;
 }
 
 .exp-card--active::after {
   opacity: 1;
-}
+} */
 
 /* Pixel corner accents */
 .exp-card__corner {
   position: absolute;
-  width: 28px;
-  height: 28px;
-  border-color: var(--exp-accent);
+  width: var(--px6);
+  height: var(--px6);
+  border-color: var(--accent-primary);
   border-style: solid;
   opacity: 0;
   transition: opacity 0.5s ease;
@@ -64,13 +54,13 @@
 .exp-card__corner--tl {
   top: var(--px4);
   left: var(--px4);
-  border-width: 3px 0 0 3px;
+  border-width: var(--border-width) 0 0 var(--border-width);
 }
 
 .exp-card__corner--br {
   bottom: var(--px4);
   right: var(--px4);
-  border-width: 0 3px 3px 0;
+  border-width: 0 var(--border-width) var(--border-width) 0;
 }
 
 /* ── Inner grid ────────────────────────────────────────────── */
@@ -101,8 +91,8 @@
 }
 
 .exp-company__index {
-  font-size: 8px;
-  color: var(--exp-accent);
+  font-size: var(--fs-pixel-sm);
+  color: var(--text-muted);
   letter-spacing: 0.1em;
   margin-bottom: var(--px2);
 }
@@ -115,7 +105,7 @@
 }
 
 .exp-card--active .exp-company__name {
-  color: var(--exp-accent);
+  color: var(--accent-primary);
 }
 
 .exp-company__full {
@@ -125,7 +115,7 @@
 }
 
 .exp-company__role {
-  font-size: 9px;
+  font-size: var(--fs-pixel-md);
   color: var(--text-secondary);
   letter-spacing: 0.05em;
   margin-bottom: var(--px4);
@@ -139,11 +129,14 @@
 }
 
 .exp-meta__chip {
-  font-size: 7px;
-  padding: var(--px) var(--px3);
-  border: var(--px) solid var(--exp-accent);
-  color: var(--exp-accent);
-  background: var(--exp-accent-dim, transparent);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--px2);
+  font-size: var(--fs-pixel-xs);
+  padding: var(--px2) var(--px3);
+  border: var(--border-width) solid var(--border-primary);
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
   letter-spacing: 0.05em;
 }
 
@@ -160,9 +153,9 @@
 }
 
 .exp-tag {
-  font-size: 7px;
-  padding: 2px var(--px2);
-  border: var(--px) solid var(--border-primary);
+  font-size: var(--fs-pixel-xs);
+  padding: var(--px) var(--px2);
+  border: var(--border-width) solid var(--border-primary);
   color: var(--text-muted);
   background: var(--bg-secondary);
   letter-spacing: 0.04em;
@@ -172,11 +165,11 @@
 }
 
 .exp-card--active .exp-tag:hover {
-  border-color: var(--exp-accent);
-  color: var(--exp-accent);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
 }
 
-/* ── Right panel — achievements ────────────────────────────── */
+/* ── Right panel, achievements ────────────────────────────── */
 
 .exp-panel--right {
   display: flex;
@@ -193,11 +186,11 @@
 }
 
 .exp-achievements__title {
-  font-size: 8px;
-  color: var(--exp-accent);
+  font-size: var(--fs-pixel-sm);
+  color: var(--text-secondary);
   letter-spacing: 0.08em;
   padding-bottom: var(--px2);
-  border-bottom: var(--px) solid var(--border-secondary);
+  border-bottom: var(--border-width) solid var(--border-secondary);
   flex-shrink: 0;
 }
 
@@ -225,8 +218,8 @@
 }
 
 .exp-achievement__icon {
-  font-size: 7px;
-  color: var(--exp-accent);
+  font-size: var(--fs-pixel-xs);
+  color: var(--accent-muted);
   margin-top: 5px;
   flex-shrink: 0;
 }
@@ -245,14 +238,14 @@
 }
 
 .exp-achievement__label {
-  font-size: 7px;
+  font-size: var(--fs-pixel-xs);
   color: var(--text-muted);
   letter-spacing: 0.05em;
 }
 
 .exp-achievement__metric {
   font-size: 1.4rem;
-  color: var(--exp-accent);
+  color: var(--text-primary);
   line-height: 1;
   font-weight: 600;
 }

@@ -15,10 +15,7 @@ export default function Apps() {
           {PUBLISHED_APPS.map((app) => (
             <li key={app.slug}>
               <a className="apps-index__card" href={`/apps/${app.slug}/`}>
-                <span
-                  className="pixel-text apps-index__card-label"
-                  style={{ color: app.accent }}
-                >
+                <span className="pixel-text apps-index__card-label">
                   {app.label}
                 </span>
                 <span className="pixel-text apps-index__card-title">

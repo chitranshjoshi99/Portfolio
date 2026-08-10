@@ -30,7 +30,7 @@
 }
 
 .contact-info__label {
-  font-size: 8px;
+  font-size: var(--fs-pixel-sm);
   color: var(--accent-primary);
   letter-spacing: 0.08em;
 }
@@ -62,15 +62,15 @@
 }
 
 .contact-link__icon {
-  font-size: 14px;
+  display: inline-flex;
   color: var(--accent-primary);
-  width: 20px;
+  width: var(--px5);
   flex-shrink: 0;
   margin-top: 2px;
 }
 
 .contact-link__label {
-  font-size: 7px;
+  font-size: var(--fs-pixel-xs);
   color: var(--text-muted);
   letter-spacing: 0.07em;
   margin-bottom: 2px;
@@ -89,9 +89,9 @@
 
 /* Terminal decoration */
 .contact-terminal {
-  border: var(--px) solid var(--border-primary);
+  border: var(--border-width) solid var(--border-primary);
   background: var(--bg-code);
-  box-shadow: var(--px2) var(--px2) 0 var(--border-primary);
+  box-shadow: var(--shadow-pixel);
   overflow: hidden;
   margin-top: var(--px4);
 }
@@ -102,23 +102,23 @@
   align-items: center;
   padding: var(--px2) var(--px3);
   background: var(--bg-secondary);
-  border-bottom: var(--px) solid var(--border-primary);
+  border-bottom: var(--border-width) solid var(--border-primary);
 }
 
 .contact-terminal__bar span {
   width: 8px;
   height: 8px;
-  border: 1px solid var(--border-primary);
+  border: var(--border-thin) solid var(--border-primary);
 }
 
 .contact-terminal__bar span:nth-child(1) {
-  background: #b87a72;
+  background: var(--border-primary);
 }
 .contact-terminal__bar span:nth-child(2) {
-  background: #9e8562;
+  background: var(--accent-muted);
 }
 .contact-terminal__bar span:nth-child(3) {
-  background: #7a9e7a;
+  background: var(--accent-primary);
 }
 
 .contact-terminal__body {
@@ -129,7 +129,7 @@
 }
 
 .contact-terminal__line {
-  font-size: 9px;
+  font-size: var(--fs-pixel-md);
   color: var(--text-secondary);
 }
 
@@ -138,13 +138,13 @@
 }
 
 .contact-terminal__output {
-  font-size: 9px;
+  font-size: var(--fs-pixel-md);
   color: var(--text-muted);
   padding-left: var(--px4);
 }
 
 .contact-terminal__output--green {
-  color: #7a9e7a;
+  color: var(--signal-ok);
 }
 
 .contact-terminal__cursor {
@@ -164,16 +164,16 @@
   gap: var(--px6);
   padding: var(--px8);
   background: var(--bg-card);
-  border: var(--px) solid var(--border-primary);
-  box-shadow: var(--px2) var(--px2) 0 var(--border-primary);
+  border: var(--border-width) solid var(--border-primary);
+  box-shadow: var(--shadow-pixel);
 }
 
 .contact-form__title {
-  font-size: 9px;
+  font-size: var(--fs-pixel-md);
   color: var(--accent-primary);
   letter-spacing: 0.08em;
   padding-bottom: var(--px4);
-  border-bottom: var(--px) solid var(--border-secondary);
+  border-bottom: var(--border-width) solid var(--border-secondary);
 }
 
 .form-row {
@@ -189,7 +189,7 @@
 }
 
 .form-label {
-  font-size: 7px;
+  font-size: var(--fs-pixel-xs);
   color: var(--text-muted);
   letter-spacing: 0.08em;
 }
@@ -197,7 +197,7 @@
 .form-input,
 .form-textarea {
   background: var(--bg-secondary);
-  border: var(--px) solid var(--border-primary);
+  border: var(--border-width) solid var(--border-primary);
   color: var(--text-primary);
   font-family: var(--font-body);
   font-size: var(--font-size-base);
@@ -212,16 +212,16 @@
 .form-input:focus,
 .form-textarea:focus {
   border-color: var(--accent-primary);
-  box-shadow: var(--px2) var(--px2) 0 var(--accent-glow);
+  box-shadow: var(--shadow-depth) var(--shadow-depth) 0 var(--accent-glow);
 }
 
 .form-input--error {
-  border-color: var(--delhivery-red);
+  border-color: var(--signal-danger);
 }
 
 .form-error {
-  font-size: 7px;
-  color: var(--delhivery-red);
+  font-size: var(--fs-pixel-xs);
+  color: var(--signal-danger);
   letter-spacing: 0.05em;
 }
 
@@ -241,86 +241,24 @@
   margin-top: var(--px2);
 }
 
-/* WhatsApp button — green accent */
-.btn--whatsapp {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--px2);
-  padding: var(--px3) var(--px6);
-  font-size: 9px;
-  letter-spacing: 0.08em;
-  background: rgba(74, 128, 74, 0.12);
-  color: #7aba7a;
-  border: var(--px) solid #4a7a4a;
-  box-shadow: var(--px) var(--px) 0 #2a4a2a;
-  cursor: pointer;
-  transition:
-    background var(--transition-fast),
-    box-shadow var(--transition-fast),
-    transform var(--transition-fast);
-}
-
-.btn--whatsapp:hover:not(:disabled) {
-  background: rgba(74, 128, 74, 0.22);
-  box-shadow: var(--px) var(--px) 0 #3a6a3a;
-}
-
-.btn--whatsapp:active:not(:disabled) {
-  transform: translate(var(--px), var(--px));
-  box-shadow: 0 0 0 #2a4a2a;
-}
-
-/* Email button — accent colour */
-.btn--email {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--px2);
-  padding: var(--px3) var(--px6);
-  font-size: 9px;
-  letter-spacing: 0.08em;
-  background: var(--accent-glow);
-  color: var(--accent-primary);
-  border: var(--px) solid var(--accent-primary);
-  box-shadow: var(--px) var(--px) 0 var(--accent-primary);
-  cursor: pointer;
-  transition:
-    background var(--transition-fast),
-    box-shadow var(--transition-fast),
-    transform var(--transition-fast);
-}
-
-.btn--email:hover:not(:disabled) {
-  background: var(--bg-secondary);
-}
-
-.btn--email:active:not(:disabled) {
-  transform: translate(var(--px), var(--px));
-  box-shadow: 0 0 0 var(--accent-primary);
-}
-
-.form-actions__icon {
-  font-size: 10px;
-}
-
-.btn--loading {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
+/* The send actions are plain .btn--primary / .btn--outline, no bespoke
+   button variants here, so padding, type size and shadow depth stay
+   identical to every other button in the app. */
 
 .form-send-error {
-  font-size: 7px;
-  color: var(--delhivery-red);
+  font-size: var(--fs-pixel-xs);
+  color: var(--signal-danger);
   letter-spacing: 0.05em;
   align-self: center;
 }
 
 .form-hint {
-  font-size: 7px;
+  font-size: var(--fs-pixel-xs);
   color: var(--text-muted);
   letter-spacing: 0.04em;
   opacity: 0.6;
   padding-top: var(--px2);
-  border-top: var(--px) dashed var(--border-secondary);
+  border-top: var(--border-width) dashed var(--border-secondary);
 }
 
 /* ── Success state ─────────────────────────────────────────── */
@@ -334,36 +272,31 @@
   gap: var(--px6);
   text-align: center;
   padding: var(--px8);
-  border: var(--px) solid var(--border-primary);
+  border: var(--border-width) solid var(--border-primary);
   background: var(--bg-card);
+  box-shadow: var(--shadow-pixel);
 }
 
 .contact-success__icon {
-  font-size: 2rem;
-  color: #7a9e7a;
-  border: var(--px2) solid #7a9e7a;
-  width: 60px;
-  height: 60px;
+  color: var(--signal-ok);
+  border: var(--border-width) solid var(--signal-ok);
+  width: var(--px16);
+  height: var(--px16);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .contact-success__title {
-  font-size: var(--font-size-sm);
-  color: #7a9e7a;
+  font-size: var(--fs-pixel-lg);
+  color: var(--signal-ok);
   letter-spacing: 0.1em;
 }
 
 .contact-success__sub {
   color: var(--text-secondary);
   font-size: var(--font-size-base);
-  margin-bottom: var(--px2);
-}
-
-.contact-success__sub {
-  color: var(--text-muted);
-  font-size: var(--font-size-sm);
+  max-width: 42ch;
 }
 
 /* ── RESPONSIVE ────────────────────────────────────────────── */

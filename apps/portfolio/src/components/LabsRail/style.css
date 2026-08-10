@@ -1,5 +1,5 @@
 /* ============================================================
-   LABS RAIL — floating side menu
+   LABS RAIL: floating side menu
    Collapsed = dots only.  Hover/focus = dots expand to names.
    Desktop: detached pill, left-of-center.  Mobile: bottom dock.
    ============================================================ */
@@ -12,9 +12,9 @@
   z-index: 90;
 
   background: var(--bg-card);
-  border: var(--px) solid var(--border-primary);
+  border: var(--border-width) solid var(--border-primary);
   border-radius: 20px;
-  box-shadow: var(--px2) var(--px2) 0 var(--border-secondary);
+  box-shadow: var(--shadow-depth) var(--shadow-depth) 0 var(--border-secondary);
   padding: var(--px3) 10px;
 }
 
@@ -44,7 +44,7 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  border: var(--px) solid var(--border-primary);
+  border: var(--border-width) solid var(--border-primary);
   background: transparent;
   flex-shrink: 0;
   transition:
@@ -64,7 +64,7 @@
   transform: scale(1.3);
 }
 
-/* Label — hidden until the pill is hovered or focused */
+/* Label, hidden until the pill is hovered or focused */
 .labs-rail__label {
   display: flex;
   align-items: center;
@@ -85,7 +85,7 @@
 }
 
 .labs-rail__tag {
-  font-size: 6px;
+  font-size: var(--fs-pixel-2xs);
   letter-spacing: 0.04em;
   color: var(--text-muted);
   flex-shrink: 0;
@@ -104,7 +104,7 @@
 }
 
 .labs-rail__status {
-  font-size: 7px;
+  font-size: var(--fs-pixel-xs);
   color: var(--row-accent, var(--text-muted));
 }
 
@@ -124,7 +124,7 @@
 }
 
 .labs-rail__sep-label {
-  font-size: 5px;
+  font-size: var(--fs-pixel-2xs);
   letter-spacing: 0.12em;
   color: var(--text-muted);
   max-width: 0;
@@ -159,7 +159,7 @@
     gap: var(--px3);
   }
 
-  /* No hover on touch — keep dots, but reveal the active item's name */
+  /* No hover on touch, keep dots, but reveal the active item's name */
   .labs-rail__label {
     display: none;
   }

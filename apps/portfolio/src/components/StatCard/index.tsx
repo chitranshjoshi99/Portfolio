@@ -7,7 +7,6 @@ interface StatCardProps {
   after: string;
   pct: number;
   unit: string;
-  color?: string;
   delay?: number;
 }
 
@@ -17,7 +16,6 @@ export function StatCard({
   after,
   pct,
   unit,
-  color,
   delay = 0,
 }: StatCardProps) {
   const ref = useRef<HTMLDivElement>(null);
@@ -43,12 +41,7 @@ export function StatCard({
     <div
       className={`stat-card ${visible ? "stat-card--visible" : ""}`}
       ref={ref}
-      style={
-        {
-          "--stat-color": color ?? "var(--accent-primary)",
-          "--delay": `${delay}ms`,
-        } as React.CSSProperties
-      }
+      style={{ "--delay": `${delay}ms` } as React.CSSProperties}
     >
       <span className="stat-card__metric vt-text">{after}</span>
       <span className="stat-card__label pixel-text">{label}</span>
@@ -61,7 +54,9 @@ export function StatCard({
           }}
         />
       </div>
-      <span className="stat-card__pct pixel-text">{pct}% {unit}</span>
+      <span className="stat-card__pct pixel-text">
+        {pct}% {unit}
+      </span>
     </div>
   );
 }

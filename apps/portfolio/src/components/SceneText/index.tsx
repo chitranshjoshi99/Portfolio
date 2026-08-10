@@ -19,6 +19,14 @@ const STATUS_GLYPHS: Record<LabExperiment["status"], string> = {
   OFFLINE: "◌",
 };
 
+// Status is carried by the glyph + word first; the signal colour is a
+// secondary cue only (WCAG 1.4.1, colour is never the sole carrier).
+const STATUS_COLORS: Record<LabExperiment["status"], string> = {
+  RUNNING: "var(--signal-ok)",
+  WRITING: "var(--signal-warn)",
+  OFFLINE: "var(--text-muted)",
+};
+
 export function SceneText({ experiment: exp }: Props) {
   const isMobile = useIsMobile();
   const [showCode, setShowCode] = useState(false);
@@ -34,7 +42,10 @@ export function SceneText({ experiment: exp }: Props) {
     <div className="scene-text">
       <div className="scene-text__meta pixel-text">
         <span className="scene-text__channel">{channelLabel}</span>
-        <span className="scene-text__badge" style={{ color: exp.accent }}>
+        <span
+          className="scene-text__badge"
+          style={{ color: STATUS_COLORS[exp.status] }}
+        >
           {STATUS_GLYPHS[exp.status]} {exp.status}
         </span>
       </div>
@@ -43,7 +54,7 @@ export function SceneText({ experiment: exp }: Props) {
       <p className="vt-text scene-text__teaser">{exp.teaser}</p>
 
       {isMobile ? (
-        /* Mobile: don't render the heavy inline code / TV — gate behind buttons */
+        /* Mobile: don't render the heavy inline code / TV, gate behind buttons */
         <div className="scene-text__actions">
           <button
             type="button"
@@ -88,7 +99,6 @@ export function SceneText({ experiment: exp }: Props) {
         <CodePopup
           code={exp.code}
           filename={filename}
-          accent={exp.accent}
           onClose={() => setShowCode(false)}
         />
       )}

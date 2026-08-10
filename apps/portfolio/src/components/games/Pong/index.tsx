@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
 import type { GameAction, GameProps } from "../types";
-import { useTheme } from "../../../contexts/ThemeContext";
 import "./style.css";
 
 const CW = 280;
@@ -66,7 +65,7 @@ function physics(s: PongState, dt: number) {
   if (s.keys.w || s.keys.up) s.padL = clampPad(s.padL - PAD_SPEED * dt);
   if (s.keys.s || s.keys.down) s.padL = clampPad(s.padL + PAD_SPEED * dt);
 
-  // AI paddle — tracks ball center with lag
+  // AI paddle, tracks ball center with lag
   const ballCenterY = s.ball.y + BALL / 2;
   const aiCenterY = s.padR + PAD_H / 2;
   const aiDelta = (ballCenterY - aiCenterY) * 3 * dt;
@@ -128,12 +127,12 @@ function physics(s: PongState, dt: number) {
 }
 
 function draw(ctx: CanvasRenderingContext2D, s: PongState, accent: string) {
-  ctx.fillStyle = "#0c0a0e";
+  ctx.fillStyle = "#141310";
   ctx.fillRect(0, 0, CW, CH);
 
   // Center dashed line
   ctx.setLineDash([6, 4]);
-  ctx.strokeStyle = "#2a2535";
+  ctx.strokeStyle = "#2f2b25";
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(CW / 2, 0);
@@ -142,7 +141,7 @@ function draw(ctx: CanvasRenderingContext2D, s: PongState, accent: string) {
   ctx.setLineDash([]);
 
   // Score
-  ctx.fillStyle = "#3a3545";
+  ctx.fillStyle = "#6f685d";
   ctx.font = '14px "Press Start 2P"';
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
@@ -150,7 +149,7 @@ function draw(ctx: CanvasRenderingContext2D, s: PongState, accent: string) {
   ctx.fillText(String(s.scoreR), CW / 2 + 28, 6);
 
   // Paddles
-  ctx.fillStyle = "#e8e4dc";
+  ctx.fillStyle = "#ece8e0";
   ctx.fillRect(8, s.padL, PAD_W, PAD_H);
   ctx.fillStyle = "#8b7ba8";
   ctx.fillRect(CW - 8 - PAD_W, s.padR, PAD_W, PAD_H);
@@ -160,18 +159,15 @@ function draw(ctx: CanvasRenderingContext2D, s: PongState, accent: string) {
   ctx.fillRect(s.ball.x, s.ball.y, BALL, BALL);
 }
 
-// Mirrors --accent-primary's dark/light token values (canvas can't read CSS vars directly).
-const ACCENT_DARK = "#9b8ea0";
-const ACCENT_LIGHT = "#7a6e8e";
+// The CRT screen is always a dark surface regardless of page theme, so the
+// canvas accent is the dark-theme --accent-primary in both themes. Using the
+// light-theme token here would draw near-black on near-black.
+const ACCENT = "#dad4c8";
 
 export function Pong({ active, controlRef }: GameProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef<PongState>(initState());
-  const { isDark } = useTheme();
-  const accentRef = useRef(isDark ? ACCENT_DARK : ACCENT_LIGHT);
-  useEffect(() => {
-    accentRef.current = isDark ? ACCENT_DARK : ACCENT_LIGHT;
-  }, [isDark]);
+  const accentRef = useRef(ACCENT);
 
   // Held-input setter shared by keyboard + the Handheld touch pad.
   const setKey = useCallback((action: GameAction, down: boolean) => {
@@ -255,7 +251,7 @@ export function Pong({ active, controlRef }: GameProps) {
         role="img"
         aria-label="Pong game. Use W/S or arrow keys to move your paddle (left side)."
       />
-      <p className="pixel-text pong-game__hint">W/S or ↑↓ — you are left</p>
+      <p className="pixel-text pong-game__hint">W/S or ↑↓ moves the left paddle</p>
     </div>
   );
 }

@@ -95,14 +95,10 @@ export function Handheld({ experiment, onClose }: Props) {
       className="handheld-overlay"
       role="dialog"
       aria-modal="true"
-      aria-label={`${experiment.title} — playable console`}
+      aria-label={`${experiment.title}, playable console`}
       onClick={onClose}
     >
-      <div
-        className="handheld"
-        style={{ "--hh-accent": experiment.accent } as React.CSSProperties}
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="handheld" onClick={(e) => e.stopPropagation()}>
         <div className="handheld__top">
           <span className="pixel-text handheld__brand">LABS&nbsp;·&nbsp;HANDHELD</span>
           <span
@@ -171,7 +167,7 @@ export function Handheld({ experiment, onClose }: Props) {
             </div>
           )}
 
-          {/* Action button — primary play button (jump / select) */}
+          {/* Action button, primary play button (jump / select) */}
           <div className="handheld__action-cluster">
             <PadButton
               action="action"
@@ -195,7 +191,7 @@ export function Handheld({ experiment, onClose }: Props) {
             type="button"
             className="pixel-text handheld__btn handheld__btn--power"
             onClick={togglePower}
-            aria-label="Power off — close console"
+            aria-label="Power off, close console"
           >
             ⏻ OFF
           </button>

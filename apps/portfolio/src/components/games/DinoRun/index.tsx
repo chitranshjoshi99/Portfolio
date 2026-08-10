@@ -74,7 +74,7 @@ function step(s: DinoState, dt: number) {
     s.onGround = true;
   }
 
-  // Obstacles — move existing ones left, cull once fully off-screen
+  // Obstacles, move existing ones left, cull once fully off-screen
   for (const obs of s.obstacles) {
     obs.x -= s.speed * dt;
   }
@@ -110,22 +110,22 @@ function step(s: DinoState, dt: number) {
 }
 
 function draw(ctx: CanvasRenderingContext2D, s: DinoState) {
-  ctx.fillStyle = "#0c0a0e";
+  ctx.fillStyle = "#141310";
   ctx.fillRect(0, 0, CW, CH);
 
   // Ground
-  ctx.fillStyle = "#2e2b38";
+  ctx.fillStyle = "#2f2b25";
   ctx.fillRect(0, GROUND_Y, CW, 2);
 
   // Score
-  ctx.fillStyle = "#3a3545";
+  ctx.fillStyle = "#6f685d";
   ctx.font = '7px "Press Start 2P"';
   ctx.textAlign = "right";
   ctx.textBaseline = "top";
   ctx.fillText(`${Math.floor(s.score).toString().padStart(5, "0")}`, CW - 8, 6);
 
   // Obstacles (cactus-like)
-  ctx.fillStyle = "#9e8562";
+  ctx.fillStyle = "#aca596";
   for (const obs of s.obstacles) {
     const oy = GROUND_Y - obs.h;
     ctx.fillRect(obs.x, oy, OBS_W, obs.h);
@@ -137,17 +137,17 @@ function draw(ctx: CanvasRenderingContext2D, s: DinoState) {
   // Dino body
   const dx = DINO_X;
   const dy = s.dinoY;
-  ctx.fillStyle = s.dead ? "#b87a72" : "#e8e4dc";
+  ctx.fillStyle = s.dead ? "#d98d85" : "#ece8e0";
 
   // Body
   ctx.fillRect(dx + 2, dy, DINO_W - 4, DINO_H - 6);
   // Head
   ctx.fillRect(dx + 6, dy - 8, 12, 10);
   // Eye
-  ctx.fillStyle = "#0c0a0e";
+  ctx.fillStyle = "#141310";
   ctx.fillRect(dx + 14, dy - 6, 2, 2);
   // Jaw
-  ctx.fillStyle = s.dead ? "#b87a72" : "#e8e4dc";
+  ctx.fillStyle = s.dead ? "#d98d85" : "#ece8e0";
   ctx.fillRect(dx + 12, dy - 2, 6, 2);
 
   // Legs
@@ -169,7 +169,7 @@ function draw(ctx: CanvasRenderingContext2D, s: DinoState) {
 
   // Waiting overlay
   if (s.waiting) {
-    ctx.fillStyle = "#6a6570";
+    ctx.fillStyle = "#8d867a";
     ctx.font = '6px "Press Start 2P"';
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -181,12 +181,12 @@ function draw(ctx: CanvasRenderingContext2D, s: DinoState) {
   if (s.dead) {
     ctx.fillStyle = "rgba(0,0,0,0.65)";
     ctx.fillRect(0, 0, CW, CH);
-    ctx.fillStyle = "#b87a72";
+    ctx.fillStyle = "#d98d85";
     ctx.font = '7px "Press Start 2P"';
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText("GAME OVER", CW / 2, CH / 2 - 10);
-    ctx.fillStyle = "#6a6570";
+    ctx.fillStyle = "#8d867a";
     ctx.font = '6px "Press Start 2P"';
     ctx.fillText(`SCORE ${Math.floor(s.score)}`, CW / 2, CH / 2 + 6);
     ctx.fillText("SPACE / TAP TO RETRY", CW / 2, CH / 2 + 20);
@@ -198,7 +198,7 @@ export function DinoRun({ active, controlRef }: GameProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef<DinoState>(initState());
 
-  // Stable (refs-only) — shared by keyboard, canvas tap, and Handheld pad.
+  // Stable (refs-only), shared by keyboard, canvas tap, and Handheld pad.
   const doJump = useCallback(() => {
     const s = stateRef.current;
     if (s.dead) {

@@ -4,7 +4,6 @@ import "./style.css";
 interface JourneyProgressItem {
   id: string;
   company: string;
-  accentHex: string;
   period: string;
 }
 
@@ -56,7 +55,6 @@ export default function JourneyProgress({
         <button
           key={item.id}
           className={`jp-dot ${activeIdx === i ? "jp-dot--active" : ""} ${activeIdx > i ? "jp-dot--past" : ""} ${revealedIndices.includes(i) ? "jp-dot--revealed" : ""}`}
-          style={{ "--dot-color": item.accentHex } as React.CSSProperties}
           onClick={() => onDotClick(i)}
           aria-label={item.company}
           title={item.company}

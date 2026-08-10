@@ -9,14 +9,14 @@ interface Meta {
 
 /**
  * Mirror per-route meta into the document head for users + JS-capable crawlers
- * (Google renders the SPA). Non-JS crawlers like LinkedIn never run this — they
+ * (Google renders the SPA). Non-JS crawlers like LinkedIn never run this, they
  * get the same tags from the Vercel meta-injection function (see api/page.js).
  */
 export function useDocumentMeta(m: Meta | null) {
   useEffect(() => {
     if (!m) return;
     const prevTitle = document.title;
-    document.title = `${m.title} — Chitransh Joshi`;
+    document.title = `${m.title} · Chitransh Joshi`;
 
     const set = (sel: string, attr: string, val: string) =>
       document.querySelector(sel)?.setAttribute(attr, val);

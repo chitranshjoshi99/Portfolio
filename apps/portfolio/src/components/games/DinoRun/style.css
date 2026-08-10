@@ -6,8 +6,8 @@
 }
 
 .dino-game__canvas {
-  border: var(--px) solid var(--border-primary);
-  box-shadow: var(--px2) var(--px2) 0 var(--border-secondary);
+  border: var(--border-width) solid var(--border-primary);
+  box-shadow: var(--shadow-depth) var(--shadow-depth) 0 var(--border-secondary);
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   cursor: pointer;
@@ -15,7 +15,8 @@
 }
 
 .dino-game__hint {
-  font-size: 5px;
-  color: var(--text-muted);
+  font-size: var(--fs-pixel-2xs);
+  /* Sits on the dark CRT surface in both themes, see --crt-* in tokens.css */
+  color: var(--crt-dim);
   letter-spacing: 0.08em;
 }

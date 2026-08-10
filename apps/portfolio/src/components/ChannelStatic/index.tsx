@@ -6,7 +6,7 @@ interface Props {
   height?: number;
 }
 
-// Canvas-based TV static noise — runs only while mounted.
+// Canvas-based TV static noise, runs only while mounted.
 // Extract from Labs and mount only during a channel-change burst.
 export function ChannelStatic({ width = 60, height = 45 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);

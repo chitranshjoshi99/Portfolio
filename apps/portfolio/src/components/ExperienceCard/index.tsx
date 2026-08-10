@@ -1,6 +1,7 @@
 import { forwardRef } from "react";
 import { EXPERIENCE } from "../../data/resume";
 import type { Experience } from "../../data/resume";
+import { PixelIcon } from "../PixelIcon";
 import "./style.css";
 
 export interface ExpCardProps {
@@ -20,18 +21,8 @@ const ExperienceCard = forwardRef<HTMLElement, ExpCardProps>(
       <section
         className={`exp-card exp-card--${exp.id} ${isActive ? "exp-card--active" : ""}`}
         ref={ref as React.Ref<HTMLElement>}
-        style={
-          {
-            "--exp-accent": exp.accentHex,
-            "--exp-accent-dim": exp.accentHex + "22",
-            // "--exp-bg": exp.bgHex,
-          } as React.CSSProperties
-        }
         aria-label={`${exp.companyFull} experience`}
       >
-        {/* Subtle tinted background overlay — activates on active card */}
-        <div className="exp-card__bg-overlay" aria-hidden="true" />
-
         <div
           className={`container exp-card__inner ${isEven ? "" : "exp-card__inner--reverse"}`}
         >
@@ -48,10 +39,12 @@ const ExperienceCard = forwardRef<HTMLElement, ExpCardProps>(
 
               <div className="exp-meta">
                 <span className="exp-meta__chip pixel-text">
-                  📅 {exp.period}
+                  <PixelIcon name="calendar" size={12} />
+                  {exp.period}
                 </span>
                 <span className="exp-meta__chip pixel-text">
-                  📍 {exp.location}
+                  <PixelIcon name="pin" size={12} />
+                  {exp.location}
                 </span>
               </div>
 

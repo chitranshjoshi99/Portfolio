@@ -1,16 +1,30 @@
 /* ============================================================
-   DESIGN TOKENS — Pixel Art Portfolio
-   Muted, soothing palette with dark/light theme support
+   DESIGN TOKENS - Pixel Art Portfolio
 
-   Company accent inspirations (muted):
-   - Nivoda  → champagne gold  (#C9A96E → muted: #9E8562)
-   - Delhivery → coral red    (#E8472F → muted: #B87A72)
-   - Classplus → soft purple  (#7B5EA7 → muted: #8B7BA8)
+   One purple ink ramp, three steps: accent-primary ->
+   accent-secondary -> accent-muted. There are no per-company
+   accents; a colour never means "Nivoda" or "Delhivery" or
+   "Classplus". Identity comes from copy and layout, hue is
+   shared by the whole app.
+
+   Colour is never the only carrier of meaning: the three
+   `--signal-*` hues are reserved for status and always pair
+   with a glyph or a word.
+
+   The SpaceBackground scene keeps real colour (blue sky, warm
+   sun, pale moon) via the `--sky-*` tokens. Everything in the
+   UI chrome stays on the purple ramp.
+
+   All foreground/background pairs below are verified against
+   WCAG 2.0 AA (4.5:1 text, 3:1 borders & UI boundaries),
+   including against `--bg-sky`, which is what actually paints
+   behind page content (body's background propagates to the
+   canvas, and .space-bg sits above it).
    ============================================================ */
 
 :root {
-  /* ---------- PIXEL GRID ---------- */
-  --px: 4px; /* 1 pixel unit — scale all pixel-art sizing */
+  /* ---------- PIXEL GRID (spacing scale) ---------- */
+  --px: 4px; /* 1 pixel unit, every size/space/border is a multiple */
   --px2: 8px;
   --px3: 12px;
   --px4: 16px;
@@ -26,7 +40,7 @@
   --font-vt: "VT323", monospace; /* large display numbers / accents */
   --font-body: "Inter", sans-serif; /* readable body copy */
 
-  --font-size-xs: 0.6rem;
+  /* Body/prose scale (rem, respects user font-size preference) */
   --font-size-sm: 0.75rem;
   --font-size-base: 0.875rem;
   --font-size-md: 1rem;
@@ -35,32 +49,17 @@
   --font-size-2xl: 2rem;
   --font-size-3xl: 3rem;
 
-  /* ---------- COMPANY ACCENT PALETTE ---------- */
-  --nivoda-gold: #9e8562; /* muted champagne — diamond luxury */
-  --nivoda-gold-dim: #7a6448;
-  --nivoda-bg: #1c1812; /* very dark warm brown */
-
-  --delhivery-red: #b87a72; /* muted coral — logistics energy */
-  --delhivery-red-dim: #8f5c55;
-  --delhivery-bg: #1c1212;
-
-  --classplus-purple: #8b7ba8; /* muted violet — edtech creativity */
-  --classplus-purple-dim: #6b5d88;
-  --classplus-bg: #14121c;
-
-  /* ---------- NEUTRAL BASE PALETTE ---------- */
-  --slate-50: #f8f7f5;
-  --slate-100: #edeae5;
-  --slate-200: #d8d3cb;
-  --slate-300: #beb7ac;
-  --slate-400: #9e9690;
-  --slate-500: #7a756e;
-  --slate-600: #5c5852;
-  --slate-700: #3d3a35;
-  --slate-800: #28251f;
-  --slate-850: #1e1b16;
-  --slate-900: #141210;
-  --slate-950: #0c0a08;
+  /* ---------- PIXEL TYPE SCALE ----------
+     "Press Start 2P" is a 5x7 grid font with no descenders, so it
+     reads much larger than its nominal size. This scale is tuned
+     tight on purpose: the whole app should feel compact, not
+     shouty. 8px is the floor, nothing goes below --fs-pixel-2xs. */
+  --fs-pixel-2xs: 8px; /* micro chrome labels (CH tags, badges) */
+  --fs-pixel-xs: 9px; /* small labels, captions */
+  --fs-pixel-sm: 10px; /* nav links, chips, field labels */
+  --fs-pixel-md: 11px; /* buttons, section eyebrows */
+  --fs-pixel-lg: 13px; /* card titles */
+  --fs-pixel-xl: 16px; /* page headings */
 
   /* ---------- RADIUS (pixel-art = no radius by default) ---------- */
   --radius-none: 0px;
@@ -72,10 +71,34 @@
   --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  /* ---------- SHADOWS (pixel-drop-shadow style) ---------- */
-  --shadow-pixel-sm: 4px 4px 0px var(--shadow-color);
-  --shadow-pixel-md: 6px 6px 0px var(--shadow-color);
-  --shadow-pixel-lg: 8px 8px 0px var(--shadow-color);
+  /* ---------- BORDERS ---------- */
+  --border-thin: 1px; /* hairlines inside dense chrome only */
+  --border-width: 3px; /* every content border is 4px */
+
+  /* ---------- ELEVATION (pixel drop-shadow) ----------
+     One depth for everything on the page (--shadow-depth = --px),
+     one deeper step reserved for modals/overlays. Components set
+     the colour via --shadow-pixel / --shadow-pixel-strong. */
+  --shadow-depth: 3px;
+  --shadow-depth-lg: 6px;
+  --shadow-pixel: var(--shadow-depth) var(--shadow-depth) 0 var(--shadow-color);
+  --shadow-pixel-strong: var(--shadow-depth) var(--shadow-depth) 0
+    var(--accent-primary);
+  --shadow-pixel-lg: var(--shadow-depth-lg) var(--shadow-depth-lg) 0
+    var(--shadow-color);
+
+  /* Back-compat aliases (older components), all resolve to the
+     same two steps so nothing drifts to a third depth. */
+  --shadow-pixel-sm: var(--shadow-pixel);
+  --shadow-pixel-md: var(--shadow-pixel-lg);
+
+  /* ---------- CRT SCREEN ----------
+     The TV / handheld screen is a dark surface in BOTH themes, so anything
+     drawn on it must NOT use the themed text tokens: in light theme those
+     are near-black and vanish. These are theme-independent on purpose. */
+  --crt-bg: #100e16;
+  --crt-fg: #ece9f2; /* 16.4:1 on --crt-bg */
+  --crt-dim: #a099b4; /* 7.3:1 on --crt-bg */
 
   /* ---------- Z-INDEX ---------- */
   --z-bg: -1; /* intentionally negative: fixed space background paints behind all in-flow content (CSS stacking rule) without every page needing explicit position/z-index */
@@ -86,87 +109,111 @@
 }
 
 /* ============================================================
-   LIGHT THEME
+   LIGHT THEME: blue sky, sand accent
+
+   The backdrop stays the blue daytime sky and cool paper. Only
+   the accent ramp is warm: a dark sand/bronze that sits against
+   the blue instead of blending into it. Dark theme keeps its
+   purple ramp; the two themes are allowed to differ in hue.
    ============================================================ */
 [data-theme="light"] {
-  /* Backgrounds */
-  --bg-primary: #f5f3ef; /* warm cream */
-  --bg-secondary: #ede9e2; /* slightly darker cream */
-  --bg-card: #faf8f4; /* near-white card */
-  --bg-card-hover: #f0ede7;
-  --bg-nav: rgba(245, 243, 239, 0.92);
-  --bg-code: #e8e4dc;
+  /* Backgrounds - cool paper, tinted toward the sky */
+  --bg-primary: #f2f5f9;
+  --bg-secondary: #e3e9f1;
+  --bg-card: #fbfcfe;
+  --bg-card-hover: #eaeff6;
+  --bg-nav: rgba(242, 245, 249, 0.92);
+  --bg-code: #e2e8f1;
 
-  /* Text */
-  --text-primary: #2a2520; /* warm near-black */
-  --text-secondary: #4f4b45; /* muted mid — darkened vs cream-tuned #5c5852 for contrast against the sky background */
-  --text-muted: #7d766f; /* darkened vs cream-tuned #9e9690 — was too low-contrast on sky blue */
-  --text-inverse: #f5f3ef;
+  /* Text - 15.0 / 8.5 / 5.8 : 1 on --bg-primary (12.1 / 6.9 / 4.7 on sky) */
+  --text-primary: #16202e;
+  --text-secondary: #3c4859;
+  --text-muted: #556074;
+  --text-inverse: #f2f5f9;
 
-  /* Borders */
-  --border-primary: #b3ad9f; /* darkened vs cream-tuned #c8c3ba so borders stay visible on sky-blue background */
-  --border-secondary: #e0dbd3;
+  /* Borders - 3.9:1 on --bg-primary, 3.2:1 on --bg-sky (AA non-text) */
+  --border-primary: #6d7b95;
+  --border-secondary: #c2cbda;
   --border-accent: var(--accent-primary);
 
-  /* Accent */
-  --accent-primary: #3e3614; /* muted purple-slate */
-  --accent-secondary: #9e8562; /* nivoda gold */
-  --accent-tertiary: #b87a72; /* delhivery coral */
-  --accent-glow: rgba(
-    122,
-    110,
-    142,
-    0.28
-  ); /* stronger wash (was 0.15) so outline/glow buttons read against sky blue */
+  /* Sand ramp - 6.9 / 5.7 / 3.8 : 1 on --bg-primary
+     (5.6 / 4.6 / 3.1 on --bg-sky, which is the tighter constraint;
+     the blue sky is bright, so the sand has to run dark to clear AA) */
+  --accent-primary: #6b4f22;
+  --accent-secondary: #7a5b24;
+  --accent-muted: #8e723c;
+  --accent-glow: rgba(107, 79, 34, 0.1);
 
-  /* Pixel shadow — tied to accent-primary (not the old cream-toned grey) so it reads intentional against the sky-blue background */
-  --shadow-color: color-mix(in srgb, var(--accent-primary) 55%, white);
-  --shadow-dark: rgba(42, 37, 32, 0.12);
+  /* Status signals - desaturated, always paired with a glyph */
+  --signal-ok: #2f6a44;
+  --signal-warn: #6b5410;
+  --signal-danger: #8c3630;
+
+  /* SpaceBackground scene - the one place real colour lives */
+  --bg-sky: #bfe3f5; /* daytime sky */
+  --sky-sun: #e8bb4e;
+  --sky-cloud: #ffffff;
+  --sky-moon: #e6dfc2;
+
+  /* Pixel shadow */
+  --shadow-color: #a8b4c6;
+  --shadow-dark: rgba(22, 32, 46, 0.12);
 
   /* Scrollbar */
-  --scrollbar-track: #ede9e2;
-  --scrollbar-thumb: #c8c3ba;
+  --scrollbar-track: #e3e9f1;
+  --scrollbar-thumb: #a8b4c6;
 
   /* Cursor / scanline overlay */
   --scanline-opacity: 0.03;
 }
 
 /* ============================================================
-   DARK THEME
+   DARK THEME: warm ink
    ============================================================ */
 [data-theme="dark"] {
   /* Backgrounds */
-  --bg-primary: #16141a; /* deep slate-purple */
-  --bg-secondary: #1e1b24;
-  --bg-card: #1a1820;
-  --bg-card-hover: #22202a;
-  --bg-nav: rgba(22, 20, 26, 0.92);
-  --bg-code: #120f18;
+  --bg-primary: #131019;
+  --bg-secondary: #1d1926;
+  --bg-card: #191522;
+  --bg-card-hover: #262032;
+  --bg-nav: rgba(19, 16, 25, 0.92);
+  --bg-code: #0f0d14;
 
-  /* Text */
-  --text-primary: #e8e4dc; /* warm off-white */
-  --text-secondary: #a8a2b0; /* muted lavender-grey */
-  --text-muted: #6a6570;
-  --text-inverse: #16141a;
+  /* Text - 15.7 / 9.1 / 5.4 : 1 on --bg-primary */
+  --text-primary: #ece9f2;
+  --text-secondary: #b7b1c6;
+  --text-muted: #8d86a2;
+  --text-inverse: #131019;
 
-  /* Borders */
-  --border-primary: #2e2b38;
-  --border-secondary: #231f2e;
+  /* Borders - 3.5:1 on --bg-primary (AA non-text) */
+  --border-primary: #6d6684;
+  --border-secondary: #2c2738;
   --border-accent: var(--accent-primary);
 
-  /* Accent */
-  --accent-primary: #9b8ea0; /* muted lilac */
-  --accent-secondary: #c9a96e; /* nivoda gold — brighter on dark */
-  --accent-tertiary: #c47a72; /* delhivery coral */
-  --accent-glow: rgba(155, 142, 160, 0.12);
+  /* Purple ink ramp - 9.3 / 5.9 / 4.2 : 1 on --bg-primary */
+  --accent-primary: #bfaee4;
+  --accent-secondary: #9689bc;
+  --accent-muted: #7d719e;
+  --accent-glow: rgba(191, 174, 228, 0.12);
+
+  /* Status signals */
+  --signal-ok: #8ab894;
+  --signal-warn: #cdb173;
+  --signal-danger: #d98d85;
+
+  /* SpaceBackground scene - the one place real colour lives */
+  --bg-sky: #0a0812; /* night sky */
+  --sky-sun: #e8bb4e;
+  --sky-cloud: #2c2738;
+  --sky-moon: #e6dfc2;
 
   /* Pixel shadow */
-  --shadow-color: #0a080e;
+  --shadow-color: #000000;
   --shadow-dark: rgba(0, 0, 0, 0.4);
 
   /* Scrollbar */
-  --scrollbar-track: #1e1b24;
-  --scrollbar-thumb: #3a3545;
+  --scrollbar-track: #1d1926;
+  --scrollbar-thumb: #3a3348;
 
   /* Cursor / scanline overlay */
   --scanline-opacity: 0.04;

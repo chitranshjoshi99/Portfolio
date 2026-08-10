@@ -1,5 +1,5 @@
 // ============================================================
-// RESUME DATA — single source of truth for the portfolio
+// RESUME DATA: single source of truth for the portfolio
 // ============================================================
 
 export const PERSON = {
@@ -7,7 +7,7 @@ export const PERSON = {
   initials: "CJ",
   role: "Software Development Engineer",
   tagline: "Frontend-first Full-Stack Engineer",
-  bio: "Building high-performance web apps for 5+ years across logistics, B2B marketplaces, and edtech. I turn slow, fragile systems into fast, reliable products — and ship end-to-end features that actually move metrics.",
+  bio: "Building high-performance web apps for 5+ years across logistics, B2B marketplaces, and edtech. I turn slow, fragile systems into fast, reliable products, and ship end-to-end features that actually move metrics.",
   location: "Gurugram, India",
   email: "chitransh.joshi99@gmail.com",
   phone: "+91 81261 96827",
@@ -82,11 +82,6 @@ export interface Experience {
   role: string;
   period: string;
   location: string;
-  // Design language
-  accentVar: string; // CSS variable name e.g. '--nivoda-gold'
-  accentHex: string; // fallback hex
-  bgHex: string; // dark background hex for card
-  // Content
   summary: string;
   achievements: Achievement[];
   tags: string[];
@@ -100,11 +95,8 @@ export const EXPERIENCE: Experience[] = [
     role: "Software Development Engineer II",
     period: "May 2024 – Apr 2026",
     location: "Mumbai · Remote",
-    accentVar: "--nivoda-gold",
-    accentHex: "#9E8562",
-    bgHex: "#1C1812",
     summary:
-      "Built and scaled a B2B diamond trading platform — shipping a barcode-driven shipment system, optimising GraphQL APIs for 50k+ row datasets, and pioneering AI tooling across the engineering org.",
+      "Built and scaled a B2B diamond trading platform: a barcode-driven shipment system, optimising GraphQL APIs for 50k+ row datasets, and pioneering AI tooling across the engineering org.",
     achievements: [
       {
         label: "Order Page Load",
@@ -160,9 +152,6 @@ export const EXPERIENCE: Experience[] = [
     role: "Software Development Engineer I",
     period: "Aug 2022 – Apr 2024",
     location: "Gurugram",
-    accentVar: "--delhivery-red",
-    accentHex: "#B87A72",
-    bgHex: "#1C1212",
     summary:
       "Modularised a monolithic logistics platform into independent apps, built real-time WebSocket shipment tracking for 10k+ daily shipments, and integrated multi-provider maps to cut costs by 35%.",
     achievements: [
@@ -194,7 +183,7 @@ export const EXPERIENCE: Experience[] = [
       {
         label: "A11y Score",
         metric: "62 → 94",
-        text: "WCAG 2.1 AA audit — keyboard nav, ARIA, colour contrast fixes",
+        text: "WCAG 2.1 AA audit covering keyboard nav, ARIA and colour contrast",
       },
     ],
     tags: [
@@ -215,11 +204,8 @@ export const EXPERIENCE: Experience[] = [
     role: "Software Engineer, Frontend",
     period: "Dec 2020 – Aug 2022",
     location: "Noida",
-    accentVar: "--classplus-purple",
-    accentHex: "#8B7BA8",
-    bgHex: "#14121C",
     summary:
-      "Built the Classplus Content Store from scratch — Redux-Saga payment flows, HLS.js adaptive video player, 100ms WebRTC live classes with 200–500 concurrent viewers, and Next.js mobile web-view.",
+      "Built the Classplus Content Store from scratch: Redux-Saga payment flows, HLS.js adaptive video player, 100ms WebRTC live classes with 200–500 concurrent viewers, and Next.js mobile web-view.",
     achievements: [
       {
         label: "Video Quality Drops",
@@ -243,7 +229,7 @@ export const EXPERIENCE: Experience[] = [
       },
       {
         label: "Micro Frontend",
-        metric: "✓",
+        metric: "SHIPPED",
         text: "Decoupled Content Store into independent micro frontend",
       },
     ],
@@ -261,7 +247,7 @@ export const EXPERIENCE: Experience[] = [
 
 // ── Education ────────────────────────────────────────────────
 export const EDUCATION = {
-  degree: "Bachelor of Technology — Computer Science & Engineering",
+  degree: "Bachelor of Technology, Computer Science & Engineering",
   school: "APJ Abdul Kalam Technical University, UP",
   period: "2016 – 2020",
 } as const;

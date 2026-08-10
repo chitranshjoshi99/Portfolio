@@ -1,6 +1,11 @@
-/* Fixed, app-wide background scene — dark shows space, light shows sky.
+/* Fixed, app-wide background scene: dark shows space, light shows sky.
    Sits at var(--z-bg) (negative) so it paints behind all normal in-flow
-   page content without any page needing explicit positioning. */
+   page content without any page needing explicit positioning.
+
+   This is the ONE place in the app that keeps real colour. Everything
+   here draws from the --sky-* tokens, not the purple UI ramp. Because
+   body's background propagates to the canvas, --bg-sky is what actually
+   sits behind page copy, so its contrast is part of the AA budget. */
 .space-bg {
   position: fixed;
   inset: 0;
@@ -9,12 +14,9 @@
   overflow: hidden;
 }
 
-.space-bg--dark {
-  background: #05040a; /* ponytail: one-off near-black space color, not worth a token for a single use */
-}
-
+.space-bg--dark,
 .space-bg--light {
-  background: #bfe3f5; /* ponytail: one-off soft sky blue, muted so it doesn't fight foreground contrast */
+  background: var(--bg-sky);
 }
 
 .space-bg__star {
@@ -23,8 +25,8 @@
   top: var(--star-y);
   width: var(--star-size);
   height: var(--star-size);
-  background: var(--text-secondary);
-  opacity: 0.5;
+  background: var(--sky-moon);
+  opacity: 0.55;
 }
 
 .space-bg__star--twinkle {
@@ -53,13 +55,13 @@
   right: 10%;
   width: 64px;
   height: 64px;
-  fill: var(--accent-secondary);
-  opacity: 0.6;
+  fill: var(--sky-moon);
+  opacity: 0.9;
 }
 
 .space-bg__moon-crater {
-  fill: var(--bg-primary);
-  opacity: 0.35;
+  fill: var(--bg-sky);
+  opacity: 0.4;
 }
 
 @media (max-width: 480px) {
@@ -76,23 +78,23 @@
   right: 12%;
   width: 72px;
   height: 72px;
-  fill: var(--nivoda-gold);
-  opacity: 0.75;
+  fill: var(--sky-sun);
+  opacity: 0.9;
   animation: space-bg-sun-glow 5s ease-in-out infinite;
 }
 
 .space-bg--reduced-motion .space-bg__sun {
   animation: none;
-  opacity: 0.75;
+  opacity: 0.9;
 }
 
 @keyframes space-bg-sun-glow {
   0%,
   100% {
-    opacity: 0.65;
+    opacity: 0.8;
   }
   50% {
-    opacity: 0.85;
+    opacity: 1;
   }
 }
 
@@ -102,8 +104,8 @@
   top: var(--cloud-y);
   width: calc(96px * var(--cloud-scale, 1));
   height: calc(48px * var(--cloud-scale, 1));
-  fill: var(--bg-card);
-  opacity: 0.8;
+  fill: var(--sky-cloud);
+  opacity: 0.85;
   animation: space-bg-cloud-drift 18s ease-in-out var(--cloud-delay, 0s) infinite;
 }
 

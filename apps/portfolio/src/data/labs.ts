@@ -7,7 +7,7 @@ export type GameKey =
   | "magic8ball"
   | "gacha";
 
-// Where the interactive piece renders on MOBILE (desktop is unaffected — it
+// Where the interactive piece renders on MOBILE (desktop is unaffected, it
 // always uses `render`/the sticky CRT). See §Mobile in CLAUDE.md.
 //   TV   → keep it in an inline CRT (e.g. paste-a-URL LinkPreview)
 //   HH   → behind a "See in Action" button → Handheld console with touch pad
@@ -23,7 +23,6 @@ export interface LabExperiment {
   title: string;
   teaser: string;
   status: "RUNNING" | "WRITING" | "OFFLINE";
-  accent: string; // CSS custom property reference
   render: RenderType;
   game: GameKey;
   device: MobileDevice; // mobile interactive surface (TV / HH / NONE)
@@ -41,7 +40,6 @@ export const LAB_EXPERIMENTS: LabExperiment[] = [
     teaser:
       "React re-renders on every state change, but game loops fire 60 times a second. Keep all mutable state in refs, run one rAF loop, and let React own only the canvas element.",
     status: "RUNNING",
-    accent: "var(--classplus-purple)",
     render: "tv",
     game: "snake",
     device: "HH",
@@ -73,7 +71,6 @@ useEffect(() => {
     teaser:
       "A fixed timestep accumulates elapsed time and steps physics in discrete chunks. This decouples rendering from physics, preventing the ball from tunnelling through a paddle at high frame rates.",
     status: "RUNNING",
-    accent: "var(--delhivery-red)",
     render: "tv",
     game: "pong",
     device: "HH",
@@ -105,7 +102,6 @@ function intersects(a: Rect, b: Rect): boolean {
     teaser:
       "The dino's jump feels instant because it uses raw keydown, with no delay. Debounce waits for silence; throttle limits frequency. Picking the wrong one is the difference between snappy and laggy.",
     status: "RUNNING",
-    accent: "var(--nivoda-gold)",
     render: "tv",
     game: "dino",
     device: "HH",
@@ -142,7 +138,6 @@ function throttle<T extends unknown[]>(fn: (...a: T) => void, ms: number) {
     teaser:
       "Paste any page URL and the TV tunes into its social card. An edge function fetches the page, scrapes its og: tags, and beams back the title, image, and description that LinkedIn would show.",
     status: "RUNNING",
-    accent: "var(--delhivery-red)",
     render: "tv",
     game: "linkpreview",
     device: "TV",
@@ -174,7 +169,6 @@ export default async function handler(req) {
     teaser:
       "Five taps, a countdown, a reveal, all driven by an explicit FSM with four states. No boolean spaghetti, no impossible UI states. The machine makes illegal states unrepresentable.",
     status: "RUNNING",
-    accent: "var(--classplus-purple)",
     render: "standalone",
     game: "magic8ball",
     device: "NONE",
@@ -202,7 +196,6 @@ function transition(phase: Phase, event: 'tap' | 'reset'): Phase {
     teaser:
       "Stale-while-revalidate: return cached data immediately, fetch fresh data in background, update when done. This ~40-line hook is the entire idea, no library needed for simple use cases.",
     status: "WRITING",
-    accent: "var(--nivoda-gold)",
     render: "standalone",
     game: "gacha",
     device: "NONE",

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useTheme } from "../../contexts/ThemeContext";
 import "./style.css";
 
-// ponytail: fixed star field — deterministic positions from index, not Math.random(),
+// ponytail: fixed star field, deterministic positions from index, not Math.random(),
 // so the layout never shifts between renders/remounts.
 const STAR_COUNT = 40;
 const STARS = Array.from({ length: STAR_COUNT }, (_, i) => ({
@@ -14,7 +14,7 @@ const STARS = Array.from({ length: STAR_COUNT }, (_, i) => ({
   dur: 2.5 + (i % 4) * 0.6,
 }));
 
-// ponytail: fixed cloud layout — same determinism precedent as STARS, tiny fixed array
+// ponytail: fixed cloud layout, same determinism precedent as STARS, tiny fixed array
 // instead of Math.random(), so clouds never jump between renders/remounts.
 const CLOUDS = [
   { x: 8, y: 14, scale: 1 },
@@ -65,7 +65,7 @@ export function SpaceBackground() {
             />
           ))}
 
-          {/* Small pixel-art moon — blocky rect cluster forming a circle silhouette */}
+          {/* Small pixel-art moon, blocky rect cluster forming a circle silhouette */}
           <svg
             className="space-bg__moon"
             viewBox="0 0 16 16"
@@ -97,7 +97,7 @@ export function SpaceBackground() {
         </>
       ) : (
         <>
-          {/* Pixel-art sun — same rect-cluster circle silhouette technique as the moon */}
+          {/* Pixel-art sun, same rect-cluster circle silhouette technique as the moon */}
           <svg
             className="space-bg__sun"
             viewBox="0 0 16 16"
@@ -112,7 +112,7 @@ export function SpaceBackground() {
             <rect x="6" y="13" width="4" height="1" />
           </svg>
 
-          {/* Pixel-art clouds — blocky rect clusters, fixed positions (see CLOUDS array) */}
+          {/* Pixel-art clouds, blocky rect clusters, fixed positions (see CLOUDS array) */}
           {CLOUDS.map((c, i) => (
             <svg
               key={i}

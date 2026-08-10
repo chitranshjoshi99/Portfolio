@@ -1,5 +1,5 @@
 /* ============================================================
-   LABS PAGE — scroll-snap with sticky TV (right column)
+   LABS PAGE: scroll-snap with sticky TV (right column)
    ============================================================ */
 
 .labs-page {
@@ -59,7 +59,7 @@
 }
 
 .labs-hero__boot {
-  font-size: 7px;
+  font-size: var(--fs-pixel-xs);
   color: var(--text-muted);
   letter-spacing: 0.08em;
 }
@@ -81,17 +81,17 @@
   display: flex;
   flex-direction: column;
   gap: var(--px2);
-  border: var(--px) solid var(--border-primary);
+  border: var(--border-width) solid var(--border-primary);
   padding: var(--px3) var(--px4);
   background: var(--bg-card);
-  box-shadow: var(--px2) var(--px2) 0 var(--border-secondary);
+  box-shadow: var(--shadow-depth) var(--shadow-depth) 0 var(--border-secondary);
 }
 
 .labs-hero__entry {
   display: flex;
   align-items: center;
   gap: var(--px2);
-  font-size: 6px;
+  font-size: var(--fs-pixel-2xs);
   letter-spacing: 0.06em;
   color: var(--text-primary);
 }
@@ -108,7 +108,7 @@
 }
 
 .labs-hero__hint {
-  font-size: 6px;
+  font-size: var(--fs-pixel-2xs);
   color: var(--text-muted);
   letter-spacing: 0.1em;
   text-align: center;
@@ -116,7 +116,7 @@
 }
 
 /* ══════════════════════════════════════════════════════════════
-   TV ZONE — LEFT = scrollable text, RIGHT = sticky TV
+   TV ZONE: LEFT = scrollable text, RIGHT = sticky TV
    ══════════════════════════════════════════════════════════════ */
 
 .tv-zone {
@@ -132,7 +132,7 @@
   flex-direction: column;
 }
 
-/* Right: sticky TV — stretches to match text column height */
+/* Right: sticky TV, stretches to match text column height */
 .tv-zone__right {
   flex: 0 0 46%;
 }
@@ -145,7 +145,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--px6);
-  /* Unified background — no color separation; shared SpaceBackground shows through in dark theme */
+  /* Unified background, no color separation; shared SpaceBackground shows through in dark theme */
 }
 
 /* ── TV Blog Scene (text for one channel) ────────────────────── */
@@ -158,7 +158,7 @@
 
 .tv-blog-scene__inner {
   width: 100%;
-  /* No max-width — SceneText fills the column */
+  /* No max-width, SceneText fills the column */
 }
 
 /* Inline CRT for TV-device experiments on mobile (e.g. LinkPreview) */
@@ -169,7 +169,7 @@
 }
 
 /* ══════════════════════════════════════════════════════════════
-   TOY SCENES — text left, toy right
+   TOY SCENES: text left, toy right
    ══════════════════════════════════════════════════════════════ */
 
 .toy-scene {
@@ -198,7 +198,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--px6); /* mirror .tv-set-wrapper */
-  /* Scroll-driven parallax — reads --p (0..1) from the registered .toy-scene */
+  /* Scroll-driven parallax, reads --p (0..1) from the registered .toy-scene */
   opacity: calc(0.35 + var(--p, 1) * 0.65);
   transform: translateX(calc((1 - var(--p, 1)) * 36px))
     scale(calc(0.94 + var(--p, 1) * 0.06));

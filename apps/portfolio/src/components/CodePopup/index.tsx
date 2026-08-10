@@ -6,16 +6,15 @@ import "./style.css";
 interface Props {
   code: string;
   filename: string;
-  accent: string;
   onClose: () => void;
 }
 
 // Keep in sync with the cp-fold exit animation duration in style.css
 const CLOSE_MS = 240;
 
-/** Mobile "Show Code" — a terminal that unfolds in 3D as if it sprang up out of
+/** Mobile "Show Code", a terminal that unfolds in 3D as if it sprang up out of
  *  the button, then folds back down on close. Reuses CodePanel for the body. */
-export function CodePopup({ code, filename, accent, onClose }: Props) {
+export function CodePopup({ code, filename, onClose }: Props) {
   const [closing, setClosing] = useState(false);
 
   // Play the fold-back animation, then actually unmount.
@@ -47,7 +46,6 @@ export function CodePopup({ code, filename, accent, onClose }: Props) {
     >
       <div
         className={`code-popup${closing ? " code-popup--closing" : ""}`}
-        style={{ "--cp-accent": accent } as React.CSSProperties}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="code-popup__inner">

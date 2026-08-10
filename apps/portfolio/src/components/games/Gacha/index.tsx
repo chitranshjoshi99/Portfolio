@@ -5,11 +5,15 @@ import "./style.css";
 
 const SYMBOLS = ["◈", "◆", "◉", "●", "◎", "▲", "▼", "★"];
 
+// Rarity is encoded as brightness on the dark reel window, not as hue, the
+// symbol and the RARITY label carry the meaning, the ramp just reinforces it.
+// These are the theme-independent --crt-* values (the reel is dark in both
+// themes), so a light-theme token would render near-black on near-black.
 const RARITIES = [
-  { name: "LEGENDARY", symbol: "◈", prob: 0.05, color: "var(--nivoda-gold)" },
-  { name: "EPIC", symbol: "◆", prob: 0.15, color: "var(--classplus-purple)" },
-  { name: "RARE", symbol: "◉", prob: 0.3, color: "var(--delhivery-red)" },
-  { name: "COMMON", symbol: "●", prob: 0.5, color: "var(--text-muted)" },
+  { name: "LEGENDARY", symbol: "◈", prob: 0.05, color: "var(--crt-fg)" },
+  { name: "EPIC", symbol: "◆", prob: 0.15, color: "#c2baaa" },
+  { name: "RARE", symbol: "◉", prob: 0.3, color: "var(--crt-dim)" },
+  { name: "COMMON", symbol: "●", prob: 0.5, color: "#7d7669" },
 ] as const;
 
 type GachaPhase = "idle" | "spinning" | "result";
@@ -138,9 +142,11 @@ export function Gacha({ active }: GameProps) {
           <div className="gacha__result-line" aria-hidden="true" />
 
           {/* Rarity badge */}
+          {/* No inline colour here: the badge sits on the machine body, not on
+              the dark reel, so result.color (a --crt-* value) would vanish in
+              light theme. The name itself carries the rarity. */}
           <div
             className={`pixel-text gacha__rarity${result ? " gacha__rarity--visible" : ""}`}
-            style={result ? { color: result.color } : undefined}
             aria-live="assertive"
           >
             {result ? result.name : " "}

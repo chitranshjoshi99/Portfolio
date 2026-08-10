@@ -16,10 +16,7 @@ export default function BlogIndex() {
           {BLOGS.map((b) => (
             <li key={b.slug}>
               <Link to={`/blogs/${b.slug}`} className="blog-index__card">
-                <span
-                  className="pixel-text blog-index__card-tag"
-                  style={{ color: b.accent }}
-                >
+                <span className="pixel-text blog-index__card-tag">
                   {b.tag}
                 </span>
                 <span className="pixel-text blog-index__card-title">

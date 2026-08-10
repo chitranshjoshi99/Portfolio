@@ -1,7 +1,7 @@
 @import "./tokens.css";
 
 /* ============================================================
-   ACCESSIBILITY — skip link
+   ACCESSIBILITY: skip link
    ============================================================ */
 
 .skip-link {
@@ -12,10 +12,10 @@
   background: var(--accent-primary);
   color: var(--text-inverse);
   font-family: var(--font-pixel);
-  font-size: 8px;
+  font-size: var(--fs-pixel-sm);
   letter-spacing: 0.06em;
   padding: var(--px2) var(--px4);
-  border: var(--px) solid var(--border-primary);
+  border: var(--border-width) solid var(--border-primary);
   transition: top var(--transition-fast);
 }
 
@@ -61,7 +61,7 @@ body {
     background-color var(--transition-slow),
     color var(--transition-slow);
 
-  /* Subtle scanline overlay — the pixel-art texture */
+  /* Subtle scanline overlay, the pixel-art texture */
   position: relative;
   user-select: none;
 }
@@ -117,7 +117,7 @@ code,
 pre {
   font-family: var(--font-vt);
   background: var(--bg-code);
-  border: 1px solid var(--border-primary);
+  border: var(--border-thin) solid var(--border-primary);
 }
 
 /* ============================================================
@@ -176,18 +176,30 @@ pre {
 }
 
 .pixel-border {
-  border: var(--px) solid var(--border-primary);
-  box-shadow: var(--shadow-pixel-sm);
+  border: var(--border-width) solid var(--border-primary);
+  box-shadow: var(--shadow-pixel);
 }
 
 .pixel-border-accent {
-  border: var(--px) solid var(--accent-primary);
-  box-shadow: var(--px) var(--px) 0 var(--accent-primary);
+  border: var(--border-width) solid var(--accent-primary);
+  box-shadow: var(--shadow-pixel-strong);
 }
 
 /* Pixel-art dashed border */
 .pixel-border-dashed {
-  border: var(--px) dashed var(--border-primary);
+  border: var(--border-width) dashed var(--border-primary);
+}
+
+/* ------------------------------------------------------------
+   SURFACE: the single card/panel recipe.
+   Every boxed thing in the app (cards, panels, terminals,
+   screens) uses this so border width, background and shadow
+   depth never drift apart.
+   ------------------------------------------------------------ */
+.pixel-surface {
+  background: var(--bg-card);
+  border: var(--border-width) solid var(--border-primary);
+  box-shadow: var(--shadow-pixel);
 }
 
 /* Blinking cursor animation */
@@ -201,7 +213,7 @@ pre {
   }
 }
 
-/* Softer blink — for persistent chrome elements (navbar cursor) that would
+/* Softer blink, for persistent chrome elements (navbar cursor) that would
    otherwise compete with page-level blink animations */
 @keyframes blink-soft {
   0%,
@@ -287,18 +299,24 @@ pre {
 }
 
 /* ============================================================
-   BUTTONS — shared across pages and components
+   BUTTONS: shared across pages and components
    ============================================================ */
 
 .btn {
   --btn-shadow: var(--border-primary); /* overridden per variant */
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: var(--px2);
-  padding: var(--px3) var(--px6);
-  font-size: 9px;
+  /* One button box for the whole app: 8/20 padding, --fs-pixel-md type,
+     4px border, 4px shadow. Size variants change padding only. */
+  padding: var(--px2) var(--px5);
+  min-height: 32px;
+  font-size: var(--fs-pixel-md);
+  line-height: 1;
   letter-spacing: 0.08em;
-  border: var(--px) solid transparent;
+  border: var(--border-width) solid transparent;
+  box-shadow: var(--shadow-depth) var(--shadow-depth) 0 var(--btn-shadow);
   cursor: pointer;
   text-decoration: none;
   transition:
@@ -313,16 +331,21 @@ pre {
 
 /* 3D press: translate exactly the shadow depth, shadow collapses to nothing */
 .btn:active {
-  transform: translate(var(--px), var(--px));
+  transform: translate(var(--shadow-depth), var(--shadow-depth));
   box-shadow: 0 0 0 var(--btn-shadow) !important;
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.55;
+  pointer-events: none;
 }
 
 .btn--primary {
   --btn-shadow: var(--border-primary);
-  background: var(--bg-primary);
+  background: var(--bg-card);
   color: var(--text-primary);
   border-color: var(--border-primary);
-  box-shadow: var(--px) var(--px) 0 var(--btn-shadow);
 }
 
 .btn--primary:hover {
@@ -330,70 +353,60 @@ pre {
   background: var(--accent-primary);
   color: var(--text-inverse);
   border-color: var(--accent-primary);
-  box-shadow: var(--px) var(--px) 0 var(--btn-shadow);
 }
 
 .btn--outline {
   --btn-shadow: var(--border-secondary);
-  /* background: transparent; */
+  background: transparent;
   color: var(--text-secondary);
   border-color: var(--border-primary);
-  box-shadow: var(--px) var(--px) 0 var(--accent-glow);
 }
 
 .btn--outline:hover {
   --btn-shadow: var(--accent-primary);
   background: var(--accent-glow);
-  box-shadow: var(--px) var(--px) 0 var(--btn-shadow);
   color: var(--accent-primary);
+  border-color: var(--accent-primary);
 }
 
 .btn--ghost {
   --btn-shadow: var(--border-secondary);
   background: transparent;
   color: var(--text-muted);
-  border-color: var(--border-primary);
-  box-shadow: var(--px) var(--px) 0 var(--btn-shadow);
+  border-color: var(--border-secondary);
 }
 
 .btn--ghost:hover {
+  --btn-shadow: var(--border-primary);
   color: var(--text-primary);
   border-color: var(--border-primary);
   background: var(--bg-secondary);
 }
 
-.btn--lg {
-  padding: var(--px4) var(--px8);
-  font-size: 10px;
+.btn--sm {
+  padding: var(--px) var(--px3);
+  min-height: 26px;
+  font-size: var(--fs-pixel-sm);
 }
 
-/* .btn--resume {
-  --btn-shadow: var(--delhivery-red);
-  background: transparent;
-  color: var(--delhivery-red);
-  border-color: var(--delhivery-red);
-  box-shadow: var(--px) var(--px) 0 var(--btn-shadow);
-} */
-
-/* .btn--resume:hover {
-  background: color-mix(in srgb, var(--delhivery-red) 12%, transparent);
-  color: var(--delhivery-red);
-  box-shadow: var(--px) var(--px) 0 var(--btn-shadow);
-} */
+.btn--lg {
+  padding: var(--px3) var(--px6);
+  min-height: 40px;
+}
 
 /* 3D press animation for programmatic triggers (ENTER key on CTA) */
 @keyframes btn-press {
   0% {
     transform: translate(0, 0);
-    box-shadow: var(--px) var(--px) 0 var(--btn-shadow);
+    box-shadow: var(--shadow-depth) var(--shadow-depth) 0 var(--btn-shadow);
   }
   40% {
-    transform: translate(var(--px), var(--px));
+    transform: translate(var(--shadow-depth), var(--shadow-depth));
     box-shadow: 0 0 0 var(--btn-shadow);
   }
   100% {
     transform: translate(0, 0);
-    box-shadow: var(--px) var(--px) 0 var(--btn-shadow);
+    box-shadow: var(--shadow-depth) var(--shadow-depth) 0 var(--btn-shadow);
   }
 }
 
@@ -428,7 +441,7 @@ pre {
 }
 
 /* ============================================================
-   CUSTOM CURSOR (CursorRocket) — hide native cursor everywhere.
+   CUSTOM CURSOR (CursorRocket), hide native cursor everywhere.
    Overrides all `cursor: pointer/default/not-allowed` set throughout
    the app (buttons, links, disabled states, etc).
    ============================================================ */
@@ -459,7 +472,6 @@ pre {
 
 @media (max-width: 768px) {
   :root {
-    --font-size-xs: 0.5rem;
     --font-size-sm: 0.65rem;
     --font-size-base: 0.8rem;
   }

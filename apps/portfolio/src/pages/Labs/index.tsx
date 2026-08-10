@@ -43,7 +43,7 @@ function HeroScene({
         <p className="pixel-text labs-hero__boot">$ ls ~/labs/experiments/</p>
         <h1 className="pixel-text labs-hero__title">LABS.exe</h1>
         <p className="vt-text labs-hero__sub">
-          experimental playground — digital toys &amp; works in progress.
+          experimental playground of digital toys &amp; works in progress.
           <br />
           each entry pairs a short write-up with a live mini-game.
         </p>
@@ -55,7 +55,7 @@ function HeroScene({
   );
 }
 
-// ── TV blog scene (text column — LEFT side) ───────────────────
+// ── TV blog scene (text column, LEFT side) ───────────────────
 interface TVBlogSceneProps {
   experiment: LabExperiment;
   isActive: boolean;
@@ -116,7 +116,7 @@ const ToyScene = forwardRef<HTMLElement, ToySceneProps>(
         aria-label={experiment.title}
       >
         <div className="toy-scene__inner">
-          {/* Text left — SceneText handles toggle + code panel */}
+          {/* Text left, SceneText handles toggle + code panel */}
           <div className="toy-scene__text">
             <SceneText experiment={experiment} />
           </div>
@@ -145,7 +145,7 @@ export default function Labs() {
 
   const TV_COUNT = TV_EXPERIMENTS.length;
 
-  // IntersectionObserver — stage root on desktop, viewport on mobile
+  // IntersectionObserver, stage root on desktop, viewport on mobile
   useEffect(() => {
     const container = stageRef.current;
     if (!container) return;
@@ -190,7 +190,7 @@ export default function Labs() {
   return (
     <main className="labs-page" id="main-content">
       <ScrollProgressProvider stageRef={stageRef}>
-        {/* Persistent named index — left rail (desktop) / top strip (mobile) */}
+        {/* Persistent named index, left rail (desktop) / top strip (mobile) */}
         <LabsRail
           activeIdx={activeIdx}
           experiments={LAB_EXPERIMENTS}
@@ -222,7 +222,7 @@ export default function Labs() {
               ))}
             </div>
 
-            {/* Right: sticky CRT TV (channel-switching) — desktop only.
+            {/* Right: sticky CRT TV (channel-switching), desktop only.
                 On mobile each channel renders its own surface (handheld
                 button for HH, inline CRT for TV) inside TVBlogScene. */}
             {!isMobile && (

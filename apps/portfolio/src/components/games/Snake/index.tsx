@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
 import type { GameAction, GameProps } from "../types";
-import { useTheme } from "../../../contexts/ThemeContext";
 import "./style.css";
 
 const GRID = 20;
@@ -74,7 +73,7 @@ function draw(
   started: boolean,
   accent: string,
 ) {
-  ctx.fillStyle = "#0c0a0e";
+  ctx.fillStyle = "#141310";
   ctx.fillRect(0, 0, W, H);
 
   // Subtle grid dots
@@ -91,7 +90,7 @@ function draw(
 
   // Snake
   s.snake.forEach(([x, y], i) => {
-    ctx.fillStyle = i === 0 ? "#e8e4dc" : i % 2 === 0 ? "#4a4555" : "#3a3545";
+    ctx.fillStyle = i === 0 ? "#ece8e0" : i % 2 === 0 ? "#847d70" : "#6f685d";
     ctx.fillRect(x * CELL + 1, y * CELL + 1, CELL - 2, CELL - 2);
   });
 
@@ -106,7 +105,7 @@ function draw(
   if (!started && !s.dead) {
     ctx.fillStyle = "rgba(0,0,0,0.6)";
     ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = "#e8e4dc";
+    ctx.fillStyle = "#ece8e0";
     ctx.font = '7px "Press Start 2P"';
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -117,33 +116,30 @@ function draw(
   if (s.dead) {
     ctx.fillStyle = "rgba(0,0,0,0.65)";
     ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = "#b87a72";
+    ctx.fillStyle = "#d98d85";
     ctx.font = '8px "Press Start 2P"';
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText("GAME OVER", W / 2, H / 2 - 8);
-    ctx.fillStyle = "#6a6570";
+    ctx.fillStyle = "#8d867a";
     ctx.font = '6px "Press Start 2P"';
     ctx.fillText("CLICK TO RETRY", W / 2, H / 2 + 10);
     ctx.textAlign = "left";
   }
 }
 
-// Mirrors --accent-primary's dark/light token values (canvas can't read CSS vars directly).
-const ACCENT_DARK = "#9b8ea0";
-const ACCENT_LIGHT = "#7a6e8e";
+// The CRT screen is always a dark surface regardless of page theme, so the
+// canvas accent is the dark-theme --accent-primary in both themes. Using the
+// light-theme token here would draw near-black on near-black.
+const ACCENT = "#dad4c8";
 
 export function Snake({ active, controlRef }: GameProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef<SnakeState>(init());
   const startedRef = useRef(false);
-  const { isDark } = useTheme();
-  const accentRef = useRef(isDark ? ACCENT_DARK : ACCENT_LIGHT);
-  useEffect(() => {
-    accentRef.current = isDark ? ACCENT_DARK : ACCENT_LIGHT;
-  }, [isDark]);
+  const accentRef = useRef(ACCENT);
 
-  // Shared input handler — used by both keyboard and the Handheld touch pad.
+  // Shared input handler, used by both keyboard and the Handheld touch pad.
   // Only reads refs, so it's stable across renders.
   const press = useCallback((action: GameAction) => {
     const s = stateRef.current;
@@ -182,7 +178,7 @@ export function Snake({ active, controlRef }: GameProps) {
     d: "right",
   };
 
-  // Keyboard input — only when active
+  // Keyboard input, only when active
   useEffect(() => {
     if (!active) return;
     const onKey = (e: KeyboardEvent) => {
@@ -210,7 +206,7 @@ export function Snake({ active, controlRef }: GameProps) {
     };
   }, [controlRef, press]);
 
-  // rAF game loop — pauses when inactive
+  // rAF game loop, pauses when inactive
   useEffect(() => {
     if (!active) return;
     const canvas = canvasRef.current;

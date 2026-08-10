@@ -1,4 +1,4 @@
-import { Fragment, type CSSProperties } from "react";
+import { Fragment } from "react";
 import { haptics } from "../../utils/haptics";
 import type { LabExperiment } from "../../data/labs";
 import "./style.css";
@@ -63,7 +63,6 @@ export function LabsRail({ activeIdx, experiments, onJump }: Props) {
               <li>
                 <button
                   className={`labs-rail__item${isActive ? " is-active" : ""}`}
-                  style={{ "--row-accent": exp.accent } as CSSProperties}
                   onClick={() => jump(idx)}
                   aria-current={isActive ? "true" : undefined}
                   aria-label={`Go to ${exp.title}`}

@@ -10,7 +10,7 @@ declare module "virtual:blogs" {
     date: string;
     /** e.g. "CH01 · SNAKE" */
     tag: string;
-    /** hex colour (not a CSS var — also used by the OG image renderer) */
+    /** hex colour (not a CSS var, also used by the OG image renderer) */
     accent: string;
     /** matches a LabExperiment.game key */
     gameKey: string;

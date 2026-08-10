@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 
 /**
  * Scrolls the window back to (0, 0) on every route change.
- * Place this anywhere inside <BrowserRouter> — it renders nothing.
+ * Place this anywhere inside <BrowserRouter>, it renders nothing.
  */
 export function ScrollToTop() {
   const { pathname } = useLocation();

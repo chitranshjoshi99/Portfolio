@@ -1,5 +1,5 @@
 /* ============================================================
-   ABOUT PAGE — full-height intro + snap experience journey
+   ABOUT PAGE: full-height intro + snap experience journey
    Component-specific styles live in their own component folders:
      ExperienceCard → src/components/ExperienceCard/style.css
      JourneyProgress → src/components/JourneyProgress/style.css
@@ -28,7 +28,7 @@
 .about-intro {
   min-height: calc(100dvh - 56px);
   padding: var(--px12) 0 var(--px16);
-  border-bottom: var(--px) solid var(--border-primary);
+  /* border-bottom: var(--border-width) solid var(--border-primary); */
   display: flex;
   align-items: center;
   scroll-snap-align: start;
@@ -44,7 +44,7 @@
 }
 
 .about-intro__label {
-  font-size: 8px;
+  font-size: var(--fs-pixel-sm);
   color: var(--accent-primary);
   letter-spacing: 0.08em;
   margin-bottom: var(--px3);
@@ -74,20 +74,21 @@
   display: flex;
   gap: var(--px4);
   align-items: flex-start;
-  padding: var(--px3) var(--px4);
-  border: var(--px) solid var(--border-primary);
+  padding: var(--px4);
+  border: var(--border-width) solid var(--border-primary);
   background: var(--bg-card);
-  box-shadow: var(--px2) var(--px2) 0 var(--border-primary);
+  box-shadow: var(--shadow-pixel);
 }
 
 .edu-card__icon {
-  font-size: 1rem;
+  display: inline-flex;
+  color: var(--accent-primary);
   flex-shrink: 0;
   margin-top: 2px;
 }
 
 .edu-card__degree {
-  font-size: 8px;
+  font-size: var(--fs-pixel-sm);
   color: var(--text-primary);
   letter-spacing: 0.04em;
   margin-bottom: var(--px);
@@ -100,7 +101,7 @@
 }
 
 .about-intro__stats-title {
-  font-size: 9px;
+  font-size: var(--fs-pixel-md);
   color: var(--accent-primary);
   letter-spacing: 0.08em;
   margin-bottom: var(--px4);

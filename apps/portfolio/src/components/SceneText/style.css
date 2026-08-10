@@ -13,22 +13,22 @@
 }
 
 .scene-text__channel {
-  font-size: 6px;
+  font-size: var(--fs-pixel-2xs);
   color: var(--text-muted);
   letter-spacing: 0.1em;
 }
 
 .scene-text__badge {
-  font-size: 5px;
+  font-size: var(--fs-pixel-2xs);
   letter-spacing: 0.08em;
   padding: 2px var(--px2);
-  border: var(--px) solid currentColor;
+  border: var(--border-width) solid currentColor;
   flex-shrink: 0;
   animation: none;
 }
 
-/* Blink the WRITING badge */
-.scene-text__badge[style*="nivoda-gold"] {
+/* Blink the WRITING badge (matched on the signal token, not a brand colour) */
+.scene-text__badge[style*="signal-warn"] {
   animation: blink 1.6s step-end infinite;
 }
 
@@ -53,10 +53,10 @@
 
 .scene-text__toggle {
   align-self: flex-start;
-  font-size: 6px;
+  font-size: var(--fs-pixel-2xs);
   letter-spacing: 0.08em;
   padding: var(--px2) var(--px3);
-  border: var(--px) solid var(--border-primary);
+  border: var(--border-width) solid var(--border-primary);
   background: transparent;
   color: var(--accent-primary);
   cursor: pointer;
@@ -67,7 +67,7 @@
 
 .scene-text__toggle:hover {
   background: var(--bg-card-hover);
-  box-shadow: var(--px) var(--px) 0 var(--border-primary);
+  box-shadow: var(--shadow-depth) var(--shadow-depth) 0 var(--border-primary);
 }
 
 .scene-text__code-wrap {
@@ -83,19 +83,19 @@
 }
 
 .scene-text__action {
-  font-size: 8px;
+  font-size: var(--fs-pixel-sm);
   padding: var(--px3) var(--px4);
 }
 
 .scene-text__readmore {
   align-self: flex-start;
   margin-top: var(--px2);
-  font-size: 6px;
+  font-size: var(--fs-pixel-2xs);
   letter-spacing: 0.08em;
   color: var(--accent-primary);
   text-decoration: none;
   padding: var(--px2) var(--px3);
-  border: var(--px) solid var(--accent-primary);
+  border: var(--border-width) solid var(--accent-primary);
   transition:
     background var(--transition-fast),
     box-shadow var(--transition-fast),
@@ -104,7 +104,7 @@
 
 .scene-text__readmore:hover {
   background: var(--bg-card-hover);
-  box-shadow: var(--px) var(--px) 0 var(--accent-primary);
+  box-shadow: var(--shadow-depth) var(--shadow-depth) 0 var(--accent-primary);
   transform: translate(-1px, -1px);
 }
 

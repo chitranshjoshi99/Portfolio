@@ -8,8 +8,8 @@ import { asset } from "@/assets";
 const NAV_LINKS = [
   { to: "/about", label: "> ABOUT", key: "about" },
   { to: "/labs", label: "> LABS", key: "labs" },
-  { to: "/apps", label: "> APPS", key: "apps" },
   { to: "/blogs", label: "> BLOGS", key: "blogs" },
+  { to: "/apps", label: "> APPS", key: "apps" },
   { to: "/contact", label: "> CONTACT", key: "contact" },
 ];
 
@@ -32,7 +32,7 @@ export function Navbar() {
   // Close menu on route change; reset avatar badge on non-home routes
   useEffect(() => {
     setMenuOpen(false);
-    if (location.pathname !== "/") setAvatarHidden(false);
+    if (location.pathname !== "/") setAvatarHidden(true);
   }, [location]);
 
   // Observe the hero avatar element (only present on the Home page).
@@ -53,7 +53,7 @@ export function Navbar() {
       return true;
     };
 
-    // The element might not be in the DOM on first paint — retry once
+    // The element might not be in the DOM on first paint, retry once
     if (!attach()) {
       const t = setTimeout(attach, 120);
       return () => {
@@ -92,7 +92,7 @@ export function Navbar() {
       <nav className="navbar__inner container" ref={menuRef}>
         {/* Logo / brand */}
         <NavLink to="/" className="navbar__logo" aria-label="Go to home">
-          {/* Mini avatar — slides in from behind the logo when hero avatar leaves view */}
+          {/* Mini avatar, slides in from behind the logo when hero avatar leaves view */}
           <span
             className={`navbar__mini-avatar ${avatarHidden ? "navbar__mini-avatar--visible" : ""}`}
             aria-hidden="true"
@@ -130,7 +130,7 @@ export function Navbar() {
 
         {/* Right side: resume download + theme toggle + mobile burger */}
         <div className="navbar__controls">
-          <a
+          {/* <a
             href={asset("/resume.pdf")}
             download="ChitranshJoshi-Resume.pdf"
             className="navbar__link navbar__link--active pixel-text"
@@ -138,7 +138,7 @@ export function Navbar() {
             onClick={() => haptics.press()}
           >
             ↓ RESUME
-          </a>
+          </a> */}
           <ThemeToggleButton
             isDark={isDark}
             onToggle={() => {

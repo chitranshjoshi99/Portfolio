@@ -7,7 +7,7 @@ import "./style.css";
 const ANGLE_OFFSET = 90;
 const IDLE_MS = 150; // no mousemove for this long => snap back to nose-up
 const LERP_FACTOR = 0.35;
-const MOVE_THRESHOLD = 1.5; // px — ignore sub-pixel jitter
+const MOVE_THRESHOLD = 1.5; // px, ignore sub-pixel jitter
 
 function shortestAngleDelta(from: number, to: number) {
   let delta = (to - from) % 360;
@@ -88,7 +88,7 @@ export function CursorRocket() {
   }, []);
 
   // ponytail: touch devices still mount this (harmless, no mousemove ever
-  // fires so it just sits off-screen at -100,-100) — no separate touch branch.
+  // fires so it just sits off-screen at -100,-100), no separate touch branch.
   return (
     <div ref={rootRef} className="cursor-rocket" aria-hidden="true">
       <svg

@@ -1,5 +1,5 @@
 /* ============================================================
-   JOURNEY PROGRESS — Right-side carousel dots
+   JOURNEY PROGRESS: Right-side carousel dots
    ============================================================ */
 
 .journey-progress {
@@ -72,42 +72,42 @@
     transform 0.3s ease;
 }
 
-/* Past — accent colour at reduced opacity */
+/* Past, accent colour at reduced opacity */
 .jp-dot--past .jp-dot__ring {
-  border-color: var(--dot-color);
+  border-color: var(--accent-primary);
 }
 
 .jp-dot--past .jp-dot__fill {
-  background: var(--dot-color);
+  background: var(--accent-primary);
   opacity: 0.45;
 }
 
-/* Active — fully highlighted + slightly scaled */
+/* Active, fully highlighted + slightly scaled */
 .jp-dot--active .jp-dot__ring {
-  border-color: var(--dot-color);
+  border-color: var(--accent-primary);
   transform: scale(1.15);
 }
 
 .jp-dot--active .jp-dot__fill {
-  background: var(--dot-color);
+  background: var(--accent-primary);
   transform: scale(1.2);
 }
 
 /* Hover */
 .jp-dot:hover .jp-dot__ring {
-  border-color: var(--dot-color, var(--accent-primary));
+  border-color: var(--accent-primary);
   transform: scale(1.1);
 }
 
-/* Tooltip — slides out to the left on hover / active */
+/* Tooltip, slides out to the left on hover / active */
 .jp-dot__tooltip {
   position: absolute;
   right: calc(100% + 12px);
   top: 50%;
   transform: translateY(-50%);
   background: var(--bg-card);
-  border: var(--px) solid var(--border-primary);
-  box-shadow: var(--px2) var(--px2) 0 var(--border-primary);
+  border: var(--border-width) solid var(--border-primary);
+  box-shadow: var(--shadow-depth) var(--shadow-depth) 0 var(--border-primary);
   padding: var(--px2) var(--px3);
   white-space: nowrap;
   pointer-events: none;
@@ -127,8 +127,8 @@
   width: 4px;
   height: 4px;
   background: var(--bg-card);
-  border-right: var(--px) solid var(--border-primary);
-  border-top: var(--px) solid var(--border-primary);
+  border-right: var(--border-width) solid var(--border-primary);
+  border-top: var(--border-width) solid var(--border-primary);
   transform: translateY(-50%) rotate(45deg);
 }
 
@@ -138,13 +138,13 @@
 }
 
 .jp-dot__tooltip-name {
-  font-size: 7px;
-  color: var(--dot-color, var(--accent-primary));
+  font-size: var(--fs-pixel-xs);
+  color: var(--accent-primary);
   letter-spacing: 0.06em;
 }
 
 .jp-dot__tooltip-period {
-  font-size: var(--font-size-xs);
+  font-size: var(--fs-pixel-sm);
   color: var(--text-muted);
   font-family: var(--font-body);
 }

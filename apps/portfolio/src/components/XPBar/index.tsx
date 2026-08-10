@@ -4,11 +4,10 @@ import "./style.css";
 interface XPBarProps {
   label: string;
   value: number; // 0–100
-  color?: string; // CSS color or var(--...)
   delay?: number; // animation stagger in ms
 }
 
-export function XPBar({ label, value, color, delay = 0 }: XPBarProps) {
+export function XPBar({ label, value, delay = 0 }: XPBarProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [filled, setFilled] = useState(false);
 
@@ -48,12 +47,9 @@ export function XPBar({ label, value, color, delay = 0 }: XPBarProps) {
           <span
             key={i}
             className={`xp-bar__segment ${i < filledCount ? "xp-bar__segment--filled" : ""}`}
-            style={
-              {
-                "--seg-color": color ?? "var(--accent-primary)",
-                transitionDelay: filled ? `${delay + i * 30}ms` : "0ms",
-              } as React.CSSProperties
-            }
+            style={{
+              transitionDelay: filled ? `${delay + i * 30}ms` : "0ms",
+            }}
           />
         ))}
       </div>

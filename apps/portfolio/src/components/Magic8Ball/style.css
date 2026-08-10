@@ -1,5 +1,5 @@
 /* ============================================================
-   MAGIC 8-BALL — pixel-art oracle game
+   MAGIC 8-BALL: pixel-art oracle game
 
    Canvas: 28 × 28 logical pixels → 168 × 168 CSS (6× integer scale)
    image-rendering: pixelated keeps every pixel a perfect hard square.
@@ -8,12 +8,12 @@
    White window:     centre (14, 14)  radius: 6
    Window CSS size:  radius 6 × scale 6 × 2 = 72 × 72 px
 
-   Content (8 / countdown / answer) is an HTML overlay — NOT drawn
-   on canvas — so we can use any font and animate freely.
+   Content (8 / countdown / answer) is an HTML overlay, NOT drawn
+   on canvas, so we can use any font and animate freely.
 
    Layout: .m8b__stage is always the same size (168 × 168).
    The ball and the button-overlay are both position:absolute inside it.
-   When the ball fades out, the overlay appears in exactly the same spot —
+   When the ball fades out, the overlay appears in exactly the same spot,
    zero layout shift.
    ============================================================ */
 
@@ -26,7 +26,7 @@
   gap: var(--px3);
 }
 
-/* ── Stage (fixed 168×168 — never changes size) ─────────── */
+/* ── Stage (fixed 168×168, never changes size) ─────────── */
 
 .m8b__stage {
   position: relative;
@@ -78,7 +78,7 @@
   image-rendering: crisp-edges; /* Safari fallback */
 }
 
-/* ── HTML window overlay — sits on the white circle ─────── */
+/* ── HTML window overlay, sits on the white circle ─────── */
 /*
    White circle CSS coords:
      centre  14 × 6 = 84px from canvas edge
@@ -103,7 +103,7 @@
 
 /* ── Window contents ─────────────────────────────────────── */
 
-/* Idle / tapping — "8" */
+/* Idle / tapping, "8" */
 .m8b__w-eight {
   font-size: 20px;
   color: #080612;
@@ -111,7 +111,7 @@
   letter-spacing: 0;
 }
 
-/* Countdown number — blasts in from large */
+/* Countdown number, blasts in from large */
 .m8b__w-count {
   font-size: 46px;
   line-height: 1;
@@ -130,7 +130,7 @@
   }
 }
 
-/* Answer text — 3 lines, fades in */
+/* Answer text, 3 lines, fades in */
 .m8b__w-answer {
   display: flex;
   flex-direction: column;
@@ -138,7 +138,7 @@
   gap: 2px;
   font-size: 14px;
   line-height: 1;
-  color: var(--delhivery-red);
+  color: var(--accent-secondary);
   letter-spacing: 0.04em;
   text-align: center;
   animation: m8b-answer-fade 0.35s ease both;
@@ -343,14 +343,14 @@
 }
 
 .m8b__hint {
-  font-size: 6px;
+  font-size: var(--fs-pixel-2xs);
   color: var(--text-muted);
   letter-spacing: 0.08em;
   animation: m8b-blink 1.7s step-end infinite;
 }
 
 .m8b__progress {
-  font-size: 6px;
+  font-size: var(--fs-pixel-2xs);
   color: var(--accent-secondary);
   letter-spacing: 0.07em;
 }
@@ -398,7 +398,7 @@
     font-size: 30px;
   }
   .m8b__w-answer {
-    font-size: 10px;
+    font-size: var(--fs-pixel-md);
     gap: 1px;
   }
 }

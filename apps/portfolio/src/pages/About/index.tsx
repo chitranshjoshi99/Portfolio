@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { XPBar } from "../../components/XPBar";
 import ExperienceCard from "../../components/ExperienceCard";
 import JourneyProgress from "../../components/JourneyProgress";
+import { PixelIcon } from "../../components/PixelIcon";
 import { PERSON, EXPERIENCE, EDUCATION, SKILLS } from "../../data/resume";
 import "./style.css";
 
@@ -50,16 +51,10 @@ export default function About() {
   };
 
   const progressItems = [
-    {
-      id: "intro",
-      company: "PROFILE",
-      accentHex: "var(--accent-primary)",
-      period: "ABOUT",
-    },
+    { id: "intro", company: "PROFILE", period: "ABOUT" },
     ...EXPERIENCE.map((exp) => ({
       id: exp.id,
       company: exp.company,
-      accentHex: exp.accentHex,
       period: exp.period,
     })),
   ];
@@ -85,7 +80,7 @@ export default function About() {
 
               <div className="edu-card">
                 <span className="edu-card__icon" aria-hidden="true">
-                  🎓
+                  <PixelIcon name="cap" size={24} />
                 </span>
                 <div>
                   <p className="edu-card__degree pixel-text">
@@ -106,15 +101,6 @@ export default function About() {
                     key={s.label}
                     label={s.label}
                     value={s.xp}
-                    color={
-                      s.category === "frontend"
-                        ? "var(--accent-primary)"
-                        : s.category === "data"
-                          ? "var(--nivoda-gold)"
-                          : s.category === "backend"
-                            ? "var(--delhivery-red)"
-                            : "var(--classplus-purple)"
-                    }
                     delay={i * 70}
                   />
                 ))}

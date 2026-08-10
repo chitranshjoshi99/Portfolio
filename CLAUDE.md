@@ -4,7 +4,7 @@ This file is read by Claude at the start of every session. It captures
 architecture decisions, conventions, and gotchas so you don't have to
 re-derive them from the code.
 
-**Last updated:** 2026-08-08
+**Last updated:** 2026-08-10
 
 ---
 
@@ -57,6 +57,7 @@ src/
 │   ├── Magic8Ball/       index.tsx + style.css   ← pixel-art oracle game (unchanged)
 │   ├── Navbar/           index.tsx + style.css
 │   ├── PixelBorder/      index.tsx + style.css
+│   ├── PixelIcon/        index.tsx + style.css   ← 8×8 rect-grid SVG icon set (replaces all emoji)
 │   ├── SceneText/        index.tsx + style.css   ← title + teaser + SHOW LOGIC toggle
 │   ├── ScrollIndicator/  index.tsx + style.css
 │   ├── ScrollToTop/      index.tsx
@@ -139,26 +140,118 @@ global (universal selector), so they also style the nested Labs/About scrollers.
 Each `.tsx` file has a sibling `.css` file. Global utilities live in
 `global.css`. Do not add page-specific rules to `global.css`.
 
-### Pixel-art conventions
+### Pixel-art conventions — the four uniformity rules
 
-- Spacing always uses `--px` multiples (`--px2` = 8px, `--px4` = 16px, etc.)
-- Borders are `var(--px)` (4px) solid — never `border-radius` except `--radius-sm` (2px) on inputs
-- Box shadows use the pixel drop-shadow pattern: `Xpx Xpx 0 <color>` (hard offset, no blur)
-- Image rendering: `image-rendering: pixelated` on the avatar
+Everything visual resolves to one of four token families. If you find yourself
+typing a raw `px` value for any of these, reach for the token instead.
+
+| Axis | Token | Rule |
+| ---- | ----- | ---- |
+| **Spacing** | `--px` … `--px24` | Always a `--px` multiple (`--px2` = 8px, `--px4` = 16px, …). |
+| **Borders** | `--border-width` (4px), `--border-thin` (1px) | Every content border is `--border-width`. `--border-thin` is only for hairlines inside dense chrome (XP-bar segments, terminal dots). Never `border-radius` except `--radius-sm` (2px) on inputs. |
+| **Elevation** | `--shadow-depth` (4px), `--shadow-depth-lg` (8px) | One resting depth for the whole page; the deeper step is reserved for modals and hover lifts. Prebuilt: `--shadow-pixel`, `--shadow-pixel-strong` (accent-coloured), `--shadow-pixel-lg`. Hard offset, no blur. |
+| **Pixel type** | `--fs-pixel-2xs` … `--fs-pixel-xl` | 8 / 9 / 10 / 11 / 13 / 16 px. Tuned tight on purpose: "Press Start 2P" is a 5x7 grid font with no descenders, so it reads a size or two larger than its nominal value. **8px is the floor.** Prose keeps the rem-based `--font-size-*` scale. |
+
+### Prose style
+
+No em dashes in user-facing copy. Use a colon, a comma, a semicolon or
+parentheses instead, whichever the sentence actually wants. This applies to
+everything a reader sees: `resume.ts`, `labs.ts`, page copy, `aria-label`s,
+blog frontmatter and MDX bodies, and the head meta in `index.html`. En dashes
+in numeric ranges ("May 2024 – Apr 2026", "200–500") are fine. Title
+separators use "·".
+
+`.pixel-surface` in `global.css` is the single card/panel recipe (bg + border +
+shadow) — use it rather than re-declaring the trio.
+
+Image rendering: `image-rendering: pixelated` on the avatar and pixel icons.
 
 ### Navbar theme toggle — icon only
 
 `.theme-toggle__label` in `Navbar/style.css` has `display: none` — the "DARK"/"LIGHT" text label is hidden. Only the toggle track (sun/moon icons + sliding thumb) renders. Do not restore the label unless you also check that it fits in the navbar bar on narrow desktops.
 
-### Company accent colours
+### Colour, one ramp per theme and no brand accents
 
-Three muted accent colours used throughout the experience cards:
+The per-company accents (`--nivoda-gold`, `--delhivery-red`,
+`--classplus-purple`) **were removed**. Each theme now has exactly one shared
+accent ramp: do not reintroduce a colour that means "a particular company,
+blog post, or lab experiment". Identity is carried by copy, numbering and
+layout, not hue.
 
-- `--nivoda-gold` (#9E8562) — Nivoda LLP
-- `--delhivery-red` (#B87A72) — Delhivery
-- `--classplus-purple` (#8B7BA8) — Classplus
+**The two themes deliberately use different hues**, because they sit on
+different backdrops:
 
-These are defined in both light and dark themes in `tokens.css`.
+| Theme | Ramp | Why |
+| ----- | ---- | --- |
+| Dark | Purple (`#bfaee4` -> `#9689bc` -> `#7d719e`) | Sits on the near-black night sky. |
+| Light | Sand (`#6b4f22` -> `#7a5b24` -> `#8e723c`) | Warm accent against the blue daytime sky. Only the accent is warm: backgrounds, text and borders stay cool blue-tinted paper. |
+
+The light sand ramp runs dark on purpose. `--bg-sky` (`#bfe3f5`) is bright, and
+sand is a light hue, so anything lighter than these values drops under 4.5:1
+against the sky. If you want a sunnier accent, you must darken the sky first.
+
+Keep them in step: a change to one theme's ramp does not imply the same change
+to the other, but both must stay a single hue in three steps.
+
+What exists, all in `tokens.css`:
+
+- **Accent ramp**: `--accent-primary` -> `--accent-secondary` ->
+  `--accent-muted`. One hue, three steps. `--accent-glow` is the translucent
+  wash. Backgrounds and text are tinted toward the same hue so the surface
+  reads as one temperature rather than grey.
+- **Status signals**: `--signal-ok`, `--signal-warn`, `--signal-danger`.
+  Desaturated, and reserved for genuine state (availability, form errors,
+  experiment status, POWER-off). Per WCAG 1.4.1 they always ride alongside a
+  glyph or a word, never carrying meaning alone.
+- **Sky scene**: `--bg-sky`, `--sky-sun`, `--sky-cloud`, `--sky-moon`. This is
+  the one place with real, non-purple colour: a blue daytime sky with a warm
+  sun and white clouds, a near-black night sky with a pale moon. Keep the
+  decor out of the UI ramp and vice versa.
+- **CRT tokens**: `--crt-bg` / `--crt-fg` / `--crt-dim` are **theme-independent
+  on purpose**. The TV screen, handheld screen and gacha reels are dark surfaces
+  in *both* themes, so anything drawn on them must use these; a themed text
+  token would render near-black on near-black in light mode. This is the single
+  easiest mistake to make in this codebase.
+
+**Contrast is a contract.** Every foreground/background pair in `tokens.css` is
+verified against WCAG 2.0 AA (4.5:1 text, 3:1 borders and UI boundaries) and
+the ratios are noted in the comments.
+
+The pair to check is against **`--bg-sky`, not `--bg-primary`**: `body`'s
+background propagates to the viewport canvas, and `.space-bg` (at the negative
+`--z-bg`) paints above it, so the sky is what actually sits behind page copy.
+The light sky is the brightest backdrop in the app and is therefore the binding
+constraint on `--accent-secondary`, `--accent-muted` and `--border-primary`.
+When you change a colour, re-check it: the app is audited to zero failures
+across all six routes in both themes.
+
+### Button system — `--btn-shadow` and 3D press
+
+All `.btn` variants in `global.css` carry a `--btn-shadow` CSS custom property that controls both the resting drop-shadow colour **and** the 3D press collapse. The pattern:
+
+```css
+.btn {
+  --btn-shadow: var(--border-primary); /* base default */
+  box-shadow: var(--shadow-depth) var(--shadow-depth) 0 var(--btn-shadow);
+}
+/* On hover, set --btn-shadow to the hover colour too, so :active collapses the right shade */
+.btn--primary:hover { --btn-shadow: var(--accent-primary); ... }
+
+/* 3D press: translate exactly the shadow depth, collapse shadow to 0 */
+.btn:active {
+  transform: translate(var(--shadow-depth), var(--shadow-depth));
+  box-shadow: 0 0 0 var(--btn-shadow) !important;
+}
+```
+
+Shadow depth is **`--shadow-depth` (4px)** — not 8px. A 4px shadow + 4px translate means the button shifts into the exact space the shadow occupied, giving a clean physical press with no floating artifact. The `@keyframes btn-press` animation (used for the ENTER-key CTA trigger) animates the same translate + shadow collapse + restore.
+
+The base `.btn` also owns padding (`--px3`/`--px6`), `min-height: 40px`,
+`--fs-pixel-md` type and the disabled state. Variants (`--primary`,
+`--outline`, `--ghost`) change **colour only**; `--sm` / `--lg` change padding
+and min-height only. **Do not add a bespoke button** — the old
+`.btn--whatsapp` / `.btn--email` one-offs on Contact were deleted for exactly
+this reason; that page now uses `.btn--primary` and `.btn--outline`.
 
 ### Button system — `--btn-shadow` and 3D press
 
@@ -187,9 +280,34 @@ Shadow depth is **4px (`var(--px)`)** — not 8px. A 4px shadow + 4px translate 
 
 ## StatCard component
 
-`src/components/StatCard/` — displays a single impact metric. The component accepts `before`, `after`, `pct`, `unit`, `label`, `color`, and `delay` props but **renders only the `after` value** as the headline metric — the before/after comparison row was removed. The `before` prop is destructured as `_before` (satisfies no-unused-vars) and intentionally ignored.
+`src/components/StatCard/` — displays a single impact metric. The component accepts `before`, `after`, `pct`, `unit`, `label`, and `delay` props but **renders only the `after` value** as the headline metric — the before/after comparison row was removed. The `before` prop is destructured as `_before` (satisfies no-unused-vars) and intentionally ignored.
 
-Layout: accent-colored metric number (`vt-text`, 2.2rem) → label → XP-style fill bar → percentage. No strikethrough "before" figure.
+Layout: metric number (`vt-text`, 2.2rem) → label → XP-style fill bar → percentage. No strikethrough "before" figure.
+
+`StatCard` and `XPBar` **no longer take a `color` prop** — both draw from
+`--accent-primary`. The old per-category / per-index colour maps in `Home` and
+`About` are gone; don't reintroduce them.
+
+---
+
+## PixelIcon component
+
+`src/components/PixelIcon/` — the app's icon set. **There are no emoji anywhere
+in the app**; emoji render in the OS colour font, so they ignored the theme,
+broke the monochrome palette and changed shape per platform.
+
+Each icon is a list of `[x, y, w, h]` rects on an 8×8 grid, drawn with
+`fill="currentColor"` and `shapeRendering="crispEdges"` — so it inherits text
+colour, re-themes for free, and stays crisp at any integer size. Names:
+`calendar`, `pin`/`location`, `cap`, `phone`, `mail`, `code`.
+
+```tsx
+<PixelIcon name="calendar" size={12} />          // decorative (aria-hidden)
+<PixelIcon name="mail" size={16} title="Email" /> // pass title only when the icon alone carries meaning
+```
+
+Keep `size` a multiple of 8 where practical so pixels stay square. To add an
+icon, add a rect list to `ICONS` and its name to `PixelIconName`.
 
 ---
 
@@ -217,7 +335,8 @@ Layout: accent-colored metric number (`vt-text`, 2.2rem) → label → XP-style 
 
 **CSS classes of note:** `.m8b__ball--shake[data-intensity="1-5"]`, `.m8b__ball--counting`, `.m8b__ball--hidden`, `.m8b__btns-overlay`.
 
-**Home CTA section layout:** `.home-cta-inner` is a centered flex column — `PRESS START` pixel-screen → `▶ VIEW EXPERIENCE` button → `.home-nav-grid` (4 quick-nav cards). (Was previously a two-column grid with Magic8Ball on the left; simplified after Magic8Ball moved to Labs. Nav cards added in the UI declutter pass.)
+**Home closing section:** see §Section 3 below — the old `PRESS START`
+pixel-screen and 4-card nav grid were replaced by the `.home-outro` directory.
 
 ---
 
@@ -254,8 +373,9 @@ Two shared, app-wide fixed-position layers, each mounted **once** in `src/App.ts
 
 `src/components/SpaceBackground/` renders one fixed, full-viewport decorative layer behind all page content, branching on `useTheme().isDark`:
 
-- **Dark theme**: black pixel space scene — a deterministic star field (fixed positions, not `Math.random()`, so layout never shifts) with a few twinkling stars, plus a small pixel-art moon (blocky SVG rect-cluster).
-- **Light theme**: soft pixel sky — a pixel-art sun (same rect-cluster silhouette technique as the moon, `var(--nivoda-gold)`) plus a few pixel-art clouds.
+- Both variants paint `var(--bg-sky)` and draw their decor from the `--sky-*` tokens, never the purple UI ramp. This is deliberately the one colourful surface in the app.
+- **Dark theme**: near-black night sky, a deterministic star field (fixed positions, not `Math.random()`, so layout never shifts) with a few twinkling stars, plus a small pixel-art moon (blocky SVG rect-cluster) in `--sky-moon`.
+- **Light theme**: blue pixel sky, a warm `--sky-sun` and white `--sky-cloud` rect-clusters. The decor sits top-right, clear of the content column. If you move it over body copy, re-check contrast: text is measured against `--bg-sky`, and a solid shape behind it changes the local ratio.
 - Both variants respect `prefers-reduced-motion` (twinkle/drift animations disabled, decor stays visible) via the same `matchMedia` + `change`-listener pattern used elsewhere in the codebase.
 - Sits at the new `--z-bg: -1` token (tokens.css) — intentionally **negative** so it paints behind all normal in-flow page content without requiring every page to add explicit `position`/`z-index` just to sit above it (CSS paints negative-z-index descendants before non-positioned in-flow boxes).
 - `pointer-events: none` throughout — never blocks clicks or Labs game input.
@@ -276,6 +396,7 @@ Two shared, app-wide fixed-position layers, each mounted **once** in `src/App.ts
 - `game: GameKey` — maps to a game component in `src/components/games/`
 - `code: string` — the core-logic snippet shown in the expandable `CodePanel`
 - **Invariant**: all `render: 'tv'` entries must be contiguous before `standalone` entries. A dev-mode assertion in `labs.ts` throws if violated.
+- There is **no `accent` field** — it was a per-experiment brand colour and is gone. `SceneText` derives the status badge colour from `status` via its `STATUS_COLORS` map (`RUNNING` → `--signal-ok`, `WRITING` → `--signal-warn`, `OFFLINE` → `--text-muted`); the rail, CRT and code popup all use `--accent-primary`. Likewise `Experience` in `resume.ts` has no `accentVar` / `accentHex` / `bgHex`.
 
 ### Component tree
 
@@ -314,7 +435,7 @@ New components: `LabsRail`, `TVSet`, `TVScreen`, `ChannelStatic`, `CodePanel`, `
 
 - **Always visible** (including on the hero) — no hide-on-scroll. The old hero experiment-list was removed so the rail is the single index.
 - **Collapsed = dots only.** Each item is a 10px dot; the label (`CH0X`/`TOY`/`INIT` tag + experiment name + status glyph) is `max-width: 0; opacity: 0` and slides open on `.labs-rail:hover` / `:focus-within`. This is the icon-rail-expands-on-hover pattern.
-- Active item tracked by `activeIdx`; dot fills with the item's accent (`--row-accent` set inline), active name tints to the accent. Groups separated by a thin `.labs-rail__sep` line whose `TV` / `TOYS` micro-label also reveals on hover.
+- Active item tracked by `activeIdx`; the dot fills with `--accent-primary` and the active name tints to it. (The old per-experiment `--row-accent` inline style is gone.) Groups separated by a thin `.labs-rail__sep` line whose `TV` / `TOYS` micro-label also reveals on hover.
 - **Desktop:** detached pill `position: fixed; left: 20px; top: 50%`, rounded (`border-radius: 20px`), pixel drop-shadow. `.labs-page` has `padding-left: 76px` so content clears the _collapsed_ pill (expanded labels overlay transiently on hover).
 - **Mobile (≤899px):** becomes a floating bottom dock (`left: 50%; bottom: 16px; flex-direction: row`). No hover on touch, so it stays dots-only except the **active** item, which shows its name inline.
 - Props: `{ activeIdx, experiments, onJump }`. (No `progress` fill / `isVisible` / `totalSections` — removed.)
@@ -424,7 +545,7 @@ main.home-page
                                scroll-snap-type: y mandatory, scrollbar hidden
      ├── section.hero.home-snap__section           ← Hero
      ├── section.impact-skills-section.home-snap__section  ← Stats + Skills
-     └── section.home-cta-section.home-snap__section       ← CTA + nav cards
+     └── section.home-outro.home-snap__section             ← Directory + contact
 ```
 
 Key rules:
@@ -434,35 +555,56 @@ Key rules:
 - `scrollDown` (the ▼ scroll prompt) calls `snapRef.current.scrollTo({ top: snapRef.current.clientHeight, behavior: "smooth" })`. Do **not** use `scrollIntoView` — it doesn't work on a nested scroll container.
 - **No section divider borders or alternate backgrounds** — all three sections share the same `--bg-primary` background for a seamless look.
 
-### Section 1 — Hero
+### Section 1, Hero
 
-Unchanged two-column layout: text left, avatar right. The floating deco (`div.hero__deco`) is a sibling of `.home-snap`, positioned **outside** the snap container so it persists across all three sections as a fixed background layer.
+Two-column layout: text left, avatar right. (The old floating `div.hero__deco`
+pixel-symbol layer was removed; `SpaceBackground` already provides the drifting
+backdrop.)
 
-- **Desktop:** `position: fixed; top: 56px; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 0` — the deco floats behind the snap sections (which are `z-index: 1`).
-- **Mobile:** `position: absolute; top: 0; height: 100svh` — reverts to avoid mobile scroll conflicts.
+**Typewriter lines must not shift the page.** `.hero__role` and
+`.hero__location` both use the `.hero__type` pattern: a `.hero__type-ghost`
+span holds the *full* string at `visibility: hidden`, and `.hero__type-live`
+is absolutely positioned over it with the typed characters. The ghost defines
+the height and wraps exactly as the finished text will, so the bio and CTAs
+below never move while the text types in.
+
+Do not swap this back to `min-height` on the paragraph. `min-height` was what
+caused the original jump: it can't know how many lines the finished string
+takes, and it was also set smaller than the paragraph's own `line-height`, so
+the box grew the moment the first character landed.
 
 ### Section 2 — Impact + Skills
 
 `.impact-skills-section` merges what were previously separate stats and skills sections. Layout: centered flex column with `overflow-y: auto` (scrollable within snap if content overflows on small screens). Contains two `.impact-block` divs — `IMPACT.log` (all `STATS`) and `SKILL_TREE` (first 8 `SKILLS`).
 
-### Section 3 — CTA + nav card grid
+### Section 3 — `.home-outro` (directory + contact)
 
-`.home-cta-section`: centered flex column with `PRESS START` pixel-screen, `▶ VIEW EXPERIENCE` button, and a 4-card nav grid (`.home-nav-grid`).
+Replaced the old `PRESS START` pixel-screen + 4-card nav grid. Four cramped
+cards competing with a blinking arcade screen gave the page two focal points
+and no clear exit; the section is now one quiet index with a single primary
+action.
 
-Nav grid:
+```
+section.home-outro
+└── div.home-outro__inner        ← flex column, gap --px8
+     ├── header.home-outro__head        eyebrow "// NEXT" + title + lede
+     ├── nav.home-outro__list           4 × a.outro-row
+     └── div.home-outro__bar            availability + RESUME + GET IN TOUCH
+```
 
-- `grid-template-columns: repeat(4, 1fr); max-width: 720px` on desktop
-- `repeat(2, 1fr)` on mobile (≤768px)
-- Each `.home-nav-card` links to `/about`, `/labs`, `/blogs`, `/contact` with a `pixel-text` number, title, and short description.
+- **`.outro-row`** is a full-width `grid-template-columns: var(--px8) 1fr var(--px5)` — index number, title + description, and a `>` chevron that nudges right on hover. Uses the standard surface recipe (`--border-width`, `--shadow-pixel`, `--shadow-pixel-strong` on hover) and presses in like a button on `:active`.
+- Destinations live in the **`NEXT_LINKS`** array at the top of `Home/index.tsx` — add a row there, not in JSX.
+- `.home-outro__bar` is the closing action strip: availability status (`--signal-ok` + blinking square) on the left, `RESUME` (`.btn--outline`) and `GET IN TOUCH` (`.btn--primary`) on the right.
+- **Mobile (≤768px):** the bar stacks, buttons go full-width (`flex: 1`), `.outro-row__num` is hidden, and the `ENTER` key hint is `display: none` (no physical keyboard).
 
-### ENTER key on CTA
+### ENTER key on the closing CTA
 
-The "PRESS START" pixel screen triggers navigation to `/about` on ENTER when ≥60% visible. Implementation in `Home.tsx`:
+ENTER navigates to `/contact` while `.home-outro__inner` is ≥40% visible. Implementation in `Home.tsx`:
 
-- `ctaRef` → the pixel-screen div
-- `ctaInView` state via IntersectionObserver
-- `keydown` listener on `window` that checks `ctaInView && !ctaPressed`
-- 320ms delay before `navigate('/about')` for the press animation to complete
+- `ctaRef` → `.home-outro__inner`
+- `ctaInView` state via IntersectionObserver (`threshold: 0.4`)
+- `keydown` listener on `window` that checks `ctaInView && !ctaPressed`, **and bails if `document.activeElement` isn't `body`** — otherwise ENTER on a focused link or input would hijack the user's own keypress
+- 320ms delay before `navigate('/contact')` so the `.btn--pressed` animation completes
 
 **Mobile hero CTAs:** at `≤768px` only the **↓ RESUME** download button is shown — `Home/style.css` hides the others with `.hero__ctas .btn:not(.btn--resume) { display: none }`. VIEW JOURNEY / HIRE ME stay reachable from the nav, so the mobile hero isn't cluttered with buttons. Keep this selector keyed off `.btn--resume`, not button order.
 
@@ -545,6 +687,7 @@ lives in each feature's own section; this is the lookup.** "Mobile" is whatever
 | **Labs scroll-snap**         | `scroll-snap-type: y mandatory`, nested scroll container                                                            | snap off; `.labs-stage` `overflow: visible`, sections stack                                                                                                                                    | `Labs/style.css`                                               |
 | **Home snap-scroll**         | 3-section `div.home-snap` nested scroll container with `scroll-snap-type: y mandatory`; hero deco `position: fixed` | snap off (`scroll-snap-type: none`); sections stack with `min-height: 100svh`; deco reverts to `position: absolute`                                                                            | `Home/style.css`                                               |
 | **Home hero CTAs**           | RESUME + VIEW JOURNEY + HIRE ME                                                                                     | only **↓ RESUME**; others hidden via `.hero__ctas .btn:not(.btn--resume)`                                                                                                                      | `Home/style.css`                                               |
+| **Home closing section**     | `.home-outro__bar` is a single row; `.outro-row__num` visible; `ENTER` hint shown in the primary CTA                | bar stacks and buttons go full-width (`flex: 1`); `.outro-row__num` hidden; `ENTER` hint `display: none` (no physical keyboard)                                                                 | `Home/style.css`                                               |
 | **About journey**            | nested scroll-snap journey + right-side `journey-progress` dots                                                     | snap disabled, cards stack; progress dots hidden `≤900px`                                                                                                                                      | `About/`, `JourneyProgress`                                    |
 
 When you add a new mobile divergence, add a row here **and** document the detail in the feature's own section.

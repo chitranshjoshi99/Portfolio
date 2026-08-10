@@ -4,7 +4,7 @@ import type { MutableRefObject } from "react";
 export type GameAction = "up" | "down" | "left" | "right" | "action";
 
 /** Imperative handle the mobile Handheld console uses to drive a game with
- *  on-screen buttons. `phase` distinguishes press from release — momentary
+ *  on-screen buttons. `phase` distinguishes press from release, momentary
  *  games (Snake direction, Dino jump) react to "down"; held inputs (Pong
  *  paddle) use both. */
 export interface GameHandle {

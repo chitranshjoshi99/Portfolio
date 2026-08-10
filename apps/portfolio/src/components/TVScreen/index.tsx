@@ -41,7 +41,6 @@ export function TVScreen({ activeChannel, tvExperiments }: Props) {
   }, [activeChannel]);
 
   const exp = tvExperiments.find((e) => e.channel === displayChannel);
-  const incomingExp = tvExperiments.find((e) => e.channel === activeChannel);
   const GameComponent = exp ? GAME_MAP[exp.game] : null;
 
   return (
@@ -53,11 +52,7 @@ export function TVScreen({ activeChannel, tvExperiments }: Props) {
       {status === "static" && (
         <>
           <ChannelStatic />
-          <div
-            className="tv-screen__ch-flash pixel-text"
-            style={{ color: incomingExp?.accent }}
-            aria-hidden="true"
-          >
+          <div className="tv-screen__ch-flash pixel-text" aria-hidden="true">
             CH {String(activeChannel).padStart(2, "0")}
           </div>
         </>

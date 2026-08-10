@@ -19,13 +19,13 @@ function drawBallShape(canvas: HTMLCanvasElement) {
   ctx.arc(14, 14, 13, 0, Math.PI * 2);
   ctx.fill();
 
-  // Gloss — subtle top-left sphere illusion
+  // Gloss, subtle top-left sphere illusion
   ctx.fillStyle = "rgba(255,255,255,0.07)";
   ctx.beginPath();
   ctx.arc(9, 8, 3.5, 0, Math.PI * 2);
   ctx.fill();
 
-  // White inner window — content overlay sits on top of this via CSS
+  // White inner window, content overlay sits on top of this via CSS
   ctx.fillStyle = "#dcd8cc";
   ctx.beginPath();
   ctx.arc(14, 14, 6, 0, Math.PI * 2);
@@ -136,7 +136,7 @@ export function Magic8Ball() {
     <div className="m8b">
       {/* ── Stage: ball and button-overlay share the exact same space ── */}
       <div className="m8b__stage">
-        {/* The ball — fades out when showButtons is true */}
+        {/* The ball, fades out when showButtons is true */}
         <button
           ref={ballRef}
           className={[
@@ -165,21 +165,21 @@ export function Magic8Ball() {
             aria-hidden="true"
           />
 
-          {/* HTML overlay — sits exactly over the white window circle */}
+          {/* HTML overlay, sits exactly over the white window circle */}
           <div className="m8b__window" aria-hidden="true">
-            {/* Idle / tapping — show "8" */}
+            {/* Idle / tapping, show "8" */}
             {(phase === "idle" || phase === "tapping") && (
               <span className="m8b__w-eight pixel-text">8</span>
             )}
 
-            {/* Counting — 3 → 2 → 1 inside the window */}
+            {/* Counting, 3 → 2 → 1 inside the window */}
             {phase === "counting" && (
               <span key={countKey} className="m8b__w-count vt-text">
                 {countNum}
               </span>
             )}
 
-            {/* Revealed — answer text inside the window */}
+            {/* Revealed, answer text inside the window */}
             {phase === "revealed" && (
               <div className="m8b__w-answer vt-text">
                 <span>DON'T</span>
@@ -190,7 +190,7 @@ export function Magic8Ball() {
           </div>
         </button>
 
-        {/* Button overlay — appears in the same space as the ball after reveal */}
+        {/* Button overlay, appears in the same space as the ball after reveal */}
         {showButtons && (
           <div
             className="m8b__btns-overlay"
@@ -212,7 +212,7 @@ export function Magic8Ball() {
           </div>
         )}
       </div>
-      {/* ── Status row — reserved height, no layout shift ── */}
+      {/* ── Status row, reserved height, no layout shift ── */}
       <div className="m8b__status" aria-live="polite">
         {phase === "idle" && (
           <span className="m8b__hint pixel-text">[ TAP TO SHAKE ]</span>

@@ -7,7 +7,7 @@
 // a shared relative .ts import (it crashes at module load), so everything the
 // crawler needs is inlined here. The BLOGS array below is AUTO-GENERATED from
 // src/blogs/posts/*.mdx frontmatter by `pnpm gen:blogs` (runs in prebuild);
-// it sits between marker comments — regenerate it, don't edit it by hand.
+// it sits between marker comments, regenerate it, don't edit it by hand.
 
 type Blog = {
   slug: string;
@@ -23,51 +23,51 @@ const BLOGS: Blog[] = [
   {
     slug: "setup-codegen-for-boilerplates",
     title: "Make code generation a daily habit",
-    description: "Boilerplate is code you have already written, just not yet. A small generator hands it to you deterministically — and when you pair with an AI, it stops you spending tokens to have a model re-derive structure it already knows cold.",
+    description: "Boilerplate is code you have already written, just not yet. A small generator hands it to you deterministically, and when you pair with an AI it stops you spending tokens to have a model re-derive structure it already knows cold.",
     tag: "CODEGEN · WORKFLOW",
-    accent: "#b87a72",
+    accent: "#dad4c8",
   },
   {
     slug: "spa-seo-without-ssr",
     title: "SPAs can have great link previews without SSR",
     description: "Single-page apps hand crawlers an empty shell, so every shared link looks the same. Here is how to get correct, per-page social previews on Vercel with a thin meta-injection layer at the edge, no SSR required.",
     tag: "SEO · PREVIEWS",
-    accent: "#b87a72",
+    accent: "#dad4c8",
   },
   {
     slug: "game-loop-without-rerender",
     title: "A game loop in React without re-rendering",
     description: "React re-renders on every state change, but a game loop fires 60 times a second. Keep mutable state in refs, run one requestAnimationFrame loop, and let React own only the canvas element.",
     tag: "CH01 · SNAKE",
-    accent: "#8b7ba8",
+    accent: "#dad4c8",
   },
   {
     slug: "fixed-timestep-game-loop",
     title: "Fixed timesteps: physics that ignores the frame rate",
     description: "Move the ball per frame and it runs at different speeds on every monitor. A fixed timestep accumulates real time and steps physics in equal slices, which also stops the ball tunnelling through paddles.",
     tag: "CH02 · PONG",
-    accent: "#b87a72",
+    accent: "#dad4c8",
   },
   {
     slug: "input-latency-debounce-throttle",
     title: "Raw, debounce, or throttle: handling event streams",
     description: "Raw, debounce, and throttle are three answers to a stream of events. Game input wants raw immediacy, a search box wants debounce, a scroll handler wants throttle. Pick wrong and users feel it.",
     tag: "CH03 · DINO",
-    accent: "#9e8562",
+    accent: "#dad4c8",
   },
   {
     slug: "ui-as-state-machine",
     title: "Model your UI as a state machine",
     description: "Most UI bugs are impossible states made possible by a pile of booleans. Model the flow as one state variable with explicit transitions and the illegal combinations stop being representable.",
     tag: "TOY · ORACLE",
-    accent: "#8b7ba8",
+    accent: "#dad4c8",
   },
   {
     slug: "tiny-swr-cache",
     title: "Build a tiny stale-while-revalidate cache",
     description: "Stale-while-revalidate shows cached data instantly, refetches in the background, and swaps in the fresh copy. The core is about forty lines: a cache map plus an in-flight map for request dedupe.",
     tag: "TOY · GACHA",
-    accent: "#9e8562",
+    accent: "#dad4c8",
   },
 ];
 // <blogs:end>
@@ -89,7 +89,7 @@ const PAGES: Record<string, Page> = {
       "Five years across logistics (Delhivery), B2B diamond trading (Nivoda), and edtech (Classplus). The experience journey, skill tree, and the engineer behind the pixels.",
     imageTitle: "Experience & Skill Tree",
     tag: "ABOUT",
-    accent: "#8b7ba8",
+    accent: "#dad4c8",
   },
   labs: {
     path: "/labs",
@@ -98,7 +98,7 @@ const PAGES: Record<string, Page> = {
       "An experimental playground of pixel-art mini-games and interactive toys. Each one a tiny, playable proof-of-concept.",
     imageTitle: "Interactive Experiments",
     tag: "LABS",
-    accent: "#9e8562",
+    accent: "#dad4c8",
   },
   apps: {
     path: "/apps",
@@ -107,7 +107,7 @@ const PAGES: Record<string, Page> = {
       "Standalone tools, learning experiences, and experiments built by Chitransh Joshi.",
     imageTitle: "Independent Apps & Experiments",
     tag: "APPS",
-    accent: "#35e0ff",
+    accent: "#dad4c8",
   },
   blogs: {
     path: "/blogs",
@@ -116,7 +116,7 @@ const PAGES: Record<string, Page> = {
       "Engineering notes and live proof-of-concepts. Frontend deep-dives you can actually play with.",
     imageTitle: "Engineering Notes & POCs",
     tag: "BLOG",
-    accent: "#b87a72",
+    accent: "#dad4c8",
   },
   contact: {
     path: "/contact",
@@ -125,7 +125,7 @@ const PAGES: Record<string, Page> = {
       "Open to senior frontend / full-stack roles. Reach out via WhatsApp or email.",
     imageTitle: "Let's build something",
     tag: "CONTACT",
-    accent: "#9b8ea0",
+    accent: "#dad4c8",
   },
 };
 

@@ -1,5 +1,6 @@
 import { useState, useEffect, type FormEvent } from "react";
 import { PERSON } from "../../data/resume";
+import { PixelIcon, type PixelIconName } from "../../components/PixelIcon";
 import "./style.css";
 
 // ─────────────────────────────────────────────────────────────
@@ -9,7 +10,7 @@ import "./style.css";
 //   1. Create a free account at https://formspree.io
 //   2. Click "New Form" → point it at chitransh.joshi99@gmail.com
 //   3. Copy the form ID (e.g. "xpzgkwqr") and paste it below
-//   4. Formspree sends you the email directly — no mail client opens
+//   4. Formspree sends you the email directly, no mail client opens
 //
 // Until configured, the Email button falls back to mailto:.
 // ─────────────────────────────────────────────────────────────
@@ -60,7 +61,7 @@ export default function Contact() {
     }
   };
 
-  // ── WhatsApp — opens wa.me with a pre-filled message ────────
+  // ── WhatsApp, opens wa.me with a pre-filled message ────────
   const sendWhatsApp = (e: FormEvent) => {
     e.preventDefault();
     if (!validate("whatsapp")) return;
@@ -85,7 +86,7 @@ export default function Contact() {
     setStatus("whatsapp-opened");
   };
 
-  // ── Email — Formspree fetch OR mailto fallback ───────────────
+  // ── Email, Formspree fetch OR mailto fallback ───────────────
   const sendEmail = async (e: FormEvent) => {
     e.preventDefault();
     if (!validate("email")) return;
@@ -120,7 +121,7 @@ export default function Contact() {
         setStatus("error");
       }
     } else {
-      // Fallback: mailto (opens mail client — configure Formspree to remove this)
+      // Fallback: mailto (opens mail client, configure Formspree to remove this)
       await new Promise((r) => setTimeout(r, 600));
       const body = `Name: ${form.name}\nEmail: ${form.email}\n\n${form.message}`;
       window.location.href = `mailto:${PERSON.email}?subject=${encodeURIComponent(form.subject)}&body=${encodeURIComponent(body)}`;
@@ -147,7 +148,7 @@ export default function Contact() {
   return (
     <main className="contact-page" id="main-content">
       <div className="container contact-inner">
-        {/* ── Left — info panel ──────────────────────────── */}
+        {/* ── Left, info panel ──────────────────────────── */}
         <aside className="contact-info">
           <p className="contact-info__label pixel-text">// SEND_MESSAGE</p>
           <h1 className="contact-info__heading pixel-text">
@@ -161,26 +162,26 @@ export default function Contact() {
 
           <ul className="contact-links" role="list">
             <ContactLink
-              icon="@"
+              icon="mail"
               label="Email"
               href={`mailto:${PERSON.email}`}
               text={PERSON.email}
             />
             <ContactLink
-              icon="☎"
+              icon="phone"
               label="Phone / WhatsApp"
               href={`https://wa.me/${WA_NUMBER}`}
               text={PERSON.phone}
               external
             />
             <ContactLink
-              icon="◈"
+              icon="code"
               label="GitHub"
               href={PERSON.github}
               text="github.com/chitranshjoshi99"
               external
             />
-            <ContactLink icon="▦" label="Location" text={PERSON.location} />
+            <ContactLink icon="pin" label="Location" text={PERSON.location} />
           </ul>
 
           {/* Terminal decoration */}
@@ -212,7 +213,7 @@ export default function Contact() {
           </div>
         </aside>
 
-        {/* ── Right — form ────────────────────────────────── */}
+        {/* ── Right, form ────────────────────────────────── */}
         <div className="contact-form-wrap">
           {status === "sent" ? (
             <SuccessState
@@ -287,20 +288,7 @@ export default function Contact() {
               <div className="form-actions">
                 <button
                   type="button"
-                  className="btn btn--whatsapp pixel-text"
-                  onClick={sendWhatsApp}
-                  disabled={isSending}
-                  title="Opens WhatsApp — no email app needed"
-                >
-                  <span className="form-actions__icon" aria-hidden="true">
-                    ◉
-                  </span>
-                  WHATSAPP
-                </button>
-
-                <button
-                  type="button"
-                  className={`btn btn--email pixel-text ${isSending ? "btn--loading" : ""}`}
+                  className="btn btn--primary pixel-text"
                   onClick={sendEmail}
                   disabled={isSending}
                   title={
@@ -309,9 +297,7 @@ export default function Contact() {
                       : "Opens your mail app"
                   }
                 >
-                  <span className="form-actions__icon" aria-hidden="true">
-                    {isSending ? "◌" : "◫"}
-                  </span>
+                  <PixelIcon name="mail" size={12} />
                   {isSending
                     ? "SENDING..."
                     : FORMSPREE_ID
@@ -319,9 +305,20 @@ export default function Contact() {
                       : "EMAIL"}
                 </button>
 
+                <button
+                  type="button"
+                  className="btn btn--outline pixel-text"
+                  onClick={sendWhatsApp}
+                  disabled={isSending}
+                  title="Opens WhatsApp, no email app needed"
+                >
+                  <PixelIcon name="phone" size={12} />
+                  WHATSAPP
+                </button>
+
                 {status === "error" && (
                   <p className="form-send-error pixel-text" role="alert">
-                    ✕ Send failed — try WhatsApp instead
+                    Send failed, try WhatsApp instead
                   </p>
                 )}
               </div>
@@ -344,7 +341,7 @@ export default function Contact() {
 // ── Sub-components ───────────────────────────────────────────
 
 interface ContactLinkProps {
-  icon: string;
+  icon: PixelIconName;
   label: string;
   href?: string;
   text: string;
@@ -354,8 +351,8 @@ interface ContactLinkProps {
 function ContactLink({ icon, label, href, text, external }: ContactLinkProps) {
   return (
     <li className="contact-link">
-      <span className="contact-link__icon pixel-text" aria-hidden="true">
-        {icon}
+      <span className="contact-link__icon" aria-hidden="true">
+        <PixelIcon name={icon} size={16} />
       </span>
       <div>
         <p className="contact-link__label pixel-text">{label}</p>
@@ -431,15 +428,15 @@ function Field({
 function SuccessState({ onReset }: { onReset: () => void }) {
   return (
     <div className="contact-success">
-      <div className="contact-success__icon pixel-text" aria-hidden="true">
-        ✓
+      <div className="contact-success__icon" aria-hidden="true">
+        <PixelIcon name="mail" size={32} />
       </div>
       <p className="contact-success__title pixel-text">MESSAGE_SENT</p>
       <p className="contact-success__sub">
         Message dispatched. I'll get back to you within 24 hours.
       </p>
       <button className="btn btn--outline pixel-text" onClick={onReset}>
-        ↩ SEND ANOTHER
+        SEND ANOTHER
       </button>
     </div>
   );
@@ -448,15 +445,15 @@ function SuccessState({ onReset }: { onReset: () => void }) {
 function WhatsAppOpenedState({ onReset }: { onReset: () => void }) {
   return (
     <div className="contact-success">
-      <div className="contact-success__icon pixel-text" aria-hidden="true">
-        ◉
+      <div className="contact-success__icon" aria-hidden="true">
+        <PixelIcon name="phone" size={32} />
       </div>
       <p className="contact-success__title pixel-text">WHATSAPP_OPEN</p>
       <p className="contact-success__sub">
         WhatsApp opened in a new tab. Finish sending your message there.
       </p>
       <button className="btn btn--outline pixel-text" onClick={onReset}>
-        ↩ SEND ANOTHER
+        SEND ANOTHER
       </button>
     </div>
   );

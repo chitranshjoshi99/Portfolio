@@ -55,7 +55,7 @@ const next = src.slice(0, s) + build(blogs) + src.slice(e + END.length);
 
 if (next !== src) {
   fs.writeFileSync(PAGE, next);
-  console.log(`gen:blogs — synced ${blogs.length} posts into api/page.ts`);
+  console.log(`gen:blogs: synced ${blogs.length} posts into api/page.ts`);
 } else {
   console.log(`gen:blogs — api/page.ts already up to date (${blogs.length} posts)`);
 }

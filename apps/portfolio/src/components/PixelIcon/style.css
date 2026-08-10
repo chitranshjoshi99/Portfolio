@@ -1,0 +1,8 @@
+.pixel-icon {
+  display: inline-block;
+  flex-shrink: 0;
+  vertical-align: -0.15em;
+  /* Inherits text colour so it re-themes with everything else. */
+  color: inherit;
+  image-rendering: pixelated;
+}

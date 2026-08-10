@@ -5,9 +5,9 @@
 }
 
 .gacha__machine {
-  border: var(--px) solid var(--border-primary);
+  border: var(--border-width) solid var(--border-primary);
   background: var(--bg-card);
-  box-shadow: var(--px2) var(--px2) 0 var(--border-secondary);
+  box-shadow: var(--shadow-depth) var(--shadow-depth) 0 var(--border-secondary);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -20,8 +20,8 @@
   width: 100%;
   padding: var(--px2) var(--px4);
   background: var(--bg-secondary);
-  border-bottom: var(--px) solid var(--border-primary);
-  font-size: 5px;
+  border-bottom: var(--border-width) solid var(--border-primary);
+  font-size: var(--fs-pixel-2xs);
   color: var(--text-muted);
   letter-spacing: 0.08em;
   text-align: center;
@@ -42,7 +42,7 @@
   display: flex;
   gap: var(--px2);
   background: var(--bg-code);
-  border: var(--px) solid var(--border-primary);
+  border: var(--border-width) solid var(--border-primary);
   padding: var(--px2) var(--px3);
 }
 
@@ -52,8 +52,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: var(--px) solid var(--border-secondary);
-  background: #0c0a0e;
+  border: var(--border-width) solid var(--border-secondary);
+  background: var(--crt-bg);
   overflow: hidden;
 }
 
@@ -95,16 +95,17 @@
 }
 
 .gacha__rarity {
-  font-size: 7px;
+  font-size: var(--fs-pixel-xs);
   letter-spacing: 0.1em;
   color: transparent;
-  height: 16px;
+  height: var(--px4);
   display: flex;
   align-items: center;
   transition: color var(--transition-base);
 }
 
 .gacha__rarity--visible {
+  color: var(--text-primary);
   animation: gacha-rarity-in 0.3s ease both;
 }
 
@@ -124,15 +125,15 @@
   width: 100%;
   padding: var(--px2) var(--px4);
   background: var(--bg-secondary);
-  border-top: var(--px) solid var(--border-primary);
-  border-bottom: var(--px) solid var(--border-primary);
+  border-top: var(--border-width) solid var(--border-primary);
+  border-bottom: var(--border-width) solid var(--border-primary);
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
 .gacha__coin-slot .pixel-text {
-  font-size: 5px;
+  font-size: var(--fs-pixel-2xs);
   color: var(--text-muted);
   letter-spacing: 0.06em;
 }
@@ -140,8 +141,8 @@
 .gacha__slot-hole {
   width: 16px;
   height: 4px;
-  background: #0c0a0e;
-  border: 1px solid var(--border-primary);
+  background: var(--crt-bg);
+  border: var(--border-thin) solid var(--border-primary);
 }
 
 /* Controls */
@@ -156,10 +157,10 @@
 
 .gacha__pull-btn,
 .gacha__retry-btn {
-  font-size: 6px;
+  font-size: var(--fs-pixel-2xs);
   letter-spacing: 0.06em;
   padding: var(--px2) var(--px3);
-  border: var(--px) solid var(--border-primary);
+  border: var(--border-width) solid var(--border-primary);
   background: var(--bg-secondary);
   color: var(--text-primary);
   cursor: pointer;
@@ -171,7 +172,7 @@
 .gacha__pull-btn:hover:not(:disabled),
 .gacha__retry-btn:hover {
   background: var(--bg-card-hover);
-  box-shadow: var(--px) var(--px) 0 var(--border-primary);
+  box-shadow: var(--shadow-depth) var(--shadow-depth) 0 var(--border-primary);
 }
 
 .gacha__pull-btn:disabled {
@@ -185,7 +186,7 @@
 }
 
 .gacha__pulls {
-  font-size: 5px;
+  font-size: var(--fs-pixel-2xs);
   color: var(--text-muted);
   letter-spacing: 0.08em;
   padding-bottom: var(--px2);

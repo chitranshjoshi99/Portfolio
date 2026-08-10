@@ -41,7 +41,7 @@ export default function BlogPost() {
     return (
       <main className="blog-post" id="main-content">
         <div className="blog-post__inner">
-          <p className="pixel-text">404 — post not found.</p>
+          <p className="pixel-text">404: post not found.</p>
           <Link to="/blogs" className="blog-post__back pixel-text">
             ← ALL POSTS
           </Link>
@@ -61,7 +61,7 @@ export default function BlogPost() {
         >
           ← BACK
         </button>
-        <p className="pixel-text blog-post__tag" style={{ color: blog.accent }}>
+        <p className="pixel-text blog-post__tag">
           {blog.tag}
         </p>
         <h1 className="pixel-text blog-post__title">{blog.title}</h1>

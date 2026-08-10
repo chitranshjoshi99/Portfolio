@@ -9,23 +9,29 @@ import "./style.css";
 import { asset } from "@/assets";
 import { AvatarEyes } from "../../components/AvatarEyes";
 
-// ── Pixel decorations ────────────────────────────────────────
-const PIXEL_DECO = ["◆", "▲", "●", "■", "◇", "△", "○", "□"];
-
-function randomDeco(seed: number) {
-  return PIXEL_DECO[seed % PIXEL_DECO.length];
-}
-
-// ── Skill category colours ───────────────────────────────────
-const CAT_COLOR: Record<string, string> = {
-  frontend: "var(--accent-primary)",
-  backend: "var(--delhivery-red)",
-  data: "var(--nivoda-gold)",
-  tooling: "var(--accent-secondary)",
-  testing: "var(--delhivery-red-dim)",
-  ai: "var(--classplus-purple)",
-  infra: "var(--classplus-purple-dim)",
-};
+// ── Closing section nav ──────────────────────────────────────
+const NEXT_LINKS = [
+  {
+    to: "/about",
+    title: "EXPERIENCE",
+    desc: "5+ years across logistics, B2B marketplaces and edtech.",
+  },
+  {
+    to: "/labs",
+    title: "LABS",
+    desc: "Live interactive experiments, each with its own source.",
+  },
+  {
+    to: "/blogs",
+    title: "BLOG",
+    desc: "Write-ups on what I have been building and why.",
+  },
+  {
+    to: "/apps",
+    title: "APPS",
+    desc: "Standalone tools and experiments I have shipped.",
+  },
+];
 
 export default function Home() {
   const snapRef = useRef<HTMLDivElement>(null);
@@ -34,27 +40,30 @@ export default function Home() {
   const [ctaPressed, setCtaPressed] = useState(false);
   const navigate = useNavigate();
 
-  // Track when the "PRESS START" screen enters the viewport
+  // Track when the closing section enters the viewport
   useEffect(() => {
     const el = ctaRef.current;
     if (!el) return;
     const obs = new IntersectionObserver(
       ([entry]) => setCtaInView(entry.isIntersecting),
-      { threshold: 0.6 },
+      { threshold: 0.4 },
     );
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
 
-  // ENTER key fires the button when CTA is in view
+  // ENTER fires the closing CTA while that section is in view, but never
+  // while the user is typing or has focus on another interactive element.
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key !== "Enter" || !ctaInView || ctaPressed) return;
+      const focused = document.activeElement;
+      if (focused && focused !== document.body) return;
       e.preventDefault();
       setCtaPressed(true);
       haptics.press();
       // Brief visual "press" before navigating
-      setTimeout(() => navigate("/about"), 320);
+      setTimeout(() => navigate("/contact"), 320);
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
@@ -84,31 +93,13 @@ export default function Home() {
 
   return (
     <main className="home-page" id="main-content">
-      {/* Floating pixel decorations — fixed behind all snap sections */}
-      <div className="hero__deco" aria-hidden="true">
-        {Array.from({ length: 12 }, (_, i) => (
-          <span
-            key={i}
-            className="hero__deco-dot"
-            style={
-              {
-                "--deco-x": `${8 + ((i * 7.7) % 88)}%`,
-                "--deco-y": `${5 + ((i * 11.3) % 85)}%`,
-                "--deco-delay": `${(i * 0.4) % 3}s`,
-                "--deco-dur": `${2.5 + ((i * 0.3) % 2)}s`,
-              } as React.CSSProperties
-            }
-          >
-            {randomDeco(i)}
-          </span>
-        ))}
-      </div>
+     
 
       <div className="home-snap" ref={snapRef}>
         {/* ── SECTION 1: HERO ───────────────────────────────── */}
         <section className="hero home-snap__section" aria-label="Introduction">
           <div className="container hero__inner">
-            {/* Left — text content */}
+            {/* Left, text content */}
             <div className="hero__content">
               {/* Name */}
               <h1 className="hero__name pixel-text">
@@ -123,19 +114,34 @@ export default function Home() {
                 ))}
               </h1>
 
-              {/* Role — typewriter */}
-              <p className="hero__role pixel-text">
-                <span className="hero__role-prefix">{">"}</span>{" "}
-                <span className="hero__role-text">{typedRole}</span>
-                {!roleDone && (
-                  <span className="hero__cursor" aria-hidden="true">
-                    ▮
-                  </span>
-                )}
+              {/* Role, typewriter.
+                  Both typewriter lines reserve their final height with a
+                  hidden ghost copy of the full string and paint the typed
+                  text over it, so nothing below shifts as they fill in
+                  (including when the string wraps to a second line). */}
+              <p className="hero__role hero__type pixel-text">
+                <span className="hero__type-ghost" aria-hidden="true">
+                  {"> "}
+                  {PERSON.tagline}
+                </span>
+                <span className="hero__type-live">
+                  <span className="hero__role-prefix">{">"}</span>{" "}
+                  <span className="hero__role-text">{typedRole}</span>
+                  {!roleDone && (
+                    <span className="hero__cursor" aria-hidden="true">
+                      ▮
+                    </span>
+                  )}
+                </span>
               </p>
 
-              {/* Location — secondary typewriter */}
-              <p className="hero__location vt-text">{typedLoc}</p>
+              {/* Location, secondary typewriter */}
+              <p className="hero__location hero__type vt-text">
+                <span className="hero__type-ghost" aria-hidden="true">
+                  {`// ${PERSON.location}`}
+                </span>
+                <span className="hero__type-live">{typedLoc}</span>
+              </p>
 
               {/* Bio */}
               <p className="hero__bio">{PERSON.bio}</p>
@@ -176,13 +182,13 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right — profile picture (id="hero-avatar" watched by Navbar) */}
+            {/* Right, profile picture (id="hero-avatar" watched by Navbar) */}
             <div className="hero__avatar-wrap" id="hero-avatar">
               <div className="hero__avatar-frame">
                 <div className="hero__avatar-inner">
                   <AvatarEyes
                     src={asset("/profile.jpeg")}
-                    alt={`${PERSON.name} — pixel art avatar`}
+                    alt={`${PERSON.name}, pixel art avatar`}
                     imgClassName="hero__avatar-img"
                     width={240}
                     height={240}
@@ -256,15 +262,6 @@ export default function Home() {
                     after={s.after}
                     pct={s.pct}
                     unit={s.unit}
-                    color={
-                      i === 0
-                        ? "var(--nivoda-gold)"
-                        : i === 1
-                          ? "var(--delhivery-red)"
-                          : i === 2
-                            ? "var(--classplus-purple)"
-                            : "var(--accent-primary)"
-                    }
                     delay={i * 100}
                   />
                 ))}
@@ -282,7 +279,6 @@ export default function Home() {
                     key={skill.label}
                     label={skill.label}
                     value={skill.xp}
-                    color={CAT_COLOR[skill.category] ?? "var(--accent-primary)"}
                     delay={i * 60}
                   />
                 ))}
@@ -291,85 +287,79 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── SECTION 3: CTA ────────────────────────────────── */}
+        {/* ── SECTION 3: DIRECTORY + CONTACT ─────────────────── */}
         <section
-          className="home-cta-section home-snap__section"
-          aria-label="Call to action"
+          className="home-outro home-snap__section"
+          aria-labelledby="outro-heading"
         >
-          <div className="container home-cta-inner">
-            <div
-              ref={ctaRef}
-              className={`pixel-screen ${ctaPressed ? "pixel-screen--pressed" : ""}`}
-              role="group"
-              aria-label="Press ENTER to view experience"
-            >
-              <span className="pixel-text pixel-screen__text">PRESS START</span>
-              <span className="pixel-screen__sub vt-text">
-                to view my experience →
-              </span>
-              <span className="pixel-screen__hint pixel-text">[ ENTER ]</span>
-            </div>
+          <div className="container home-outro__inner" ref={ctaRef}>
+            <header className="home-outro__head">
+              <p className="home-outro__eyebrow pixel-text">
+                <span className="home-outro__eyebrow-mark">//</span> NEXT
+              </p>
+              <h2 id="outro-heading" className="home-outro__title pixel-text">
+                Pick a thread
+              </h2>
+              <p className="home-outro__lede">
+                Four ways into the work: the roles behind the numbers, the
+                experiments, the write-ups, and the things already shipped.
+              </p>
+            </header>
 
-            {/* <Link
-              to="/about"
-              ref={ctaBtnRef}
-              className={`btn btn--primary btn--lg pixel-text ${ctaPressed ? "btn--pressed" : ""}`}
-              onClick={() => {
-                setCtaPressed(true);
-                haptics.press();
-              }}
-            >
-              ▶ VIEW EXPERIENCE
-            </Link> */}
+            {/* Directory, one full-width row per destination */}
+            <nav className="home-outro__list" aria-label="Site sections">
+              {NEXT_LINKS.map((item, i) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className="outro-row"
+                  onClick={() => haptics.tap()}
+                >
+                  <span className="outro-row__num pixel-text" aria-hidden="true">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span className="outro-row__body">
+                    <span className="outro-row__title pixel-text">
+                      {item.title}
+                    </span>
+                    <span className="outro-row__desc">{item.desc}</span>
+                  </span>
+                  <span className="outro-row__go pixel-text" aria-hidden="true">
+                    &gt;
+                  </span>
+                </Link>
+              ))}
+            </nav>
 
-            {/* Quick-nav grid */}
-            <div className="home-nav-grid">
-              <Link
-                to="/about"
-                className="home-nav-card"
-                onClick={() => haptics.tap()}
-              >
-                <span className="home-nav-card__num pixel-text">01</span>
-                <span className="home-nav-card__title pixel-text">
-                  EXPERIENCE
-                </span>
-                <span className="home-nav-card__desc">
-                  5+ years · 3 companies
-                </span>
-              </Link>
-              <Link
-                to="/labs"
-                className="home-nav-card"
-                onClick={() => haptics.tap()}
-              >
-                <span className="home-nav-card__num pixel-text">02</span>
-                <span className="home-nav-card__title pixel-text">LABS</span>
-                <span className="home-nav-card__desc">
-                  Live interactive experiments
-                </span>
-              </Link>
-              <Link
-                to="/blogs"
-                className="home-nav-card"
-                onClick={() => haptics.tap()}
-              >
-                <span className="home-nav-card__num pixel-text">03</span>
-                <span className="home-nav-card__title pixel-text">BLOG</span>
-                <span className="home-nav-card__desc">
-                  What I've been building
-                </span>
-              </Link>
-              <Link
-                to="/apps"
-                className="home-nav-card"
-                onClick={() => haptics.tap()}
-              >
-                <span className="home-nav-card__num pixel-text">04</span>
-                <span className="home-nav-card__title pixel-text">APPS</span>
-                <span className="home-nav-card__desc">
-                  Tools and experiments I've shipped
-                </span>
-              </Link>
+            {/* Closing action bar */}
+            <div className="home-outro__bar">
+              <p className="home-outro__status pixel-text">
+                <span className="home-outro__status-dot" aria-hidden="true" />
+                AVAILABLE FOR WORK
+              </p>
+              <div className="home-outro__actions">
+                <a
+                  href={asset("/resume.pdf")}
+                  download="ChitranshJoshi-Resume.pdf"
+                  className="btn btn--outline pixel-text"
+                  onClick={() => haptics.press()}
+                >
+                  RESUME
+                </a>
+                <Link
+                  to="/contact"
+                  className={`btn btn--primary pixel-text ${ctaPressed ? "btn--pressed" : ""}`}
+                  onClick={() => {
+                    setCtaPressed(true);
+                    haptics.press();
+                  }}
+                >
+                  GET IN TOUCH
+                  <span className="home-outro__key" aria-hidden="true">
+                    ENTER
+                  </span>
+                </Link>
+              </div>
             </div>
           </div>
         </section>
