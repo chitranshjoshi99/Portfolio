@@ -7,6 +7,16 @@ import type { Project } from './project.types';
  */
 export const projects: Project[] = [
   {
+    id: 'feature-flags',
+    title: 'Feature Flag Control',
+    description:
+      'RBAC-gated flag console: per-environment role grants, deterministic percentage rollout, user overrides and a live who-sees-it preview.',
+    difficulty: 'hard',
+    tags: ['rbac', 'permissions', 'hashing', 'optimistic-ui'],
+    Component: lazy(() => import('./feature-flags')),
+    guideUrl: 'https://claude.ai/code/artifact/004672f5-3a24-4462-9406-cb9e1a33849b',
+  },
+  {
     id: 'file-explorer',
     title: 'File Explorer',
     description:
