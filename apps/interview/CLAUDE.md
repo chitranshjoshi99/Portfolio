@@ -41,8 +41,47 @@ src/
 1. Create `src/projects/<slug>/` with the folder split above and a default-exported `index.tsx`.
 2. Add an entry to `projects` in `src/projects/project-registry.ts` (lazy import).
 3. Write `guide.md` in the project folder using the guide standard below.
+4. **Publish the cheat-sheet artifact** (below) and set the entry's `guideUrl` to its URL.
 
-Listing page and route pick the project up automatically.
+Listing page and route pick the project up automatically. A project is not finished until
+`guideUrl` is filled in — the ↗ icon on the listing card and the project header only render when
+it is set, so a missing artifact is visible on the home page.
+
+## Cheat-sheet artifact standard
+
+Every project has a published Artifact — the **one-screen counterpart to `guide.md`**, titled
+`<Project Title> — Machine Coding Cheat Sheet`. The guide is what you read the night before; the
+sheet is what you glance at during the interview. It never introduces a fact the guide does not
+have.
+
+Publish it with the `Artifact` tool from a self-contained HTML file (no `<!doctype>`/`<html>`/
+`<head>`/`<body>` — write `<title>`, `<style>`, then the markup), and reuse the **existing sheet's
+CSS verbatim**: the dark/light token block (`--accent --bad --bg --panel --panel-head --line
+--text --muted --code`, redefined under both `@media (prefers-color-scheme: dark|light)` and
+`:root[data-theme="dark"|"light"]`), `font-size: clamp(8.5px, min(1.39vh, 0.868vw), 12.5px)`,
+`height: auto` (never `100dvh` — the embed sizes itself from `scrollHeight` and clips), and the
+`.sheet` / `.grid` / `.block` / `.body` structure. Copy it from any existing sheet rather than
+re-deriving it.
+
+Layout: a 12-column `grid-template-areas` map of `.block` sections, each with a numbered mono
+header (`<span class="idx">01</span>`) and an optional right-aligned `.note`. Blocks stack to one
+column under 1000px. The standard blocks, in order:
+
+| Block | Contents |
+| --- | --- |
+| Clarify | 5–7 requirement questions as `.q` / `.a` pairs |
+| Model | the JSON record in a `<pre>`, plus the two or three notes that justify its shape |
+| State | the `useState` / `useMemo` / `useRef` list with the comment on each |
+| Traps | the graded one-liners — `<b>` the mono token, then why it bites |
+| Core | the pure functions the question is actually about |
+| Ladder | a `<table>` with `tr.dead` for the rejected rung, `tr.ship` for the one to build, then a `.verdict` paragraph explaining what *changed*, not just what is faster. A project with two real ladders gets two blocks |
+| Hook | the one function that wires state to the pure core |
+| Build order | `<ol class="steps">` plus a `.verdict` naming where it is safe to stop |
+| Demo + cross-Q | demo beats, then the interviewer questions as `.q` / `.a` pairs |
+
+Pass `favicon` (one emoji, stable across redeploys) and a one-sentence `description`. To revise a
+published sheet, republish the same file path in the same conversation, or pass its `url` from a
+new one — never mint a second URL for a project that already has one.
 
 ## Project guide standard
 
