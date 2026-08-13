@@ -78,6 +78,32 @@ column under 1000px. The standard blocks, in order:
 | Hook | the one function that wires state to the pure core |
 | Build order | `<ol class="steps">` plus a `.verdict` naming where it is safe to stop |
 | Demo + cross-Q | demo beats, then the interviewer questions as `.q` / `.a` pairs |
+| Full code | the whole project as one file, collapsed, with a copy button — see below |
+
+### The full-code block (last block on every sheet)
+
+The sheet ends with the complete single-file source, so the page is both the glance
+reference and the thing you paste into the sandbox. Rules:
+
+- **Content is §9/§10 of `guide.md` verbatim** — the single-file `App.jsx`. The sheet never
+  holds a second copy of the code that can drift; regenerate the block from the guide.
+- **Its own full-width grid row.** Append `"fullcode ×12"` to `grid-template-areas` and one
+  more `auto` to `grid-template-rows`, then `<section class="block" style="--area: fullcode">`
+  as the last block, numbered after the existing ones.
+- **Collapsed by default** — the code lives in `<details class="fc"><summary>show App.jsx</summary>`
+  so the sheet still reads as one screen. The `.note` carries the line count.
+- **Copy button in the header**, so the file can be copied without expanding it:
+  `<button class="copy" data-copy="fc-<slug>">` with an inline SVG copy glyph and a
+  `.copy__label` that flips to `COPIED` for 1.5s. One `<script>` at the end of the file wires
+  every `.copy` on the page: `navigator.clipboard.writeText`, falling back to a hidden
+  `<textarea>` + `document.execCommand('copy')` because the async clipboard API is blocked in
+  some embedded frames.
+- **Sections are separated by a file banner comment naming the file the block becomes** in the
+  repo — `// utils/rbac.utils.js — pure`, `// hooks/use-flag-console.js`, `// App.jsx` — one
+  banner per real file, so a generic `constants` / `hooks` / `components` banner in the guide is
+  expanded into the concrete file names (`hooks/use-debounced-value.js`,
+  `components/feedback-row.jsx`, …). Banners are wrapped in `<span class="f">` and drawn in
+  `--accent`; they are the map from the one file back onto the project folder.
 
 Pass `favicon` (one emoji, stable across redeploys) and a one-sentence `description`. To revise a
 published sheet, republish the same file path in the same conversation, or pass its `url` from a
