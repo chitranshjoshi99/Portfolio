@@ -14,7 +14,7 @@ export const projects: Project[] = [
     difficulty: 'hard',
     tags: ['atlassian', 'js-round', 'batching', 'singleton', 'reliability'],
     Component: lazy(() => import('./analytics-sdk')),
-    guideUrl: 'https://claude.ai/artifact/KbFKYTtpgGnVr6YzQZAPoH',
+    guideUrl: 'https://claude.ai/artifact/A1vLRotKC9WNgv9oYGpaWv',
   },
   {
     id: 'data-table',
@@ -24,7 +24,7 @@ export const projects: Project[] = [
     difficulty: 'hard',
     tags: ['atlassian', 'pagination', 'async', 'race-conditions', 'a11y'],
     Component: lazy(() => import('./data-table')),
-    guideUrl: 'https://claude.ai/artifact/9JxtKyNYPu27ZvSgDiUK2V',
+    guideUrl: 'https://claude.ai/artifact/2dRmvqy4U6mk24C9Mcx9gi',
   },
   {
     id: 'document-renderer',
@@ -34,7 +34,7 @@ export const projects: Project[] = [
     difficulty: 'medium',
     tags: ['atlassian', 'recursion', 'registry', 'security', 'xss'],
     Component: lazy(() => import('./document-renderer')),
-    guideUrl: 'https://claude.ai/artifact/SfHTv1FrQ66eHFaYM85gJs',
+    guideUrl: 'https://claude.ai/artifact/DyQQr1WxNwpJucatPpBEjF',
   },
   {
     id: 'feature-flags',
@@ -44,7 +44,7 @@ export const projects: Project[] = [
     difficulty: 'hard',
     tags: ['rbac', 'permissions', 'hashing', 'optimistic-ui'],
     Component: lazy(() => import('./feature-flags')),
-    guideUrl: 'https://claude.ai/code/artifact/004672f5-3a24-4462-9406-cb9e1a33849b',
+    guideUrl: 'https://claude.ai/artifact/L7quvBX19XeC5rhNxTVofp',
   },
   {
     id: 'feature-flag-sdk',
@@ -54,7 +54,7 @@ export const projects: Project[] = [
     difficulty: 'hard',
     tags: ['atlassian', 'js-round', 'caching', 'promises', 'singleton'],
     Component: lazy(() => import('./feature-flag-sdk')),
-    guideUrl: 'https://claude.ai/artifact/RXejbmHi6DWJUe3ZX56PpM',
+    guideUrl: 'https://claude.ai/artifact/TWWfwrcDnb8jDqtPtJ3NTb',
   },
   {
     id: 'file-explorer',
@@ -64,7 +64,7 @@ export const projects: Project[] = [
     difficulty: 'medium',
     tags: ['atlassian', 'tree', 'recursion', 'crud'],
     Component: lazy(() => import('./file-explorer')),
-    guideUrl: 'https://claude.ai/code/artifact/670ac156-5e09-442c-b1db-e635c6a9b3c4',
+    guideUrl: 'https://claude.ai/artifact/SYp9iFo13SuGW9i6C5ixgz',
   },
   {
     id: 'jira-board',
@@ -74,7 +74,7 @@ export const projects: Project[] = [
     difficulty: 'hard',
     tags: ['atlassian', 'drag-and-drop', 'normalized-state', 'optimistic-ui', 'system-design'],
     Component: lazy(() => import('./jira-board')),
-    guideUrl: 'https://claude.ai/artifact/SSvTxeSScKHRtSh7UDazvG',
+    guideUrl: 'https://claude.ai/artifact/58rDn5kneZeacrYVL4j57E',
   },
   {
     id: 'karat-html-css',
@@ -84,7 +84,7 @@ export const projects: Project[] = [
     difficulty: 'easy',
     tags: ['atlassian', 'karat', 'css', 'layout', 'a11y'],
     Component: lazy(() => import('./karat-html-css')),
-    guideUrl: 'https://claude.ai/artifact/4LKBhzEHpAH43EF3d4ivnt',
+    guideUrl: 'https://claude.ai/artifact/3FEVNJmN9xspu4ByZhYDQp',
   },
   {
     id: 'job-board',
@@ -94,7 +94,7 @@ export const projects: Project[] = [
     difficulty: 'medium',
     tags: ['atlassian', 'async', 'concurrency', 'pagination', 'error-handling'],
     Component: lazy(() => import('./job-board')),
-    guideUrl: 'https://claude.ai/artifact/UKVAyiFPhfKWZDq9PcZcHq',
+    guideUrl: 'https://claude.ai/artifact/A44T5jHrt3DH4jXjNs6GTy',
   },
   {
     id: 'jira-issue-view',
@@ -104,7 +104,7 @@ export const projects: Project[] = [
     difficulty: 'medium',
     tags: ['atlassian', 'optimistic-ui', 'async', 'error-handling', 'forms'],
     Component: lazy(() => import('./jira-issue-view')),
-    guideUrl: 'https://claude.ai/artifact/XMtKu8y5hc7t41RuHgMsCt',
+    guideUrl: 'https://claude.ai/artifact/5GTcxzS72GB6fdbepmujjB',
   },
   {
     id: 'js-round',
@@ -114,7 +114,7 @@ export const projects: Project[] = [
     difficulty: 'medium',
     tags: ['atlassian', 'js-round', 'promises', 'polyfills', 'closures'],
     Component: lazy(() => import('./js-round')),
-    guideUrl: 'https://claude.ai/artifact/7EmET6xsWNpec7CrV3hjhX',
+    guideUrl: 'https://claude.ai/artifact/6rDLhpq2DLBWBb5pewAotU',
   },
   {
     id: 'karat-todos',
@@ -124,7 +124,7 @@ export const projects: Project[] = [
     difficulty: 'easy',
     tags: ['atlassian', 'karat', 'vanilla-js', 'fetch', 'xss', 'localstorage'],
     Component: lazy(() => import('./karat-todos')),
-    guideUrl: 'https://claude.ai/artifact/Fb1CEvQa4Kr957cxftVLme',
+    guideUrl: 'https://claude.ai/artifact/WijMf6SxpQq1Pb4bvjFdxU',
   },
   {
     id: 'nested-menu',
@@ -134,7 +134,7 @@ export const projects: Project[] = [
     difficulty: 'medium',
     tags: ['atlassian', 'tree', 'recursion', 'permissions', 'a11y'],
     Component: lazy(() => import('./nested-menu')),
-    guideUrl: 'https://claude.ai/artifact/26KbBK79FVzYabFbjEwsG4',
+    guideUrl: 'https://claude.ai/artifact/YWuqkBAgvAH1L6zuaDJq1j',
   },
   {
     id: 'page-tree',
@@ -144,7 +144,7 @@ export const projects: Project[] = [
     difficulty: 'hard',
     tags: ['atlassian', 'tree', 'lazy-loading', 'a11y', 'virtualization'],
     Component: lazy(() => import('./page-tree')),
-    guideUrl: 'https://claude.ai/artifact/S4FQ4fPSdJENX3EJeiffZz',
+    guideUrl: 'https://claude.ai/artifact/UyicduwjXe7sJ14jz5U59E',
   },
   {
     id: 'perf-benchmark',
@@ -154,7 +154,7 @@ export const projects: Project[] = [
     difficulty: 'medium',
     tags: ['atlassian', 'js-round', 'performance', 'async', 'statistics'],
     Component: lazy(() => import('./perf-benchmark')),
-    guideUrl: 'https://claude.ai/artifact/L2LgmwwLoGjYZLpoJrLmTx',
+    guideUrl: 'https://claude.ai/artifact/RfyLTsZ5Vep5LYCQT8ubzP',
   },
   {
     id: 'seller-feedback',
@@ -164,7 +164,7 @@ export const projects: Project[] = [
     difficulty: 'hard',
     tags: ['async', 'optimistic-ui', 'pagination', 'debounce'],
     Component: lazy(() => import('./seller-feedback')),
-    guideUrl: 'https://claude.ai/code/artifact/d362cf78-a436-4493-88a0-df8bfaad58cb',
+    guideUrl: 'https://claude.ai/artifact/HmoZpK1NtU7qMHsKr577yf',
   },
   {
     id: 'tabs',
@@ -174,7 +174,7 @@ export const projects: Project[] = [
     difficulty: 'medium',
     tags: ['atlassian', 'a11y', 'lazy-loading', 'url-state', 'headless'],
     Component: lazy(() => import('./tabs')),
-    guideUrl: 'https://claude.ai/artifact/T2ubbGUAF6o5AhbJJn7hpV',
+    guideUrl: 'https://claude.ai/artifact/Vr7ZF2ELMXHN7iE9G2c7Sg',
   },
   {
     id: 'tic-tac-toe',
@@ -184,7 +184,7 @@ export const projects: Project[] = [
     difficulty: 'medium',
     tags: ['atlassian', 'state-machine', 'game', 'a11y'],
     Component: lazy(() => import('./tic-tac-toe')),
-    guideUrl: 'https://claude.ai/artifact/Dgj5YzF71quqBz67QWMC9f',
+    guideUrl: 'https://claude.ai/artifact/PH6EaHicJK8YQjKQwpF54T',
   },
   {
     id: 'typeahead-search',
@@ -194,7 +194,7 @@ export const projects: Project[] = [
     difficulty: 'medium',
     tags: ['atlassian', 'debounce', 'a11y', 'keyboard', 'caching'],
     Component: lazy(() => import('./typeahead-search')),
-    guideUrl: 'https://claude.ai/code/artifact/fe1d6eae-5d0e-48b7-9101-85fb3478f64b',
+    guideUrl: 'https://claude.ai/artifact/Mh5n6JQpBdwuV2zvN1SFTU',
   },
   {
     id: 'undo-redo-editor',
@@ -204,7 +204,7 @@ export const projects: Project[] = [
     difficulty: 'hard',
     tags: ['atlassian', 'state-machine', 'history', 'keyboard', 'immutability'],
     Component: lazy(() => import('./undo-redo-editor')),
-    guideUrl: 'https://claude.ai/artifact/UbYNh9KYrRGJNsFguwS7rw',
+    guideUrl: 'https://claude.ai/artifact/FcsZSYAz8NW1dmL7e84Px7',
   },
   {
     id: 'url-shortener',
@@ -214,7 +214,7 @@ export const projects: Project[] = [
     difficulty: 'medium',
     tags: ['forms', 'validation', 'localstorage', 'security'],
     Component: lazy(() => import('./url-shortener')),
-    guideUrl: 'https://claude.ai/code/artifact/8cf3a986-642c-44b6-be82-a94a969679c4',
+    guideUrl: 'https://claude.ai/artifact/16x8LBFFWCJHySVCcyHdTx',
   },
   {
     id: 'velocity-chart',
@@ -224,7 +224,7 @@ export const projects: Project[] = [
     difficulty: 'medium',
     tags: ['atlassian', 'charts', 'css', 'tooltip', 'responsive'],
     Component: lazy(() => import('./velocity-chart')),
-    guideUrl: 'https://claude.ai/artifact/34aY5uhaxoRXrXQbkUx1ai',
+    guideUrl: 'https://claude.ai/artifact/ViqJQu1UkcctYATMsYyG9M',
   },
 ];
 
