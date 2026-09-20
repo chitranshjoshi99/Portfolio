@@ -1,0 +1,148 @@
+.nm {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.nm__toolbar,
+.nm__address {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+}
+
+.nm__field {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.nm__field select,
+.nm__field input {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font: inherit;
+  padding: 5px 8px;
+}
+
+.nm__field input {
+  width: 240px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+}
+
+.nm__btn {
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 7px;
+  color: var(--accent);
+  font-size: 13px;
+  padding: 5px 12px;
+}
+
+.nm__layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 700px) {
+  .nm__layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.nm__nav {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 6px;
+}
+
+.nm__list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.nm__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  background: none;
+  border: 0;
+  border-radius: 6px;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  padding: 6px 10px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.nm__item:hover {
+  background: var(--surface-hover);
+}
+
+.nm__item--trail {
+  color: var(--accent);
+}
+
+.nm__item--active {
+  background: rgba(88, 166, 255, 0.14);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.nm__chevron {
+  display: inline-block;
+  width: 12px;
+  color: var(--text-muted);
+  font-size: 11px;
+  transition: transform 0.15s ease;
+}
+
+.nm__chevron.is-open {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nm__chevron {
+    transition: none;
+  }
+}
+
+.nm__page {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  min-height: 160px;
+}
+
+.nm__page h2 {
+  font-size: 20px;
+}
+
+.nm__page code {
+  color: var(--accent);
+}
+
+.nm__page--error h2 {
+  color: #f85149;
+}
+
+.nm__crumbs {
+  color: var(--text-muted);
+  font-size: 12px;
+}

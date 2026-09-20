@@ -1,0 +1,254 @@
+.ur {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ur__bar {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ur__btn,
+.ur__mini {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--text);
+  font-size: 12px;
+  padding: 6px 11px;
+}
+
+.ur__btn--primary {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.ur__btn:disabled,
+.ur__mini:disabled {
+  color: var(--text-muted);
+  opacity: 0.45;
+}
+
+.ur__hint {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.ur__hint kbd {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 11px;
+  padding: 0 4px;
+}
+
+.ur__stat {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin-left: auto;
+}
+
+.ur__layout {
+  align-items: start;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(200px, 1fr) minmax(240px, 1.2fr) minmax(140px, 0.6fr);
+}
+
+@media (max-width: 900px) {
+  .ur__layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ur__list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ur__list li {
+  display: flex;
+  gap: 4px;
+}
+
+.ur__card {
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+  border-radius: 8px;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.ur__card--grey {
+  background: var(--surface);
+  border-left-color: var(--text-muted);
+}
+
+.ur__card--yellow {
+  background: var(--surface);
+  border-left-color: #d29922;
+}
+
+.ur__card--blue {
+  background: var(--surface);
+  border-left-color: var(--accent);
+}
+
+.ur__card--green {
+  background: var(--surface);
+  border-left-color: #3fb950;
+}
+
+.ur__card.is-selected {
+  border-color: var(--accent);
+}
+
+.ur__card-title {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ur__card-body {
+  color: var(--text-muted);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ur__pin {
+  background: var(--bg);
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  padding: 1px 5px;
+  text-transform: uppercase;
+}
+
+.ur__card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ur__mini {
+  line-height: 1;
+  padding: 3px 6px;
+}
+
+.ur__editor {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+}
+
+.ur__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ur__label {
+  color: var(--text-muted);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.ur__editor input,
+.ur__editor textarea {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  padding: 7px 9px;
+  resize: vertical;
+  width: 100%;
+}
+
+.ur__row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ur__swatch {
+  border: 2px solid transparent;
+  border-radius: 50%;
+  height: 20px;
+  width: 20px;
+}
+
+.ur__swatch--grey {
+  background: #6e7681;
+}
+
+.ur__swatch--yellow {
+  background: #d29922;
+}
+
+.ur__swatch--blue {
+  background: #58a6ff;
+}
+
+.ur__swatch--green {
+  background: #3fb950;
+}
+
+.ur__swatch.is-on {
+  border-color: var(--text);
+}
+
+.ur__history {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  gap: 3px;
+  list-style: none;
+  margin: 0;
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 10px 12px;
+}
+
+.ur__history .is-future {
+  opacity: 0.45;
+}
+
+.ur__num {
+  color: var(--accent);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+}
+
+.ur__muted {
+  color: var(--text-muted);
+  font-size: 12px;
+}

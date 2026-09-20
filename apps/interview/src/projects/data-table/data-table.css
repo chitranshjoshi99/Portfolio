@@ -1,0 +1,315 @@
+.dt {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dt__toolbar {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dt__search {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  min-width: 220px;
+  padding: 6px 10px;
+}
+
+.dt__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.dt__tab,
+.dt__btn {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--text-muted);
+  display: inline-flex;
+  font-size: 12px;
+  gap: 5px;
+  padding: 5px 10px;
+}
+
+.dt__tab.is-on {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.dt__count {
+  background: var(--bg);
+  border-radius: 999px;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  padding: 0 5px;
+}
+
+.dt__state {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin-left: auto;
+}
+
+.dt__error {
+  align-items: center;
+  color: #f85149;
+  display: flex;
+  font-size: 13px;
+  gap: 8px;
+}
+
+.dt__table-wrap {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow-x: auto;
+  transition: opacity 0.15s ease;
+}
+
+/* Rows stay on screen while the next page loads, dimmed: the table never collapses to a spinner. */
+.dt__table-wrap.is-stale {
+  opacity: 0.55;
+}
+
+.dt__table {
+  border-collapse: collapse;
+  font-size: 13px;
+  min-width: 720px;
+  width: 100%;
+}
+
+.dt__table th,
+.dt__table td {
+  border-bottom: 1px solid var(--border);
+  padding: 7px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.dt__table thead th {
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0;
+  position: sticky;
+  text-transform: uppercase;
+  top: 0;
+}
+
+.dt__sort {
+  align-items: center;
+  background: none;
+  border: 0;
+  color: inherit;
+  display: flex;
+  font: inherit;
+  gap: 5px;
+  padding: 8px 10px;
+  text-transform: inherit;
+  width: 100%;
+}
+
+.dt__sort:hover {
+  color: var(--text);
+}
+
+.dt__arrow {
+  color: var(--accent);
+  font-size: 10px;
+}
+
+.dt__table tbody tr:hover {
+  background: var(--surface-hover);
+}
+
+.dt__table tbody tr.is-expanded {
+  background: var(--surface);
+}
+
+.dt__expand-cell {
+  padding-right: 0;
+  width: 28px;
+}
+
+.dt__expand {
+  background: none;
+  border: 0;
+  color: var(--text-muted);
+  font-size: 11px;
+  padding: 2px 4px;
+}
+
+.dt__expand--none {
+  display: inline-block;
+  width: 19px;
+}
+
+.dt__key {
+  color: var(--text-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.dt__summary {
+  min-width: 220px;
+}
+
+.dt__num {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.dt__status {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  padding: 1px 6px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.dt__status--todo {
+  color: var(--text-muted);
+}
+
+.dt__status--in-progress {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.dt__status--blocked {
+  border-color: #f85149;
+  color: #f85149;
+}
+
+.dt__status--done {
+  border-color: #3fb950;
+  color: #3fb950;
+}
+
+.dt__subrow td {
+  background: var(--bg);
+  padding: 6px 10px 8px 38px;
+}
+
+.dt__subtasks {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  list-style: none;
+  padding: 0;
+}
+
+.dt__subtasks li {
+  align-items: center;
+  display: flex;
+  font-size: 12px;
+  gap: 10px;
+}
+
+.dt__empty {
+  color: var(--text-muted);
+  padding: 20px 10px;
+  text-align: center;
+}
+
+.dt__muted {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.dt__pager {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.dt__range {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.dt__size {
+  align-items: center;
+  color: var(--text-muted);
+  display: inline-flex;
+  font-size: 12px;
+  gap: 5px;
+}
+
+.dt__size select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  padding: 3px 6px;
+}
+
+.dt__pages {
+  display: flex;
+  gap: 3px;
+  margin-left: auto;
+}
+
+.dt__page-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  min-width: 28px;
+  padding: 4px 7px;
+}
+
+.dt__page-btn.is-current {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.dt__page-btn:disabled {
+  opacity: 0.4;
+}
+
+.dt__gap {
+  color: var(--text-muted);
+  padding: 4px 2px;
+}
+
+.dt__log {
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  gap: 2px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dt__sr {
+  clip: rect(0 0 0 0);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}

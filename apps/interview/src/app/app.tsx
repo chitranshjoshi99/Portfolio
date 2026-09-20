@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { AtlassianBankPage } from '../features/atlassian-bank/atlassian-bank-page';
 import { ProjectListPage } from '../features/project-list/project-list-page';
 import { ProjectPage } from '../features/project-page/project-page';
 
@@ -8,6 +9,7 @@ export function App() {
       <Routes>
         <Route path="/" element={<ProjectListPage />} />
         <Route path="/projects/:projectId" element={<ProjectPage />} />
+        <Route path="/atlassian" element={<AtlassianBankPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

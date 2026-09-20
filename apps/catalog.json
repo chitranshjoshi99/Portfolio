@@ -22,7 +22,8 @@
       "name": "Frontend Interview Prep",
       "label": "REACT · DRILLS · A11Y",
       "description": "Frontend interview drills — file explorer, feedback queue, typeahead and URL shortener, each with a build guide.",
-      "accent": "#7ee787"
+      "accent": "#7ee787",
+      "hidden": true
     }
   ]
 }
