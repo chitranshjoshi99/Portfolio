@@ -1,0 +1,179 @@
+.jb {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.jb__bar {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.jb__conc {
+  align-items: center;
+  color: var(--text-muted);
+  display: inline-flex;
+  font-size: 12px;
+  gap: 6px;
+}
+
+.jb__conc select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  padding: 3px 6px;
+}
+
+.jb__stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  padding: 3px 10px;
+}
+
+.jb__list {
+  counter-reset: job;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.jb__item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+}
+
+.jb__item--failed {
+  align-items: center;
+  border-color: #f85149;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.jb__title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.jb__title a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.jb__title a:hover {
+  color: var(--accent);
+}
+
+.jb__host {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.jb__meta {
+  color: var(--text-muted);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 12px;
+  gap: 6px;
+}
+
+.jb__error {
+  color: #f85149;
+  font-size: 13px;
+}
+
+.jb__btn,
+.jb__more {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--text);
+  font-size: 12px;
+  padding: 6px 12px;
+}
+
+.jb__more {
+  border-color: var(--accent);
+  color: var(--accent);
+  padding: 8px 18px;
+}
+
+.jb__more:disabled {
+  border-color: var(--border);
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+/* The skeleton occupies the same box as a loaded row, so the list never jumps when it resolves. */
+.jb__item--skeleton {
+  gap: 8px;
+  min-height: 62px;
+}
+
+.jb__bar--title,
+.jb__bar--meta {
+  animation: jb-pulse 1.2s ease-in-out infinite;
+  background: var(--surface-hover);
+  border-radius: 4px;
+  display: block;
+  height: 12px;
+}
+
+.jb__bar--title {
+  width: 42%;
+}
+
+.jb__bar--meta {
+  height: 10px;
+  width: 64%;
+}
+
+@keyframes jb-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jb__bar--title,
+  .jb__bar--meta {
+    animation: none;
+  }
+}
+
+.jb__foot {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+
+.jb__sr {
+  clip: rect(0 0 0 0);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}

@@ -638,6 +638,25 @@ const WA_NUMBER = "918126196827";
 
 ---
 
+## Hidden apps — the `revealInterviewApp` flag
+
+The interview app ships with the portfolio but is kept out of sight. Two places read the same
+localStorage key, `revealInterviewApp` (`"true"` or `"1"` reveals; anything else, including no
+value at all, hides):
+
+- `apps/portfolio/src/data/apps.ts` filters any catalogue entry marked `"hidden": true` out of the
+  Apps page, so the card is not listed.
+- `apps/interview/src/app/reveal.ts` gates the app itself; without the flag `main.tsx` renders a
+  plain "Not found." and never imports the app, so no project chunk is fetched.
+
+To read it on a device: `localStorage.setItem('revealInterviewApp', 'true')` in the console on the
+site's origin, then reload. Both surfaces read the flag once at load.
+
+**This is concealment, not protection.** `apps/catalog.json` still publishes the app, so it is still
+built and served at `/apps/interview/` and its bundle can be read by anyone who looks at the network
+tab. Anything that must genuinely stay private has to leave the catalogue (which stops it deploying)
+or sit behind real authentication. The flag exists so sharing the portfolio does not advertise it.
+
 ## Adding a new page
 
 1. Create `apps/portfolio/src/pages/NewPage/index.tsx` + `style.css`.

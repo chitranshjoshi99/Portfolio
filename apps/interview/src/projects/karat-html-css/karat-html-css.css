@@ -1,0 +1,204 @@
+.kc {
+  display: grid;
+  grid-template-columns: minmax(220px, 260px) 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .kc {
+    grid-template-columns: 1fr;
+  }
+}
+
+.kc__list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 6px;
+}
+
+.kc__item {
+  background: none;
+  border: 0;
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 13px;
+  padding: 7px 10px;
+  text-align: left;
+}
+
+.kc__item:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.kc__item.is-selected {
+  background: rgba(88, 166, 255, 0.12);
+  color: var(--accent);
+}
+
+.kc__detail {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.kc__title {
+  font-size: 18px;
+}
+
+.kc__prompt {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  padding: 10px 12px;
+}
+
+.kc__reported {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.kc__preview {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kc__ruler {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.kc__slider {
+  flex: 1 1 160px;
+  min-width: 0;
+  display: flex;
+}
+
+.kc__slider input {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.kc__width {
+  color: var(--text-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  min-width: 52px;
+}
+
+.kc__preset {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+  padding: 4px 9px;
+}
+
+.kc__preset.is-on {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* The frame is sized in px so the demo's media queries fire against the frame, not the window. */
+.kc__stage {
+  display: flex;
+  justify-content: center;
+  background:
+    repeating-conic-gradient(var(--surface) 0% 25%, transparent 0% 50%) 50% / 16px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px;
+  overflow: hidden;
+}
+
+.kc__frame {
+  height: 420px;
+  max-width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color-scheme: light dark;
+}
+
+.kc__cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.kc__h3 {
+  color: var(--text-muted);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.kc__checks,
+.kc__traps {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 13px;
+  line-height: 1.45;
+  list-style: none;
+  padding: 0;
+}
+
+.kc__checks li::before {
+  color: var(--accent);
+  content: '✓ ';
+}
+
+.kc__traps li {
+  color: var(--text-muted);
+}
+
+.kc__traps li::before {
+  color: #d29922;
+  content: '✗ ';
+}
+
+.kc__source {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.kc__source summary {
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.kc__source pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-top: 8px;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.kc__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

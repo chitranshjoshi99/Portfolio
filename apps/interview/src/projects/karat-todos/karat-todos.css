@@ -1,0 +1,155 @@
+.kt {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.kt__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+}
+
+.kt__url {
+  color: var(--accent);
+  font-size: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+
+.kt__field {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.kt__btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--text);
+  font-size: 13px;
+  padding: 6px 12px;
+}
+
+.kt__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.kt__btn--primary {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.kt__meta {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.kt__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+
+.kt__block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+}
+
+.kt__block-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.kt__block-head h2 {
+  font-size: 14px;
+}
+
+.kt__block-head span {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.kt__list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.kt__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  padding: 3px 0;
+}
+
+.kt__row--done .kt__text {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.kt__text {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.kt__badge {
+  border: 1px solid #d29922;
+  border-radius: 999px;
+  color: #d29922;
+  font-size: 10px;
+  padding: 0 6px;
+}
+
+.kt__link {
+  background: none;
+  border: 0;
+  color: var(--accent);
+  font-size: 12px;
+  padding: 0;
+}
+
+.kt__edit {
+  display: flex;
+  flex: 1;
+  gap: 4px;
+}
+
+.kt__edit input {
+  flex: 1;
+  min-width: 0;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text);
+  font: inherit;
+  padding: 2px 6px;
+}
+
+.kt__edit button {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text);
+  font-size: 12px;
+}
+
+.kt__error {
+  color: #f85149;
+  font-size: 13px;
+}

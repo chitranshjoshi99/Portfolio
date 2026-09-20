@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { ProjectCard } from './project-card';
 import { useProjectList } from './use-project-list';
 import './project-list.css';
@@ -14,14 +15,19 @@ export function ProjectListPage() {
             {totalCount} project{totalCount === 1 ? '' : 's'} · React + TypeScript interview prep
           </p>
         </div>
-        <input
-          className="project-list__search"
-          type="search"
-          placeholder="Search projects…"
-          aria-label="Search projects"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-        />
+        <div className="project-list__actions">
+          <Link className="project-list__bank" to="/atlassian">
+            Atlassian question bank →
+          </Link>
+          <input
+            className="project-list__search"
+            type="search"
+            placeholder="Search projects…"
+            aria-label="Search projects"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+          />
+        </div>
       </header>
 
       {visibleProjects.length === 0 ? (

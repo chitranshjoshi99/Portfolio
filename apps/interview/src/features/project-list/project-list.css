@@ -102,3 +102,24 @@
 .project-list__empty {
   color: var(--text-muted);
 }
+
+.project-list__actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.project-list__bank {
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  color: var(--accent);
+  font-size: 13px;
+  padding: 7px 12px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.project-list__bank:hover {
+  background: rgba(88, 166, 255, 0.1);
+}

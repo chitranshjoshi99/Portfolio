@@ -101,3 +101,10 @@ button {
   background: var(--surface-hover);
   color: var(--accent);
 }
+
+/* Shown when the reveal flag is not set: deliberately plain, and it names nothing. */
+.not-found {
+  color: var(--text-muted);
+  font-size: 14px;
+  padding: 40px 16px;
+}

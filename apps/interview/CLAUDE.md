@@ -47,6 +47,23 @@ Listing page and route pick the project up automatically. A project is not finis
 `guideUrl` is filled in — the ↗ icon on the listing card and the project header only render when
 it is set, so a missing artifact is visible on the home page.
 
+## Atlassian question bank (`/atlassian`)
+
+`src/features/atlassian-bank/` is the company-specific index: every reported Atlassian frontend
+question, the answer that gets full marks, where it was reported, and a link to the project that
+builds it. `bank.data.ts` is the single source of truth; the page filters by round and searches
+prompts, answers and sources.
+
+- A question that is **built** in this app carries `projectId` — that is the link between the two
+  halves of the app, so add it when you build the project rather than leaving the entry loose.
+- `frequency` is evidence, not a guess: `very-high` means it turns up across several independent
+  sources. Keep `sources` specific (`FrontendLead 2360`, `LeetCode 5857882`) so a claim can be
+  re-checked later.
+- Projects sourced from those reports are tagged `'atlassian'` in the registry, so the listing
+  search doubles as a company filter.
+- Answers are one or two sentences and state the *decision*, not a tutorial. If an answer needs
+  more room, it belongs in that project's `guide.md` and the entry should link to the project.
+
 ## Cheat-sheet artifact standard
 
 Every project has a published Artifact — the **one-screen counterpart to `guide.md`**, titled
