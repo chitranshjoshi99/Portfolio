@@ -1,20 +1,25 @@
-// Bob's public links (github.com/chitranshjoshi99/Builder). A Bob posts {name}; this points https://bob-<name>.chitransh.dev
-// at bob-relay (Bob's own server in Mumbai, packages/relay there) and hands back the relay's address and the address's
-// signature, HMAC-SHA256(RELAY_SECRET, address), which Bob keeps and gives the relay to prove the address is its own.
-// The DNS records are the list of names: only bob-* names, only new ones (a name with a record is someone's link: 409), and
-// at most MAX in all, so a token pulled out of a Bob build can't take over an existing link or the rest of the domain.
-// Delete a link: its DNS record at Cloudflare. Bob sends BOB_MAIL_TOKEN (the same one as bob-mail).
-// Env: CF_API_TOKEN (Zone › DNS › Edit on chitransh.dev), CF_ZONE_ID, RELAY_IP (the relay server's public IP),
-// RELAY_SECRET (the same as the relay's), BOB_MAIL_TOKEN.
+// Bob's invites (github.com/chitranshjoshi99/Builder). A Bob posts {email, invite}, what its owner typed. The invite is
+// "<name>.<nonce>.<mac>", made by `bun run invite <email> [name]` there: nonce is when it was made (unix seconds, hex) and
+// mac = HMAC(BOB_SECRET, "invite:<name>:<email>:<nonce>"),
+// so it works only with the email it was made for, and only once: the note on the address's DNS record says whose it is and
+// which invite was used. A reinstall needs a new invite for the same email, which keeps the address. A good one gets that
+// Mac everything it needs, and nothing in a Bob build is secret:
+//   url    https://bob-<name>.chitransh.dev, an A record pointing at bob-relay (Bob's own server in Mumbai, packages/relay)
+//   relay  the relay's address, and sig = HMAC(RELAY_SECRET, address), which the relay checks before it serves the address
+//   key    "<name>.<HMAC(BOB_SECRET, "key:<name>")>", this Mac's own, for bob-mail and bob-google
+//   google the Google client id (null: no Google sign-in)
+// Cut a Mac off: add its name to BOB_REVOKED (comma-separated; bob-mail and bob-google check it too), then delete its DNS record at Cloudflare.
+// Env: CF_API_TOKEN (Zone › DNS › Edit on chitransh.dev), CF_ZONE_ID, RELAY_IP (the relay's public IP), RELAY_SECRET (the same
+// as the relay's), BOB_SECRET (the same as .bob-secret in Builder), GOOGLE_CLIENT_ID, BOB_REVOKED.
+// Self-contained on purpose, like the other bob-* functions: Vercel's bundler doesn't reliably take a shared relative import.
 export const config = { runtime: "edge" };
 
 const DOMAIN = "chitransh.dev";
-const RELAY = `relay.${DOMAIN}:7000`;
 const MAX = 50;
 const reply = (status: number, body: object) =>
   new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
 
-// ponytail: per instance, so only a speed bump; MAX is the backstop.
+// ponytail: per instance, so only a speed bump; an invite is still needed to get anything.
 const seen = new Map<string, number[]>();
 const limited = (key: string, max: number, ms: number) => {
   const t = Date.now();
@@ -40,16 +45,20 @@ const sign = async (secret: string, text: string) => {
 
 export default async function handler(req: Request) {
   if (req.method !== "POST") return reply(405, { error: "post_only" });
-  const { CF_API_TOKEN: key, CF_ZONE_ID: zone, RELAY_IP: ip4, BOB_MAIL_TOKEN: token } = process.env;
-  const secret = process.env.RELAY_SECRET?.trim(); // pasted values can bring a newline
-  if (!key || !zone || !ip4 || !secret || !token) return reply(503, { error: "not_set_up" });
-  if (!same(req.headers.get("authorization") ?? "", `Bearer ${token}`)) return reply(401, { error: "bad_token" });
-
-  let name: unknown;
-  try { ({ name } = await req.json()); } catch { return reply(400, { error: "bad_json" }); }
-  if (typeof name !== "string" || !/^[a-z0-9](?:[a-z0-9-]{0,38}[a-z0-9])?$/.test(name)) return reply(400, { error: "bad_input" });
+  const { CF_API_TOKEN: key, CF_ZONE_ID: zone, RELAY_IP: ip4 } = process.env;
+  const relaySecret = process.env.RELAY_SECRET?.trim(), secret = process.env.BOB_SECRET?.trim(); // pasted values can bring a newline
+  if (!key || !zone || !ip4 || !relaySecret || !secret) return reply(503, { error: "not_set_up" });
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "";
-  if (limited(`ip:${ip}`, 5, 60 * 60_000) || limited("all", 20, 24 * 60 * 60_000)) return reply(429, { error: "slow_down" });
+  if (limited(`ip:${ip}`, 10, 60 * 60_000)) return reply(429, { error: "slow_down" });
+
+  let invite: unknown, email: unknown;
+  try { ({ invite, email } = await req.json()); } catch { return reply(400, { error: "bad_json" }); }
+  const [, name, nonce, mac] = (typeof invite === "string" && invite.match(/^([a-z0-9](?:[a-z0-9-]{0,38}[a-z0-9])?)\.([0-9a-f]{8})\.([0-9a-f]{24})$/)) || [];
+  const who = typeof email === "string" && email.length <= 254 ? email.trim().toLowerCase() : "";
+  if (!name || !who || !same(mac, (await sign(secret, `invite:${name}:${who}:${nonce}`)).slice(0, 24))) return reply(401, { error: "bad_invite" });
+  if ((process.env.BOB_REVOKED ?? "").split(",").map((s) => s.trim()).includes(name)) return reply(403, { error: "revoked" });
+  // Who holds the address and which invite they used, as the note on its DNS record: "bob <person> <invite> <minute used>".
+  const person = (await sign(secret, `email:${who}`)).slice(0, 16), minute = Math.floor(Date.now() / 60_000);
 
   const host = `bob-${name}.${DOMAIN}`;
   const cf = async (method: string, path: string, body?: object) => {
@@ -64,11 +73,27 @@ export default async function handler(req: Request) {
   };
 
   try {
-    const names = ((await cf("GET", "/dns_records?per_page=5000")) as { name: string }[]).map((r) => r.name);
-    if (names.includes(host)) return reply(409, { error: "taken" });
-    if (new Set(names.filter((n) => n.startsWith("bob-"))).size >= MAX) return reply(429, { error: "full" });
-    await cf("POST", "/dns_records", { type: "A", name: host, content: ip4, proxied: false, ttl: 300 });
-    return reply(200, { url: `https://${host}`, relay: RELAY, sig: await sign(secret, host) });
+    const records = (await cf("GET", "/dns_records?per_page=5000")) as { id: string; name: string; comment?: string | null }[];
+    const mine = records.find((r) => r.name === host);
+    const note = `bob ${person} ${nonce} ${minute}`;
+    if (!mine) {
+      if (new Set(records.map((r) => r.name).filter((n) => n.startsWith("bob-"))).size >= MAX) return reply(429, { error: "full" });
+      await cf("POST", "/dns_records", { type: "A", name: host, content: ip4, proxied: false, ttl: 300, comment: note });
+    } else {
+      // No note: an address from before invites went by email, which its first invite takes.
+      const [, holder, used, at] = mine.comment?.match(/^bob ([0-9a-f]{16}) ([0-9a-f]{8}) (\d+)$/) ?? [];
+      if (holder && holder !== person) return reply(409, { error: "taken" });
+      // One use per invite: the nonce is when the invite was made, so only one newer than the last one used works. The same
+      // one again within 15 minutes is the same Mac trying again (its answer got lost).
+      if (used && (parseInt(nonce, 16) < parseInt(used, 16) || (used === nonce && minute - Number(at) > 15)))
+        return reply(409, { error: "used" });
+      if (used !== nonce) await cf("PATCH", `/dns_records/${mine.id}`, { comment: note });
+    }
+    return reply(200, {
+      // The relay by IP: no DNS lookup to go stale, and Bob knows it by its pinned certificate, not its name.
+      url: `https://${host}`, relay: `${ip4}:7000`, sig: await sign(relaySecret, host),
+      key: `${name}.${await sign(secret, `key:${name}`)}`, google: process.env.GOOGLE_CLIENT_ID?.trim() || null,
+    });
   } catch (e) {
     console.error(e);
     return reply(502, { error: "cloudflare_failed" });
