@@ -1,12 +1,14 @@
-// Bob's invites (github.com/chitranshjoshi99/Builder). A Bob posts {invite}, the code its owner pasted: "<name>.<hex>", made by
-// `bun run invite <name>` there as HMAC(BOB_SECRET, "invite:<name>"). A good one gets that Mac everything it needs, and nothing
-// in a Bob build is secret:
+// Bob's invites (github.com/chitranshjoshi99/Builder). A Bob posts {email, invite}, what its owner typed. The invite is
+// "<name>.<nonce>.<mac>", made by `bun run invite <email> [name]` there: nonce is when it was made (unix seconds, hex) and
+// mac = HMAC(BOB_SECRET, "invite:<name>:<email>:<nonce>"),
+// so it works only with the email it was made for, and only once: the note on the address's DNS record says whose it is and
+// which invite was used. A reinstall needs a new invite for the same email, which keeps the address. A good one gets that
+// Mac everything it needs, and nothing in a Bob build is secret:
 //   url    https://bob-<name>.chitransh.dev, an A record pointing at bob-relay (Bob's own server in Mumbai, packages/relay)
 //   relay  the relay's address, and sig = HMAC(RELAY_SECRET, address), which the relay checks before it serves the address
 //   key    "<name>.<HMAC(BOB_SECRET, "key:<name>")>", this Mac's own, for bob-mail and bob-google
 //   google the Google client id (null: no Google sign-in)
-// The same invite again gives the same answer, so a reinstalled Mac gets its address back. Cut a Mac off: add its name to
-// BOB_REVOKED (comma-separated; bob-mail and bob-google check it too), then delete its DNS record at Cloudflare.
+// Cut a Mac off: add its name to BOB_REVOKED (comma-separated; bob-mail and bob-google check it too), then delete its DNS record at Cloudflare.
 // Env: CF_API_TOKEN (Zone › DNS › Edit on chitransh.dev), CF_ZONE_ID, RELAY_IP (the relay's public IP), RELAY_SECRET (the same
 // as the relay's), BOB_SECRET (the same as .bob-secret in Builder), GOOGLE_CLIENT_ID, BOB_REVOKED.
 // Self-contained on purpose, like the other bob-* functions: Vercel's bundler doesn't reliably take a shared relative import.
@@ -49,11 +51,14 @@ export default async function handler(req: Request) {
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "";
   if (limited(`ip:${ip}`, 10, 60 * 60_000)) return reply(429, { error: "slow_down" });
 
-  let invite: unknown;
-  try { ({ invite } = await req.json()); } catch { return reply(400, { error: "bad_json" }); }
-  const [, name, mac] = (typeof invite === "string" && invite.match(/^([a-z0-9](?:[a-z0-9-]{0,38}[a-z0-9])?)\.([0-9a-f]{32})$/)) || [];
-  if (!name || !same(mac, (await sign(secret, `invite:${name}`)).slice(0, 32))) return reply(401, { error: "bad_invite" });
+  let invite: unknown, email: unknown;
+  try { ({ invite, email } = await req.json()); } catch { return reply(400, { error: "bad_json" }); }
+  const [, name, nonce, mac] = (typeof invite === "string" && invite.match(/^([a-z0-9](?:[a-z0-9-]{0,38}[a-z0-9])?)\.([0-9a-f]{8})\.([0-9a-f]{24})$/)) || [];
+  const who = typeof email === "string" && email.length <= 254 ? email.trim().toLowerCase() : "";
+  if (!name || !who || !same(mac, (await sign(secret, `invite:${name}:${who}:${nonce}`)).slice(0, 24))) return reply(401, { error: "bad_invite" });
   if ((process.env.BOB_REVOKED ?? "").split(",").map((s) => s.trim()).includes(name)) return reply(403, { error: "revoked" });
+  // Who holds the address and which invite they used, as the note on its DNS record: "bob <person> <invite> <minute used>".
+  const person = (await sign(secret, `email:${who}`)).slice(0, 16), minute = Math.floor(Date.now() / 60_000);
 
   const host = `bob-${name}.${DOMAIN}`;
   const cf = async (method: string, path: string, body?: object) => {
@@ -68,10 +73,21 @@ export default async function handler(req: Request) {
   };
 
   try {
-    const names = ((await cf("GET", "/dns_records?per_page=5000")) as { name: string }[]).map((r) => r.name);
-    if (!names.includes(host)) {
-      if (new Set(names.filter((n) => n.startsWith("bob-"))).size >= MAX) return reply(429, { error: "full" });
-      await cf("POST", "/dns_records", { type: "A", name: host, content: ip4, proxied: false, ttl: 300 });
+    const records = (await cf("GET", "/dns_records?per_page=5000")) as { id: string; name: string; comment?: string | null }[];
+    const mine = records.find((r) => r.name === host);
+    const note = `bob ${person} ${nonce} ${minute}`;
+    if (!mine) {
+      if (new Set(records.map((r) => r.name).filter((n) => n.startsWith("bob-"))).size >= MAX) return reply(429, { error: "full" });
+      await cf("POST", "/dns_records", { type: "A", name: host, content: ip4, proxied: false, ttl: 300, comment: note });
+    } else {
+      // No note: an address from before invites went by email, which its first invite takes.
+      const [, holder, used, at] = mine.comment?.match(/^bob ([0-9a-f]{16}) ([0-9a-f]{8}) (\d+)$/) ?? [];
+      if (holder && holder !== person) return reply(409, { error: "taken" });
+      // One use per invite: the nonce is when the invite was made, so only one newer than the last one used works. The same
+      // one again within 15 minutes is the same Mac trying again (its answer got lost).
+      if (used && (parseInt(nonce, 16) < parseInt(used, 16) || (used === nonce && minute - Number(at) > 15)))
+        return reply(409, { error: "used" });
+      if (used !== nonce) await cf("PATCH", `/dns_records/${mine.id}`, { comment: note });
     }
     return reply(200, {
       // The relay by IP: no DNS lookup to go stale, and Bob knows it by its pinned certificate, not its name.
