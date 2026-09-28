@@ -1,7 +1,7 @@
 // Bob's sign-in emails (github.com/chitranshjoshi99/Builder). A Bob posts {to, code}; this sends one fixed email with that
-// 6-digit code through Resend. The Resend key lives only here. Bob sends BOB_MAIL_TOKEN, and its own limits (per phone, per
-// address, per day) are the real gate: the token is baked into every Bob build, so it can't be secret for long.
-// Env: RESEND_API_KEY, BOB_MAIL_TOKEN, BOB_MAIL_FROM (e.g. "Bob <bob@chitransh.dev>", a domain verified in Resend).
+// 6-digit code through Resend. The Resend key lives only here. Bob sends its own key (from bob-link, for its invite):
+// "<name>.<HMAC(BOB_SECRET, "key:<name>")>", so each Mac has its own limit and can be cut off alone (BOB_REVOKED).
+// Env: RESEND_API_KEY, BOB_SECRET, BOB_REVOKED, BOB_MAIL_FROM (e.g. "Bob <bob@chitransh.dev>", a domain verified in Resend).
 export const config = { runtime: "edge" };
 
 const EMAIL = /^[^\s@]{1,64}@[^\s@]+\.[^\s@]{2,}$/;
@@ -27,11 +27,25 @@ const same = (a: string, b: string) => {
   return d === 0;
 };
 
+const sign = async (secret: string, text: string) => {
+  const k = await crypto.subtle.importKey("raw", new TextEncoder().encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  const s = new Uint8Array(await crypto.subtle.sign("HMAC", k, new TextEncoder().encode(text)));
+  return [...s].map((b) => b.toString(16).padStart(2, "0")).join("");
+};
+
+/** The Mac's name, if the Authorization header holds its key and it isn't cut off. */
+const macOf = async (req: Request, secret: string) => {
+  const [, name, mac] = req.headers.get("authorization")?.match(/^Bearer ([a-z0-9-]{1,40})\.([0-9a-f]{64})$/) ?? [];
+  if (!name || !same(mac, await sign(secret, `key:${name}`))) return null;
+  return (process.env.BOB_REVOKED ?? "").split(",").map((s) => s.trim()).includes(name) ? null : name;
+};
+
 export default async function handler(req: Request) {
   if (req.method !== "POST") return reply(405, "post_only");
-  const token = process.env.BOB_MAIL_TOKEN, key = process.env.RESEND_API_KEY;
-  if (!token || !key) return reply(503, "not_set_up");
-  if (!same(req.headers.get("authorization") ?? "", `Bearer ${token}`)) return reply(401, "bad_token");
+  const secret = process.env.BOB_SECRET?.trim(), key = process.env.RESEND_API_KEY;
+  if (!secret || !key) return reply(503, "not_set_up");
+  const mac = await macOf(req, secret);
+  if (!mac) return reply(401, "bad_token");
 
   let to: unknown, code: unknown;
   try { ({ to, code } = await req.json()); } catch { return reply(400, "bad_json"); }
@@ -39,7 +53,8 @@ export default async function handler(req: Request) {
     return reply(400, "bad_input");
 
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "";
-  if (limited(`to:${to.toLowerCase()}`, 3, 15 * 60_000) || limited(`ip:${ip}`, 30, 60 * 60_000)) return reply(429, "slow_down");
+  if (limited(`to:${to.toLowerCase()}`, 3, 15 * 60_000) || limited(`ip:${ip}`, 30, 60 * 60_000) || limited(`mac:${mac}`, 20, 60 * 60_000))
+    return reply(429, "slow_down");
 
   const r = await fetch("https://api.resend.com/emails", {
     method: "POST",
