@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bob privacy policy</title>
+    <style>
+      :root { color-scheme: light dark; }
+      body { margin: 0 auto; max-width: 680px; padding: 32px 16px 64px; background: #121212; color: #eee;
+        font: 16px/1.6 -apple-system, system-ui, sans-serif; }
+      h1 { font-size: 26px; margin: 0 0 4px; }
+      h2 { font-size: 18px; margin: 28px 0 6px; }
+      a { color: inherit; }
+      .muted { opacity: .7; font-size: 14px; }
+      @media (prefers-color-scheme: light) { body { background: #fafafa; color: #222; } }
+    </style>
+  </head>
+  <body>
+    <h1>Bob privacy policy</h1>
+    <p class="muted">Last updated 1 October 2026</p>
+
+    <p>Bob turns your own Mac into the server for small apps that you and the people you invite open on your phones. This
+      covers the Bob app for Mac, Bob for Android, and the few small services at chitransh.dev that Bob uses. Bob is made by
+      Chitransh Joshi.</p>
+
+    <h2>Your data stays on your Mac</h2>
+    <p>Everything you and the people you invite put into Bob lives on the Mac that runs it, in that Mac's own storage:
+      names, email addresses, profile photos, messages, the apps you build and everything in them. There is no Bob cloud
+      account and no central copy. The Mac's owner decides who gets in and can remove people and their data at any time.
+      We, the makers of Bob, cannot see it.</p>
+
+    <h2>What passes through our services</h2>
+    <p>To work outside your home Wi-Fi and to send sign-in codes and notifications, Bob uses a few services we run. They
+      pass data along and do not store it:</p>
+    <ul>
+      <li><b>Public link</b> (bob-&lt;name&gt;.chitransh.dev): when you open Bob away from the Mac's Wi-Fi, traffic goes
+        through our relay server in Mumbai to the Mac. The secure connection from your phone ends at the relay, which
+        forwards it to the Mac. We don't record or keep what passes through.</li>
+      <li><b>Email sign-in codes</b>: the Mac sends us your email address and a one-time code, and we email you the code
+        through Resend.</li>
+      <li><b>Google sign-in</b>: we pass Google's sign-in answer (your name, email address and photo) back to your Mac.</li>
+      <li><b>Notifications</b> (Bob for Android): the Mac encrypts each notification for your phone before sending it. We
+        and Google's Firebase Cloud Messaging only ever see the encrypted message and your phone's notification token.</li>
+    </ul>
+
+    <h2>Bob for Android</h2>
+    <ul>
+      <li>It remembers which Mac you paired with and keeps you signed in to it.</li>
+      <li>The camera is used only to scan your Mac's pairing code, through Google Play services. Bob does not get camera
+        access or keep any picture.</li>
+      <li>Photos you pick for your profile or in an app go only to your Mac.</li>
+      <li>Apps you install from Bob are made on your phone and signed with a key that never leaves it.</li>
+      <li>No ads, no analytics, no tracking, and nothing is sold or shared for advertising.</li>
+    </ul>
+
+    <h2>Deleting your data</h2>
+    <p>Ask the owner of the Mac you use to remove you, which deletes your account and what you made there. Uninstalling
+      Bob for Android removes everything it kept on your phone. Our services keep nothing to delete.</p>
+
+    <h2>Children</h2>
+    <p>Bob is not directed at children under 13.</p>
+
+    <h2>Contact</h2>
+    <p>Questions: <a href="mailto:chitransh.joshi99@gmail.com">chitransh.joshi99@gmail.com</a></p>
+  </body>
+</html>
