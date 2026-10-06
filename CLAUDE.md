@@ -4,7 +4,7 @@ This file is read by Claude at the start of every session. It captures
 architecture decisions, conventions, and gotchas so you don't have to
 re-derive them from the code.
 
-**Last updated:** 2026-08-10
+**Last updated:** 2026-10-06
 
 ---
 
@@ -19,6 +19,9 @@ Interview Prep React app (`apps/interview`).
 
 Published workspace apps are configured in `apps/catalog.json`. The Vercel
 build bundles the portfolio at `/` and each catalogue entry at `/apps/<slug>/`.
+Apps listed on `/apps` but not built here (Bob, a Mac app whose static landing
+page is `public/bob/`, which also relays Bob's Google sign-in) go in `EXTERNAL`
+in `apps/portfolio/src/data/apps.ts` with an `href`, never in `catalog.json`.
 
 **Sub-app that has its own router** (currently only `interview`): it must pass
 `basename={import.meta.env.BASE_URL}` to `BrowserRouter` so its routes resolve

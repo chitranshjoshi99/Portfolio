@@ -9,7 +9,26 @@ export type PublishedApp = {
   accent: string;
   /** Kept out of the Apps listing unless the reader has set the reveal flag. */
   hidden?: boolean;
+  /** Where the card goes when the app isn't built here (default `/apps/<slug>/`). */
+  href?: string;
 };
+
+/**
+ * Apps listed but not built from this workspace, so they stay out of catalog.json (which
+ * scripts/build-vercel.mjs builds). Bob is a Mac app; its landing page is static, in public/bob/.
+ */
+const EXTERNAL: PublishedApp[] = [
+  {
+    project: "bob",
+    slug: "bob",
+    name: "Bob",
+    label: "MAC · CLAUDE · SELF-HOSTED",
+    description:
+      "Turns your Mac into the server for small apps: say what you need, Claude builds it, and every phone you let in opens it.",
+    accent: "#8cd99e",
+    href: "/bob",
+  },
+];
 
 export const REVEAL_KEY = "revealInterviewApp";
 
@@ -29,7 +48,7 @@ function isRevealed(): boolean {
   }
 }
 
-const published = catalog.apps as PublishedApp[];
+const published = [...EXTERNAL, ...(catalog.apps as PublishedApp[])];
 
 // Evaluated once on load: flipping the flag in the console needs a refresh, same as the app itself.
 export const PUBLISHED_APPS = published.filter((app) => !app.hidden || isRevealed());
