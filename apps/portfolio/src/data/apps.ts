@@ -9,13 +9,12 @@ export type PublishedApp = {
   accent: string;
   /** Kept out of the Apps listing unless the reader has set the reveal flag. */
   hidden?: boolean;
-  /** Where the card goes when the app isn't built here (default `/apps/<slug>/`). */
-  href?: string;
 };
 
 /**
  * Apps listed but not built from this workspace, so they stay out of catalog.json (which
- * scripts/build-vercel.mjs builds). Bob is a Mac app; its landing page is static, in public/bob/.
+ * scripts/build-vercel.mjs builds). Bob is a Mac app; its landing page is static, in
+ * public/apps/bob/, so it is still served at /apps/<slug>/ like the rest.
  */
 const EXTERNAL: PublishedApp[] = [
   {
@@ -26,7 +25,6 @@ const EXTERNAL: PublishedApp[] = [
     description:
       "Turns your Mac into the server for small apps: say what you need, Claude builds it, and every phone you let in opens it.",
     accent: "#8cd99e",
-    href: "/bob",
   },
 ];
 

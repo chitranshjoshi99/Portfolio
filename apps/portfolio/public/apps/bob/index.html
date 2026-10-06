@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bob · Your Mac is the server</title>
+    <meta name="description" content="Bob turns your Mac into the server for small apps. Say what you need, Claude builds it, and every phone you let in opens it." />
+    <meta property="og:title" content="Bob · Your Mac is the server" />
+    <meta property="og:description" content="Say what app you need. Claude builds it, your Mac hosts it, every phone opens it." />
+    <meta property="og:image" content="https://chitransh.dev/apps/bob/icon.png" />
+    <meta property="og:url" content="https://chitransh.dev/apps/bob" />
+    <link rel="icon" href="/apps/bob/icon.png" />
+    <script src="/apps/bob/access.js" defer></script>
+    <style>
+      /* Bob's own tokens (packages/phone/src/styles/base.css, mac Design/Theme.swift): ink on white, true black at night, one live green */
+      :root {
+        --snap: cubic-bezier(0.2, 0.9, 0.3, 1);
+        --fg: #121212;
+        --bg: #fff;
+        --body: #595959;
+        --muted: #737373;
+        --line: #e0e0e0;
+        --panel: #f7f7f7;
+        --good: #2e7d4d;
+        --good-bg: #ecf6ef;
+        --box: #121212;
+        --deck: #d4d4d8;
+        --live: #8cd99e;
+        color-scheme: light dark;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --fg: #f2f2f2;
+          --bg: #000;
+          --body: #b3b3b3;
+          --muted: #8c8c8c;
+          --line: #2a2a2a;
+          --panel: #141414;
+          --good: #5cc285;
+          --good-bg: #1c3326;
+          --box: #1c1c1c;
+          --deck: #3a3a3c;
+        }
+      }
+      * { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        font: 17px/1.5 -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
+        color: var(--fg);
+        background: var(--bg);
+        -webkit-font-smoothing: antialiased;
+      }
+      a { color: inherit; }
+      .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+      p { color: var(--body); margin: 0 0 12px; }
+      h1, h2, h3 { margin: 0; letter-spacing: -0.02em; }
+      h2 { font-size: clamp(28px, 4.4vw, 40px); line-height: 1.1; font-weight: 800; margin-top: 12px; }
+      h3 { font-size: 17px; font-weight: 700; }
+      .lede { font-size: 18px; margin-top: 14px; }
+      .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+      .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--live); box-shadow: 0 0 0 0 var(--live); animation: beat 2s infinite; flex: none; }
+      @keyframes beat { 70% { box-shadow: 0 0 0 7px transparent; } }
+
+
+      header { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: saturate(1.6) blur(14px); -webkit-backdrop-filter: saturate(1.6) blur(14px); }
+      header .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+      .mark { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; font-size: 22px; text-decoration: none; letter-spacing: -0.03em; }
+      .mark i { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; background: var(--box); color: #fff; font-size: 15px; font-style: normal; position: relative; }
+      .mark i::after { content: ""; position: absolute; top: 4px; right: 4px; width: 5px; height: 5px; border-radius: 50%; background: var(--live); }
+      nav { display: flex; align-items: center; gap: 24px; font-size: 15px; font-weight: 500; }
+      nav a:not(.btn) { text-decoration: none; color: var(--body); }
+      nav a:not(.btn):hover { color: var(--fg); }
+      @media (max-width: 720px) { header nav a:not(.btn) { display: none; } }
+
+      .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 22px; border: 1px solid var(--fg); border-radius: 999px; background: var(--fg); color: var(--bg); font: inherit; font-size: 16px; font-weight: 600; line-height: 1; text-decoration: none; cursor: pointer; transition: transform 0.1s var(--snap), opacity 0.1s; }
+      .btn:active { transform: scale(0.97); opacity: 0.85; }
+      .btn.ghost { background: transparent; color: var(--fg); }
+      .btn.small { padding: 9px 16px; font-size: 14px; }
+      .btn:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+
+      .hero { padding: 72px 20px 24px; text-align: center; }
+      .hero h1 { font-size: clamp(42px, 8vw, 84px); line-height: 1; font-weight: 800; letter-spacing: -0.045em; margin: 18px 0 20px; }
+      .hero p.lead { max-width: 620px; margin: 0 auto 28px; font-size: clamp(17px, 2.2vw, 20px); }
+      .ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+      .stage { margin: 48px auto 0; max-width: 860px; }
+      .stage svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+      /* the hero picture: the Mac lights up its apps, then keeps serving phones */
+      .st-fg { fill: var(--fg); }
+      .st-panel { fill: var(--panel); stroke: var(--line); }
+      .st-phone { fill: var(--bg); stroke: var(--fg); stroke-width: 2.5; }
+      .st-box { fill: var(--box); } .st-deck { fill: var(--deck); }
+      .st-wire { fill: none; stroke: var(--line); stroke-width: 2; stroke-dasharray: 4 6; }
+      .st-far { stroke-dasharray: 2 6; }
+      .st-pk { fill: var(--good); }
+      .st-globe { fill: none; stroke: var(--muted); stroke-width: 1.5; }
+      .st-ring { fill: none; stroke: var(--good); stroke-width: 1.5; transform-box: fill-box; transform-origin: center; animation: ring 3.6s ease-out 1.2s infinite backwards; opacity: 0; }
+      .st-ring.two { animation-delay: 3s; }
+      @keyframes ring { from { transform: scale(0.55); opacity: 0.55; } to { transform: scale(1.25); opacity: 0; } }
+      .st-tile { transform-box: fill-box; transform-origin: center; animation: pop 0.5s var(--snap) backwards; }
+      @keyframes pop { from { transform: scale(0.4); opacity: 0; } }
+      .st-on { animation: on 0.6s ease backwards; }
+      @keyframes on { from { opacity: 0; } }
+      .st-wave { fill: none; stroke: var(--fg); stroke-width: 3; stroke-linecap: round; animation: wave 1.8s ease-in-out infinite; }
+      .st-wave.w2 { animation-delay: 0.2s; } .st-wave.w3 { animation-delay: 0.4s; }
+      @keyframes wave { 0%, 100% { opacity: 0.25; } 40% { opacity: 1; } }
+      .st-label { font: 600 13px -apple-system, system-ui, sans-serif; fill: var(--muted); }
+      .st-pill { font: 600 13px -apple-system, system-ui, sans-serif; fill: var(--fg); }
+      @media (prefers-reduced-motion: reduce) {
+        .st-pk, .st-ring { display: none; }
+        *, *::before, *::after { animation: none !important; }
+        html { scroll-behavior: auto; }
+      }
+
+      .strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin: 56px auto 0; max-width: 860px; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--line); }
+      .strip div { background: var(--bg); padding: 18px 20px; text-align: left; }
+      .strip b { display: block; font-size: 15px; }
+      .strip span { font-size: 14px; color: var(--muted); }
+      @media (max-width: 640px) { .strip { grid-template-columns: 1fr; } }
+
+      section.part { padding-top: 104px; scroll-margin-top: 40px; }
+      .head { max-width: 640px; margin-bottom: 40px; }
+
+      .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; counter-reset: step; }
+      .step { border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
+      .step::before { counter-increment: step; content: counter(step); display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--fg); color: var(--bg); font-weight: 700; font-size: 14px; margin-bottom: 16px; }
+      .step h3 { margin-bottom: 6px; }
+      .step p { font-size: 15px; margin: 0; }
+      @media (max-width: 820px) { .steps { grid-template-columns: 1fr; } }
+
+      /* words beside a picture */
+      .split { display: grid; grid-template-columns: 1fr 1.05fr; gap: 56px; align-items: center; }
+      .split > * { min-width: 0; }
+      .split.flip > :first-child { order: 2; }
+      @media (max-width: 880px) { .split, .split.flip { grid-template-columns: 1fr; gap: 32px; } .split.flip > :first-child { order: 0; } }
+      .points { list-style: none; padding: 0; margin: 24px 0 0; display: grid; gap: 16px; }
+      .points li { display: grid; grid-template-columns: 24px 1fr; gap: 12px; }
+      .points svg { width: 22px; height: 22px; margin-top: 2px; }
+      .points b { display: block; font-size: 16px; }
+      .points span { color: var(--body); font-size: 15px; }
+      svg.i { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+      .window { border: 1px solid var(--line); border-radius: 14px; background: var(--bg); overflow: hidden; box-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.35); }
+      .bar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--line); background: var(--panel); font-size: 13px; font-weight: 600; }
+      .bar i { width: 11px; height: 11px; border-radius: 50%; background: var(--line); flex: none; }
+      .bar span { margin-left: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .bar small { margin-left: auto; color: var(--muted); font-weight: 500; white-space: nowrap; }
+
+      /* the harness: Claude's steps as Bob's chat shows them */
+      .chat { padding: 18px; display: grid; gap: 10px; font-size: 14px; }
+      .you { justify-self: end; max-width: 82%; background: var(--fg); color: var(--bg); padding: 10px 14px; border-radius: 16px 16px 4px 16px; }
+      .tool { display: grid; grid-template-columns: 22px 1fr auto; gap: 10px; align-items: center; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; }
+      .tool svg { width: 18px; height: 18px; color: var(--good); }
+      .tool code { font: 600 13px ui-monospace, SFMono-Regular, Menlo, monospace; }
+      .tool small { color: var(--muted); font-size: 12px; }
+      .shots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .shot { height: 76px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); padding: 8px; display: grid; gap: 5px; align-content: start; }
+      .shot i { display: block; height: 7px; border-radius: 4px; background: var(--line); }
+      .shot i:first-child { width: 45%; background: var(--fg); opacity: 0.8; }
+      .shot i.c { height: 18px; border-radius: 5px; background: #2e7d4d; opacity: 0.85; }
+      .claude { color: var(--body); padding: 2px 2px 0; }
+      .claude b { color: var(--fg); }
+
+      /* your data: a collection as the Mac's Data pane shows it */
+      table { width: 100%; border-collapse: collapse; font-size: 14px; }
+      th, td { text-align: left; padding: 11px 16px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+      th { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+      td.n { font-variant-numeric: tabular-nums; }
+      .who { display: inline-flex; align-items: center; gap: 8px; }
+      .av { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; color: #fff; font-size: 11px; font-weight: 700; }
+      /* tile tints, same order as tileTint() on the Mac */
+      .t0 { background: #2e7d4d; } .t1 { background: #3b5bdb; } .t2 { background: #b86b00; } .t3 { background: #8e44ad; } .t4 { background: #0f7c8c; } .t5 { background: #b3261e; }
+      .tablewrap { overflow-x: auto; }
+      .roles { display: flex; flex-wrap: wrap; gap: 8px; padding: 14px 16px; }
+      .chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; font-size: 13px; }
+      .chip b { font-weight: 600; }
+      .chip span { color: var(--muted); }
+
+      /* analytics */
+      .dash { padding: 16px; display: grid; gap: 12px; }
+      .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+      .metric { border: 1px solid var(--line); border-radius: 12px; padding: 12px; min-width: 0; }
+      .metric small { display: block; color: var(--muted); font-size: 12px; font-weight: 600; }
+      .metric b { display: block; font-size: 20px; letter-spacing: -0.02em; margin: 2px 0; font-variant-numeric: tabular-nums; }
+      .up { color: var(--good); font-size: 12px; font-weight: 600; }
+      .metric svg { display: block; width: 100%; height: 26px; margin-top: 6px; }
+      .metric svg path { fill: none; stroke: var(--fg); stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+      .goal { height: 4px; border-radius: 2px; background: var(--line); margin-top: 8px; overflow: hidden; }
+      .goal i { display: block; height: 100%; background: var(--good); }
+      .chart { border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+      .chart .top { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; font-weight: 600; }
+      .chart .top small { color: var(--muted); font-weight: 500; }
+      .bars { display: flex; align-items: flex-end; gap: 5px; height: 120px; margin-top: 14px; }
+      .bars div { flex: 1; display: flex; flex-direction: column-reverse; gap: 1px; border-radius: 3px; overflow: hidden; }
+      .legend { display: flex; gap: 14px; margin-top: 10px; font-size: 12px; color: var(--muted); }
+      .legend span { display: inline-flex; align-items: center; gap: 6px; }
+      .legend i { width: 8px; height: 8px; border-radius: 2px; }
+      .insight { display: flex; gap: 10px; align-items: flex-start; padding: 12px; border-radius: 12px; background: var(--good-bg); font-size: 14px; }
+      .insight svg { width: 18px; height: 18px; color: var(--good); flex: none; margin-top: 2px; }
+      @media (max-width: 520px) { .tiles { grid-template-columns: 1fr 1fr; } .tiles .metric:last-child { display: none; } }
+
+      .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+      .feat { border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
+      .feat .ic { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; color: #fff; margin-bottom: 14px; }
+      .feat .ic svg { width: 21px; height: 21px; }
+      .feat h3 { margin-bottom: 4px; font-size: 16px; }
+      .feat p { font-size: 14px; margin: 0; }
+      @media (max-width: 940px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+      @media (max-width: 480px) { .grid { grid-template-columns: 1fr; } }
+
+      /* request access: one of the Mac's always-dark boxes */
+      .ask { margin-top: 104px; padding: 56px; border-radius: 24px; background: var(--box); color: #fff; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; scroll-margin-top: 80px; }
+      .ask p { color: #b3b3b3; }
+      .ask h2 { color: #fff; }
+      .ask .eyebrow { color: #8c8c8c; }
+      .ask .note { font-size: 14px; color: #8c8c8c; margin-top: 20px; }
+      .ask .note b { color: #d9d9d9; font-weight: 600; }
+      form { display: grid; gap: 12px; position: relative; }
+      label { display: grid; gap: 6px; font-size: 14px; font-weight: 600; color: #d9d9d9; }
+      input, textarea { width: 100%; padding: 13px 14px; border: 1px solid #3a3a3a; border-radius: 10px; background: #000; color: #f2f2f2; font: inherit; font-size: 16px; line-height: 1.4; }
+      textarea { min-height: 104px; resize: vertical; }
+      input::placeholder, textarea::placeholder { color: #737373; }
+      .ask .btn { background: #fff; color: #121212; border-color: #fff; margin-top: 6px; padding: 15px; }
+      .ask .btn:disabled { opacity: 0.6; cursor: default; }
+      .ask .btn:focus-visible, .ask input:focus-visible, .ask textarea:focus-visible { outline-color: #fff; }
+      .trap { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+      .err { color: #f2786d; font-size: 14px; font-weight: 600; margin: 0; }
+      .err:empty { display: none; }
+      .done { align-self: center; }
+      .done .tick { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: var(--live); color: #121212; margin-bottom: 16px; }
+      .done .tick svg { width: 26px; height: 26px; stroke-width: 2.4; }
+      .done h3 { color: #fff; font-size: 22px; margin-bottom: 6px; }
+      @media (max-width: 820px) { .ask { grid-template-columns: 1fr; padding: 32px 22px; gap: 28px; border-radius: 20px; } }
+
+      footer { padding: 48px 0 56px; font-size: 14px; color: var(--muted); }
+      footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+      footer a { color: var(--muted); text-decoration: none; }
+      footer a:hover, footer .by { color: var(--fg); }
+      footer nav { gap: 20px; font-size: 14px; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap">
+        <a class="mark" href="#top" aria-label="Bob"><i aria-hidden="true">b</i>bob</a>
+        <nav>
+          <a href="#how">How it works</a>
+          <a href="#harness">The harness</a>
+          <a href="#data">Data</a>
+          <a href="#analytics">Analytics</a>
+          <a class="btn small" href="#access">Request access</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <span class="eyebrow"><span class="dot"></span>For Mac · invite only</span>
+        <h1>Your Mac is<br />the server.</h1>
+        <p class="lead">Bob turns the Mac you already own into a home for small apps. Say what you need, Claude builds it, and every phone you let in opens it, on your Wi-Fi or anywhere through your own link.</p>
+        <div class="ctas">
+          <a class="btn" href="#access">Request access</a>
+          <a class="btn ghost" href="#how">How it works</a>
+        </div>
+
+        <div class="stage" role="img" aria-label="A Mac running Bob serves six apps to four phones: three on the same Wi-Fi, one far away through the public link.">
+          <svg viewBox="0 0 800 440" aria-hidden="true">
+            <defs>
+              <path id="w1" d="M262 176 C 210 176, 200 128, 150 128" />
+              <path id="w2" d="M262 262 C 214 262, 220 330, 190 330" />
+              <path id="w3" d="M538 176 C 590 176, 600 128, 650 128" />
+              <path id="w4" d="M538 262 C 600 262, 620 330, 666 330" />
+            </defs>
+
+            <!-- the Mac starts serving: rings go out, Wi-Fi above it -->
+            <circle class="st-ring" cx="400" cy="210" r="210" />
+            <circle class="st-ring two" cx="400" cy="210" r="210" />
+            <g transform="translate(400 62)">
+              <path class="st-wave w3" d="M-28 0 a40 40 0 0 1 56 0" />
+              <path class="st-wave w2" d="M-18 10 a26 26 0 0 1 36 0" />
+              <path class="st-wave" d="M-8 20 a12 12 0 0 1 16 0" />
+              <circle class="st-fg" cx="0" cy="28" r="3.5" />
+            </g>
+
+            <!-- wires, and what travels on them -->
+            <use href="#w1" class="st-wire" />
+            <use href="#w2" class="st-wire" />
+            <use href="#w3" class="st-wire" />
+            <use href="#w4" class="st-wire st-far" />
+            <circle class="st-pk" r="3.5" cx="-20" cy="-20"><animateMotion dur="2.2s" begin="1.6s" repeatCount="indefinite"><mpath href="#w1" /></animateMotion></circle>
+            <circle class="st-pk" r="3.5" cx="-20" cy="-20"><animateMotion dur="2.6s" begin="2.2s" repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear"><mpath href="#w2" /></animateMotion></circle>
+            <circle class="st-pk" r="3.5" cx="-20" cy="-20"><animateMotion dur="2s" begin="1.9s" repeatCount="indefinite"><mpath href="#w3" /></animateMotion></circle>
+            <circle class="st-pk" r="3.5" cx="-20" cy="-20"><animateMotion dur="3.2s" begin="2.6s" repeatCount="indefinite"><mpath href="#w4" /></animateMotion></circle>
+            <circle class="st-pk" r="3.5" cx="-20" cy="-20"><animateMotion dur="3.2s" begin="4.2s" repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear"><mpath href="#w4" /></animateMotion></circle>
+
+            <!-- the Mac -->
+            <rect class="st-box" x="256" y="112" width="288" height="190" rx="14" />
+            <rect fill="#0b0b0b" x="266" y="122" width="268" height="168" rx="5" />
+            <text x="282" y="152" fill="#fff" font-family="-apple-system, system-ui, sans-serif" font-weight="800" font-size="19" letter-spacing="-0.5">bob</text>
+            <circle cx="324" cy="140" r="3.5" fill="#8cd99e" />
+            <text x="518" y="151" fill="#8c8c8c" font-family="-apple-system, system-ui, sans-serif" font-weight="600" font-size="10" text-anchor="end">6 apps live</text>
+            <rect class="st-tile" style="animation-delay: 0.5s" x="282" y="166" width="72" height="50" rx="8" fill="#2e7d4d" />
+            <rect class="st-tile" style="animation-delay: 0.7s" x="364" y="166" width="72" height="50" rx="8" fill="#3b5bdb" />
+            <rect class="st-tile" style="animation-delay: 0.9s" x="446" y="166" width="72" height="50" rx="8" fill="#b86b00" />
+            <rect class="st-tile" style="animation-delay: 1.1s" x="282" y="226" width="72" height="50" rx="8" fill="#8e44ad" />
+            <rect class="st-tile" style="animation-delay: 1.3s" x="364" y="226" width="72" height="50" rx="8" fill="#0f7c8c" />
+            <rect class="st-tile" style="animation-delay: 1.5s" x="446" y="226" width="72" height="50" rx="8" fill="#b3261e" />
+            <path class="st-deck" d="M226 302 H574 L566 316 Q563 320 556 320 H244 Q237 320 234 316 Z" />
+            <rect class="st-box" x="372" y="302" width="56" height="5" rx="2" opacity="0.35" />
+
+            <!-- what the Mac says -->
+            <g class="st-on" style="animation-delay: 1.7s">
+              <rect class="st-panel" x="306" y="344" width="188" height="32" rx="16" />
+              <circle cx="326" cy="360" r="4" fill="#8cd99e" />
+              <text class="st-pill" x="338" y="364.5">Serving 4 phones</text>
+            </g>
+
+            <!-- phones: three on the Wi-Fi, one anywhere -->
+            <rect class="st-phone" x="74" y="58" width="76" height="140" rx="15" />
+            <g class="st-on" style="animation-delay: 1.9s">
+              <rect x="84" y="78" width="56" height="34" rx="6" fill="#2e7d4d" />
+              <rect class="st-panel" x="84" y="120" width="56" height="10" rx="3" />
+              <rect class="st-panel" x="84" y="136" width="40" height="10" rx="3" />
+              <rect class="st-panel" x="84" y="152" width="48" height="10" rx="3" />
+            </g>
+            <rect class="st-fg" x="100" y="66" width="24" height="4" rx="2" />
+
+            <rect class="st-phone" x="114" y="262" width="76" height="140" rx="15" />
+            <g class="st-on" style="animation-delay: 2.3s">
+              <rect x="124" y="282" width="26" height="26" rx="6" fill="#3b5bdb" />
+              <rect x="154" y="282" width="26" height="26" rx="6" fill="#8e44ad" />
+              <rect x="124" y="312" width="26" height="26" rx="6" fill="#0f7c8c" />
+              <rect x="154" y="312" width="26" height="26" rx="6" fill="#b86b00" />
+              <rect class="st-panel" x="124" y="346" width="56" height="10" rx="3" />
+            </g>
+            <rect class="st-fg" x="140" y="270" width="24" height="4" rx="2" />
+
+            <rect class="st-phone" x="650" y="58" width="76" height="140" rx="15" />
+            <g class="st-on" style="animation-delay: 2.1s">
+              <rect class="st-panel" x="660" y="78" width="56" height="10" rx="3" />
+              <circle cx="688" cy="124" r="24" fill="none" style="stroke: var(--line)" stroke-width="7" />
+              <circle cx="688" cy="124" r="24" fill="none" stroke="#b86b00" stroke-width="7" stroke-linecap="round" stroke-dasharray="105 151" transform="rotate(-90 688 124)" />
+              <rect class="st-panel" x="660" y="160" width="36" height="10" rx="3" />
+            </g>
+            <rect class="st-fg" x="676" y="66" width="24" height="4" rx="2" />
+
+            <rect class="st-phone" x="666" y="262" width="76" height="140" rx="15" />
+            <g class="st-on" style="animation-delay: 2.8s">
+              <rect x="676" y="282" width="56" height="34" rx="6" fill="#b3261e" />
+              <rect class="st-panel" x="676" y="324" width="56" height="10" rx="3" />
+              <rect class="st-panel" x="676" y="340" width="34" height="10" rx="3" />
+              <rect class="st-fg" x="676" y="372" width="56" height="16" rx="8" />
+            </g>
+            <rect class="st-fg" x="692" y="270" width="24" height="4" rx="2" />
+
+            <text class="st-label" x="200" y="112" text-anchor="middle">Wi-Fi</text>
+            <text class="st-label" x="600" y="112" text-anchor="middle">Wi-Fi</text>
+            <text class="st-label" x="212" y="358">Wi-Fi</text>
+            <g transform="translate(578 326)">
+              <circle class="st-globe" r="7" />
+              <path class="st-globe" d="M-7 0 H7 M0 -7 C -4 -3, -4 3, 0 7 M0 -7 C 4 -3, 4 3, 0 7" />
+              <text class="st-label" x="0" y="26" text-anchor="middle">Public link</text>
+            </g>
+          </svg>
+        </div>
+
+        <div class="strip">
+          <div><b>Nothing to rent</b><span>The Mac on your desk is the server.</span></div>
+          <div><b>Nothing to code</b><span>Say what the app does. Claude builds it.</span></div>
+          <div><b>Nothing to wait for</b><span>No app store. Phones open it the moment it ships.</span></div>
+        </div>
+      </section>
+
+      <section class="part wrap" id="how">
+        <div class="head">
+          <span class="eyebrow">How it works</span>
+          <h2>Say it. Claude builds it. Phones open it.</h2>
+          <p class="lede">Bob does the parts nobody wants to think about: where the app lives, how phones reach it, who may sign in and what they may touch.</p>
+        </div>
+        <div class="steps">
+          <div class="step">
+            <h3>Say what you need</h3>
+            <p>A till for the café. A chore chart for the kids. A booking sheet for the studio. Pick the kind of app, write a line about it, and pick a look if you like.</p>
+          </div>
+          <div class="step">
+            <h3>Claude builds it inside Bob</h3>
+            <p>Bob hands Claude the tools, the rules and the parts for that kind of app. Claude writes it, checks it, tries it on a throwaway copy and ships it, beside a live preview.</p>
+          </div>
+          <div class="step">
+            <h3>Every phone opens it</h3>
+            <p>Phones on your Wi-Fi open it straight away; your own public link reaches everyone else. It goes on the Home Screen like any app, and an app opened before keeps working while the Mac is off.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="part wrap" id="harness">
+        <div class="split">
+          <div>
+            <span class="eyebrow">The harness</span>
+            <h2>Claude builds in a room Bob made for it.</h2>
+            <p class="lede">Bob isn't a chat window that hopes for the best. It's a harness: a small set of tools Claude must build with, and rules every app has to pass before a phone ever sees it.</p>
+            <ul class="points">
+              <li>
+                <svg class="i" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg>
+                <div><b>Sealed off</b><span>No shell, no web, none of your files. Claude reaches your Mac only through Bob's tools.</span></div>
+              </li>
+              <li>
+                <svg class="i" viewBox="0 0 24 24"><path d="M5 12l4 4L19 6" /></svg>
+                <div><b>Checked in seconds</b><span>Types, tests and snippets run in a sandbox while Claude works, so mistakes are caught before you see them.</span></div>
+              </li>
+              <li>
+                <svg class="i" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" /><circle cx="12" cy="12" r="3.2" /></svg>
+                <div><b>Tried before it ships</b><span>Claude opens the app on a throwaway copy with pretend data, as any role, and looks at the pictures.</span></div>
+              </li>
+              <li>
+                <svg class="i" viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z" /></svg>
+                <div><b>Rules at the door</b><span>Shipping refuses code that would break on a phone or reach outside the app. Each kind of app comes with its own craft notes.</span></div>
+              </li>
+            </ul>
+          </div>
+          <div class="window" aria-hidden="true">
+            <div class="bar"><i></i><i></i><i></i><span>Build · Market Stall</span><small>Claude</small></div>
+            <div class="chat">
+              <div class="you">A till for my market stall. Card or cash, today's takings, and what sold out.</div>
+              <div class="tool"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M8 12l3 3 5-6" /></svg><code>new_app</code><small>Shop · Mint look</small></div>
+              <div class="tool"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M8 12l3 3 5-6" /></svg><code>write_files</code><small>7 files</small></div>
+              <div class="tool"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M8 12l3 3 5-6" /></svg><code>run</code><small>types and tests pass</small></div>
+              <div class="tool"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M8 12l3 3 5-6" /></svg><code>try_app</code><small>as Seller · 3 pictures</small></div>
+              <div class="shots"><div class="shot"><i></i><i class="c"></i><i></i></div><div class="shot"><i></i><i></i><i class="c"></i></div><div class="shot"><i></i><i class="c"></i><i class="c"></i></div></div>
+              <div class="tool"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M8 12l3 3 5-6" /></svg><code>ship</code><small>live on every phone</small></div>
+              <div class="claude"><b>Market Stall is live.</b> I chose: one big Charge button, cash and card as two taps, sold-out items greyed at the bottom.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="part wrap" id="data">
+        <div class="split flip">
+          <div>
+            <span class="eyebrow">Your data</span>
+            <h2>It lives at home, on your Mac.</h2>
+            <p class="lede">Every app keeps its records in a database on your Mac. No one else's cloud, no monthly bill.</p>
+            <ul class="points">
+              <li>
+                <svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6" /></svg>
+                <div><b>Every record signed</b><span>Each one knows who made it and who changed it last.</span></div>
+              </li>
+              <li>
+                <svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M3 10h18M9 10v10" /></svg>
+                <div><b>Roles, down to the row</b><span>Who may read, add, edit or delete, per collection. Some people see only what they made.</span></div>
+              </li>
+              <li>
+                <svg class="i" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4" /><path d="M11 12l9-9M17 6l3 3M14 9l2 2" /></svg>
+                <div><b>Signing in, sorted</b><span>Google, a code by email, or a passkey. Customers at your tables get a QR that works for a few hours.</span></div>
+              </li>
+              <li>
+                <svg class="i" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10" /></svg>
+                <div><b>Yours to fix</b><span>Open any app's records on the Mac and change them in a table. The public link only carries traffic: nothing is kept on the way.</span></div>
+              </li>
+            </ul>
+          </div>
+          <div class="window" aria-hidden="true">
+            <div class="bar"><i></i><i></i><i></i><span>Data · Bistro · orders</span><small>128 records</small></div>
+            <div class="tablewrap">
+              <table>
+                <tr><th>Table</th><th>Order</th><th>Total</th><th>Added by</th><th>Changed</th></tr>
+                <tr><td>4</td><td>Paneer tikka ×2</td><td class="n">₹640</td><td><span class="who"><span class="av t1">A</span>Asha</span></td><td>2m</td></tr>
+                <tr><td>7</td><td>Masala chai ×3</td><td class="n">₹180</td><td><span class="who"><span class="av t3">R</span>Rohan</span></td><td>5m</td></tr>
+                <tr><td>2</td><td>Thali, dal fry</td><td class="n">₹520</td><td><span class="who"><span class="av t4">W</span>Walk-in</span></td><td>9m</td></tr>
+                <tr><td>11</td><td>Gulab jamun ×4</td><td class="n">₹240</td><td><span class="who"><span class="av t1">A</span>Asha</span></td><td>14m</td></tr>
+              </table>
+            </div>
+            <div class="roles">
+              <span class="chip"><b>Kitchen</b><span>read · edit</span></span>
+              <span class="chip"><b>Waiters</b><span>read · add</span></span>
+              <span class="chip"><b>Walk-ins</b><span>own rows</span></span>
+              <span class="chip"><b>Full access</b><span>everything</span></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="part wrap" id="analytics">
+        <div class="split">
+          <div>
+            <span class="eyebrow">Analytics</span>
+            <h2>Know how every app is doing.</h2>
+            <p class="lede">Today, or the last 7, 30 or 90 days against the ones before. Bob works it out on your Mac and says what changed in plain words.</p>
+            <ul class="points">
+              <li>
+                <svg class="i" viewBox="0 0 24 24"><path d="M5 20V11M11 20V5M17 20v-7M3 20h18" /></svg>
+                <div><b>Every app at a glance</b><span>Busiest first, each with its sparkline. Open one for its days, its weekday and hour, and who added the most.</span></div>
+              </li>
+              <li>
+                <svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="4.5" /><circle cx="12" cy="12" r="0.8" /></svg>
+                <div><b>Your own numbers</b><span>Takings, orders, sign-ups: pick an app, what to count and a goal. Bob suggests the ones that fit.</span></div>
+              </li>
+              <li>
+                <svg class="i" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14" /></svg>
+                <div><b>Take it with you</b><span>Split any number by what matters, and export it as a spreadsheet.</span></div>
+              </li>
+            </ul>
+          </div>
+          <div class="window" aria-hidden="true">
+            <div class="bar"><i></i><i></i><i></i><span>Analytics</span><small>Last 14 days</small></div>
+            <div class="dash">
+              <div class="tiles">
+                <div class="metric"><small>Takings</small><b>₹48,200</b><span class="up">▲ 12%</span>
+                  <svg viewBox="0 0 100 26" preserveAspectRatio="none"><path d="M0 20 L14 17 L28 19 L42 12 L56 14 L70 8 L84 10 L100 3" /></svg>
+                  <div class="goal"><i style="width: 80%"></i></div></div>
+                <div class="metric"><small>Orders</small><b>312</b><span class="up">▲ 8%</span>
+                  <svg viewBox="0 0 100 26" preserveAspectRatio="none"><path d="M0 16 L14 18 L28 12 L42 14 L56 9 L70 12 L84 6 L100 7" /></svg>
+                  <div class="goal"><i style="width: 62%"></i></div></div>
+                <div class="metric"><small>Bookings</small><b>46</b><span class="up">▲ 21%</span>
+                  <svg viewBox="0 0 100 26" preserveAspectRatio="none"><path d="M0 22 L14 20 L28 21 L42 15 L56 16 L70 11 L84 9 L100 5" /></svg>
+                  <div class="goal"><i style="width: 92%"></i></div></div>
+              </div>
+              <div class="chart">
+                <div class="top"><span>Records added</span><small>by app</small></div>
+                <div class="bars">
+                  <div style="height: 38%"><i class="t0" style="flex: 5"></i><i class="t1" style="flex: 3"></i><i class="t2" style="flex: 2"></i></div>
+                  <div style="height: 46%"><i class="t0" style="flex: 5"></i><i class="t1" style="flex: 4"></i><i class="t2" style="flex: 2"></i></div>
+                  <div style="height: 41%"><i class="t0" style="flex: 4"></i><i class="t1" style="flex: 4"></i><i class="t2" style="flex: 2"></i></div>
+                  <div style="height: 58%"><i class="t0" style="flex: 6"></i><i class="t1" style="flex: 4"></i><i class="t2" style="flex: 3"></i></div>
+                  <div style="height: 72%"><i class="t0" style="flex: 8"></i><i class="t1" style="flex: 4"></i><i class="t2" style="flex: 3"></i></div>
+                  <div style="height: 88%"><i class="t0" style="flex: 9"></i><i class="t1" style="flex: 5"></i><i class="t2" style="flex: 4"></i></div>
+                  <div style="height: 64%"><i class="t0" style="flex: 6"></i><i class="t1" style="flex: 5"></i><i class="t2" style="flex: 2"></i></div>
+                  <div style="height: 44%"><i class="t0" style="flex: 4"></i><i class="t1" style="flex: 4"></i><i class="t2" style="flex: 2"></i></div>
+                  <div style="height: 50%"><i class="t0" style="flex: 5"></i><i class="t1" style="flex: 4"></i><i class="t2" style="flex: 2"></i></div>
+                  <div style="height: 47%"><i class="t0" style="flex: 5"></i><i class="t1" style="flex: 3"></i><i class="t2" style="flex: 3"></i></div>
+                  <div style="height: 62%"><i class="t0" style="flex: 6"></i><i class="t1" style="flex: 5"></i><i class="t2" style="flex: 2"></i></div>
+                  <div style="height: 80%"><i class="t0" style="flex: 8"></i><i class="t1" style="flex: 5"></i><i class="t2" style="flex: 3"></i></div>
+                  <div style="height: 100%"><i class="t0" style="flex: 10"></i><i class="t1" style="flex: 6"></i><i class="t2" style="flex: 4"></i></div>
+                  <div style="height: 70%"><i class="t0" style="flex: 7"></i><i class="t1" style="flex: 5"></i><i class="t2" style="flex: 2"></i></div>
+                </div>
+                <div class="legend"><span><i class="t0"></i>Bistro</span><span><i class="t1"></i>Bookings</span><span><i class="t2"></i>Stock</span></div>
+              </div>
+              <div class="insight">
+                <svg class="i" viewBox="0 0 24 24"><path d="M4 16l5-5 4 4 7-7M14 8h6v6" /></svg>
+                <span>Bistro's orders are up 18% on the week before, and Friday evening is its busiest hour.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="part wrap" id="more">
+        <div class="head">
+          <span class="eyebrow">And the rest</span>
+          <h2>Everything a small app needs, already there.</h2>
+        </div>
+        <div class="grid">
+          <div class="feat"><div class="ic t0"><svg class="i" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14-4.5L4 8M4 4v4h4M4 13a8 8 0 0 0 14 4.5l2-1.5M20 20v-4h-4" /></svg></div><h3>Live on every phone</h3><p>A change on one phone shows on the others as it happens.</p></div>
+          <div class="feat"><div class="ic t1"><svg class="i" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z" /></svg></div><h3>Messages and push</h3><p>People chat in Bob, and apps can notify them, even when closed.</p></div>
+          <div class="feat"><div class="ic t2"><svg class="i" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1" /><rect x="14" y="4" width="6" height="6" rx="1" /><rect x="4" y="14" width="6" height="6" rx="1" /><path d="M14 14h2v2h-2zM18 18h2v2h-2zM14 18v2M18 14h2" /></svg></div><h3>Walk-in QRs</h3><p>Customers at a table scan once and use one app for a few hours.</p></div>
+          <div class="feat"><div class="ic t3"><svg class="i" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5zM3 13l9 5 9-5" /></svg></div><h3>Suites of apps</h3><p>Orders, kitchen and stock, built together and sharing their records.</p></div>
+          <div class="feat"><div class="ic t4"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><circle cx="8" cy="10" r="1.3" /><circle cx="12" cy="7.5" r="1.3" /><circle cx="16" cy="10" r="1.3" /></svg></div><h3>22 looks</h3><p>From dark and quiet to bright and playful, each made for a kind of app.</p></div>
+          <div class="feat"><div class="ic t5"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="10" rx="5" /><circle cx="16" cy="12" r="3" /></svg></div><h3>Feature flags</h3><p>Turn part of an app on for everyone, or just for some roles.</p></div>
+          <div class="feat"><div class="ic t0"><svg class="i" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14" /></svg></div><h3>On the Home Screen</h3><p>Each app installs on its own, with its own icon.</p></div>
+          <div class="feat"><div class="ic t1"><svg class="i" viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2" /><path d="M11 18h2" /></svg></div><h3>Bob for Android</h3><p>Apps install as real Android apps, with native notifications.</p></div>
+        </div>
+      </section>
+
+      <div class="wrap">
+        <section class="ask" id="access">
+          <div>
+            <span class="eyebrow"><span class="dot"></span>Invite only</span>
+            <h2>Request access.</h2>
+            <p class="lede">Bob is young, so invites go out a few at a time. Say who you are and what you'd build; your invite comes by email.</p>
+            <p class="note"><b>You'll need</b> a Mac on macOS 14 or later that stays on, and Claude to build with.</p>
+          </div>
+          <form id="ask-form">
+            <label>Your name<input name="name" autocomplete="name" maxlength="80" required placeholder="Asha Rao" /></label>
+            <label>Email<input name="email" type="email" autocomplete="email" maxlength="254" required placeholder="asha@example.com" /></label>
+            <label>What would you build?<textarea name="note" maxlength="1000" placeholder="A booking sheet for my yoga studio, and a till for the café next door."></textarea></label>
+            <label class="trap" aria-hidden="true">Leave this empty<input name="website" tabindex="-1" autocomplete="off" /></label>
+            <p class="err" id="ask-err" role="alert"></p>
+            <button class="btn" type="submit">Request access</button>
+          </form>
+          <div class="done" id="ask-done" hidden>
+            <div class="tick"><svg class="i" viewBox="0 0 24 24"><path d="M5 12l4 4L19 6" /></svg></div>
+            <h3>You're on the list.</h3>
+            <p>Your invite will come by email when a spot opens.</p>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <span>Bob, by <a class="by" href="/">Chitransh Joshi</a></span>
+        <nav><a href="#access">Request access</a><a href="/bob/privacy.html">Privacy</a></nav>
+      </div>
+    </footer>
+  </body>
+</html>
