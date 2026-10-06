@@ -19,9 +19,12 @@ Interview Prep React app (`apps/interview`).
 
 Published workspace apps are configured in `apps/catalog.json`. The Vercel
 build bundles the portfolio at `/` and each catalogue entry at `/apps/<slug>/`.
-Apps listed on `/apps` but not built here (Bob, a Mac app whose static landing
-page is `public/bob/`, which also relays Bob's Google sign-in) go in `EXTERNAL`
-in `apps/portfolio/src/data/apps.ts` with an `href`, never in `catalog.json`.
+Apps listed on `/apps` but not built here go in `EXTERNAL` in
+`apps/portfolio/src/data/apps.ts`, never in `catalog.json`, with their static
+page in `apps/portfolio/public/apps/<slug>/`. Bob, a Mac app, is one: its landing
+page is `/apps/bob`. `/bob` itself is Bob's Google sign-in relay (the OAuth
+redirect URI, so it can't move); `vercel.json` sends a bare `/bob` with no
+`state`/`code`/`error` to `/apps/bob`.
 
 **Sub-app that has its own router** (currently only `interview`): it must pass
 `basename={import.meta.env.BASE_URL}` to `BrowserRouter` so its routes resolve

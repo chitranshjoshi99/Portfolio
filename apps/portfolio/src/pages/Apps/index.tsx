@@ -14,7 +14,7 @@ export default function Apps() {
         <ul className="apps-index__grid" role="list">
           {PUBLISHED_APPS.map((app) => (
             <li key={app.slug}>
-              <a className="apps-index__card" href={app.href ?? `/apps/${app.slug}/`}>
+              <a className="apps-index__card" href={`/apps/${app.slug}/`}>
                 <span className="pixel-text apps-index__card-label">
                   {app.label}
                 </span>

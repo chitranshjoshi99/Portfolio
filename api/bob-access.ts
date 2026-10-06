@@ -1,4 +1,4 @@
-// Request access, from Bob's landing page (chitransh.dev/bob). It posts {name, email, note, website}; this emails the request
+// Request access, from Bob's landing page (chitransh.dev/apps/bob). It posts {name, email, note, website}; this emails the request
 // to Bob's owner through Resend, with Reply-To set to the person asking, so answering is replying. The invite itself is still
 // `bun run invite <email>` in github.com/chitranshjoshi99/Builder. `website` is a field people never see: only bots fill it.
 // Env: RESEND_API_KEY, BOB_ACCESS_TO (where requests go), BOB_MAIL_FROM (e.g. "Bob <bob@chitransh.dev>").
