@@ -11,6 +11,7 @@
     <meta property="og:url" content="https://chitransh.dev/apps/bob" />
     <link rel="icon" href="/apps/bob/icon.png" />
     <script src="/apps/bob/access.js" defer></script>
+    <script src="/apps/bob/demo.js" defer></script>
     <style>
       /* Bob's own tokens (packages/phone/src/styles/base.css, mac Design/Theme.swift): ink on white, true black at night, one live green */
       :root {
@@ -148,6 +149,25 @@
       .bar span { margin-left: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .bar small { margin-left: auto; color: var(--muted); font-weight: 500; white-space: nowrap; }
 
+      /* the demo: real frames from Bob on a Mac, with the steps under them following along */
+      .demo { margin: 0; }
+      .demo .window { background: #000; }
+      .demo video { display: block; width: 100%; height: auto; aspect-ratio: 1440 / 904; background: #000; }
+      .bar .play { margin-left: auto; padding: 4px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--bg); color: var(--body); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+      .tour { list-style: none; padding: 0; margin: 16px 0 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; counter-reset: tour; }
+      .tour button { position: relative; overflow: hidden; width: 100%; height: 100%; padding: 12px 14px 14px; border: 1px solid var(--line); border-radius: 12px; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; transition: border-color 0.2s; }
+      .tour button[aria-current] { border-color: var(--fg); }
+      .tour button::after { content: ""; position: absolute; left: 0; bottom: 0; width: 100%; height: 3px; background: var(--good); transform: scaleX(var(--p, 0)); transform-origin: left; transition: transform 0.25s linear; }
+      .tour button:not([aria-current])::after { display: none; }
+      .tour b { display: block; font-size: 15px; }
+      .tour b::before { counter-increment: tour; content: counter(tour) " · "; color: var(--muted); font-weight: 600; }
+      .tour span { display: block; margin-top: 2px; font-size: 13px; line-height: 1.35; color: var(--muted); }
+      .tour button:focus-visible, .bar .play:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+      @media (max-width: 720px) {
+        .tour { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(150px, 44%); overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 4px; }
+        .tour li { scroll-snap-align: start; }
+      }
+
       /* the harness: Claude's steps as Bob's chat shows them */
       .chat { padding: 18px; display: grid; gap: 10px; font-size: 14px; }
       .you { justify-self: end; max-width: 82%; background: var(--fg); color: var(--bg); padding: 10px 14px; border-radius: 16px 16px 4px 16px; }
@@ -247,6 +267,7 @@
         <a class="mark" href="#top" aria-label="Bob"><i aria-hidden="true">b</i>bob</a>
         <nav>
           <a href="#how">How it works</a>
+          <a href="#demo">Demo</a>
           <a href="#harness">The harness</a>
           <a href="#data">Data</a>
           <a href="#analytics">Analytics</a>
@@ -262,7 +283,7 @@
         <p class="lead">Bob turns the Mac you already own into a home for small apps. Say what you need, Claude builds it, and every phone you let in opens it, on your Wi-Fi or anywhere through your own link.</p>
         <div class="ctas">
           <a class="btn" href="#access">Request access</a>
-          <a class="btn ghost" href="#how">How it works</a>
+          <a class="btn ghost" href="#demo">Watch the demo</a>
         </div>
 
         <div class="stage" role="img" aria-label="A Mac running Bob serves six apps to four phones: three on the same Wi-Fi, one far away through the public link.">
@@ -393,6 +414,27 @@
             <p>Phones on your Wi-Fi open it straight away; your own public link reaches everyone else. It goes on the Home Screen like any app, and an app opened before keeps working while the Mac is off.</p>
           </div>
         </div>
+      </section>
+
+      <section class="part wrap" id="demo">
+        <div class="head">
+          <span class="eyebrow">Demo</span>
+          <h2>From one line to a team's app.</h2>
+          <p class="lede">The real Bob on a Mac, taking a restaurant's app from one line to the waiters, chefs and cashiers who use it.</p>
+        </div>
+        <figure class="demo">
+          <div class="window">
+            <div class="bar"><i></i><i></i><i></i><span>Bob · Restaurant</span><button class="play" id="demo-play" type="button">Play</button></div>
+            <video id="demo-video" src="/apps/bob/demo.mp4" poster="/apps/bob/demo.jpg" width="1440" height="904" muted playsinline loop preload="none" aria-label="Bob on a Mac: typing what a restaurant app should do, picking the Queue template and the Bistro look, Claude building it beside a live preview, the app live in Apps, a Waiter role allowed only to take orders, and the people with their roles."></video>
+          </div>
+          <ol class="tour" id="demo-steps">
+            <li><button type="button" data-at="0" aria-current="step"><b>Prompt</b><span>Say what it does, pick a start and a look</span></button></li>
+            <li><button type="button" data-at="8.1"><b>Build</b><span>Claude builds it beside a live preview</span></button></li>
+            <li><button type="button" data-at="11.8"><b>Publish</b><span>Live on every phone</span></button></li>
+            <li><button type="button" data-at="18.1"><b>Roles</b><span>What each job may do</span></button></li>
+            <li><button type="button" data-at="23.4"><b>Users</b><span>Everyone gets their role</span></button></li>
+          </ol>
+        </figure>
       </section>
 
       <section class="part wrap" id="harness">

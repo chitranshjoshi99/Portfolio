@@ -4,7 +4,7 @@ This file is read by Claude at the start of every session. It captures
 architecture decisions, conventions, and gotchas so you don't have to
 re-derive them from the code.
 
-**Last updated:** 2026-10-06
+**Last updated:** 2026-10-07
 
 ---
 
@@ -24,7 +24,11 @@ Apps listed on `/apps` but not built here go in `EXTERNAL` in
 page in `apps/portfolio/public/apps/<slug>/`. Bob, a Mac app, is one: its landing
 page is `/apps/bob`. `/bob` itself is Bob's Google sign-in relay (the OAuth
 redirect URI, so it can't move); `vercel.json` sends a bare `/bob` with no
-`state`/`code`/`error` to `/apps/bob`.
+`state`/`code`/`error` to `/apps/bob`. Its demo (`demo.mp4`, poster `demo.jpg`,
+`demo.js`) is still frames of the real Bob app; the Build chat is a placeholder
+chat painted in Bob's chat style and the Users frame has placeholder people over
+the real ones, so never publish a raw capture of Users. Steps' `data-at` are the
+video's scene times.
 
 **Sub-app that has its own router** (currently only `interview`): it must pass
 `basename={import.meta.env.BASE_URL}` to `BrowserRouter` so its routes resolve
