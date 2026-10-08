@@ -26,7 +26,8 @@ page is `/apps/bob`. `/bob` itself is Bob's Google sign-in relay (the OAuth
 redirect URI, so it can't move); `vercel.json` sends a bare `/bob` with no
 `state`/`code`/`error` to `/apps/bob`. Its demo (`demo.mp4`, poster `demo.jpg`,
 `demo.js`) is still frames of the real Bob app; the Build chat is a placeholder
-chat painted in Bob's chat style and the Users frame has placeholder people over
+chat painted in Bob's chat style, the Apps list shows placeholder business apps
+(Analytics, HRM, Payroll, Staff) beside the real Restaurant, and the Users frame has placeholder people over
 the real ones, so never publish a raw capture of Users. Steps' `data-at` are the
 video's scene times.
 
