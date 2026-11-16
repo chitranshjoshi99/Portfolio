@@ -30,10 +30,12 @@ export default async function handler(req: Request) {
     return to ? Response.redirect(to, 302) : reply(502, { error: "github_failed" });
   }
 
-  const r = await gh("/releases/latest");
-  const rel = (await r.json().catch(() => null)) as { tag_name?: string; body?: string } | null;
-  const version = rel?.tag_name?.replace(/^v/, "");
-  if (!r.ok || !version || !/^\d+\.\d+\.\d+$/.test(version)) return reply(502, { error: "github_failed" });
+  // Not /releases/latest: the world kit's packs are releases too (world-packs-N), and GitHub may call one of them latest.
+  const r = await gh("/releases?per_page=30");
+  const list = (await r.json().catch(() => null)) as { tag_name?: string; body?: string; draft?: boolean; prerelease?: boolean }[] | null;
+  const rel = Array.isArray(list) ? list.find((x) => !x.draft && !x.prerelease && /^v\d+\.\d+\.\d+$/.test(x.tag_name ?? "")) : undefined;
+  const version = rel?.tag_name?.slice(1);
+  if (!r.ok || !version) return reply(502, { error: "github_failed" });
   const notes = (rel?.body ?? "").split("\n### Install")[0].trim().slice(0, 4000);
   const dmg = new URL(`/api/bob-update?dmg=${version}`, req.url).href;
   return reply(200, { version, notes, dmg }, "public, s-maxage=900"); // one GitHub call per 15 minutes, however many Macs ask
